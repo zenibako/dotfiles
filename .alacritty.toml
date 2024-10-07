@@ -1,0 +1,93 @@
+# tabspaces = 8
+# background_opacity = 1
+# dynamic_title = true
+live_config_reload = true
+working_directory = "None"
+# enable_experimental_conpty_backend = false
+
+[window]
+dynamic_padding = false
+decorations = "full"
+startup_mode = "Windowed"
+
+  [window.dimensions]
+  columns = 0
+  lines = 0
+
+  [window.padding]
+  x = 8
+  y = 0
+
+[scrolling]
+history = 10_000
+multiplier = 3
+
+[font]
+size = 12
+
+  [font.normal]
+  family = "MesloLGMDZ Nerd Font Mono"
+  style = "Regular"
+
+  [font.bold]
+  family = "MesloLGMDZ Nerd Font Mono"
+  style = "Bold"
+
+  [font.italic]
+  family = "MesloLGMDZ Nerd Font Mono"
+  style = "Italic"
+
+  [font.offset]
+  x = 0
+  y = 0
+
+  [font.glyph_offset]
+  x = 0
+  y = 0
+
+[colors]
+indexed_colors = [ ]
+draw_bold_text_with_bright_colors = true
+
+  [colors.primary]
+  background = "0x2c2525"
+  foreground = "0xfff1f3"
+
+  [colors.normal]
+  black = "0x2c2525"
+  red = "0xfd6883"
+  green = "0xadda78"
+  yellow = "0xf9cc6c"
+  blue = "0xf38d70"
+  magenta = "0xa8a9eb"
+  cyan = "0x85dacc"
+  white = "0xfff1f3"
+
+  [colors.bright]
+  black = "0x72696a"
+  red = "0xfd6883"
+  green = "0xadda78"
+  yellow = "0xf9cc6c"
+  blue = "0xf38d70"
+  magenta = "0xa8a9eb"
+  cyan = "0x85dacc"
+  white = "0xfff1f3"
+
+# [visual_bell]
+# animation = "EaseOutExpo"
+# duration = 0
+# color = "0xffffff"
+
+[selection]
+semantic_escape_chars = ",│`|:\"' ()[]{}<>"
+save_to_clipboard = false
+
+[cursor]
+style = "Block"
+unfocused_hollow = true
+
+[debug]
+render_timer = false
+persistent_logging = false
+log_level = "Warn"
+print_events = false
