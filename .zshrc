@@ -129,9 +129,11 @@ export PATH=$PATH:$HOME/go/bin
 # the following to
 # ~/.zprofile (for login shells)
 # and ~/.zshrc (for interactive shells) :
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+if [ -e pyenv ]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+fi
 
 export VENV_HOME="$HOME/.virtualenvs"
 [[ -d $VENV_HOME ]] || mkdir $VENV_HOME
