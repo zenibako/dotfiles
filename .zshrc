@@ -194,3 +194,5 @@ fi
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
