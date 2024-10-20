@@ -114,9 +114,18 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# Add Salesforce CLI target org segment to Powerlevel10k.
+function prompt_sf() {
+  # Tries to pull the default username from your directory's config file, and skips if there's an issue.
+  local sf_alias=$(exec 2>/dev/null; cat .sf/config.json | jq -r '.["target-org"]')
+  [ -z "$sf_alias" ] && return
+  
+  # If you can't see the Salesforce cloud icon below, make sure you are using a Nerd Font.
+  p10k segment -i '󰢎' -b 039 -t "${sf_alias}"
+}
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 test -e $HOME/.p10k.zsh && source $HOME/.p10k.zsh
-test -e $HOME/p10k_sf.zsh && source $HOME/p10k_sf.zsh
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
