@@ -121,7 +121,7 @@ function prompt_sf() {
   [ -z "$sf_alias" ] && return
   
   # If you can't see the Salesforce cloud icon below, make sure you are using a Nerd Font.
-  p10k segment -i '󰢎' -b 039 -t "${sf_alias}"
+  p10k segment -i '󰢎' -f 039 -t "${sf_alias}"
 }
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
