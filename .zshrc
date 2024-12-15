@@ -131,6 +131,8 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 export PATH="/opt/python27/bin:$PATH"
 
+export PATH="$HOME/.cargo/bin:$PATH"
+
 set -o vi
 export PATH=$PATH:$HOME/go/bin
 
