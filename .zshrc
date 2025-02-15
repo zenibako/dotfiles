@@ -118,8 +118,10 @@ export NVM_DIR="$HOME/.nvm"
 function prompt_sf() {
   # Tries to pull the default username from your directory's config file, and skips if there's an issue.
   local sf_alias=$(exec 2>/dev/null; cat .sf/config.json | jq -r '.["target-org"]')
-  [ -z "$sf_alias" ] && return
-  
+
+  # Guard against empty or null values.
+  test -z $sf_alias || test $sf_alias = "null" && return
+
   # If you can't see the Salesforce cloud icon below, make sure you are using a Nerd Font.
   p10k segment -i '󰢎' -f 039 -t "${sf_alias}"
 }
@@ -207,3 +209,8 @@ fi
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+. "$HOME/.deno/env"
+
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit
+compinit
