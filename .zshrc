@@ -193,7 +193,7 @@ export SF_BETA_TRACK_FILE_MOVES=true
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 
-if [ -S "$SSH_AUTH_SOCK" ]; then
+if [[ -f ~/.ssh/ssh_auth_sock && -S "$SSH_AUTH_SOCK" ]]; then
     ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
 fi
 
@@ -209,7 +209,11 @@ fi
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-. "$HOME/.deno/env"
+
+if (( ${+commands[deno]} ))
+then
+  . "$HOME/.deno/env"
+fi
 
 fpath=(~/.zsh/completion $fpath)
 autoload -U compinit
