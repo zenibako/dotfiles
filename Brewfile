@@ -1,7 +1,6 @@
 tap "ankitpokhrel/jira-cli"
 tap "borkdude/brew"
 tap "clojure/tools"
-tap "homebrew/bundle"
 brew "node"
 brew "aws-cdk"
 brew "glib"
