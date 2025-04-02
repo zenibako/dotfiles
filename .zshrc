@@ -80,7 +80,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git git-extras jira tmux git-commit nvm gitignore encode64 brew)
+plugins=(extract git git-extras jira tmux git-commit nmap nvm gitignore encode64 brew rsync)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -206,7 +206,7 @@ fi
 # autoload -U compinit; compinit
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+test -e brew && source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
@@ -219,6 +219,9 @@ fpath=(~/.zsh/completion $fpath)
 autoload -U compinit
 compinit
 
-source "$P10K_ROOT_DIR/powerlevel10k.zsh-theme"
+[[ ! -f "$P10K_ROOT_DIR/powerlevel10k.zsh-theme" ]] || source "$P10K_ROOT_DIR/powerlevel10k.zsh-theme"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+test -f ~/.p10k.zsh && source ~/.p10k.zsh
+
+# Home Assistant CLI
+test -e ha && source <(ha completion zsh) && compdef _ha ha
