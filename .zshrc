@@ -206,6 +206,7 @@ fi
 # autoload -U compinit; compinit
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
+test -e pixlet && pixlet completion zsh > $(brew --prefix)/share/zsh/site-functions/_pixlet
 test -e brew && source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
