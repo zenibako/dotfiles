@@ -206,10 +206,15 @@ fi
 # autoload -U compinit; compinit
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-test -e pixlet && pixlet completion zsh > $(brew --prefix)/share/zsh/site-functions/_pixlet
-test -e brew && source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+if (( ${+commands[pixlet]} ))
+then
+  pixlet completion zsh > $(brew --prefix)/share/zsh/site-functions/_pixlet
+fi
 
-alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+if (( ${+commands[ha]} ))
+then
+  source <(ha completion zsh) && compdef _ha ha
+fi
 
 if (( ${+commands[deno]} ))
 then
@@ -219,9 +224,6 @@ fi
 fpath=(~/.zsh/completion $fpath)
 autoload -U compinit
 compinit
-
-# Home Assistant CLI
-test -e ha && source <(ha completion zsh) && compdef _ha ha
 
 if [[ -f "$P10K_ROOT_DIR/powerlevel10k.zsh-theme" ]]
   then
