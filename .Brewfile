@@ -72,7 +72,7 @@ brew "luarocks"
 # Java-based project management
 brew "maven"
 # Fast, highly customisable system info script
-brew "neofetch"
+brew "fastfetch"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # HTTP/2 C Library
@@ -87,8 +87,6 @@ brew "pipx"
 brew "pnpm"
 # Object-relational database system
 brew "postgresql@14"
-# Theme for zsh
-brew "powerlevel10k"
 # Python version management
 brew "pyenv"
 # Cross-platform application and UI framework
@@ -150,8 +148,6 @@ cask "font-hack-nerd-font"
 cask "gpg-suite"
 # Intercept, modify, replay, save HTTP/S traffic
 cask "mitmproxy"
-# Neovim Client
-cask "neovide"
 # Salesforce CLI tools
 cask "sf"
 # Open-source code editor
