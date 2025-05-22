@@ -1,10 +1,22 @@
-if [ "$(uname)" == "Darwin" ]; then
+platform="$(uname -s)"
+
+if [ platform == "Darwin" ]; then
   if [ ! -f $(command -v brew) ]; then
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
   brew bundle install
   echo "Installed Homebrew packages!"
+elif [ platform == "Linux" ]; then
+  if [ -f $(command -v pacman) ]; then
+    sudo pacman -Syu --needed $(cat packages.txt)
+  elif [ -f $(command -v apt) ]; then
+    sudo apt update && sudo apt install -y $(cat packages.txt)
+    echo "Installed Linux packages!"
+  fi
+else
+  echo "Unsupported platform: $platform"
+  exit 1
 fi
 
 if [ ! -d ~/.oh-my-zsh ]; then
