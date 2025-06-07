@@ -7,16 +7,28 @@ if [ platform == "Darwin" ]; then
   fi
   brew bundle install
   echo "Installed Homebrew packages!"
-elif [ platform == "Linux" ]; then
+else
   if [ -f $(command -v pacman) ]; then
     sudo pacman -Syu --needed $(cat packages.txt)
   elif [ -f $(command -v apt) ]; then
     sudo apt update && sudo apt install -y $(cat packages.txt)
     echo "Installed Linux packages!"
+  elif [ -f $(command -v apk) ]; then
+    echo "Detected Alpine Linux; packages should already be installed."
+  elif [ -f $(command -v dnf) ]; then
+    sudo dnf install -y $(cat packages.txt)
+    echo "Installed Fedora packages!"
+  elif [ -f $(command -v yum) ]; then
+    sudo yum install -y $(cat packages.txt)
+    echo "Installed CentOS/RHEL packages!"
+  elif [ -f $(command -v zypper) ]; then
+    sudo zypper install -y $(cat packages.txt)
+    echo "Installed openSUSE packages!"
+  else
+    echo "Unsupported $Linux distro"
+    cat /etc/os-release
+    exit 1
   fi
-else
-  echo "Unsupported platform: $platform"
-  exit 1
 fi
 
 if [ ! -d ~/.oh-my-zsh ]; then
