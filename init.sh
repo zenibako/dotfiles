@@ -1,3 +1,8 @@
+DOTFILES_DIR="$(dirname "$0")"
+cd $DOTFILES_DIR
+echo "Dotfiles directory is $DOTFILES_DIR"
+echo "Home is $HOME"
+
 platform="$(uname -s)"
 
 if [ platform == "Darwin" ]; then
@@ -45,14 +50,15 @@ else
   echo "Tmux Plugin Manager is already installed. Skipping."
 fi
 
-DOTFILES_DIR="$(dirname "$0")"
-echo "Dotfiles directory is $DOTFILES_DIR"
-for file in "$DOTFILES_DIR/.*"; do
+for file in ".*"; do
   if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" && "$file" ]]; then
+    echo "Processing $file"
     target="$HOME/$file"
+    echo "Target is $target"
     if [ ! -e "$target" ]; then
-      ln -s "$DOTFILES_DIR/$file" "$target"
-      echo "Linked $file to $target"
+      source="$DOTFILES_DIR/$file"
+      ln -s "$source" "$target"
+      echo "Linked $source to $target"
     else
       echo "$target is already linked. Skipping."
     fi
