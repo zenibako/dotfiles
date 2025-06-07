@@ -50,7 +50,7 @@ else
   echo "Tmux Plugin Manager is already installed. Skipping."
 fi
 
-for file in ".*"; do
+for file in .*; do
   if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" && "$file" ]]; then
     echo "Processing $file"
     target="$HOME/$file"
