@@ -46,6 +46,7 @@ else
 fi
 
 DOTFILES_DIR="$(dirname "$0")"
+echo "Dotfiles directory is $DOTFILES_DIR"
 for file in "$DOTFILES_DIR/.*"; do
   if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" && "$file" ]]; then
     target="$HOME/$file"
