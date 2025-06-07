@@ -45,8 +45,8 @@ else
   echo "Tmux Plugin Manager is already installed. Skipping."
 fi
 
-for file in "$PWD/.*"; do
-  if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" ]]; then
+for file in "$PWD/dotfiles/.*"; do
+  if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" && "$file" ]]; then
     target="$HOME/$file"
     if [ ! -e "$target" ]; then
       ln -s "$PWD/$file" "$target"
