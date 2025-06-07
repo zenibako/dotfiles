@@ -45,11 +45,12 @@ else
   echo "Tmux Plugin Manager is already installed. Skipping."
 fi
 
-for file in "$PWD/dotfiles/.*"; do
+DOTFILES_DIR="$(dirname "$0")"
+for file in "$DOTFILES_DIR/.*"; do
   if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" && "$file" ]]; then
     target="$HOME/$file"
     if [ ! -e "$target" ]; then
-      ln -s "$PWD/$file" "$target"
+      ln -s "$DOTFILES_DIR/$file" "$target"
       echo "Linked $file to $target"
     else
       echo "$target is already linked. Skipping."
