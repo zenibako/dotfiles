@@ -1,1 +1,14 @@
 font-family = "MesloLGMDZ Nerd Font Mono"
+theme = "Monokai Remastered"
+background-opacity=0.8
+background-blur=5
+
+shell-integration = zsh
+mouse-hide-while-typing = true
+scrollback-limit = 1000000
+copy-on-select = true
+window-save-state = always
+
+keybind = super+r=reload_config
+
+command= /bin/zsh -l -c "tmux attach || tmux"
