@@ -194,10 +194,14 @@ fi
 # fi
 # autoload -U compinit; compinit
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-if (( ${+commands[pixlet]} ))
+ 
+if (( ${+commands[brew]} ))
 then
-  pixlet completion zsh > $(brew --prefix)/share/zsh/site-functions/_pixlet
+  export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+  if (( ${+commands[pixlet]} ))
+  then
+    pixlet completion zsh > $(brew --prefix)/share/zsh/site-functions/_pixlet
+  fi
 fi
 
 if (( ${+commands[ha]} ))
@@ -215,6 +219,9 @@ autoload -U compinit
 compinit
 
 eval "$(starship init zsh)"
-source ${HOME}/.ghcup/env
 
-export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+GHCUP_DIR="${HOME}/.ghcup"
+if [[ -d $GHCUP_DIR ]]
+then
+  source "${GHCUP_DIR}/env"
+fi
