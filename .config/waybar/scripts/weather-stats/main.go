@@ -92,6 +92,8 @@ var weatherCodeIcons = map[string]string{
 
 type WttrResponse struct {
 	CurrentCondition []struct {
+		TempF       string `json:"temp_F"`
+		FeelsLikeF  string `json:"FeelsLikeF"`
 		TempC       string `json:"temp_C"`
 		FeelsLikeC  string `json:"FeelsLikeC"`
 		WeatherDesc []struct {
@@ -187,7 +189,7 @@ func getWeather() (WaybarOutput, error) {
 
 	weatherIcon := getIcon(weatherCondition, current.WeatherCode)
 
-	temperatureText := fmt.Sprintf("%s°C", current.TempC)
+	temperatureText := fmt.Sprintf("%s°F", current.TempF)
 
 	outputText := fmt.Sprintf("%s %s", weatherIcon, temperatureText)
 
@@ -196,11 +198,11 @@ func getWeather() (WaybarOutput, error) {
 	windMs := windKmph / 3.6
 
 	tooltip := fmt.Sprintf(
-		"%s\n%s\nTemperature: %s°C\nFeels like: %s°C\nHumidity: %s%%\nWind: %.1f m/s %s\nPrecipitation: %s mm\nUpdated: %s",
+		"%s\n%s\nTemperature: %s°F\nFeels like: %s°F\nHumidity: %s%%\nWind: %.1f m/s %s\nPrecipitation: %s mm\nUpdated: %s",
 		locationName,
 		weatherCondition,
-		current.TempC,
-		current.FeelsLikeC,
+		current.TempF,
+		current.FeelsLikeF,
 		current.Humidity,
 		windMs,
 		current.WindDir16Point,

@@ -8,11 +8,11 @@
   "modules-right": [
     "network",
     "custom/uptime",
-    "battery",
+    "pulseaudio",
     "cpu",
     "memory",
     "tray",
-    "pulseaudio",
+    "battery",
   ],
 
   "hyprland/workspaces": {
@@ -24,7 +24,7 @@
   },
 
   "tray": {
-    "icon-size": 16,
+    "icon-size": 20,
     "spacing": 10
   },
 
@@ -41,7 +41,7 @@
   "clock": {
     "timezone": "America/New_York",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-    "format": "{:%Y/%m/%d - %H:%M:%S}",
+    "format": "{:%Y-%m-%d • %I:%M %p}",
     "interval": 1
   },
 
@@ -50,7 +50,9 @@
     "format-ethernet": "󰈀 {bandwidthDownBits}",
     "format-disconnected": "󰤠 No Network",
     "interval": 5,
-    "tooltip": false
+    "tooltip": true,
+    "tooltip-format": "{ifname}\n{ipaddr}",
+    "tooltip-format-wifi": "{ifname}: {essid}\n{ipaddr}\n{bssid}"
   },
 
   "cpu": {
@@ -74,9 +76,14 @@
     "format": "{icon} {volume}%",
     "format-muted": "",
     "format-icons": {
-      "default": ["", "", " "]
+      "default": ["", "", ""]
     },
     "on-click": "pavucontrol"
+  },
+
+  "battery": {
+    "format": "{icon} {capacity}%",
+    "format-icons": ["󱊡", "󱊢", "󱊣"],
   },
 
   "custom/power": {
