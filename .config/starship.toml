@@ -4,6 +4,28 @@
 # Inserts a blank line between shell prompts
 add_newline = true
 
+# Put JJ prompt before git
+format = """
+$username\
+$hostname\
+$localip\
+$shlvl\
+$singularity\
+$kubernetes\
+$directory\
+$vcsh\
+$fossil_branch\
+$fossil_metrics\
+${custom.jj}\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$all"""
+
+command_timeout = 2500
+
 # Replace the '❯' symbol in the prompt with '➜'
 # [character] # The name of the module we are configuring is 'character'
 # success_symbol = '[➜](bold green)' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
@@ -12,4 +34,18 @@ add_newline = true
 [package]
 disabled = true
 
-command_timeout = 1000
+[git_commit]
+disabled = true
+
+[custom.sf]
+command = "sf config get target-org --json | jq -r '.result[0].value'"
+detect_folders = ['.sf']
+format = 'via [$symbol ($output)]($style) '
+style = 'bold 039'
+symbol = '󰢎'
+
+[custom.jj]
+command = "jj log --no-graph -r @ -T 'concat(\"(\", change_id.shortest(), \") \", self.description())'"
+detect_folders = ['.jj']
+format = 'on [$symbol ($output)]($style) '
+symbol = '🐦'
