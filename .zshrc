@@ -232,3 +232,11 @@ if [[ -d $GHCUP_DIR ]]
 then
   source "${GHCUP_DIR}/env"
 fi
+
+BREW_NVM_DIR="/opt/homebrew/opt/nvm/"
+if [[ -d $GHCUP_DIR ]]
+then
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$BREW_NVM_DIR/nvm.sh" ] && \. "$BREW_NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$BREW_NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$BREW_NVM_DIR/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+fi
