@@ -38,6 +38,7 @@ disabled = true
 disabled = true
 
 [custom.sf]
+description = "The target org used by default for Salesforce CLI comamnds"
 command = "sf config get target-org --json | jq -r '.result[0].value'"
 detect_folders = ['.sf']
 format = 'via [$symbol ($output)]($style) '
@@ -45,6 +46,7 @@ style = 'bold 039'
 symbol = '󰢎'
 
 [custom.jj]
+description = "The working copy of the repo in your current directory"
 command = "jj log --no-graph -r @ -T 'concat(\"(\", change_id.shortest(), \") \", self.description())'"
 detect_folders = ['.jj']
 format = 'on [$symbol ($output)]($style) '
