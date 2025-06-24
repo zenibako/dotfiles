@@ -49,7 +49,7 @@ symbol = '󰢎'
 description = "The working copy of the repo in your current directory"
 command = """
 jj log --no-graph -r @ \
-    -T 'separate(" ", surround("(", ")", separate(" ", working_copies, change_id.shortest())), self.description())'
+    -T 'separate(" ", surround("(", ")", separate(" ", bookmarks, working_copies, change_id.shortest())), self.description())'
 """
 detect_folders = ['.jj']
 format = 'on [$symbol ($output)]($style) '
