@@ -47,19 +47,19 @@ style = 'bold 039'
 symbol = '󰢎'
 
 [custom.jj_change]
-description = "The working copy of the repo in your current directory"
-command = """
-jj log --no-graph -r @ -T 'separate(" ", working_copies, change_id.shortest(), bookmarks,)'
-"""
+description = "The working copy of the repo in your current directory: workspaces (if relevant), change ID, bookmarks"
+command = ''' jj log --no-graph -r=@ -T='separate(" ", working_copies, change_id.shortest(), bookmarks,)' '''
 detect_folders = ['.jj']
 format = 'on [$symbol ($output)]($style) '
 symbol = '🐦'
 style = 'bold red'
 
 [custom.jj_desc]
-description = "The working copy of the repo in your current directory"
-command = """
-jj log --no-graph -r @ -T 'description'
-"""
-detect_folders = ['.jj']
-format = '| [$output]($style) '
+description = "The description of your working copy, if set"
+command = ''' jj log --no-graph -r=@ -T="description" '''
+when = """
+if [[ -z "$(jj log --no-graph -r=@ -T="description")" ]]; then
+  exit 1
+fi"""
+format = '$symbol [($output)]($style) '
+symbol = '|'
