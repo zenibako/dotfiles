@@ -183,12 +183,12 @@ fi
 # autoload -U compinit; compinit
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 #
+ 
 if (( ${+commands[nvim]} ))
 then
-  export EDITOR=nvim
-  export MANPAGER=nvim
+  export EDITOR="nvim"
+  export MANPAGER="nvim +Man!"
 fi
-
  
 if (( ${+commands[brew]} ))
 then
