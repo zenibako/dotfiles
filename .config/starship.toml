@@ -16,7 +16,8 @@ $directory\
 $vcsh\
 $fossil_branch\
 $fossil_metrics\
-${custom.jj}\
+${custom.jj_change}\
+${custom.jj_desc}\
 $git_branch\
 $git_commit\
 $git_state\
@@ -45,12 +46,20 @@ format = 'via [$symbol ($output)]($style) '
 style = 'bold 039'
 symbol = '󰢎'
 
-[custom.jj]
+[custom.jj_change]
 description = "The working copy of the repo in your current directory"
 command = """
-jj log --no-graph -r @ \
-    -T 'separate(" ", surround("(", ")", separate(" ", bookmarks, working_copies, change_id.shortest())), self.description())'
+jj log --no-graph -r @ -T 'separate(" ", working_copies, change_id.shortest(), bookmarks,)'
 """
 detect_folders = ['.jj']
 format = 'on [$symbol ($output)]($style) '
 symbol = '🐦'
+style = 'bold red'
+
+[custom.jj_desc]
+description = "The working copy of the repo in your current directory"
+command = """
+jj log --no-graph -r @ -T 'description'
+"""
+detect_folders = ['.jj']
+format = '| [$output]($style) '
