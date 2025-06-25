@@ -65,7 +65,7 @@ when        = """
 """
 format      = 'on [$symbol ($output)]($style) '
 symbol      = '🐦'
-style       = 'bold red'
+style       = 'bold purple'
 
 [custom.jj_desc]
 description = "The description of your working copy, if set"
