@@ -4,7 +4,7 @@
 # Inserts a blank line between shell prompts
 add_newline = true
 
-# Put JJ prompt after git
+# Show jj after git but before rest of prompts
 format = """
 $username\
 $hostname\
@@ -35,11 +35,11 @@ command_timeout = 2000
 [package]
 disabled = true
 
-[git_commit]
+[git_commit] # Hide the git commit prompt
 disabled = true
 
 [custom.sf]
-description     = "The target org used by default for Salesforce CLI comamnds"
+description     = "The target org used by default for Salesforce CLI commands"
 command         = ''' sf config get target-org --json | jq -r '.result[0].value' '''
 when            = """
   TARGET_ORG=$(sf config get target-org --json | jq -r '.result[0].value')
