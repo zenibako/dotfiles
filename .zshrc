@@ -228,3 +228,6 @@ then
   [ -s "$BREW_NVM_DIR/nvm.sh" ] && \. "$BREW_NVM_DIR/nvm.sh"  # This loads nvm
   [ -s "$BREW_NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$BREW_NVM_DIR/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 fi
+
+# Created by `pipx` on 2025-06-27 18:19:27
+export PATH="$PATH:/Users/chanderson/.local/bin"

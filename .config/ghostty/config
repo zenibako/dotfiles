@@ -1,7 +1,12 @@
 font-family = "MesloLGMDZ Nerd Font Mono"
-theme = "Monokai Remastered"
-background-opacity=0.8
-background-blur=5
+
+theme = "Monokai Pro"
+
+background-opacity  = 0
+background-blur     = true
+background          = "#000000"
+
+macos-titlebar-style = "transparent"
 
 shell-integration = zsh
 mouse-hide-while-typing = true
@@ -11,4 +16,4 @@ window-save-state = always
 
 keybind = super+r=reload_config
 
-command= /bin/zsh -l -c "tmux attach || tmux"
+command = /bin/zsh -l -c "tmux attach || tmux"
