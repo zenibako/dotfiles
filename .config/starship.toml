@@ -69,7 +69,7 @@ style       = 'bold purple'
 
 [custom.jj_desc]
 description = "The description of your working copy, if set"
-command     = ''' jj log --no-graph -r=@ -T="description" '''
+command     = ''' jj log --no-graph -r=@ -T="description.first_line()" '''
 when        = """
   DESC=$(jj log --no-graph -r=@ -T='description')
   if [ -z $DESC ]; then
