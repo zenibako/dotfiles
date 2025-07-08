@@ -57,11 +57,11 @@ ignore_timeout  = true
 description = "The working copy of the repo in your current directory: workspaces (if relevant), change ID, bookmarks"
 command     = ''' jj log --no-graph -r=@ -T='separate(" ", working_copies, change_id.shortest(), bookmarks,)' '''
 when        = """
-  ID=$(jj log --no-graph -r=@ -T='change_id')
-  if [ -z $ID ]; then
+  if [ -z $(jj log --no-graph -r=@ -T='change_id') ]; then
     exit 1
+  else
+    exit 0
   fi
-  exit 0
 """
 format      = 'on [$symbol ($output)]($style) '
 symbol      = '🐦'
@@ -71,11 +71,11 @@ style       = 'bold purple'
 description = "The description of your working copy, if set"
 command     = ''' jj log --no-graph -r=@ -T="description.first_line()" '''
 when        = """
-  DESC=$(jj log --no-graph -r=@ -T='description')
-  if [ -z $DESC ]; then
+  if [ -z $(jj log --no-graph -r=@ -T='description') ]; then
     exit 1
+  else
+    exit 0
   fi
-  exit 0
 """
 format      = '$symbol [($output)]($style) '
 symbol      = '|'
