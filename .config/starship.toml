@@ -25,7 +25,7 @@ ${custom.jj_change}\
 ${custom.jj_desc}\
 $all"""
 
-command_timeout = 2000
+command_timeout = 750
 
 # Replace the '❯' symbol in the prompt with '➜'
 # [character] # The name of the module we are configuring is 'character'
@@ -66,6 +66,7 @@ when        = """
 format      = 'on [$symbol ($output)]($style) '
 symbol      = '🐦'
 style       = 'bold purple'
+ignore_timeout  = true
 
 [custom.jj_desc]
 description = "The description of your working copy, if set"
@@ -79,3 +80,4 @@ when        = """
 """
 format      = '$symbol [($output)]($style) '
 symbol      = '|'
+ignore_timeout  = true
