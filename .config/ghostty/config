@@ -8,7 +8,6 @@ background          = "#000000"
 
 macos-titlebar-style = "transparent"
 
-shell-integration = fish
 mouse-hide-while-typing = true
 scrollback-limit = 1000000
 copy-on-select = true
@@ -16,4 +15,4 @@ window-save-state = always
 
 keybind = super+r=reload_config
 
-command = /usr/local/bin/fish -l -c "tmux attach || tmux"
+command = zsh -l -c "tmux attach || tmux"
