@@ -41,11 +41,7 @@ disabled = true
 [custom.sf]
 description     = "The target org used by default for Salesforce CLI commands"
 command         = ''' sf config get target-org --json | jq -r '.result[0].value' '''
-when            = """
-  TARGET_ORG=$(sf config get target-org --json | jq -r '.result[0].value')
-  test -z $TARGET_ORG && exit 1 || exit 0  
-  test $TARGET_ORG = "null" && exit 1 || exit 0
-"""
+when            = ''' test -n "$(sf config get target-org --json | jq -r ' .result[0].value // "" ')" || exit 1 '''
 format          = 'via [$symbol ($output)]($style) '
 style           = 'bold 039'
 symbol          = '󰢎'
@@ -54,7 +50,7 @@ ignore_timeout  = true
 [custom.jj_change]
 description = "The working copy of the repo in your current directory: workspaces (if relevant), change ID, bookmarks"
 command     = ''' jj log --no-graph -r=@ -T='separate(" ", working_copies, change_id.shortest(), bookmarks,)' '''
-when        = ''' test -z $(jj log --no-graph -r=@ -T='change_id') && exit 1 || exit 0 '''
+when        = ''' test -n "$(jj log --no-graph -r=@ -T='change_id')" || exit 1 '''
 format      = 'on [$symbol ($output)]($style) '
 symbol      = '🐦'
 style       = 'bold purple'
@@ -63,7 +59,7 @@ ignore_timeout  = true
 [custom.jj_desc]
 description = "The description of your working copy, if set"
 command     = ''' jj log --no-graph -r=@ -T="description.first_line()" '''
-when        = ''' test -z $(jj log --no-graph -r=@ -T='description') && exit 1 || exit 0 '''
+when        = ''' test -n "$(jj log --no-graph -r=@ -T='description')" || exit 1 '''
 format      = '$symbol [($output)]($style) '
 symbol      = '|'
 ignore_timeout  = true
