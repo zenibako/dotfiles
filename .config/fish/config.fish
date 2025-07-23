@@ -3,3 +3,4 @@ if status is-interactive
 end
 set -gx EDITOR nvim
 starship init fish | source
+fish_vi_key_bindings
