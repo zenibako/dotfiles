@@ -3,12 +3,17 @@ tap "borkdude/brew"
 tap "clojure/tools"
 tap "heroku/brew"
 tap "homebrew/bundle"
+tap "rsteube/tap"
+tap "sst/tap"
+tap "zenibako/jira-cli"
 # Platform built on V8 to build network applications
-brew "node"
+brew "node", link: false
 # AWS Cloud Development Kit - framework for defining AWS infra as code
 brew "aws-cdk"
 # Core application library for C
 brew "glib"
+# Multi-shell multi-command argument completer
+brew "carapace"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
 # Cryptographic recipes and primitives for Python
@@ -17,22 +22,28 @@ brew "cryptography"
 brew "curl"
 # Spellchecker wrapping library
 brew "enchant"
+# Like neofetch, but much faster because written mostly in C
+brew "fastfetch"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # OpenType text shaping engine
 brew "harfbuzz"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c@76"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Play, record, convert, and stream audio and video
 brew "ffmpeg"
+# User-friendly command-line shell for UNIX-like operating systems
+brew "fish"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
+# Command-line fuzzy finder written in Go
+brew "fzf"
 # Integer Set Library for the polyhedral model
 brew "isl"
 # GNU compiler collection
 brew "gcc"
+# Interact with Google Gemini AI models from the command-line
+brew "gemini-cli"
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -53,14 +64,22 @@ brew "graphviz"
 brew "grep"
 # Improved top (interactive process viewer)
 brew "htop"
-# Configurable static site generator
-brew "hugo"
 # Spell checker and morphological analyzer
 brew "hunspell"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c@76"
+# Tools and libraries to manipulate images in many formats
+brew "imagemagick"
 # Development kit for the Java programming language
 brew "openjdk"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.13"
 # Java language specific implementation of the Language Server Protocol
 brew "jdtls"
+# Feature-rich interactive Jira CLI
+brew "jira-cli"
+# Git-compatible distributed version control system
+brew "jj"
 # Development kit for the Java programming language
 brew "openjdk@21"
 # Load testing and performance measurement application
@@ -71,8 +90,6 @@ brew "jq"
 brew "luarocks"
 # Java-based project management
 brew "maven"
-# Fast, highly customisable system info script
-brew "fastfetch"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # HTTP/2 C Library
@@ -87,6 +104,12 @@ brew "pipx"
 brew "pnpm"
 # Object-relational database system
 brew "postgresql@14"
+# Theme for zsh
+brew "powerlevel10k"
+# Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
+brew "prettier"
+# Protocol buffers (Google's data interchange format)
+brew "protobuf"
 # Python version management
 brew "pyenv"
 # Cross-platform application and UI framework
@@ -106,7 +129,7 @@ brew "ripgrep"
 # Safe, concurrent, practical language
 brew "rust"
 # Command-line toolkit for Salesforce development
-brew "sf", link: false
+brew "sf"
 # Launcher to analyze a project with SonarQube
 brew "sonar-scanner"
 # Cross-shell prompt for astronauts
@@ -135,25 +158,33 @@ brew "zsh"
 brew "zsh-autosuggestions"
 # Additional completion definitions for zsh
 brew "zsh-completions"
-# Feature-rich interactive Jira command-line
-brew "ankitpokhrel/jira-cli/jira-cli"
 # Native, fast starting Clojure interpreter for scripting.
 brew "borkdude/brew/babashka"
 # The Clojure Programming Language
 brew "clojure/tools/clojure"
 # Everything you need to get started with Heroku
 brew "heroku/brew/heroku"
+# define simple completions using a spec file
+brew "rsteube/tap/carapace-spec"
+# The AI coding agent built for the terminal.
+brew "sst/tap/opencode"
+# GPU-accelerated terminal emulator
+cask "alacritty"
 cask "font-hack-nerd-font"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # Intercept, modify, replay, save HTTP/S traffic
 cask "mitmproxy"
-# Salesforce CLI tools
-cask "sf"
+# Neovim Client
+cask "neovide-app"
+# CLI tools for Salesforce
+cask "salesforce-cli"
 # Open-source code editor
 cask "visual-studio-code"
 # Free and open source web app scanner
 cask "zap"
+# Mesh VPN client
+cask "zerotier-one"
 vscode "alefragnani.project-manager"
 vscode "amiralizadeh9480.cpp-helper"
 vscode "astro-build.astro-vscode"
@@ -172,7 +203,6 @@ vscode "esbenp.prettier-vscode"
 vscode "financialforce.lana"
 vscode "github.copilot"
 vscode "github.copilot-chat"
-vscode "google.geminicodeassist"
 vscode "juanblanco.solidity"
 vscode "kendoui.kendotemplatewizard"
 vscode "linhmtran168.mac-ca-vscode"
@@ -182,6 +212,7 @@ vscode "mcu-debug.memory-view"
 vscode "mcu-debug.peripheral-viewer"
 vscode "mcu-debug.rtos-views"
 vscode "midouest.playdate-debug"
+vscode "ms-azuretools.vscode-containers"
 vscode "ms-azuretools.vscode-docker"
 vscode "ms-dotnettools.vscode-dotnet-runtime"
 vscode "ms-python.black-formatter"
