@@ -2,7 +2,6 @@ tap "ankitpokhrel/jira-cli"
 tap "borkdude/brew"
 tap "clojure/tools"
 tap "heroku/brew"
-tap "homebrew/bundle"
 tap "rsteube/tap"
 tap "sst/tap"
 tap "zenibako/jira-cli"
@@ -162,8 +161,6 @@ brew "zsh-completions"
 brew "borkdude/brew/babashka"
 # The Clojure Programming Language
 brew "clojure/tools/clojure"
-# Everything you need to get started with Heroku
-brew "heroku/brew/heroku"
 # define simple completions using a spec file
 brew "rsteube/tap/carapace-spec"
 # The AI coding agent built for the terminal.
