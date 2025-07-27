@@ -2,7 +2,7 @@ font-family = "MesloLGMDZ Nerd Font Mono"
 
 theme = "Monokai Pro"
 
-background-opacity  = 0
+background-opacity  = 0.5
 background-blur     = true
 background          = "#000000"
 
