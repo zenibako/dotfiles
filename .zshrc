@@ -230,6 +230,12 @@ then
 fi
 
 # Created by `pipx` on 2025-06-27 18:19:27
-export PATH="$PATH:/Users/chanderson/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 
 eval "$(zoxide init zsh)"
+
+export PATH="$PATH:$HOME/.atuin/bin"
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"

@@ -47,3 +47,5 @@ $env.PROMPT_MULTILINE_INDICATOR = "::: "
 source ~/.zoxide.nu
 
 source ~/.cache/carapace/init.nu
+
+source ~/.local/share/atuin/init.nu
