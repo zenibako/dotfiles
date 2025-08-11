@@ -40,26 +40,27 @@ disabled = true
 
 [custom.sf]
 description     = "The target org used by default for Salesforce CLI commands"
-command         = ''' sf config get target-org --json | jq -r '.result[0].value' '''
-when            = ''' test -n "$(sf config get target-org --json | jq -r ' .result[0].value // "" ')" || exit 1 '''
+command         = ''' sf config get target-org --json | from json | get result.value.0 '''
+when            = ''' sf config get target-org --json | from json | get result.value '''
 format          = 'via [$symbol ($output)]($style) '
 style           = 'bold 039'
 symbol          = '󰢎'
 ignore_timeout  = true
 
 [custom.jj_change]
-description = "The working copy of the repo in your current directory: workspaces (if relevant), change ID, bookmarks"
-command     = ''' jj log --no-graph -r=@ -T='separate(" ", working_copies, change_id.shortest(), bookmarks,)' '''
-when        = ''' test -n "$(jj status)" || exit 1 '''
-format      = 'on [$symbol ($output)]($style) '
-symbol      = '🐦'
-style       = 'bold purple'
+description     = "The working copy of the repo in your current directory: workspaces (if relevant), change ID, bookmarks"
+command         = ''' jj log --no-graph -r=@ -T='separate(" ", working_copies, change_id.shortest(), bookmarks,)' '''
+when            = ''' zsh -c 'test -n "$(jj status)" || exit 1' '''
+format          = 'on [$symbol ($output)]($style) '
+symbol          = '🐦'
+style           = 'bold purple'
 ignore_timeout  = true
 
 [custom.jj_desc]
-description = "The description of your working copy, if set"
-command     = ''' jj log --no-graph -r=@ -T="description.first_line()" | awk '{if(length($0) > 25) {s = substr($0, 1, 25); sub(/[ \t\r\n]+$/, "", s); print s "…"} else {print $0}}' '''
-when        = ''' test -n "$(jj status)" -a -n "$(jj log --no-graph -r=@ -T='description')" || exit 1 '''
-format      = '$symbol [($output)]($style) '
-symbol      = '|'
+description     = "The description of your working copy, if set"
+# command         = ''' jj log --no-graph -r=@ -T="description.first_line()" | awk '{if(length($0) > 25) {s = substr($0, 1, 25); sub(/[ \t\r\n]+$/, "", s); print s "…"} else {print $0}}' '''
+command         = ''' jj log --no-graph -r=@ -T="description.first_line()" '''
+when            = ''' zsh -c 'test -n "$(jj status)" -a -n "$(jj log --no-graph -r=@ -T='description')" || exit 1' '''
+format          = '$symbol [($output)]($style) '
+symbol          = '|'
 ignore_timeout  = true
