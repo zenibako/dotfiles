@@ -7,3 +7,6 @@ fish_vi_key_bindings
 carapace-spec $HOME/.config/oclif-carapace-spec/sf.yml | source
 
 zoxide init fish | source
+
+# Created by `pipx` on 2025-08-07 19:05:08
+set PATH $PATH /Users/chandler.anderson/.local/bin
