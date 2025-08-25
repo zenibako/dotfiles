@@ -2648,6 +2648,30 @@ commands:
                 version number (major.minor.patch.build) in the ancestry tree.
               --help: Show help for command
             commands: []
+          - description: Display the dependency graph for an unlocked or 2GP managed package
+              version.
+            name: displaydependencies
+            flags:
+              --json: Format output as json.
+              --flags-dir=: Import flag values from a directory.
+              -v, --target-dev-hub=: Username or alias of the Dev Hub org. Not required if the
+                `target-dev-hub` configuration variable is already set.
+              --api-version=: Override the api version used for api requests made by this
+                command
+              -p, --package=: ID or alias of the package version (starts with 04t) or the
+                package version create request (starts with 08c) to display the
+                dependency graph for.
+              --edge-direction=: Order (root-first or root-last) in which the dependencies are
+                displayed.
+              --verbose: Display both the package version ID (starts with 04t) and the
+                version number (major.minor.patch.build) in each node.
+              --help: Show help for command
+            completion:
+              flag:
+                edge-direction:
+                  - root-first
+                  - root-last
+            commands: []
           - description: List all package versions in the Dev Hub org.
             name: list
             flags:
