@@ -239,3 +239,5 @@ export PATH="$PATH:$HOME/.atuin/bin"
 . "$HOME/.atuin/bin/env"
 
 eval "$(atuin init zsh)"
+
+export XDG_CONFIG_HOME=$HOME/.config
