@@ -24,6 +24,10 @@ starship init nu | save -f ~/.starship.nu
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
 mkdir ~/.cache/carapace
 carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
+
+# $env.JAVA_HOME = "/opt/homebrew/opt/openjdk"
+# $env.PATH = ($env.PATH | prepend $"($env.JAVA_HOME)/bin/")
+
 $env.PATH = ($env.PATH | append $"($env.HOME)/.atuin/bin/")
 
 $env.XDG_CONFIG_HOME = $"($env.HOME)/.config"
