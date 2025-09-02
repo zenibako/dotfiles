@@ -242,4 +242,13 @@ eval "$(atuin init zsh)"
 
 export XDG_CONFIG_HOME=$HOME/.config
 
+# Updates the gpg-agent TTY before every command since
+# there's no way to detect this info in the ssh-agent protocol
+function _gpg-agent-update-tty {
+  gpg-connect-agent UPDATESTARTUPTTY /bye &>/dev/null
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec _gpg-agent-update-tty
+
 eval "$(fjira completion zsh)"
