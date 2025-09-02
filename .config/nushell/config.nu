@@ -46,6 +46,7 @@ $env.PROMPT_MULTILINE_INDICATOR = "::: "
 
 source ~/.zoxide.nu
 
+carapace _carapace nushell | save -f "~/.cache/carapace/init.nu"
 source ~/.cache/carapace/init.nu
 
 source ~/.local/share/atuin/init.nu

@@ -241,3 +241,5 @@ export PATH="$PATH:$HOME/.atuin/bin"
 eval "$(atuin init zsh)"
 
 export XDG_CONFIG_HOME=$HOME/.config
+
+eval "$(fjira completion zsh)"
