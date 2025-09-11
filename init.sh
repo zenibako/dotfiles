@@ -50,16 +50,4 @@ else
   echo "Tmux Plugin Manager is already installed. Skipping."
 fi
 
-for file in .*; do
-  if [[ "$file" != "." && "$file" != ".." && "$file" != ".git" && "$file" ]]; then
-    echo "Processing $file"
-    target="$HOME/$file"
-    echo "Target is $target"
-    if [ -e "$target" ]; then
-      mv $target "$target.$(date +%s).bak"
-    fi
-    source="$DOTFILES_DIR/$file"
-    ln -s "$source" "$target"
-    echo "Linked $source to $target"
-  fi
-done
+dotter deploy -f
