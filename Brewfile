@@ -1,19 +1,18 @@
 tap "ankitpokhrel/jira-cli"
 tap "borkdude/brew"
+tap "browsh-org/browsh"
 tap "clojure/tools"
+tap "gcenx/wine"
 tap "heroku/brew"
-tap "homebrew/services"
+tap "jichu4n/palm-os"
 tap "jonathanruiz/tap"
-tap "koekeishiya/formulae"
 tap "rsteube/tap"
 tap "sst/tap"
 tap "valkyrie00/bbrew"
-tap "zenibako/jira-cli"
 tap "zerotier/tap"
+tap "vladkens/tap"
 # General-purpose data compression with high compression ratio
 brew "xz"
-# To build and run Airflow DAGs locally and interact with the Astronomer API
-brew "astro"
 # Automatic configure script builder
 brew "autoconf"
 # Tool for generating GNU Standards-compliant Makefiles
@@ -23,23 +22,17 @@ brew "openssl@3"
 # Library for command-line editing
 brew "readline"
 # Platform built on V8 to build network applications
-brew "node", link: false
+brew "node"
 # AWS Cloud Development Kit - framework for defining AWS infra as code
 brew "aws-cdk"
 # Core application library for C
 brew "glib"
 # Parser generator
 brew "bison"
-# Open source, extensible AI agent that goes beyond code suggestions
-brew "block-goose-cli"
 # Multi-shell multi-command argument completer
 brew "carapace"
 # Cross-platform make
 brew "cmake"
-# Open source programming language to build simple/reliable/efficient software
-brew "go"
-# Tool to generate cobra applications and commands
-brew "cobra-cli"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
 # Cryptographic recipes and primitives for Python
@@ -52,20 +45,22 @@ brew "docker"
 brew "docker-buildx"
 # Platform keystore credential helper for Docker
 brew "docker-credential-helper"
+# Dotfile manager and templater written in rust
+brew "dotter"
 # Spellchecker wrapping library
 brew "enchant"
 # Like neofetch, but much faster because written mostly in C
 brew "fastfetch"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
+# GNU Transport Layer Security (TLS) Library
+brew "gnutls"
 # OpenType text shaping engine
 brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Play, record, convert, and stream audio and video
 brew "ffmpeg"
-# User-friendly command-line shell for UNIX-like operating systems
-brew "fish"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
 # Command-line fuzzy finder written in Go
@@ -74,8 +69,6 @@ brew "fzf"
 brew "isl"
 # GNU compiler collection
 brew "gcc"
-# Interact with Google Gemini AI models from the command-line
-brew "gemini-cli"
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -84,16 +77,14 @@ brew "git"
 brew "git-extras"
 # Open-source GitLab command-line tool
 brew "glab"
+# Open source programming language to build simple/reliable/efficient software
+brew "go"
 # Image manipulation
 brew "netpbm"
-# Generic library support script
-brew "libtool"
 # Graph visualization software from AT&T and Bell Labs
 brew "graphviz"
 # GNU grep, egrep and fgrep
 brew "grep"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.13"
 # Command-line utility for Home Assistant
 brew "homeassistant-cli"
 # Improved top (interactive process viewer)
@@ -134,10 +125,14 @@ brew "luarocks"
 brew "make"
 # Java-based project management
 brew "maven"
+# Remote terminal application
+brew "mosh"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # HTTP/2 C Library
 brew "nghttp2"
+# Modern shell for the GitHub era
+brew "nushell"
 # Manage multiple Node.js versions
 brew "nvm"
 # Create, run, and share large language models (LLMs)
@@ -146,12 +141,14 @@ brew "ollama", restart_service: :changed
 brew "pandoc"
 # Execute binaries from Python packages in isolated environments
 brew "pipx"
+# CLI for the Pkl programming language
+brew "pkl"
+# Source code analyzer for Java, JavaScript, and more
+brew "pmd"
 # Fast, disk space efficient package manager
 brew "pnpm"
 # Object-relational database system
 brew "postgresql@14"
-# Theme for zsh
-brew "powerlevel10k"
 # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
 brew "prettier"
 # Protocol buffers (Google's data interchange format)
@@ -190,8 +187,6 @@ brew "sesh"
 brew "sf"
 # Launcher to analyze a project with SonarQube
 brew "sonar-scanner"
-# Terminal-based client for Spotify
-brew "spotify-tui"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Opinionated Lua code formatter
@@ -204,6 +199,8 @@ brew "termscp"
 brew "terraform"
 # Terminal multiplexer
 brew "tmux"
+# Incremental parsing library
+brew "tree-sitter"
 # Extensible IRC client
 brew "weechat"
 # Internet file retriever
@@ -228,14 +225,18 @@ brew "zsh-completions"
 brew "ankitpokhrel/jira-cli/jira-cli"
 # Native, fast starting Clojure interpreter for scripting.
 brew "borkdude/brew/babashka"
+# The modern, text-based browser
+brew "browsh-org/browsh/browsh"
 # The Clojure Programming Language
 brew "clojure/tools/clojure"
 # Everything you need to get started with Heroku
 brew "heroku/brew/heroku"
+# Suite of tools for connecting to Palm OS devices
+brew "jichu4n/palm-os/pilot-link"
+# Sudoless performance monitoring CLI tool for Apple Silicon processors
+brew "vladkens/tap/macmon"
 # A TUI built for managing and waking your devices using Wake-on-LAN.
 brew "jonathanruiz/tap/wakey"
-# A tiling window manager for macOS based on binary space partitioning.
-brew "koekeishiya/formulae/yabai"
 # define simple completions using a spec file
 brew "rsteube/tap/carapace-spec"
 # The AI coding agent built for the terminal.
@@ -249,14 +250,14 @@ cask "android-commandlinetools"
 # Android SDK component
 cask "android-platform-tools"
 cask "font-hack-nerd-font"
+# Tool to measure the computer system's performance
+cask "geekbench"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # Intercept, modify, replay, save HTTP/S traffic
 cask "mitmproxy"
-# Neovim Client
-cask "neovide-app"
 # MacBook Notch utility
 cask "quakenotch"
 # CLI tools for Salesforce
@@ -265,8 +266,6 @@ cask "salesforce-cli"
 cask "temurin"
 # Open-source code editor
 cask "visual-studio-code"
-# GPU-accelerated cross-platform terminal emulator and multiplexer
-cask "wezterm"
 # Free and open source web app scanner
 cask "zap"
 # Mesh VPN client
