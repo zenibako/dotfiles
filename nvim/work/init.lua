@@ -4,6 +4,7 @@ require("config.formatting")
 require("config.lazy")
 require("config.keymaps")
 -- require("config.rocks")
+require("config.salesforce")
 
 vim.opt.hlsearch = true
 
@@ -16,11 +17,17 @@ vim.api.nvim_create_autocmd("TermOpen", {
 })
 
 vim.lsp.enable({
+	-- "apex-language-server",
+  -- "astro",
+	-- "gitlab_ci_ls",
 	"gopls",
-	-- "html",
+	"html",
 	-- "jsonls",
 	"lua_ls",
+	-- "lwc_ls",
+	-- "terraformls",
 	-- "ts_ls",
+	-- "visualforce_ls",
 	-- "yamlls",
 })
 
