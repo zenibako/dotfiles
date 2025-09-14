@@ -5,16 +5,13 @@
 "tmux.conf"         	        = "~/.tmux.conf"
 vimrc              = { target = "~/.vimrc",                   type = "template" }
 # "wezterm.lua"       	      = "~/.wezterm.lua"
-yabairc             	        = "~/.yabairc"
 zshrc               	        = "~/.zshrc"
 carapace            	        = "~/.config/carapace"
 # fish              	        = "~/.config/fish"
 "ghostty/config"    	        = "~/.config/ghostty/config"
-hypr                	        = "~/.config/hypr"
 iamb                	        = "~/.config/iamb"
 nushell             	        = "~/.config/nushell"
 # "tmix-sessionizer"          = "~/.config/tmux-sessionizer"
-# "waybar"                    = "~/.config/waybar"
 "starship.toml"               = "~/.config/starship.toml"
 jj                 = { target = "~/.config/jj",               type = "template" }
 
@@ -25,6 +22,21 @@ vim_set_num_relnum            = "set number relativenumber"
 
 [nvim.files]
 "nvim/default"     = { target = "~/.config/nvim",             type = "template" }
+
+[opencode.files]
+"opencode/opencode.jsonc"     = "~/.config/opencode/opencode.jsonc"
+
+[opencode.variables]
+mcp_salesforce_enabled        = false
+mcp_atlassian_enabled         = false
+lsp_salesforce_disabled       = true
+
+[linux.files]
+hypr                	        = "~/.config/hypr"
+# "waybar"                    = "~/.config/waybar"
+
+[mac.files]
+yabairc             	        = "~/.yabairc"
 
 [settings]
 default_target_type           = "automatic"

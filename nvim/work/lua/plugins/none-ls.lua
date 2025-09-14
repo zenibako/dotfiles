@@ -14,7 +14,8 @@ return {
 					},
 				}),
 				require("none-ls.diagnostics.eslint"), -- requires none-ls-extras.nvim
-			},
+        null_ls.builtins.formatting.xmllint,
+      },
 		})
 
     local helpers = require("null-ls.helpers")

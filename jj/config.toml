@@ -6,3 +6,25 @@ email = "{{email}}"
 
 [ui]
 default-command = "log"
+
+[signing]
+behavior = "own"
+backend = "gpg"
+
+[templates]
+duplicate_description = '''
+concat(
+  description,
+  "\n(cherry picked from commit ",
+  commit_id,
+  ")"
+)
+'''
+
+[merge-tools.diffconflicts]
+program = "nvim"
+merge-args = [
+    "-c", "let g:jj_diffconflicts_marker_length=$marker_length",
+    "-c", "JJDiffConflicts!", "$output", "$base", "$left", "$right",
+]
+merge-tool-edits-conflict-markers = true

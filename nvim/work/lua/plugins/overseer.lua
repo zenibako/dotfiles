@@ -1,4 +1,8 @@
 return {
   'stevearc/overseer.nvim',
-  opts = {},
+  opts = {
+    task_list = {
+      min_height = 15,
+    }
+  },
 }

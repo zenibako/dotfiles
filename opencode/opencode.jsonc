@@ -1,0 +1,126 @@
+/**
+ * # PREREQUISITES:
+ * - OpenCode CLI: https://opencode.ai/docs/cli/installation
+ * - `npm install`
+ * - Review this file and follow any inline directions in the comments.
+ *
+ * # INSTRUCTIONS:
+ * 1. Copy this file to `~/.config/opencode/`. Remove any other `opencode.json` or `opencode.jsonc` files in that directory.
+ * 2. Authenticate with Github Copilot: https://opencode.ai/docs/cli/authentication
+ * 3. Run OpenCode and select the model you want to use from Github Copilot: `opencode` `/models`
+ * 4. Go forth and prompt!
+ */
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "Jiujitsu": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "jj-mcp-server"
+      ],
+      "enabled": true,
+    },
+    "Salesforce DX": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@salesforce/mcp",
+        "--orgs",
+        "DEFAULT_TARGET_ORG",
+        "--toolsets",
+        "all",
+        "--allow-non-ga-tools"
+      ],
+      "enabled": "{{mcp_salesforce_enabled}}",
+    },
+    "Odaseva": {
+      "type": "local",
+      "command": [
+        "oda-mcp"
+      ],
+      "enabled": "{{mcp_salesforce_enabled}}",
+    },
+    "Atlassian": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-remote",
+        "https://mcp.atlassian.com/v1/sse"
+      ],
+      "enabled": "{{mcp_atlassian_enabled}}",
+    },
+    "Neovim": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-neovim-server"
+      ],
+      "environment": {
+        "ALLOW_SHELL_COMMANDS": "true",
+        "NVIM_SOCKET_PATH": "/tmp/nvim"
+      },
+      "enabled": false
+    },
+    "tmux": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "tmux-mcp",
+        "--shell-type=nu"
+      ],
+      "enabled": false
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "enabled": false
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "chrome-devtools-mcp@latest"],
+      "enabled": false
+    }
+  },
+  "lsp": {
+    "apex-language-server": {
+      "command": [
+        "java",
+        "-cp",
+        // Replace the path below with the path to apex-jorje-lsp.jar on your local machine:
+        "$HOME/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar",
+        // "/Users/chandler.anderson/.vscode/extensions/salesforce.salesforcedx-vscode-apex-64.14.0/dist/apex-jorje-lsp.jar",
+        "-Ddebug.internal.errors=true",
+        "-Ddebug.semantic.errors=true",
+        "-Ddebug.completion.statistics=false",
+        "-Dlwc.typegeneration.disabled=true",
+        "apex.jorje.lsp.ApexLanguageServerLauncher"
+      ],
+      "extensions": [
+        ".apex",
+        ".cls"
+      ],
+      "disabled": "{{lsp_salesforce_disabled}}",
+    },
+    "lwc-language-server": {
+      "command": [
+        "npx",
+        "@salesforce/lwc-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".js",
+        ".html"
+      ],
+      "disabled": "{{lsp_salesforce_disabled}}",
+    }
+  },
+}

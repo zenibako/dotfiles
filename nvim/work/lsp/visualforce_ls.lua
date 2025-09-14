@@ -1,7 +1,7 @@
 ---@type vim.lsp.Config
 return {
   cmd = {
-    vim.fn.expand("$HOME/.local/share/nvim/mason/packages/visualforce-language-server/visualforce-language-server"),
+    vim.fn.expand("$HOME/.local/share/nvim/mason/bin/visualforce-language-server"),
     "--stdio",
   },
   filetypes = { "visualforce", "page", "component" },
