@@ -17,6 +17,9 @@ nushell             	  = "~/.config/nushell"
 # "tmix-sessionizer"    = "~/.config/tmux-sessionizer"
 # "waybar"              = "~/.config/waybar"
 "starship.toml"         = "~/.config/starship.toml"
+"atuin/bin"                   = "~/.atuin/bin"
+"atuin/config.toml"           = "~/.config/atuin/config.toml"
 
 [settings]
 default_target_type     = "automatic"
+default_target_type           = "automatic"
