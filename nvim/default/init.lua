@@ -22,6 +22,7 @@ vim.lsp.enable({
   "lua_ls",
   -- "ts_ls",
   -- "yamlls",
+  "cuelang",
 })
 
 vim.cmd("{{vim_set_num_relnum}}")
