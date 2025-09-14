@@ -8,20 +8,20 @@ require("config.keymaps")
 vim.opt.hlsearch = true
 
 vim.api.nvim_create_autocmd("TermOpen", {
-	group = vim.api.nvim_create_augroup("custom-term-open", { clear = true }),
-	callback = function()
-		vim.opt.number = false
-		vim.opt.relativenumber = false
-	end,
+  group = vim.api.nvim_create_augroup("custom-term-open", { clear = true }),
+  callback = function()
+    vim.opt.number = false
+    vim.opt.relativenumber = false
+  end,
 })
 
 vim.lsp.enable({
-	"gopls",
-	-- "html",
-	-- "jsonls",
-	"lua_ls",
-	-- "ts_ls",
-	-- "yamlls",
+  "gopls",
+  -- "html",
+  -- "jsonls",
+  "lua_ls",
+  -- "ts_ls",
+  -- "yamlls",
 })
 
-vim.cmd("set number relativenumber")
+vim.cmd("{{vim_set_num_relnum}}")

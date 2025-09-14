@@ -10,15 +10,18 @@ carapace            	  = "~/.config/carapace"
 "ghostty/config"    	  = "~/.config/ghostty/config"
 hypr                	  = "~/.config/hypr"
 iamb                	  = "~/.config/iamb"
-"nvim/default/init.lua" = "~/.config/nvim/init.lua"
-"nvim/default/lsp" 	    = "~/.config/nvim/lsp"
-"nvim/default/lua" 	    = "~/.config/nvim/lua"
 # "tmix-sessionizer"    = "~/.config/tmux-sessionizer"
 # "waybar"              = "~/.config/waybar"
 "starship.toml"         = "~/.config/starship.toml"
 "atuin/bin"                   = "~/.atuin/bin"
 "atuin/config.toml"           = "~/.config/atuin/config.toml"
 nushell             	        = "~/.config/nushell"
+
+[default.variables]
+vim_set_num_relnum                = "set number relativenumber"
+
+[nvim.files]
+"nvim/default"     = { target = "~/.config/nvim",             type = "template" }
 
 [settings]
 default_target_type           = "automatic"
