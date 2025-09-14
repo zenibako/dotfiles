@@ -16,6 +16,7 @@ iamb                	  = "~/.config/iamb"
 "atuin/bin"                   = "~/.atuin/bin"
 "atuin/config.toml"           = "~/.config/atuin/config.toml"
 nushell             	        = "~/.config/nushell"
+jj                 = { target = "~/.config/jj",               type = "template" }
 
 [default.variables]
 vim_set_num_relnum                = "set number relativenumber"
