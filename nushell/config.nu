@@ -44,8 +44,13 @@ $env.PROMPT_INDICATOR_VI_INSERT = ""
 $env.PROMPT_INDICATOR_VI_NORMAL = ""
 $env.PROMPT_MULTILINE_INDICATOR = "::: "
 
+source ~/.local/share/atuin/init.nu
+
+atuin gen-completions --shell nushell | save -f "~/.cache/atuin.nu"
+source ~/.cache/atuin.nu
+
 source ~/.zoxide.nu
 
+carapace _carapace nushell | save -f "~/.cache/carapace/init.nu"
 source ~/.cache/carapace/init.nu
 
-source ~/.local/share/atuin/init.nu
