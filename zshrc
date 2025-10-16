@@ -251,5 +251,3 @@ function _gpg-agent-update-tty {
 autoload -Uz add-zsh-hook
 add-zsh-hook preexec _gpg-agent-update-tty
 
-eval "$(pkl shell-completion zsh)"
-eval "$(fjira completion zsh)"
