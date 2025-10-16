@@ -109,5 +109,13 @@ return {
       vim.opt.termguicolors = true
       require("colorizer").setup()
     end,
-  }
+  },
+  {
+    'zenibako/lazyjj.nvim',
+    dependencies = 'nvim-lua/plenary.nvim',
+    opts = {}
+  },
+  {
+    'rafikdraoui/jj-diffconflicts'
+  },
 }

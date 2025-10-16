@@ -1,0 +1,9 @@
+vim.lsp.enable({
+  "gopls",
+  "html",
+  "jsonls",
+  "lua_ls",
+  "ts_ls",
+  "yamlls",
+  "cuelang",
+})

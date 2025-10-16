@@ -14,22 +14,30 @@ nushell             	        = "~/.config/nushell"
 # "tmix-sessionizer"          = "~/.config/tmux-sessionizer"
 "starship.toml"               = "~/.config/starship.toml"
 jj                 = { target = "~/.config/jj",               type = "template" }
+"nvim/default"     = { target = "~/.config/nvim",             type = "template" }
+"opencode/opencode.jsonc"     = "~/.config/opencode/opencode.jsonc"
 
 [default.variables]
 name                          = "Chandler Anderson"
-email                         = "chanderson90@proton.me"
 vim_set_num_relnum            = "set number relativenumber"
 
-[nvim.files]
-"nvim/default"     = { target = "~/.config/nvim",             type = "template" }
+[personal.files]
+"nvim/personal"    = { target = "~/.config/nvim",             type = "template" }
 
-[opencode.files]
-"opencode/opencode.jsonc"     = "~/.config/opencode/opencode.jsonc"
-
-[opencode.variables]
+[personal.variables]
+email                         = "chanderson90@proton.me"
 mcp_salesforce_enabled        = false
 mcp_atlassian_enabled         = false
 lsp_salesforce_disabled       = true
+
+[work.files]
+"nvim/work"        = { target = "~/.config/nvim",             type = "template" }
+
+[work.variables]
+email                         = "chandler.anderson@odaseva.com"
+mcp_salesforce_enabled        = true
+mcp_atlassian_enabled         = true
+lsp_salesforce_disabled       = false
 
 [linux.files]
 hypr                	        = "~/.config/hypr"
