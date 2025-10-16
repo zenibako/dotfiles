@@ -7,9 +7,9 @@ email = "{{email}}"
 [ui]
 default-command = "log"
 
-[signing]
-behavior = "own"
-backend = "gpg"
+# [signing]
+# behavior = "own"
+# backend = "gpg"
 
 [templates]
 duplicate_description = '''

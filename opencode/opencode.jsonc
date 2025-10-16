@@ -34,14 +34,14 @@
         "all",
         "--allow-non-ga-tools"
       ],
-      "enabled": "{{mcp_salesforce_enabled}}",
+      "enabled": {{mcp_salesforce_enabled}},
     },
     "Odaseva": {
       "type": "local",
       "command": [
         "oda-mcp"
       ],
-      "enabled": "{{mcp_salesforce_enabled}}",
+      "enabled": {{mcp_salesforce_enabled}},
     },
     "Atlassian": {
       "type": "local",
@@ -51,7 +51,7 @@
         "mcp-remote",
         "https://mcp.atlassian.com/v1/sse"
       ],
-      "enabled": "{{mcp_atlassian_enabled}}",
+      "enabled": {{mcp_atlassian_enabled}},
     },
     "Neovim": {
       "type": "local",
@@ -108,7 +108,7 @@
         ".apex",
         ".cls"
       ],
-      "disabled": "{{lsp_salesforce_disabled}}",
+      "disabled": {{lsp_salesforce_disabled}},
     },
     "lwc-language-server": {
       "command": [
@@ -120,7 +120,7 @@
         ".js",
         ".html"
       ],
-      "disabled": "{{lsp_salesforce_disabled}}",
+      "disabled": {{lsp_salesforce_disabled}},
     }
   },
 }
