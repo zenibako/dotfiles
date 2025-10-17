@@ -29,6 +29,7 @@ carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
 # $env.PATH = ($env.PATH | prepend $"($env.JAVA_HOME)/bin/")
 
 $env.PATH = ($env.PATH | append $"($env.HOME)/.atuin/bin/")
+$env.PATH = ($env.PATH | append $"($env.HOME)/go/bin/")
 
 $env.XDG_CONFIG_HOME = $"($env.HOME)/.config"
 
