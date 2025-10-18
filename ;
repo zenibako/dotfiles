@@ -1,8 +1,0 @@
-includes = []
-packages = ["default", "nvim", "opencode"]
-
-[variables]
-email                   = "chandler.anderson@odaseva.com"
-mcp_salesforce_enabled  = true
-mcp_atlassian_enabled   = true
-lsp_salesforce_disabled = false
