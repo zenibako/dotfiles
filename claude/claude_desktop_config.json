@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "Home Assistant": {
+      "command": "mcp-proxy",
+      "env": {
+        "SSE_URL": "https://home.chanderson.tech/mcp_server/sse",
+        "API_ACCESS_TOKEN": "{{hass_api_token}}"
+      }
+    },
+    "Cuejitsu": {
+      "command": "cj",
+      "args": [
+        "mcp"
+      ]
+    }
+  },
+  "preferences": {
+    "quickEntryDictationShortcut": "off"
+  }
+}
