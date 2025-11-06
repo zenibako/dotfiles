@@ -121,6 +121,35 @@
         ".html"
       ],
       "disabled": {{lsp_salesforce_disabled}},
+    },
+    "sourcekit-lsp": {
+      "command": [
+        "sourcekit-lsp"
+      ],
+      "extensions": [
+        ".swift"
+      ]
+    },
+    "cue": {
+      "command": [
+        "cue",
+        "lsp"
+      ],
+      "extensions": [
+        ".cue"
+      ]
+    },
+    "typescript-language-server": {
+      "command": [
+        "typescript-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx"
+      ]
     }
   },
 }
