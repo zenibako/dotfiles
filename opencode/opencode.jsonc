@@ -22,6 +22,31 @@
       ],
       "enabled": true,
     },
+    "GitHub": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}"
+      },
+      "enabled": true,
+    },
+    "GitLab": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-gitlab"
+      ],
+      "environment": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
+        "GITLAB_API_URL": "{{gitlab_api_url}}"
+      },
+      "enabled": false,
+    },
     "Salesforce DX": {
       "type": "local",
       "command": [
