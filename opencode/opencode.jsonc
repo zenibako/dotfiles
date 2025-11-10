@@ -45,7 +45,7 @@
         "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
         "GITLAB_API_URL": "{{gitlab_api_url}}"
       },
-      "enabled": false,
+      "enabled": {{mcp_gitlab_enabled}},
     },
     "Salesforce DX": {
       "type": "local",
