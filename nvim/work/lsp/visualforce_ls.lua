@@ -13,4 +13,29 @@ return {
     },
     provideFormatter = true,
   },
+  settings = {
+    html = {
+      format = {
+        enable = true,
+        wrapLineLength = 120,
+        wrapAttributes = "auto",
+        indentInnerHtml = false,
+        preserveNewLines = true,
+        maxPreserveNewLines = 2,
+        indentHandlebars = false,
+        endWithNewline = true,
+        extraLiners = "head, body, /html",
+        templating = false,
+      },
+      suggest = {
+        html5 = true,
+      },
+      validate = {
+        scripts = true,
+        styles = true,
+      },
+      autoClosingTags = true,
+      mirrorCursorOnMatchingTag = false,
+    },
+  },
 }

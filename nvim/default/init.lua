@@ -1,4 +1,9 @@
 vim.g.mapleader = " "
+{{#unless lsp_salesforce_disabled}}
+
+-- Load Salesforce filetype detection BEFORE plugins
+require("config.salesforce")
+{{/unless}}
 
 require("config.formatting")
 require("config.lazy")

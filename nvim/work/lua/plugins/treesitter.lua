@@ -8,6 +8,8 @@ return {
       ensure_installed = {
         "vimdoc",
         "apex",
+        "soql",
+        "sosl",
         "jsdoc",
         "json",
         "javascript",
@@ -73,5 +75,9 @@ return {
     })
 
     vim.treesitter.language.register("templ", "templ")
+    
+    -- Use HTML treesitter parser for Visualforce files
+    -- This provides HTML syntax highlighting while keeping Visualforce LSP
+    vim.treesitter.language.register("html", "visualforce")
   end,
 }

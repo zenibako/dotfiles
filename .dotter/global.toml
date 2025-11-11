@@ -40,7 +40,7 @@ mcp_salesforce_enabled        = true
 mcp_atlassian_enabled         = false
 mcp_gitlab_enabled            = true
 lsp_salesforce_disabled       = false
-apex_lsp_jar_path             = "$HOME/.local/share/nvim/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar"
+apex_lsp_jar_path             = "$HOME/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
 
 [linux.files]
 hypr                	        = "~/.config/hypr"

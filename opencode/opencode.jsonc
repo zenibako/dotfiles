@@ -120,9 +120,7 @@
       "command": [
         "java",
         "-cp",
-        // Replace the path below with the path to apex-jorje-lsp.jar on your local machine:
         "$HOME/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar",
-        // "/Users/chandler.anderson/.vscode/extensions/salesforce.salesforcedx-vscode-apex-64.14.0/dist/apex-jorje-lsp.jar",
         "-Ddebug.internal.errors=true",
         "-Ddebug.semantic.errors=true",
         "-Ddebug.completion.statistics=false",
@@ -131,7 +129,8 @@
       ],
       "extensions": [
         ".apex",
-        ".cls"
+        ".cls",
+        ".trigger"
       ],
       "disabled": {{lsp_salesforce_disabled}},
     },
@@ -144,6 +143,17 @@
       "extensions": [
         ".js",
         ".html"
+      ],
+      "disabled": {{lsp_salesforce_disabled}},
+    },
+    "visualforce-language-server": {
+      "command": [
+        "$HOME/.local/share/nvim/mason/bin/visualforce-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".page",
+        ".component"
       ],
       "disabled": {{lsp_salesforce_disabled}},
     },
