@@ -13,7 +13,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "Jiujitsu": {
+    "Jujutsu": {
       "type": "local",
       "command": [
         "npx",
