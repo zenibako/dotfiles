@@ -37,7 +37,7 @@ lsp_salesforce_disabled       = true
 [work.variables]
 email                         = "chandler.anderson@odaseva.com"
 mcp_salesforce_enabled        = true
-mcp_atlassian_enabled         = false
+mcp_atlassian_enabled         = true
 mcp_gitlab_enabled            = true
 lsp_salesforce_disabled       = false
 apex_lsp_jar_path             = "$HOME/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
