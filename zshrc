@@ -206,7 +206,7 @@ fi
 
 if (( ${+commands[deno]} ))
 then
-  . "$HOME/.deno/env"
+  [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 fi
 
 fpath=(~/.zsh/completion $fpath)
