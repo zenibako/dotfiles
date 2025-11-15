@@ -1,53 +1,54 @@
 [default.files]
-"atuin/bin"                   = "~/.atuin/bin"
-"atuin/config.toml"           = "~/.config/atuin/config.toml"
-"alacritty.toml"    	        = "~/.alacritty.toml"
-"tmux.conf"         	        = "~/.tmux.conf"
-vimrc              = { target = "~/.vimrc",                   type = "template" }
-# "wezterm.lua"       	      = "~/.wezterm.lua"
-zshrc               	        = "~/.zshrc"
-carapace            	        = "~/.config/carapace"
-# fish              	        = "~/.config/fish"
-"ghostty/config"    	        = "~/.config/ghostty/config"
-iamb                	        = "~/.config/iamb"
-nushell             	        = "~/.config/nushell"
-# "tmix-sessionizer"          = "~/.config/tmux-sessionizer"
-"starship.toml"               = "~/.config/starship.toml"
-jj                 = { target = "~/.config/jj",               type = "template" }
-"nvim/default"     = { target = "~/.config/nvim",             type = "template" }
-"opencode/opencode.jsonc"     = "~/.config/opencode/opencode.jsonc"
+"atuin/bin"                           = "~/.atuin/bin"
+"atuin/config.toml"                   = "~/.config/atuin/config.toml"
+"alacritty.toml"    	                = "~/.alacritty.toml"
+"tmux.conf"         	                = "~/.tmux.conf"
+vimrc                     = { target  = "~/.vimrc",                           type = "template" }
+# "wezterm.lua"       	              = "~/.wezterm.lua"
+zshrc               	                = "~/.zshrc"
+carapace            	                = "~/.config/carapace"
+# fish              	                = "~/.config/fish"
+"ghostty/config"    	                = "~/.config/ghostty/config"
+iamb                	                = "~/.config/iamb"
+nushell             	                = "~/.config/nushell"
+# "tmix-sessionizer"                  = "~/.config/tmux-sessionizer"
+"starship.toml"                       = "~/.config/starship.toml"
+jj                        = { target  = "~/.config/jj",                       type = "template" }
+"nvim/default"            = { target  = "~/.config/nvim",                     type = "template" }
+"opencode/opencode.jsonc" = { target  = "~/.config/opencode/opencode.jsonc",  type = "template" }
 
 [default.variables]
-name                          = "Chandler Anderson"
-vim_set_num_relnum            = "set number relativenumber"
+name                                  = "Chandler Anderson"
+vim_set_num_relnum                    = "set number relativenumber"
 
 [personal.files]
-"nvim/personal"    = { target = "~/.config/nvim",             type = "template" }
+"nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
 
 [personal.variables]
-email                         = "chanderson90@proton.me"
-mcp_salesforce_enabled        = false
-mcp_atlassian_enabled         = false
-mcp_gitlab_enabled            = false
-lsp_salesforce_disabled       = true
+email                                 = "chanderson90@proton.me"
+mcp_salesforce_enabled                = false
+mcp_atlassian_enabled                 = false
+mcp_gitlab_enabled                    = false
+lsp_salesforce_disabled               = true
+apex_lsp_jar_path                     = "/Users/chanderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
 
 [work.files]
-"nvim/work"        = { target = "~/.config/nvim",             type = "template" }
+"nvim/work"               = { target  = "~/.config/nvim",                     type = "template" }
 
 [work.variables]
-email                         = "chandler.anderson@odaseva.com"
-mcp_salesforce_enabled        = true
-mcp_atlassian_enabled         = true
-mcp_gitlab_enabled            = true
-lsp_salesforce_disabled       = false
-apex_lsp_jar_path             = "$HOME/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
+email                                 = "chandler.anderson@odaseva.com"
+mcp_salesforce_enabled                = true
+mcp_atlassian_enabled                 = true
+mcp_gitlab_enabled                    = true
+lsp_salesforce_disabled               = false
+apex_lsp_jar_path                     = "/Users/chandler.anderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
 
 [linux.files]
-hypr                	        = "~/.config/hypr"
-# "waybar"                    = "~/.config/waybar"
+hypr                	                = "~/.config/hypr"
+# "waybar"                            = "~/.config/waybar"
 
 [mac.files]
-yabairc             	        = "~/.yabairc"
+yabairc             	                = "~/.yabairc"
 
 [settings]
-default_target_type           = "automatic"
+default_target_type                   = "automatic"

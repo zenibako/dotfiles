@@ -120,7 +120,7 @@
       "command": [
         "java",
         "-cp",
-        "$HOME/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar",
+        "{{apex_lsp_jar_path}}",
         "-Ddebug.internal.errors=true",
         "-Ddebug.semantic.errors=true",
         "-Ddebug.completion.statistics=false",
@@ -133,6 +133,10 @@
         ".trigger"
       ],
       "disabled": {{lsp_salesforce_disabled}},
+      "initialization": {
+        "enableSemanticErrors": true,
+        "enableCompletionStatistics": false
+      }
     },
     "lwc-language-server": {
       "command": [
