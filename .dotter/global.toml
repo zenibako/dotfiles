@@ -15,7 +15,7 @@ nushell             	                = "~/.config/nushell"
 "starship.toml"                       = "~/.config/starship.toml"
 jj                        = { target  = "~/.config/jj",                       type = "template" }
 "nvim/default"            = { target  = "~/.config/nvim",                     type = "template" }
-"opencode/opencode.jsonc" = { target  = "~/.config/opencode/opencode.jsonc",  type = "template" }
+"opencode"                = { target  = "~/.config/opencode",                 type = "template" }
 
 [default.variables]
 name                                  = "Chandler Anderson"
