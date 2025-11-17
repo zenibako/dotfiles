@@ -1,6 +1,6 @@
 font-family = "MesloLGMDZ Nerd Font Mono"
 
-theme = "Monokai Pro"
+theme = "{{ ghostty_theme }}"
 
 background-opacity  = 0.5
 background-blur     = true
