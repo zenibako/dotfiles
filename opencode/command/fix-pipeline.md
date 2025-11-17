@@ -14,7 +14,7 @@ Detect the git remote type (GitHub or GitLab) and check for CI/CD pipeline failu
 2. **For GitHub (prioritize MCP):**
    - Extract owner and repo from the remote URL
    - Get the current branch name with `git branch --show-current`
-   - **Try MCP first:** Use GitHub_get_pull_request_status to check PR CI status
+   - **Try MCP first:** Use `GitHub_get_pull_request_status` to check PR CI status
    - **Fallback to CLI:** If MCP unavailable, use bash with `gh pr checks`
    - If there are failures:
      - **MCP approach:** Parse status response for failed check details
