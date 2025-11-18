@@ -114,6 +114,15 @@
       "command": ["npx", "chrome-devtools-mcp@latest"],
       "enabled": false
     }
+    "Postman": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@postman/mcp-server-postman"
+      ],
+      "enabled": {{mcp_postman_enabled}}
+    }
   },
   "lsp": {
     "apex-language-server": {

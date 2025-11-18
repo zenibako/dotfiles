@@ -29,6 +29,7 @@ email                                 = "chanderson90@proton.me"
 mcp_salesforce_enabled                = false
 mcp_atlassian_enabled                 = false
 mcp_gitlab_enabled                    = false
+mcp_postman_enabled                   = false
 lsp_salesforce_disabled               = true
 apex_lsp_jar_path                     = "/Users/chanderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
 
@@ -40,6 +41,7 @@ email                                 = "chandler.anderson@odaseva.com"
 mcp_salesforce_enabled                = true
 mcp_atlassian_enabled                 = true
 mcp_gitlab_enabled                    = true
+mcp_postman_enabled                   = true
 lsp_salesforce_disabled               = false
 apex_lsp_jar_path                     = "/Users/chandler.anderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
 
