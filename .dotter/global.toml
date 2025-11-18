@@ -16,10 +16,12 @@ nushell             	                = "~/.config/nushell"
 jj                        = { target  = "~/.config/jj",                       type = "template" }
 "nvim/default"            = { target  = "~/.config/nvim",                     type = "template" }
 "opencode"                = { target  = "~/.config/opencode",                 type = "template" }
+"claude"                  = { target  = "~/Library/Application Support/Claude", type = "template" }
 
 [default.variables]
 name                                  = "Chandler Anderson"
 vim_set_num_relnum                    = "set number relativenumber"
+mcp_odaseva_enabled                   = false
 
 [personal.files]
 "nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
@@ -44,6 +46,9 @@ mcp_gitlab_enabled                    = true
 mcp_postman_enabled                   = true
 lsp_salesforce_disabled               = false
 apex_lsp_jar_path                     = "/Users/chandler.anderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
+
+[oda-mcp.variables]
+mcp_odaseva_enabled                   = true
 
 [linux.files]
 hypr                	                = "~/.config/hypr"

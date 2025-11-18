@@ -66,7 +66,7 @@
       "command": [
         "oda-mcp"
       ],
-      "enabled": {{mcp_salesforce_enabled}},
+      "enabled": {{mcp_odaseva_enabled}},
     },
     "Atlassian": {
       "type": "local",

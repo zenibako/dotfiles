@@ -1,20 +1,21 @@
+
 {
   "mcpServers": {
-    "Home Assistant": {
-      "command": "mcp-proxy",
-      "env": {
-        "SSE_URL": "https://home.chanderson.tech/mcp_server/sse",
-        "API_ACCESS_TOKEN": "{{hass_api_token}}"
-      }
+{{#if mcp_salesforce_enabled}}
+    "Salesforce DX": {
+      "command": "npx",
+      "args": ["-y", "@salesforce/mcp", 
+               "--orgs", "DEFAULT_TARGET_ORG", 
+               "--toolsets", "all"]
     },
-    "Cuejitsu": {
-      "command": "cj",
-      "args": [
-        "mcp"
-      ]
-    }
-  },
-  "preferences": {
-    "quickEntryDictationShortcut": "off"
+{{/if}}
+    "Chrome DevTools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"]
+    }{{#if mcp_odaseva_enabled}},
+    "Odaseva": {
+      "command": "oda-mcp",
+      "args": ["-env", "/Users/chandler.anderson/Projects/oda-mcp/.env"]
+    }{{/if}}
   }
 }
