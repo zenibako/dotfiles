@@ -20,7 +20,7 @@
         "-y",
         "jj-mcp-server"
       ],
-      "enabled": true,
+      "enabled": true
     },
     "GitHub": {
       "type": "local",
@@ -32,7 +32,7 @@
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}"
       },
-      "enabled": true,
+      "enabled": true
     },
     "GitLab": {
       "type": "local",
@@ -45,7 +45,7 @@
         "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
         "GITLAB_API_URL": "{{gitlab_api_url}}"
       },
-      "enabled": {{mcp_gitlab_enabled}},
+      "enabled": {{mcp_gitlab_enabled}}
     },
     "Salesforce DX": {
       "type": "local",
@@ -59,7 +59,7 @@
         "all",
         "--allow-non-ga-tools"
       ],
-      "enabled": {{mcp_salesforce_enabled}},
+      "enabled": {{mcp_salesforce_enabled}}
     },
     "Odaseva": {
       "type": "local",
@@ -113,14 +113,13 @@
       "type": "local",
       "command": ["npx", "chrome-devtools-mcp@latest"],
       "enabled": false
-    }
+    },
     "Postman": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@postman/mcp-server-postman"
-      ],
+      "type": "remote",
+      "url": "https://mcp.postman.com/mcp",
+      "headers": {
+        "Authorization": "Bearer {{postman_api_key}}"
+      },
       "enabled": {{mcp_postman_enabled}}
     }
   },
