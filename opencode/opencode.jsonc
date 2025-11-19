@@ -121,6 +121,27 @@
         "Authorization": "Bearer {{postman_api_key}}"
       },
       "enabled": {{mcp_postman_enabled}}
+    },
+    "SonarQube": {
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "-i",
+        "--name",
+        "sonarqube-mcp-server",
+        "--rm",
+        "-e",
+        "SONARQUBE_TOKEN",
+        "-e",
+        "SONARQUBE_URL",
+        "mcp/sonarqube"
+      ],
+      "environment": {
+        "SONARQUBE_URL": "{{sonarqube_url}}",
+        "SONARQUBE_TOKEN": "{{sonarqube_token}}"
+      },
+      "enabled": {{mcp_sonarqube_enabled}}
     }
   },
   "lsp": {
