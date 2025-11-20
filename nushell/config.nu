@@ -71,3 +71,37 @@ def "nu-complete zoxide path" [context: string] {
 def --env --wrapped z [...rest: string@"nu-complete zoxide path"] {
   __zoxide_z ...$rest
 }
+
+
+# Custom nvm wrapper
+def --env --wrapped nvm [...args] {
+    let nvm_sh = "/opt/homebrew/opt/nvm/nvm.sh"
+
+    if ($args | is-empty) {
+        bash -c $"source ($nvm_sh); nvm"
+        return
+    }
+
+    let cmd = $"nvm ($args | str join ' ')"
+    let delimiter = "---NVM_ENV_JSON---"
+
+    let res = (bash -c $"export NVM_DIR='($env.NVM_DIR)'; source ($nvm_sh); ($cmd); echo ($delimiter); jq -n --arg nvm_bin \"\$NVM_BIN\" --arg nvm_inc \"\$NVM_INC\" --arg path \"\$PATH\" '{NVM_BIN: \$nvm_bin, NVM_INC: \$nvm_inc, PATH: \$path}'" | complete)
+
+    if $res.exit_code != 0 {
+        print $res.stderr
+        return
+    }
+
+    let parts = ($res.stdout | split row $delimiter)
+    print ($parts | first | str trim)
+
+    if ($parts | length) > 1 {
+        let new_env = ($parts | last | from json)
+
+        load-env {
+            NVM_BIN: $new_env.NVM_BIN
+            NVM_INC: $new_env.NVM_INC
+        }
+        $env.PATH = ($new_env.PATH | split row (char esep))
+    }
+}
