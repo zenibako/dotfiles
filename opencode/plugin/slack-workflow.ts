@@ -101,7 +101,7 @@ const SlackWorkflowPlugin: Plugin = createWebhookPlugin({
   ],
   
   // Enable debug logging (set to false in production)
-  debug: false,
+  debug: true,
 });
 
 export default SlackWorkflowPlugin;

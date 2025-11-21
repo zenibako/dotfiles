@@ -1,26 +1,26 @@
 [default.files]
-"atuin/bin"                           = "~/.atuin/bin"
-"atuin/config.toml"                   = "~/.config/atuin/config.toml"
-"alacritty.toml"    	                = "~/.alacritty.toml"
-"tmux.conf"               = { target  = "~/.tmux.conf",                       type = "template" }
-vimrc                     = { target  = "~/.vimrc",                           type = "template" }
-# "wezterm.lua"       	              = "~/.wezterm.lua"
-zshrc               	                = "~/.zshrc"
-carapace            	                = "~/.config/carapace"
-# fish              	                = "~/.config/fish"
-"ghostty/config"          = { target  = "~/.config/ghostty/config",           type = "template" }
-iamb                	                = "~/.config/iamb"
-nushell             	                = "~/.config/nushell"
-# "tmix-sessionizer"                  = "~/.config/tmux-sessionizer"
-"starship.toml"                       = "~/.config/starship.toml"
-jj                        = { target  = "~/.config/jj",                       type = "template" }
-"nvim/default"            = { target  = "~/.config/nvim",                     type = "template" }
-"opencode/.gitignore"     = { target  = "~/.config/opencode/.gitignore",      type = "symbolic" }
-"opencode/command"        = { target  = "~/.config/opencode/command",         type = "symbolic" }
-"opencode/opencode.jsonc" = { target  = "~/.config/opencode/opencode.jsonc",  type = "template" }
-"opencode/package.json"   = { target  = "~/.config/opencode/package.json",    type = "template" }
-"opencode/package-lock.json" = { target = "~/.config/opencode/package-lock.json", type = "symbolic" }
-"claude"                  = { target  = "~/Library/Application Support/Claude", type = "template" }
+"atuin/bin"                               = "~/.atuin/bin"
+"atuin/config.toml"                       = "~/.config/atuin/config.toml"
+"alacritty.toml"    	                    = "~/.alacritty.toml"
+"tmux.conf"                   = { target  = "~/.tmux.conf",                         type = "template" }
+vimrc                         = { target  = "~/.vimrc",                             type = "template" }
+# "wezterm.lua"       	                  = "~/.wezterm.lua"
+zshrc               	                    = "~/.zshrc"
+carapace            	                    = "~/.config/carapace"
+# fish              	                    = "~/.config/fish"
+"ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }
+iamb                	                    = "~/.config/iamb"
+nushell             	                    = "~/.config/nushell"
+# "tmix-sessionizer"                      = "~/.config/tmux-sessionizer"
+"starship.toml"                           = "~/.config/starship.toml"
+jj                            = { target  = "~/.config/jj",                         type = "template" }
+"nvim/default"                = { target  = "~/.config/nvim",                       type = "template" }
+"opencode/.gitignore"         = { target  = "~/.config/opencode/.gitignore",        type = "symbolic" }
+"opencode/command"            = { target  = "~/.config/opencode/command",           type = "symbolic" }
+"opencode/opencode.jsonc"     = { target  = "~/.config/opencode/opencode.jsonc",    type = "template" }
+"opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }
+"opencode/package-lock.json"  = { target  = "~/.config/opencode/package-lock.json", type = "symbolic" }
+"claude"                      = { target  = "~/Library/Application Support/Claude", type = "template" }
 
 [default.variables]
 name                                  = "Chandler Anderson"
