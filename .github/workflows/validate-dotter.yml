@@ -1,0 +1,165 @@
+name: Validate Dotter Deployment
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  validate-dotter:
+    name: Validate ${{ matrix.profile }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        profile: [default, personal, work]
+        theme: [monokai, nightowl, tokyonight]
+        include:
+          # Test linux profile only on Ubuntu
+          - os: ubuntu-latest
+            profile: default
+            theme: monokai
+            extra_packages: linux
+          # Test mac profile only on macOS
+          - os: macos-latest
+            profile: default
+            theme: monokai
+            extra_packages: mac
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dotter
+        run: |
+          case "$RUNNER_OS" in
+            Linux)
+              wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x86_64 -O dotter
+              chmod +x dotter
+              sudo mv dotter /usr/local/bin/
+              ;;
+            macOS)
+              brew install dotter
+              ;;
+          esac
+
+      - name: Verify dotter installation
+        run: dotter --version
+
+      - name: Create temporary deployment directory
+        run: |
+          DEPLOY_DIR=$(mktemp -d)
+          echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
+          echo "Created deployment directory: $DEPLOY_DIR"
+
+      - name: Test dotter deployment (dry-run)
+        run: |
+          echo "Testing deployment for profile: ${{ matrix.profile }}, theme: ${{ matrix.theme }}"
+          
+          # Build package list for this combination
+          PACKAGES="${{ matrix.profile }},${{ matrix.theme }}"
+          if [ -n "${{ matrix.extra_packages }}" ]; then
+            PACKAGES="$PACKAGES,${{ matrix.extra_packages }}"
+          fi
+          
+          echo "Package combination: $PACKAGES"
+          
+          # Perform dry-run deployment
+          dotter deploy \
+            --dry-run \
+            --verbose \
+            --packages "$PACKAGES" \
+            --target-directory "$DEPLOY_DIR"
+
+      - name: Test dotter deployment (actual)
+        run: |
+          # Build package list for this combination
+          PACKAGES="${{ matrix.profile }},${{ matrix.theme }}"
+          if [ -n "${{ matrix.extra_packages }}" ]; then
+            PACKAGES="$PACKAGES,${{ matrix.extra_packages }}"
+          fi
+          
+          echo "Deploying with packages: $PACKAGES"
+          
+          # Perform actual deployment
+          dotter deploy \
+            --force \
+            --verbose \
+            --packages "$PACKAGES" \
+            --target-directory "$DEPLOY_DIR"
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying files were deployed to $DEPLOY_DIR"
+          ls -la "$DEPLOY_DIR" || true
+          find "$DEPLOY_DIR" -type f | head -20 || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -n "$DEPLOY_DIR" ] && [ -d "$DEPLOY_DIR" ]; then
+            rm -rf "$DEPLOY_DIR"
+            echo "Cleaned up deployment directory"
+          fi
+
+  validate-syntax:
+    name: Validate Configuration Syntax
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install TOML validator
+        run: |
+          pip install toml
+
+      - name: Validate TOML files
+        run: |
+          python3 << 'EOF'
+          import toml
+          import sys
+          from pathlib import Path
+          
+          files = [
+              '.dotter/global.toml',
+              'atuin/config.toml',
+              'iamb/config.toml',
+              'jj/config.toml',
+          ]
+          
+          failed = False
+          for file in files:
+              try:
+                  with open(file, 'r') as f:
+                      toml.load(f)
+                  print(f"✓ {file} is valid TOML")
+              except Exception as e:
+                  print(f"✗ {file} failed: {e}")
+                  failed = True
+          
+          sys.exit(1 if failed else 0)
+          EOF
+
+      - name: Validate Lua files
+        run: |
+          # Install luac for syntax checking
+          sudo apt-get update
+          sudo apt-get install -y lua5.4
+          
+          # Check all Lua files for syntax errors
+          find nvim -name "*.lua" -type f | while read -r file; do
+            if ! luac -p "$file" > /dev/null 2>&1; then
+              echo "✗ Syntax error in $file"
+              luac -p "$file"
+              exit 1
+            else
+              echo "✓ $file is valid Lua"
+            fi
+          done
