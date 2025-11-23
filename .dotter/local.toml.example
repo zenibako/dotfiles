@@ -1,0 +1,37 @@
+# Dotter Local Configuration Example
+# Copy this file to local.toml and fill in your actual values
+# WARNING: Never commit local.toml - it contains secrets!
+
+includes = []
+
+# Available packages: default, personal, work
+# Available profiles: mac, linux
+# Available themes: monokai, tokyonight, onedark
+packages = ["default", "personal", "mac", "monokai"]
+
+[files]
+
+[variables]
+# GitHub Personal Access Token (for gh CLI, Neovim plugins)
+# Create at: https://github.com/settings/tokens
+github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
+
+# GitLab Personal Access Token (for gitlab.nvim plugin)
+# Create at: https://gitlab.com/-/user_settings/personal_access_tokens
+gitlab_personal_access_token = ""
+
+# GitLab API URL (usually https://gitlab.com/api/v4)
+gitlab_api_url = ""
+
+# Home Assistant Long-Lived Access Token
+# Create at: http://YOUR_HA_URL/profile/security
+home_assistant_token = "eyJhbGci..."
+
+# Home Assistant Instance URL
+home_assistant_url = "https://your-instance.ui.nabu.casa"
+
+# Home Assistant Webhook ID (for OpenCode plugin)
+home_assistant_webhook_id = "your-webhook-id"
+
+# Slack Workflow Webhook URL (for OpenCode plugin)
+opencode_slack_webhook_url = "https://hooks.slack.com/triggers/..."
