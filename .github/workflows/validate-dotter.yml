@@ -212,8 +212,9 @@ jobs:
           packages = ["$profile", "monokai"]
           EOF
             
-            if ! dotter deploy --dry-run; then
-              echo "✗ Failed to deploy $profile profile - likely duplicate variables in global.toml"
+            if ! dotter deploy --dry-run --force 2>&1 | tee /tmp/dotter-$profile.log; then
+              echo "✗ Failed to deploy $profile profile"
+              cat /tmp/dotter-$profile.log
               exit 1
             fi
             echo "✓ $profile profile deploys successfully"
