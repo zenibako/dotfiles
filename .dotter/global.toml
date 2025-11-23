@@ -20,8 +20,12 @@ jj                        = { target  = "~/.config/jj",                       ty
 
 [default.variables]
 name                                  = "Chandler Anderson"
+email                                 = "user@example.com"
 vim_set_num_relnum                    = "set number relativenumber"
 mcp_odaseva_enabled                   = false
+github_personal_access_token          = ""
+home_assistant_url                    = ""
+opencode_slack_webhook_url            = ""
 
 [personal.files]
 "nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
