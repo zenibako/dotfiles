@@ -22,7 +22,12 @@ jj                        = { target  = "~/.config/jj",                       ty
 name                                  = "Chandler Anderson"
 email                                 = "user@example.com"
 vim_set_num_relnum                    = "set number relativenumber"
+mcp_atlassian_enabled                 = false
+mcp_gitlab_enabled                    = false
 mcp_odaseva_enabled                   = false
+mcp_postman_enabled                   = false
+mcp_salesforce_enabled                = false
+mcp_sonarqube_enabled                 = false
 github_personal_access_token          = ""
 gitlab_personal_access_token          = ""
 gitlab_api_url                        = "https://gitlab.com/api/v4"
