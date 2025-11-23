@@ -18,7 +18,7 @@
  * Full guide: https://slack.com/help/articles/360041352714
  */
 
-import { createWebhookPlugin } from './opencode-webhooks/src/index.ts';
+import { createWebhookPlugin } from 'opencode-webhooks';
 
 // ============================================================================
 // Configuration
