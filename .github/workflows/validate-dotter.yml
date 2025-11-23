@@ -63,19 +63,26 @@ jobs:
           echo "Testing deployment for profile: ${{ matrix.profile }}, theme: ${{ matrix.theme }}"
           
           # Build package list for this combination
-          PACKAGES="${{ matrix.profile }},${{ matrix.theme }}"
+          PACKAGES=("${{ matrix.profile }}" "${{ matrix.theme }}")
           if [ -n "${{ matrix.extra_packages }}" ]; then
-            PACKAGES="$PACKAGES,${{ matrix.extra_packages }}"
+            PACKAGES+=("${{ matrix.extra_packages }}")
           fi
           
-          echo "Package combination: $PACKAGES"
+          echo "Package combination: ${PACKAGES[@]}"
+          
+          # Create a local.toml for this test
+          {
+            echo "packages = ["
+            for pkg in "${PACKAGES[@]}"; do
+              echo "  \"$pkg\","
+            done
+            echo "]"
+          } > .dotter/local.toml
+          
+          cat .dotter/local.toml
           
           # Perform dry-run deployment
-          dotter deploy \
-            --dry-run \
-            --verbose \
-            --packages "$PACKAGES" \
-            --target-directory "$DEPLOY_DIR"
+          dotter deploy --dry-run --verbose
 
       - name: Test dotter deployment (actual)
         run: |
@@ -87,12 +94,10 @@ jobs:
           
           echo "Deploying with packages: $PACKAGES"
           
+          # local.toml already created in dry-run step
+          
           # Perform actual deployment
-          dotter deploy \
-            --force \
-            --verbose \
-            --packages "$PACKAGES" \
-            --target-directory "$DEPLOY_DIR"
+          dotter deploy --force --verbose
 
       - name: Verify deployment
         run: |
@@ -155,10 +160,13 @@ jobs:
 
       - name: Deploy with dotter (for Lua validation)
         run: |
-          DEPLOY_DIR=$(mktemp -d)
-          echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
-          dotter deploy --force --packages "default,monokai" --target-directory "$DEPLOY_DIR"
-          echo "Deployed configs to $DEPLOY_DIR for validation"
+          # Create local.toml for default + monokai packages
+          cat > .dotter/local.toml <<EOF
+          packages = ["default", "monokai"]
+          EOF
+          
+          echo "Deploying configs for validation"
+          dotter deploy --force --verbose
 
       - name: Validate Lua files
         run: |
@@ -167,8 +175,8 @@ jobs:
           sudo apt-get install -y lua5.4
           
           # Check deployed Lua files (after dotter processing)
-          if [ -d "$DEPLOY_DIR/.config/nvim" ]; then
-            find "$DEPLOY_DIR/.config/nvim" -name "*.lua" -type f | while read -r file; do
+          if [ -d "$HOME/.config/nvim" ]; then
+            find "$HOME/.config/nvim" -name "*.lua" -type f | while read -r file; do
               if ! luac -p "$file" > /dev/null 2>&1; then
                 echo "✗ Syntax error in $file"
                 luac -p "$file"
@@ -178,13 +186,5 @@ jobs:
               fi
             done
           else
-            echo "⚠ No nvim config found in deployment directory, skipping Lua validation"
-          fi
-
-      - name: Cleanup
-        if: always()
-        run: |
-          if [ -n "$DEPLOY_DIR" ] && [ -d "$DEPLOY_DIR" ]; then
-            rm -rf "$DEPLOY_DIR"
-            echo "Cleaned up deployment directory"
+            echo "⚠ No nvim config found in $HOME/.config/nvim, skipping Lua validation"
           fi
