@@ -18,13 +18,21 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         profile: [default, personal, work]
         theme: [monokai, nightowl, tokyonight]
+        exclude:
+          # Exclude default+monokai from base matrix for platform-specific testing
+          - os: ubuntu-latest
+            profile: default
+            theme: monokai
+          - os: macos-latest
+            profile: default
+            theme: monokai
         include:
-          # Test linux profile only on Ubuntu
+          # Test linux package on Ubuntu with default+monokai
           - os: ubuntu-latest
             profile: default
             theme: monokai
             extra_packages: linux
-          # Test mac profile only on macOS
+          # Test mac package on macOS with default+monokai
           - os: macos-latest
             profile: default
             theme: monokai
@@ -70,15 +78,51 @@ jobs:
           
           echo "Package combination: ${PACKAGES[@]}"
           
-          # Create a local.toml for this test
-          {
-            echo "packages = ["
-            for pkg in "${PACKAGES[@]}"; do
-              echo "  \"$pkg\","
-            done
-            echo "]"
-          } > .dotter/local.toml
+          # Create a local.toml for this test with profile-specific variable overrides
+          cat > .dotter/local.toml <<'EOF'
+          packages = [
+          EOF
           
+          for pkg in "${PACKAGES[@]}"; do
+            echo "  \"$pkg\"," >> .dotter/local.toml
+          done
+          
+          cat >> .dotter/local.toml <<'EOF'
+          ]
+
+          [variables]
+          # Test variable overrides based on profile
+          EOF
+          
+          # Add profile-specific variables to test templating
+          case "${{ matrix.profile }}" in
+            work)
+              cat >> .dotter/local.toml <<'EOF'
+          email = "test@work.example.com"
+          mcp_salesforce_enabled = true
+          lsp_salesforce_disabled = false
+          apex_lsp_jar_path = "/test/path/apex-jorje-lsp.jar"
+          gitlab_personal_access_token = "glpat-test123456789"
+          gitlab_api_url = "https://gitlab.example.com/api/v4"
+          EOF
+              ;;
+            personal)
+              cat >> .dotter/local.toml <<'EOF'
+          email = "test@personal.example.com"
+          github_personal_access_token = "ghp_test123456789"
+          home_assistant_url = "https://test.hass.example.com"
+          home_assistant_token = "test_token_123"
+          EOF
+              ;;
+            default)
+              cat >> .dotter/local.toml <<'EOF'
+          email = "test@default.example.com"
+          github_personal_access_token = "ghp_test123456789"
+          EOF
+              ;;
+          esac
+          
+          echo "Generated local.toml:"
           cat .dotter/local.toml
           
           # Perform dry-run deployment
