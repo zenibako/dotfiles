@@ -66,7 +66,7 @@ jobs:
           echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
           echo "Created deployment directory: $DEPLOY_DIR"
 
-      - name: Test dotter deployment (dry-run)
+      - name: Test dotter deployment
         run: |
           echo "Testing deployment for profile: ${{ matrix.profile }}, theme: ${{ matrix.theme }}"
           
@@ -125,22 +125,8 @@ jobs:
           echo "Generated local.toml:"
           cat .dotter/local.toml
           
-          # Perform dry-run deployment to the temporary directory by overriding HOME
-          HOME="$DEPLOY_DIR" dotter deploy --dry-run --verbose
-
-      - name: Test dotter deployment (actual)
-        run: |
-          # Build package list for this combination
-          PACKAGES="${{ matrix.profile }},${{ matrix.theme }}"
-          if [ -n "${{ matrix.extra_packages }}" ]; then
-            PACKAGES="$PACKAGES,${{ matrix.extra_packages }}"
-          fi
-          
-          echo "Deploying with packages: $PACKAGES"
-          
-          # local.toml already created in dry-run step
-          
-          # Perform actual deployment to the temporary directory by overriding HOME
+          # Perform deployment to the temporary directory by overriding HOME
+          # The --force flag allows overwriting files from the depends chain
           HOME="$DEPLOY_DIR" dotter deploy --force --verbose
 
       - name: Verify deployment
