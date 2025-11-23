@@ -2,4 +2,7 @@
 .dotter/cache.toml
 .dotter/cache
 
+# Deployed config directory (dotter output)
+.config/
+
 **/lazy-lock.json

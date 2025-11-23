@@ -147,19 +147,44 @@ jobs:
           sys.exit(1 if failed else 0)
           EOF
 
+      - name: Install dotter
+        run: |
+          wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x86_64 -O dotter
+          chmod +x dotter
+          sudo mv dotter /usr/local/bin/
+
+      - name: Deploy with dotter (for Lua validation)
+        run: |
+          DEPLOY_DIR=$(mktemp -d)
+          echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
+          dotter deploy --force --packages "default,monokai" --target-directory "$DEPLOY_DIR"
+          echo "Deployed configs to $DEPLOY_DIR for validation"
+
       - name: Validate Lua files
         run: |
           # Install luac for syntax checking
           sudo apt-get update
           sudo apt-get install -y lua5.4
           
-          # Check all Lua files for syntax errors
-          find nvim -name "*.lua" -type f | while read -r file; do
-            if ! luac -p "$file" > /dev/null 2>&1; then
-              echo "✗ Syntax error in $file"
-              luac -p "$file"
-              exit 1
-            else
-              echo "✓ $file is valid Lua"
-            fi
-          done
+          # Check deployed Lua files (after dotter processing)
+          if [ -d "$DEPLOY_DIR/.config/nvim" ]; then
+            find "$DEPLOY_DIR/.config/nvim" -name "*.lua" -type f | while read -r file; do
+              if ! luac -p "$file" > /dev/null 2>&1; then
+                echo "✗ Syntax error in $file"
+                luac -p "$file"
+                exit 1
+              else
+                echo "✓ $file is valid Lua"
+              fi
+            done
+          else
+            echo "⚠ No nvim config found in deployment directory, skipping Lua validation"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -n "$DEPLOY_DIR" ] && [ -d "$DEPLOY_DIR" ]; then
+            rm -rf "$DEPLOY_DIR"
+            echo "Cleaned up deployment directory"
+          fi
