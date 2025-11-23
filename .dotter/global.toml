@@ -15,7 +15,11 @@ nushell             	                = "~/.config/nushell"
 "starship.toml"                       = "~/.config/starship.toml"
 jj                        = { target  = "~/.config/jj",                       type = "template" }
 "nvim/default"            = { target  = "~/.config/nvim",                     type = "template" }
-"opencode"                = { target  = "~/.config/opencode",                 type = "template" }
+"opencode/.gitignore"     = { target  = "~/.config/opencode/.gitignore",      type = "symbolic" }
+"opencode/command"        = { target  = "~/.config/opencode/command",         type = "symbolic" }
+"opencode/opencode.jsonc" = { target  = "~/.config/opencode/opencode.jsonc",  type = "template" }
+"opencode/package.json"   = { target  = "~/.config/opencode/package.json",    type = "template" }
+"opencode/package-lock.json" = { target = "~/.config/opencode/package-lock.json", type = "symbolic" }
 "claude"                  = { target  = "~/Library/Application Support/Claude", type = "template" }
 
 [default.variables]
@@ -46,12 +50,14 @@ depends = ["default"]
 
 [personal.files]
 "nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
+"opencode/plugin/home-assistant.ts" = { target = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [work]
 depends = ["default"]
 
 [work.files]
 "nvim/work"               = { target  = "~/.config/nvim",                     type = "template" }
+"opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
 
 [oda-mcp.variables]
 mcp_odaseva_enabled                   = true

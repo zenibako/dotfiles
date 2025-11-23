@@ -4,38 +4,37 @@
  * This plugin sends OpenCode events to Home Assistant via webhook automation.
  * 
  * Setup Instructions:
- * 1. In Home Assistant, create a new automation:
+ * 1. Copy this file to ~/.config/opencode/plugin/home-assistant.ts
+ * 2. In Home Assistant, create a new automation:
  *    - Settings → Automations & Scenes → Create Automation
  *    - Add trigger: Webhook
  *    - Set a webhook ID (e.g., "opencode_events")
  *    - Copy the webhook URL
- * 2. Update WEBHOOK_ID in this file or set home_assistant_webhook_id variable in dotter
- * 3. Update HOME_ASSISTANT_URL if needed
- * 4. (Optional) Create a long-lived access token:
+ * 3. Update WEBHOOK_URL below with your Home Assistant webhook URL
+ * 4. Update HOME_ASSISTANT_TOKEN with a long-lived access token:
  *    - User Profile → Long-Lived Access Tokens → Create Token
- *    - Set home_assistant_token variable in dotter
- * 5. Deploy with dotter: `dotter deploy -f`
+ * 5. Restart OpenCode
  * 
  * Example Automation Actions:
  * - Send a notification when an error occurs
  * - Turn on a light when a session starts
- * - Log events to a sensor or history
- * - Trigger other automations based on OpenCode activity
+ * - Log events to a sensor or history Trigger other automations based on OpenCode activity
  * 
  * Full guide: https://www.home-assistant.io/docs/automation/trigger/#webhook-trigger
  */
 
+import type { Plugin } from '@opencode-ai/plugin';
 import { createWebhookPlugin } from 'opencode-webhooks';
 
 // ============================================================================
 // Configuration
 // ============================================================================
 
-const HOME_ASSISTANT_URL = '{{home_assistant_url}}';
+const HOME_ASSISTANT_URL = '{{home_assistant_url}}'; 
 const WEBHOOK_ID = '{{home_assistant_webhook_id}}';
 
 // Optional: Uncomment and set if you need authentication
-// const HOME_ASSISTANT_TOKEN = '{{home_assistant_token}}';
+const HOME_ASSISTANT_TOKEN = '{{home_assistant_token}}';
 
 // Construct the webhook URL
 const WEBHOOK_URL = `${HOME_ASSISTANT_URL}/api/webhook/${WEBHOOK_ID}`;
@@ -44,7 +43,8 @@ const WEBHOOK_URL = `${HOME_ASSISTANT_URL}/api/webhook/${WEBHOOK_ID}`;
 // Plugin Setup
 // ============================================================================
 
-export default createWebhookPlugin({
+// Export the plugin with explicit type annotation for OpenCode
+const HomeAssistantPlugin: Plugin = createWebhookPlugin({
   webhooks: [
     {
       url: WEBHOOK_URL,
@@ -56,6 +56,8 @@ export default createWebhookPlugin({
         'session.deleted',
         'session.error',
         'session.resumed',
+        'message.updated',
+        'message.part.updated',
         'file.edited',
         'command.executed',
       ],
@@ -69,6 +71,8 @@ export default createWebhookPlugin({
           'session.deleted': 'Session Ended',
           'session.error': 'Error Occurred',
           'session.resumed': 'Session Resumed',
+          'message.updated': 'Message Updated',
+          'message.part.updated': 'Message Part Updated',
           'file.edited': 'File Edited',
           'command.executed': 'Command Executed',
         };
@@ -76,10 +80,19 @@ export default createWebhookPlugin({
         // Determine severity for conditional automations
         const severity = payload.eventType === 'session.error' ? 'error' : 'info';
         
+        // Extract message content if available
+        const messageContent = payload.content || payload.text || payload.message || '';
+        
         // Create a notification-friendly message
         let notificationMessage = `OpenCode: ${eventLabels[payload.eventType] || payload.eventType}`;
         if (payload.error) {
           notificationMessage += ` - ${payload.error}`;
+        }
+        
+        // Add message preview for message events
+        if (messageContent && (payload.eventType === 'message.updated' || payload.eventType === 'message.part.updated')) {
+          const preview = messageContent.substring(0, 100);
+          notificationMessage = preview + (messageContent.length > 100 ? '...' : '');
         }
 
         // Return formatted payload for Home Assistant
@@ -90,6 +103,7 @@ export default createWebhookPlugin({
           session_id: payload.sessionId || 'unknown',
           timestamp: payload.timestamp,
           notification_message: notificationMessage,
+          messageContent: messageContent || null,
           // Include original payload for advanced automations
           raw_payload: payload,
         };
@@ -98,7 +112,7 @@ export default createWebhookPlugin({
       // Optional: Custom headers (uncomment if using authentication)
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${HOME_ASSISTANT_TOKEN}`,
+        'Authorization': `Bearer ${HOME_ASSISTANT_TOKEN}`,
       },
       
       // Retry configuration
@@ -114,3 +128,5 @@ export default createWebhookPlugin({
   // Enable debug logging (set to false in production)
   debug: false,
 });
+
+export default HomeAssistantPlugin;
