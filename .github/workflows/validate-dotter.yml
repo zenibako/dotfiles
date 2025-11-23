@@ -40,7 +40,7 @@ jobs:
         run: |
           case "$RUNNER_OS" in
             Linux)
-              wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x86_64 -O dotter
+              wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x64-musl -O dotter
               chmod +x dotter
               sudo mv dotter /usr/local/bin/
               ;;
@@ -149,7 +149,7 @@ jobs:
 
       - name: Install dotter
         run: |
-          wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x86_64 -O dotter
+          wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x64-musl -O dotter
           chmod +x dotter
           sudo mv dotter /usr/local/bin/
 
