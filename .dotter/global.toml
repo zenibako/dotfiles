@@ -41,23 +41,17 @@ home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 opencode_slack_webhook_url            = ""
 
+[personal]
+depends = ["default"]
+
 [personal.files]
 "nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
 
-[personal.variables]
-email                                 = "chanderson90@proton.me"
+[work]
+depends = ["default"]
 
 [work.files]
 "nvim/work"               = { target  = "~/.config/nvim",                     type = "template" }
-
-[work.variables]
-email                                 = "chandler.anderson@odaseva.com"
-mcp_atlassian_enabled                 = true
-mcp_gitlab_enabled                    = true
-mcp_postman_enabled                   = true
-mcp_salesforce_enabled                = true
-mcp_sonarqube_enabled                 = false
-lsp_salesforce_disabled               = false
 
 [oda-mcp.variables]
 mcp_odaseva_enabled                   = true

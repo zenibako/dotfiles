@@ -4,16 +4,35 @@
 
 includes = []
 
-# IMPORTANT: Choose ONE profile (default, personal, OR work) - not multiple!
-# Profiles are mutually exclusive and define different variable sets
-# Available profiles: default, personal, work
-# Available platforms: mac, linux (pick one or omit on other platforms)
-# Available themes: monokai, nightowl, tokyonight
+# Packages system:
+# - `default` package contains all common files (starship, nvim, opencode, etc.)
+# - `personal` and `work` profiles use `depends = ["default"]` to automatically include default files
+# - Only select ONE profile (personal OR work), which will auto-include default via depends
+# - Add platform package (mac OR linux) for platform-specific files
+# - Add ONE theme (monokai, nightowl, or tokyonight)
 packages = ["personal", "mac", "monokai"]
 
 [files]
 
 [variables]
+# IMPORTANT: Variables in local.toml override ALL package variables
+# This allows you to customize settings per-machine without editing global.toml
+
+# Profile-specific email (overrides default.variables.email)
+email = "your@email.com"
+
+# Apex LSP jar path (if using Salesforce development)
+# Set to your actual path or leave as empty string if not needed
+apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
+
+# Enable/disable LSP for Salesforce (work profile sets this to false by default)
+# lsp_salesforce_disabled = true
+
+# Enable/disable MCP servers (work profile enables some by default)
+# mcp_atlassian_enabled = false
+# mcp_gitlab_enabled = false
+# mcp_salesforce_enabled = false
+
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
 github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
@@ -21,9 +40,6 @@ github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
 # GitLab Personal Access Token (for gitlab.nvim plugin)
 # Create at: https://gitlab.com/-/user_settings/personal_access_tokens
 gitlab_personal_access_token = ""
-
-# GitLab API URL (usually https://gitlab.com/api/v4)
-gitlab_api_url = ""
 
 # Home Assistant Long-Lived Access Token
 # Create at: http://YOUR_HA_URL/profile/security
