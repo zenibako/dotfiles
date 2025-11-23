@@ -202,6 +202,23 @@ jobs:
           chmod +x dotter
           sudo mv dotter /usr/local/bin/
 
+      - name: Test global.toml for duplicate variables
+        run: |
+          echo "Testing each profile without variable overrides to catch conflicts in global.toml"
+          
+          for profile in default personal work; do
+            echo "Testing $profile profile..."
+            cat > .dotter/local.toml <<EOF
+          packages = ["$profile", "monokai"]
+          EOF
+            
+            if ! dotter deploy --dry-run; then
+              echo "✗ Failed to deploy $profile profile - likely duplicate variables in global.toml"
+              exit 1
+            fi
+            echo "✓ $profile profile deploys successfully"
+          done
+
       - name: Deploy with dotter (for Lua validation)
         run: |
           # Create local.toml for default + monokai packages

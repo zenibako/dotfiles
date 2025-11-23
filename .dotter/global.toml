@@ -46,17 +46,6 @@ opencode_slack_webhook_url            = ""
 
 [personal.variables]
 email                                 = "chanderson90@proton.me"
-mcp_atlassian_enabled                 = false
-mcp_gitlab_enabled                    = false
-mcp_postman_enabled                   = false
-mcp_salesforce_enabled                = false
-mcp_sonarqube_enabled                 = false
-lsp_salesforce_disabled               = true
-apex_lsp_jar_path                     = "/Users/chanderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
-postman_api_key                       = ""
-sonarqube_url                         = ""
-sonarqube_token                       = ""
-# opencode_slack_webhook_url            = ""
 
 [work.files]
 "nvim/work"               = { target  = "~/.config/nvim",                     type = "template" }
@@ -69,7 +58,6 @@ mcp_postman_enabled                   = true
 mcp_salesforce_enabled                = true
 mcp_sonarqube_enabled                 = false
 lsp_salesforce_disabled               = false
-apex_lsp_jar_path                     = "/Users/chandler.anderson/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar"
 
 [oda-mcp.variables]
 mcp_odaseva_enabled                   = true

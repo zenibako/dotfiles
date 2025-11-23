@@ -4,10 +4,12 @@
 
 includes = []
 
-# Available packages: default, personal, work
-# Available profiles: mac, linux
-# Available themes: monokai, tokyonight, onedark
-packages = ["default", "personal", "mac", "monokai"]
+# IMPORTANT: Choose ONE profile (default, personal, OR work) - not multiple!
+# Profiles are mutually exclusive and define different variable sets
+# Available profiles: default, personal, work
+# Available platforms: mac, linux (pick one or omit on other platforms)
+# Available themes: monokai, nightowl, tokyonight
+packages = ["personal", "mac", "monokai"]
 
 [files]
 
