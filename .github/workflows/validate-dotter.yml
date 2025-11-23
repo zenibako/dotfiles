@@ -125,8 +125,8 @@ jobs:
           echo "Generated local.toml:"
           cat .dotter/local.toml
           
-          # Perform dry-run deployment
-          dotter deploy --dry-run --verbose
+          # Perform dry-run deployment to the temporary directory
+          dotter deploy --dry-run --verbose --target-dir "$DEPLOY_DIR"
 
       - name: Test dotter deployment (actual)
         run: |
@@ -140,8 +140,8 @@ jobs:
           
           # local.toml already created in dry-run step
           
-          # Perform actual deployment
-          dotter deploy --force --verbose
+          # Perform actual deployment to the temporary directory
+          dotter deploy --force --verbose --target-dir "$DEPLOY_DIR"
 
       - name: Verify deployment
         run: |
