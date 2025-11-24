@@ -26,13 +26,6 @@ jj                            = { target  = "~/.config/jj",                     
 name                                  = "Chandler Anderson"
 email                                 = "user@example.com"
 vim_set_num_relnum                    = "set number relativenumber"
-mcp_atlassian_enabled                 = false
-mcp_gitlab_enabled                    = false
-mcp_odaseva_enabled                   = false
-mcp_postman_enabled                   = false
-mcp_salesforce_enabled                = false
-mcp_sonarqube_enabled                 = false
-lsp_salesforce_disabled               = true
 apex_lsp_jar_path                     = ""
 postman_api_key                       = ""
 sonarqube_url                         = ""
@@ -44,6 +37,7 @@ home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 opencode_slack_webhook_url            = ""
+mcp_odaseva_enabled                   = false
 
 [personal]
 depends = ["default"]
@@ -52,12 +46,28 @@ depends = ["default"]
 "nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
 "opencode/plugin/home-assistant.ts" = { target = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
+[personal.variables]
+mcp_atlassian_enabled                 = false
+mcp_gitlab_enabled                    = false
+mcp_postman_enabled                   = false
+mcp_salesforce_enabled                = false
+mcp_sonarqube_enabled                 = false
+lsp_salesforce_disabled               = true
+
 [work]
 depends = ["default"]
 
 [work.files]
 "nvim/work"               = { target  = "~/.config/nvim",                     type = "template" }
 "opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
+
+[work.variables]
+mcp_atlassian_enabled                 = true
+mcp_gitlab_enabled                    = true
+mcp_postman_enabled                   = false
+mcp_salesforce_enabled                = false
+mcp_sonarqube_enabled                 = false
+lsp_salesforce_disabled               = false
 
 [oda-mcp.variables]
 mcp_odaseva_enabled                   = true
@@ -82,16 +92,8 @@ tmux_theme_config                     = """
 # available plugins: battery, cpu-usage, git, gpu-usage, ram-usage, tmux-ram-usage, network, network-bandwidth, network-ping, ssh-session, attached-clients, network-vpn, weather, time, mpc, spotify-tui, playerctl, kubernetes-context, synchronize-panes
 set -g @monokai-plugins 'time battery cpu-usage ram-usage'
 set -g @monokai-show-powerline true
-
-# for left
 set -g @monokai-show-left-sep ''
-# set -g @monokai-show-left-icon-padding 4
-set -g @monokai-show-powerline-left-end ''
-
-# for right symbol (can set any symbol you like as separator)
 set -g @monokai-show-right-sep ''
-# set -g @monokai-show-right-icon-padding 2
-set -g @monokai-show-powerline-right-end ''
 """
 
 [nightowl.variables]
@@ -104,6 +106,9 @@ tmux_theme_plugin                     = "kylepeeler/tmux-nightowl"
 tmux_theme_config                     = """
 # Nightowl theme configuration
 set -g @nightowl-show-powerline true
+set -g @nightowl-show-left-icon session
+set -g @nightowl-show-left-sep ''
+set -g @nightowl-show-right-sep ''
 set -g @nightowl-military-time false
 set -g @nightowl-cpu-usage true
 set -g @nightowl-ram-usage true
