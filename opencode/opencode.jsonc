@@ -45,7 +45,7 @@
         "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
         "GITLAB_API_URL": "{{gitlab_api_url}}"
       },
-      "enabled": {{mcp_gitlab_enabled}}
+      "enabled": {{#if mcp_gitlab_enabled}}true{{else}}false{{/if}}
     },
     "Salesforce DX": {
       "type": "local",
@@ -59,14 +59,14 @@
         "all",
         "--allow-non-ga-tools"
       ],
-      "enabled": {{mcp_salesforce_enabled}}
+      "enabled": {{#if mcp_salesforce_enabled}}true{{else}}false{{/if}}
     },
     "Odaseva": {
       "type": "local",
       "command": [
         "oda-mcp"
       ],
-      "enabled": {{mcp_odaseva_enabled}},
+      "enabled": {{#if mcp_odaseva_enabled}}true{{else}}false{{/if}},
     },
     "Atlassian": {
       "type": "local",
@@ -76,7 +76,7 @@
         "mcp-remote",
         "https://mcp.atlassian.com/v1/sse"
       ],
-      "enabled": {{mcp_atlassian_enabled}},
+      "enabled": {{#if mcp_atlassian_enabled}}true{{else}}false{{/if}},
     },
     "Neovim": {
       "type": "local",
@@ -120,7 +120,7 @@
       "headers": {
         "Authorization": "Bearer {{postman_api_key}}"
       },
-      "enabled": {{mcp_postman_enabled}}
+      "enabled": {{#if mcp_postman_enabled}}true{{else}}false{{/if}}
     },
     "SonarQube": {
       "type": "local",
@@ -141,7 +141,7 @@
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       },
-      "enabled": {{mcp_sonarqube_enabled}}
+      "enabled": {{#if mcp_sonarqube_enabled}}true{{else}}false{{/if}}
     }
   },
   "lsp": {
@@ -161,7 +161,7 @@
         ".cls",
         ".trigger"
       ],
-      "disabled": {{lsp_salesforce_disabled}},
+      "disabled": {{#if lsp_salesforce_disabled}}true{{else}}false{{/if}},
       "initialization": {
         "enableSemanticErrors": true,
         "enableCompletionStatistics": false
@@ -177,7 +177,7 @@
         ".js",
         ".html"
       ],
-      "disabled": {{lsp_salesforce_disabled}},
+      "disabled": {{#if lsp_salesforce_disabled}}true{{else}}false{{/if}},
     },
     "visualforce-language-server": {
       "command": [
@@ -188,7 +188,7 @@
         ".page",
         ".component"
       ],
-      "disabled": {{lsp_salesforce_disabled}},
+      "disabled": {{#if lsp_salesforce_disabled}}true{{else}}false{{/if}},
     },
     "sourcekit-lsp": {
       "command": [
