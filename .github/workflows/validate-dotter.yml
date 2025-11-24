@@ -116,6 +116,12 @@ jobs:
               cat >> .dotter/local.toml <<'EOF'
           email = "test@default.example.com"
           github_personal_access_token = "ghp_test123456789"
+          mcp_atlassian_enabled = false
+          mcp_gitlab_enabled = false
+          mcp_postman_enabled = false
+          mcp_salesforce_enabled = false
+          mcp_sonarqube_enabled = false
+          lsp_salesforce_disabled = true
           EOF
               ;;
           esac

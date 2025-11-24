@@ -37,13 +37,7 @@ home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 opencode_slack_webhook_url            = ""
-mcp_atlassian_enabled                 = false
-mcp_gitlab_enabled                    = false
 mcp_odaseva_enabled                   = false
-mcp_postman_enabled                   = false
-mcp_salesforce_enabled                = false
-mcp_sonarqube_enabled                 = false
-lsp_salesforce_disabled               = true
 
 [personal]
 depends = ["default"]
@@ -53,7 +47,12 @@ depends = ["default"]
 "opencode/plugin/home-assistant.ts" = { target = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
-# No overrides needed - uses defaults from [default.variables]
+mcp_atlassian_enabled                 = false
+mcp_gitlab_enabled                    = false
+mcp_postman_enabled                   = false
+mcp_salesforce_enabled                = false
+mcp_sonarqube_enabled                 = false
+lsp_salesforce_disabled               = true
 
 [work]
 depends = ["default"]
