@@ -99,8 +99,6 @@ jobs:
             work)
               cat >> .dotter/local.toml <<'EOF'
           email = "test@work.example.com"
-          mcp_salesforce_enabled = true
-          lsp_salesforce_disabled = false
           apex_lsp_jar_path = "/test/path/apex-jorje-lsp.jar"
           gitlab_personal_access_token = "glpat-test123456789"
           gitlab_api_url = "https://gitlab.example.com/api/v4"
