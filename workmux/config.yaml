@@ -1,0 +1,7 @@
+agent: opencode
+
+panes:
+  - command: <agent>
+    focus: true
+  - command: jira issue view $(basename $(pwd))
+    split: horizontal

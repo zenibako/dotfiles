@@ -1,0 +1,4 @@
+# gitlogue configuration
+speed = 5
+loop = true
+ignore_patterns = ["**/datasetComponents*.js"]

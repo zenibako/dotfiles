@@ -22,6 +22,8 @@ jj                            = { target  = "~/.config/jj",                     
 "opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }
 "opencode/package-lock.json"  = { target  = "~/.config/opencode/package-lock.json", type = "symbolic" }
 "claude"                      = { target  = "~/Library/Application Support/Claude", type = "template" }
+workmux                                   = "~/.config/workmux"
+gitlogue                                  = "~/.config/gitlogue"
 
 [default.variables]
 name                                  = "Chandler Anderson"
