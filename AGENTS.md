@@ -1,30 +1,17 @@
 # Agent Guidelines for Dotfiles Repository
 
-## Build/Test Commands
-- **Deploy configs**: `dotter deploy -f` (templates from .dotter/global.toml)
+## Build/Deploy Commands
+- **Deploy configs**: `dotter deploy -f` (templates from .dotter/global.toml, uses `depends` for profile inheritance)
 - **Go scripts**: `cd waybar/scripts/{docker-stats,weather-stats} && go run main.go`
 - **Init setup**: `sh init.sh` (installs packages, oh-my-zsh, tpm)
+- **OpenCode plugins**: `cd ~/.config/opencode && npm install`
 
-## Code Style
-
-**Lua (Neovim):**
-- 2-space indentation, spaces not tabs
-- Plugin files return table with lazy.nvim spec: `return { "plugin/name", config = function() ... end }`
-- LSP configs in `lsp/*.lua`, require via `require("lsp.server_name")`
-- Use `vim.keymap.set()` for keymaps, `vim.opt` for options
-- Leader key is space: `vim.g.mapleader = " "`
-
-**Go:**
-- Standard Go formatting (gofmt)
-- Struct-based JSON output for scripts
-- Error handling with early returns
-
-**Shell:**
-- POSIX-compliant sh scripts
-- Platform detection via `uname -s`
-- Check command existence before use
+## Version Control
+- Config in `jj/config.toml`
+- **Merge tool**: `jj-diffconflicts` via nvim (`merge-tools.diffconflicts`)
 
 ## Repository Structure
-- `nvim/default/`, `nvim/work/`, `nvim/personal/` are profile variants deployed via dotter
-- `.config/nvim/` is the active deployed config (don't edit directly)
-- Edit source files in profile directories, then run `dotter deploy -f`
+- Profiles: `nvim/{default,work,personal}` deployed via dotter (don't edit `~/.config/nvim` directly!)
+- Packages: Select ONE profile (personal/work), ONE platform (mac/linux), ONE theme (monokai/nightowl/tokyonight)
+- Profile inheritance: `work` and `personal` depend on `default` via `depends = ["default"]`
+- Secrets: Never commit `local.toml` (use `local.toml.example` as template)

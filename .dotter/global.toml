@@ -16,6 +16,7 @@ nushell             	                    = "~/.config/nushell"
 jj                            = { target  = "~/.config/jj",                         type = "template" }
 "nvim/default"                = { target  = "~/.config/nvim",                       type = "template" }
 "opencode/.gitignore"         = { target  = "~/.config/opencode/.gitignore",        type = "symbolic" }
+"opencode/AGENTS.md"          = { target  = "~/.config/opencode/AGENTS.md",         type = "symbolic" }
 "opencode/command"            = { target  = "~/.config/opencode/command",           type = "symbolic" }
 "opencode/opencode.jsonc"     = { target  = "~/.config/opencode/opencode.jsonc",    type = "template" }
 "opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }
