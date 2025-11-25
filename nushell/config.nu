@@ -73,6 +73,145 @@ def --env --wrapped z [...rest: string@"nu-complete zoxide path"] {
 }
 
 
+# Workmux completions
+def "nu-complete workmux subcommands" [] {
+    [
+        { value: "add", description: "Create a new worktree and tmux window" }
+        { value: "open", description: "Open a tmux window for an existing worktree" }
+        { value: "merge", description: "Merge a branch, then clean up the worktree and tmux window" }
+        { value: "remove", description: "Remove a worktree, tmux window, and branch without merging" }
+        { value: "rm", description: "Remove a worktree, tmux window, and branch without merging" }
+        { value: "list", description: "List all worktrees" }
+        { value: "ls", description: "List all worktrees" }
+        { value: "init", description: "Generate example .workmux.yaml configuration file" }
+        { value: "claude", description: "Claude Code integration commands" }
+        { value: "completions", description: "Generate shell completions" }
+        { value: "help", description: "Print help message" }
+    ]
+}
+
+def "nu-complete workmux branches" [] {
+    let worktree_branches = (do { git worktree list --porcelain } | complete)
+    if $worktree_branches.exit_code == 0 {
+        $worktree_branches.stdout
+        | lines
+        | where ($it | str starts-with "branch refs/heads/")
+        | each { |line| $line | str replace "branch refs/heads/" "" }
+    } else {
+        []
+    }
+}
+
+def "nu-complete workmux git-branches" [] {
+    let branches = (do { git branch --format="%(refname:short)" } | complete)
+    if $branches.exit_code == 0 {
+        $branches.stdout | lines
+    } else {
+        []
+    }
+}
+
+def "nu-complete workmux shells" [] {
+    ["bash", "elvish", "fish", "powershell", "zsh"]
+}
+
+def "nu-complete workmux claude-subcommands" [] {
+    [
+        { value: "prune", description: "Remove stale entries from ~/.claude.json" }
+        { value: "help", description: "Print help for subcommand" }
+    ]
+}
+
+export extern "workmux" [
+    command?: string@"nu-complete workmux subcommands"
+    --help(-h)
+    --version(-V)
+]
+
+export extern "workmux add" [
+    branch_name?: string@"nu-complete workmux git-branches"
+    --pr: int
+    --base: string
+    --prompt(-p): string
+    --prompt-file(-P): path
+    --prompt-editor(-e)
+    --no-hooks(-H)
+    --no-file-ops(-F)
+    --no-pane-cmds(-C)
+    --background(-b)
+    --with-changes(-w)
+    --patch
+    --include-untracked(-u)
+    --agent(-a): string
+    --count(-n): int
+    --foreach: string
+    --branch-template: string
+    --help(-h)
+]
+
+export extern "workmux open" [
+    branch_name: string@"nu-complete workmux branches"
+    --run-hooks
+    --force-files
+    --help(-h)
+]
+
+export extern "workmux merge" [
+    branch_name?: string@"nu-complete workmux branches"
+    --ignore-uncommitted
+    --delete-remote(-r)
+    --rebase
+    --squash
+    --keep(-k)
+    --help(-h)
+]
+
+export extern "workmux remove" [
+    branch_name?: string@"nu-complete workmux branches"
+    --force(-f)
+    --delete-remote(-r)
+    --keep-branch(-k)
+    --help(-h)
+]
+
+export extern "workmux rm" [
+    branch_name?: string@"nu-complete workmux branches"
+    --force(-f)
+    --delete-remote(-r)
+    --keep-branch(-k)
+    --help(-h)
+]
+
+export extern "workmux list" [
+    --help(-h)
+]
+
+export extern "workmux ls" [
+    --help(-h)
+]
+
+export extern "workmux init" [
+    --help(-h)
+]
+
+export extern "workmux completions" [
+    shell: string@"nu-complete workmux shells"
+    --help(-h)
+]
+
+export extern "workmux claude" [
+    command?: string@"nu-complete workmux claude-subcommands"
+    --help(-h)
+]
+
+export extern "workmux claude prune" [
+    --help(-h)
+]
+
+export extern "workmux help" [
+    command?: string@"nu-complete workmux subcommands"
+]
+
 # Custom nvm wrapper
 def --env --wrapped nvm [...args] {
     let nvm_sh = "/opt/homebrew/opt/nvm/nvm.sh"

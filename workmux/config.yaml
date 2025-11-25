@@ -1,7 +1,14 @@
 agent: opencode
 
+post_create:
+  - jj git init --colocate
+
 panes:
   - command: <agent>
     focus: true
-  - command: jira issue view $(basename $(pwd))
-    split: horizontal
+  - split: vertical
+  - split: horizontal
+
+files:
+  symlink:
+    - node_modules

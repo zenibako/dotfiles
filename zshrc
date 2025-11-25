@@ -210,6 +210,17 @@ then
 fi
 
 fpath=(~/.zsh/completion $fpath)
+
+if (( ${+commands[workmux]} ))
+then
+  workmux completions zsh > ~/.zsh/completion/_workmux
+fi
+
+if (( ${+commands[opencode]} ))
+then
+  opencode completion zsh > ~/.zsh/completion/_opencode 2>/dev/null
+fi
+
 autoload -U compinit
 compinit
 
