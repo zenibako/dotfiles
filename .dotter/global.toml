@@ -78,7 +78,7 @@ hypr                	                = "~/.config/hypr"
 # "waybar"                            = "~/.config/waybar"
 
 [mac.files]
-yabairc             	                = "~/.yabairc"
+"aerospace.toml"             	        = "~/.aerospace.toml"
 
 [monokai.variables]
 ghostty_theme                         = "Monokai Pro"

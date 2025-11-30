@@ -11,7 +11,7 @@ Personal configuration files for various development tools and shell environment
 - **CLI Tools**: Starship prompt, Atuin (shell history), Carapace (completions), Jujutsu (VCS), iamb (Matrix client)
 - **OpenCode**: Custom commands and plugins for OpenCode AI assistant
 - **Claude**: MCP server configurations
-- **Window Management**: yabai (macOS), Hyprland (Linux)
+- **Window Management**: AeroSpace (macOS), Hyprland (Linux)
 
 ## Installation
 

@@ -238,8 +238,6 @@ brew "jichu4n/palm-os/pilot-link"
 brew "vladkens/tap/macmon"
 # A TUI built for managing and waking your devices using Wake-on-LAN.
 brew "jonathanruiz/tap/wakey"
-# A tiling window manager for macOS based on binary space partitioning.
-brew "koekeishiya/formulae/yabai"
 # define simple completions using a spec file
 brew "rsteube/tap/carapace-spec"
 # The AI coding agent built for the terminal.
