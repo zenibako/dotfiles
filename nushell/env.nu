@@ -36,6 +36,12 @@ $env.OLLAMA_HOST = "http://10.0.7.73:11434"
 
 $env.XDG_CONFIG_HOME = $"($env.HOME)/.config"
 
+{{#if playdate_sdk_enabled}}
+# Playdate SDK
+$env.PLAYDATE_SDK_PATH = $"($env.HOME)/Developer/PlaydateSDK"
+$env.PATH = ($env.PATH | append $"($env.PLAYDATE_SDK_PATH)/bin/")
+{{/if}}
+
 $env.GPG_TTY = (try { tty } catch { "" })
 
 

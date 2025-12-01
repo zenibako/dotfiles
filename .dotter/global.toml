@@ -10,7 +10,7 @@ carapace            	                    = "~/.config/carapace"
 # fish              	                    = "~/.config/fish"
 "ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }
 iamb                	                    = "~/.config/iamb"
-nushell             	                    = "~/.config/nushell"
+nushell                       = { target  = "~/.config/nushell",                  type = "template" }
 # "tmix-sessionizer"                      = "~/.config/tmux-sessionizer"
 "starship.toml"                           = "~/.config/starship.toml"
 jj                            = { target  = "~/.config/jj",                         type = "template" }
@@ -55,7 +55,7 @@ mcp_gitlab_enabled                    = false
 mcp_postman_enabled                   = false
 mcp_salesforce_enabled                = false
 mcp_sonarqube_enabled                 = false
-lsp_salesforce_disabled               = true
+playdate_sdk_enabled                  = true
 
 [work]
 depends = ["default"]
@@ -68,7 +68,6 @@ depends = ["default"]
 # Override defaults for work profile
 mcp_atlassian_enabled                 = true
 mcp_gitlab_enabled                    = true
-lsp_salesforce_disabled               = false
 
 [oda-mcp.variables]
 mcp_odaseva_enabled                   = true
