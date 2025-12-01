@@ -1,3 +1,6 @@
+-- Load Salesforce filetype detection BEFORE enabling LSPs
+require("config.salesforce")
+
 vim.lsp.enable({
   "apex-language-server",
   "gitlab_ci_ls",
