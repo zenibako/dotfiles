@@ -17,15 +17,23 @@
 # options using:
 #     config nu --doc | nu-highlight | less -R
 
+# Source third-party integrations first (some reset $env.config)
+# Note: These files are generated in env.nu which runs before config.nu
+source ~/.local/share/atuin/init.nu
+atuin gen-completions --shell nushell | save -f ~/.cache/atuin.nu
+source ~/.cache/atuin.nu
+
+source ~/.zoxide.nu
+source ~/.cache/carapace/init.nu
+source ~/.starship.nu
+
+# Set config options AFTER sourcing third-party scripts
+# (atuin init and starship init reset $env.config)
 $env.config.buffer_editor = "nvim"
 $env.config.edit_mode = "vi"
-$env.config.cursor_shape.vi_insert = "line"       # Cursor shape in vi-insert mode
-$env.config.cursor_shape.vi_normal = "block"  # Cursor shape in normal vi mode
-
+$env.config.cursor_shape.vi_insert = "line"
+$env.config.cursor_shape.vi_normal = "block"
 $env.config.show_banner = false
-
-mkdir ($nu.data-dir | path join "vendor/autoload")
-starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 
 $env.STARSHIP_SHELL = "nu"
 
@@ -43,18 +51,6 @@ $env.PROMPT_INDICATOR = ""
 $env.PROMPT_INDICATOR_VI_INSERT = ""
 $env.PROMPT_INDICATOR_VI_NORMAL = ""
 $env.PROMPT_MULTILINE_INDICATOR = "::: "
-
-source ~/.local/share/atuin/init.nu
-
-atuin gen-completions --shell nushell | save -f "~/.cache/atuin.nu"
-source ~/.cache/atuin.nu
-
-source ~/.zoxide.nu
-
-carapace _carapace nushell | save -f "~/.cache/carapace/init.nu"
-source ~/.cache/carapace/init.nu
-
-source ~/.local/share/atuin/init.nu
 
 def "nu-complete zoxide path" [context: string] {
     let parts = $context | split row " " | skip 1

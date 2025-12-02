@@ -16,7 +16,35 @@
 #
 # You can remove these comments if you want or leave
 # them for future reference.
-$env.EDITOR = "nvim"
+
+# Load shared environment variables from env.toml
+# This is the single source of truth for env vars shared with zsh
+let shared_env_path = ($env.HOME | path join ".config/shared/env.toml")
+if ($shared_env_path | path exists) {
+    let shared = (open $shared_env_path)
+
+    # Load environment variables (expanding $HOME)
+    for item in ($shared.env | transpose key value) {
+        let expanded_value = ($item.value | str replace --all '$HOME' $env.HOME)
+        load-env { ($item.key): $expanded_value }
+    }
+
+    # Prepend paths (in reverse order so first in list = highest priority)
+    for p in ($shared.path.prepend | reverse) {
+        let expanded_path = ($p | str replace --all '$HOME' $env.HOME)
+        if ($expanded_path | path exists) {
+            $env.PATH = ($env.PATH | prepend $expanded_path)
+        }
+    }
+
+    # Append paths
+    for p in ($shared.path.append) {
+        let expanded_path = ($p | str replace --all '$HOME' $env.HOME)
+        if ($expanded_path | path exists) {
+            $env.PATH = ($env.PATH | append $expanded_path)
+        }
+    }
+}
 
 zoxide init nushell | save -f ~/.zoxide.nu
 starship init nu | save -f ~/.starship.nu
@@ -28,13 +56,11 @@ carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
 # $env.JAVA_HOME = "/opt/homebrew/opt/openjdk"
 # $env.PATH = ($env.PATH | prepend $"($env.JAVA_HOME)/bin/")
 
-$env.PATH = ($env.PATH | append $"($env.HOME)/.atuin/bin/")
-$env.PATH = ($env.PATH | append $"($env.HOME)/go/bin/")
+# Note: Most PATH and env vars are now loaded from shared/env.toml above
+# Shell-specific additions can still be added here:
 $env.PATH = ($env.PATH | append $"($env.HOME)/.opencode/bin/")
 
 $env.OLLAMA_HOST = "http://10.0.7.73:11434"
-
-$env.XDG_CONFIG_HOME = $"($env.HOME)/.config"
 
 {{#if playdate_sdk_enabled}}
 # Playdate SDK

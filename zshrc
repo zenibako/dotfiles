@@ -1,6 +1,54 @@
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+# Load shared environment variables from env.toml
+# This is the single source of truth for env vars shared with nushell
+_load_shared_env() {
+    local env_file="$HOME/.config/shared/env.toml"
+    [[ -f "$env_file" ]] || return
+
+    local in_env=0 in_prepend=0 in_append=0
+    while IFS= read -r line; do
+        # Skip comments and empty lines
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// }" ]] && continue
+
+        # Track sections
+        if [[ "$line" == "[env]" ]]; then
+            in_env=1; in_prepend=0; in_append=0; continue
+        elif [[ "$line" == "[path]" ]]; then
+            in_env=0; in_prepend=0; in_append=0; continue
+        elif [[ "$line" =~ ^prepend[[:space:]]*= ]]; then
+            in_prepend=1; in_append=0; in_env=0; continue
+        elif [[ "$line" =~ ^append[[:space:]]*= ]]; then
+            in_append=1; in_prepend=0; in_env=0; continue
+        elif [[ "$line" == "["* ]]; then
+            in_env=0; in_prepend=0; in_append=0; continue
+        fi
+
+        # Parse env vars
+        if (( in_env )) && [[ "$line" =~ ^([A-Z_]+)[[:space:]]*=[[:space:]]*\"(.*)\"$ ]]; then
+            local key="${match[1]}"
+            local value="${match[2]}"
+            value="${value//\$HOME/$HOME}"
+            export "$key"="$value"
+        fi
+
+        # Parse path entries
+        if (( in_prepend )) && [[ "$line" =~ \"(.+)\" ]]; then
+            local p="${match[1]}"
+            p="${p//\$HOME/$HOME}"
+            [[ -d "$p" ]] && export PATH="$p:$PATH"
+        fi
+        if (( in_append )) && [[ "$line" =~ \"(.+)\" ]]; then
+            local p="${match[1]}"
+            p="${p//\$HOME/$HOME}"
+            [[ -d "$p" ]] && export PATH="$PATH:$p"
+        fi
+    done < "$env_file"
+}
+_load_shared_env
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -108,12 +156,10 @@ export NVM_DIR="$HOME/.nvm"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-export PATH="/opt/python27/bin:$PATH"
-
-export PATH="$HOME/.cargo/bin:$PATH"
+# Note: Most PATH entries are now loaded from shared/env.toml
+# Shell-specific additions can still be added here
 
 set -o vi
-export PATH=$PATH:$HOME/go/bin
 
 # Load pyenv automatically by appending
 # the following to
@@ -163,10 +209,11 @@ rmvenv() {
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
+# Note: SF_USE_GENERIC_UNIX_KEYCHAIN and SF_BETA_TRACK_FILE_MOVES
+# are now loaded from shared/env.toml
 export SF_AC_ZSH_SETUP_PATH=$HOME/Library/Caches/sf/autocomplete/zsh_setup && test -f $SF_AC_ZSH_SETUP_PATH && source $SF_AC_ZSH_SETUP_PATH; # sf autocomplete setup 
 
 export SF_USE_GENERIC_UNIX_KEYCHAIN=true
-export SF_BETA_TRACK_FILE_MOVES=true
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 
@@ -241,18 +288,17 @@ then
   [ -s "$BREW_NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$BREW_NVM_DIR/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 fi
 
+# Note: Most PATH entries are now loaded from shared/env.toml
 # Created by `pipx` on 2025-06-27 18:19:27
-export PATH="$PATH:$HOME/.local/bin"
+# Shell-specific PATH additions below:
 
 eval "$(zoxide init zsh)"
-
-export PATH="$PATH:$HOME/.atuin/bin"
 
 . "$HOME/.atuin/bin/env"
 
 eval "$(atuin init zsh)"
 
-export XDG_CONFIG_HOME=$HOME/.config
+# Note: XDG_CONFIG_HOME is now loaded from shared/env.toml
 
 # Updates the gpg-agent TTY before every command since
 # there's no way to detect this info in the ssh-agent protocol

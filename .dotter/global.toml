@@ -1,4 +1,5 @@
 [default.files]
+"shared/env.toml"                         = "~/.config/shared/env.toml"
 "atuin/bin"                               = "~/.atuin/bin"
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
 "alacritty.toml"    	                    = "~/.alacritty.toml"
