@@ -209,6 +209,7 @@ then
   [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 fi
 
+[[ -d ~/.zsh/completion ]] || mkdir -p ~/.zsh/completion
 fpath=(~/.zsh/completion $fpath)
 
 if (( ${+commands[workmux]} ))
