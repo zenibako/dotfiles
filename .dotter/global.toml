@@ -11,7 +11,7 @@ carapace            	                    = "~/.config/carapace"
 # fish              	                    = "~/.config/fish"
 "ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }
 iamb                	                    = "~/.config/iamb"
-nushell                       = { target  = "~/.config/nushell",                  type = "template" }
+nushell                       = { target  = "~/.config/nushell",                    type = "template" }
 # "tmix-sessionizer"                      = "~/.config/tmux-sessionizer"
 "starship.toml"                           = "~/.config/starship.toml"
 jj                            = { target  = "~/.config/jj",                         type = "template" }
@@ -28,7 +28,7 @@ gitlogue                                  = "~/.config/gitlogue"
 
 [default.variables]
 name                                  = "Chandler Anderson"
-email                                 = "user@example.com"
+email                                 = "chanderson90@proton.me"
 vim_set_num_relnum                    = "set number relativenumber"
 apex_lsp_jar_path                     = ""
 postman_api_key                       = ""
@@ -48,9 +48,10 @@ depends = ["default"]
 
 [personal.files]
 "nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
-"opencode/plugin/home-assistant.ts" = { target = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
+"opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
+lsp_salesforce_disabled               = true
 mcp_atlassian_enabled                 = false
 mcp_gitlab_enabled                    = false
 mcp_postman_enabled                   = false
