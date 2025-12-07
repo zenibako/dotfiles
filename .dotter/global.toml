@@ -69,7 +69,7 @@ depends = ["default"]
 "opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
 
 [work.variables]
-# Override defaults for work profile
+lsp_salesforce_disabled               = false
 mcp_atlassian_enabled                 = true
 mcp_gitlab_enabled                    = true
 opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"

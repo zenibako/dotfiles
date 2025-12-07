@@ -116,12 +116,14 @@ jobs:
               cat >> .dotter/local.toml <<'EOF'
           email = "test@default.example.com"
           github_personal_access_token = "ghp_test123456789"
+          lsp_salesforce_disabled = true
           mcp_atlassian_enabled = false
           mcp_gitlab_enabled = false
           mcp_postman_enabled = false
           mcp_salesforce_enabled = false
           mcp_sonarqube_enabled = false
-          lsp_salesforce_disabled = true
+          opencode_build_agent_model = "anthropic:claude-sonnet-4-5"
+          opencode_plan_agent_model = "anthropic:claude-opus-4-5"
           EOF
               ;;
           esac
@@ -213,8 +215,18 @@ jobs:
       - name: Deploy with dotter (for Lua validation)
         run: |
           # Create local.toml for default + monokai packages
-          cat > .dotter/local.toml <<EOF
+          cat > .dotter/local.toml <<'EOF'
           packages = ["default", "monokai"]
+          
+          [variables]
+          lsp_salesforce_disabled = true
+          mcp_atlassian_enabled = false
+          mcp_gitlab_enabled = false
+          mcp_postman_enabled = false
+          mcp_salesforce_enabled = false
+          mcp_sonarqube_enabled = false
+          opencode_build_agent_model = "anthropic:claude-sonnet-4-5"
+          opencode_plan_agent_model = "anthropic:claude-opus-4-5"
           EOF
           
           echo "Deploying configs for validation"
