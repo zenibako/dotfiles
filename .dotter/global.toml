@@ -41,6 +41,11 @@ home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 opencode_slack_webhook_url            = ""
+mcp_atlassian_enabled                 = false
+mcp_gitlab_enabled                    = false
+mcp_postman_enabled                   = false
+mcp_salesforce_enabled                = false
+mcp_sonarqube_enabled                 = false
 mcp_odaseva_enabled                   = false
 lsp_salesforce_disabled               = true
 
@@ -52,12 +57,6 @@ depends = ["default"]
 "opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
-lsp_salesforce_disabled               = true
-mcp_atlassian_enabled                 = false
-mcp_gitlab_enabled                    = false
-mcp_postman_enabled                   = false
-mcp_salesforce_enabled                = false
-mcp_sonarqube_enabled                 = false
 playdate_sdk_enabled                  = true
 opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
 opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
