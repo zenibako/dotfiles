@@ -220,20 +220,6 @@
       ]
     }
   },
-  "provider": {
-    "ollama": { // provider id
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
-      "options": {
-        "baseURL": "http://10.0.7.73:11434/v1"
-      },
-      "models": {
-        "qwen3-coder:latest": { // configure the model
-          "name": "Qwen3 Coder"
-        },
-      }
-    }
-  },
   "keybinds": {
     "leader": "ctrl+space",
     "command_list": "<leader>p"
@@ -251,5 +237,13 @@
         },
       }
     }
-  } 
+  },
+  "agent": {
+    "build": {
+      "model": "{{opencode_build_agent_model}}"
+    },
+    "plan": {
+      "model": "{{opencode_plan_agent_model}}"
+    }
+  }
 }
