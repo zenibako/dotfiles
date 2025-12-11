@@ -1,33 +1,101 @@
 /**
  * Home Assistant Webhook Integration
  * 
- * This plugin sends OpenCode events to Home Assistant via webhook automation.
+ * Sends a notification to Home Assistant when the OpenCode agent completes work.
  * 
  * Setup Instructions:
  * 1. Copy this file to ~/.config/opencode/plugin/home-assistant.ts
- * 2. In Home Assistant, create a new automation:
- *    - Settings → Automations & Scenes → Create Automation
- *    - Add trigger: Webhook
- *    - Set a webhook ID (e.g., "opencode_events")
- *    - Copy the webhook URL
+ * 2. In Home Assistant, create a new automation (see example below)
  * 3. Update WEBHOOK_URL below with your Home Assistant webhook URL
- * 4. Update HOME_ASSISTANT_TOKEN with a long-lived access token:
- *    - User Profile → Long-Lived Access Tokens → Create Token
- * 5. Restart OpenCode
+ * 4. Restart OpenCode
  * 
- * Example Automation Actions:
- * - Send a notification when an error occurs
- * - Turn on a light when a session starts
- * - Log events to a sensor or history Trigger other automations based on OpenCode activity
+ * ============================================================================
+ * Example Home Assistant Automation (automations.yaml):
+ * ============================================================================
+ * 
+ * - id: opencode_agent_completed
+ *   alias: "OpenCode Agent Completed"
+ *   trigger:
+ *     - platform: webhook
+ *       webhook_id: {{home_assistant_webhook_id}}
+ *       allowed_methods:
+ *         - POST
+ *       local_only: false
+ *   conditions:
+ *     - condition: template
+ *       value_template: "\{{ trigger.json.event_type == 'opencode_agent_completed' }}"
+ *   action:
+ *     - service: notify.mobile_app_chandler_s_iphone
+ *       data:
+ *         title: "\{{ trigger.json.notification_title }}"
+ *         message: "\{{ trigger.json.notification_message }}"
+ *         data:
+ *           notification_icon: mdi:robot
+ *           tag: opencode_completed
+ *           group: opencode
+ *           color: green
+ *           push:
+ *             interruption-level: time-sensitive
+ *     - service: persistent_notification.create
+ *       data:
+ *         title: "\{{ trigger.json.notification_title }}"
+ *         message: |
+ *           **Session:** \{{ trigger.json.session_title }}
+ *           **Tokens:** \{{ trigger.json.tokens_total }} ($\{{ "%.4f" | format(trigger.json.cost | default(0)) }})
+ *           **Time:** \{{ trigger.json.timestamp }}
+ *           
+ *           ---
+ *           
+ *           \{{ trigger.json.message_full }}
+ *         notification_id: "opencode_\{{ trigger.json.session_id }}"
+ *     - service: logbook.log
+ *       data:
+ *         name: OpenCode
+ *         message: >-
+ *           Agent completed in "\{{ trigger.json.session_title }}" - 
+ *           \{{ trigger.json.tokens_total }} tokens ($\{{ "%.4f" | format(trigger.json.cost | default(0)) }})
+ *         entity_id: automation.opencode_agent_completed
+ * 
+ * ============================================================================
+ * Webhook Payload Structure:
+ * ============================================================================
+ * 
+ * {
+ *   "event_type": "opencode_agent_completed",
+ *   "session_id": "ses_abc123",
+ *   "session_title": "My Session",
+ *   "message_id": "msg_xyz789",
+ *   "message_preview": "I've completed the task... (truncated to 500 chars)",
+ *   "message_full": "Full agent response text...",
+ *   "tokens_input": 1500,
+ *   "tokens_output": 800,
+ *   "tokens_total": 2300,
+ *   "cost": 0.025,
+ *   "notification_title": "OpenCode: My Session",
+ *   "notification_message": "I've completed the task...",
+ *   "timestamp": "2025-01-01T12:00:00.000Z"
+ * }
+ * 
+ * ============================================================================
+ * Available Template Variables in Home Assistant:
+ * ============================================================================
+ * 
+ * - \{{ trigger.json.session_title }} - Human-readable session name
+ * - \{{ trigger.json.notification_title }} - Ready-to-use notification title
+ * - \{{ trigger.json.notification_message }} - Truncated message (500 chars)
+ * - \{{ trigger.json.message_full }} - Full agent response
+ * - \{{ trigger.json.tokens_total }} - Total tokens used
+ * - \{{ trigger.json.cost }} - Cost in dollars (if available)
  * 
  * Full guide: https://www.home-assistant.io/docs/automation/trigger/#webhook-trigger
  */
 
 import type { Plugin } from '@opencode-ai/plugin';
-import { createWebhookPlugin } from 'opencode-webhooks';
+// @ts-ignore - Using local dev version
+import { createAgentNotificationPlugin } from '/Users/chanderson/Projects/opencode-webhooks/dist/index.js';
 
 // ============================================================================
-// Configuration
+// Configuration (Preserved from your dotfiles)
 // ============================================================================
 
 const HOME_ASSISTANT_URL = '{{home_assistant_url}}'; 
@@ -43,87 +111,53 @@ const WEBHOOK_URL = `${HOME_ASSISTANT_URL}/api/webhook/${WEBHOOK_ID}`;
 // Plugin Setup
 // ============================================================================
 
-// Export the plugin with explicit type annotation for OpenCode
-const HomeAssistantPlugin: Plugin = createWebhookPlugin({
-  webhooks: [
-    {
-      url: WEBHOOK_URL,
+// @ts-ignore - Using local dev version
+const HomeAssistantPlugin: Plugin = createAgentNotificationPlugin({
+  webhooks: [{
+    url: WEBHOOK_URL,
+    
+    // Transform for Home Assistant - includes all useful fields
+    transformPayload: (payload) => ({
+      // Event identification
+      event_type: 'opencode_agent_completed',
       
-      // Which events to send
-      events: [
-        'session.created',
-        'session.idle',
-        'session.deleted',
-        'session.error',
-        'session.resumed',
-        'message.updated',
-        'message.part.updated',
-        'file.edited',
-        'command.executed',
-      ],
+      // Session info
+      session_id: payload.sessionId,
+      session_title: payload.sessionTitle,
       
-      // Transform for Home Assistant
-      transformPayload: (payload) => {
-        // Map event types to friendly names for Home Assistant
-        const eventLabels: Record<string, string> = {
-          'session.created': 'Session Started',
-          'session.idle': 'Session Idle',
-          'session.deleted': 'Session Ended',
-          'session.error': 'Error Occurred',
-          'session.resumed': 'Session Resumed',
-          'message.updated': 'Message Updated',
-          'message.part.updated': 'Message Part Updated',
-          'file.edited': 'File Edited',
-          'command.executed': 'Command Executed',
-        };
-
-        // Determine severity for conditional automations
-        const severity = payload.eventType === 'session.error' ? 'error' : 'info';
-        
-        // Extract message content if available
-        const messageContent = payload.content || payload.text || payload.message || '';
-        
-        // Create a notification-friendly message
-        let notificationMessage = `OpenCode: ${eventLabels[payload.eventType] || payload.eventType}`;
-        if (payload.error) {
-          notificationMessage += ` - ${payload.error}`;
-        }
-        
-        // Add message preview for message events
-        if (messageContent && (payload.eventType === 'message.updated' || payload.eventType === 'message.part.updated')) {
-          const preview = messageContent.substring(0, 100);
-          notificationMessage = preview + (messageContent.length > 100 ? '...' : '');
-        }
-
-        // Return formatted payload for Home Assistant
-        return {
-          event_type: payload.eventType,
-          event_label: eventLabels[payload.eventType] || payload.eventType,
-          severity: severity,
-          session_id: payload.sessionId || 'unknown',
-          timestamp: payload.timestamp,
-          notification_message: notificationMessage,
-          messageContent: messageContent || null,
-          // Include original payload for advanced automations
-          raw_payload: payload,
-        };
-      },
+      // Message content
+      message_id: payload.messageId,
+      message_preview: payload.messageContent.substring(0, 500),
+      message_full: payload.messageContent,
       
-      // Optional: Custom headers (uncomment if using authentication)
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${HOME_ASSISTANT_TOKEN}`,
-      },
+      // Usage stats (for advanced automations/tracking)
+      tokens_input: payload.tokens?.input,
+      tokens_output: payload.tokens?.output,
+      tokens_total: payload.tokens ? payload.tokens.input + payload.tokens.output : undefined,
+      cost: payload.cost,
       
-      // Retry configuration
-      retry: {
-        maxAttempts: 3,
-        delayMs: 2000,
-      },
+      // Notification-ready fields (ready to use in Home Assistant notifications)
+      notification_title: `OpenCode: ${payload.sessionTitle}`,
+      notification_message: payload.messageContent.substring(0, 500),
       
-      timeoutMs: 5000,
+      // Metadata
+      timestamp: payload.timestamp,
+    }),
+    
+    // Optional: Custom headers (authentication if needed)
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${HOME_ASSISTANT_TOKEN}`,
     },
-  ],
+    
+    // Retry configuration
+    retry: {
+      maxAttempts: 3,
+      delayMs: 2000,
+    },
+    
+    timeoutMs: 5000,
+  }],
   
   // Enable debug logging (set to false in production)
   debug: false,
