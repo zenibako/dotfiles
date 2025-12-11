@@ -15,7 +15,8 @@ window-save-state = always
 
 keybind = super+r=reload_config
 
-command = zsh -l -c "tmux attach || tmux"
+# Trying to fly without tmux temporarily
+# command = zsh -l -c "tmux attach || tmux"
 
 # Allow tmux to set window title
 window-title-font-family = "MesloLGMDZ Nerd Font Mono"
