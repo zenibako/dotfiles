@@ -6,9 +6,9 @@
 "tmux.conf"                   = { target  = "~/.tmux.conf",                         type = "template" }
 vimrc                         = { target  = "~/.vimrc",                             type = "template" }
 # "wezterm.lua"       	                  = "~/.wezterm.lua"
-zshrc               	                    = "~/.zshrc"
+zshrc                         = { target  = "~/.zshrc",                             type = "template" }
 carapace            	                    = "~/.config/carapace"
-# fish              	                    = "~/.config/fish"
+fish                          = { target  = "~/.config/fish",                       type = "template" }
 "ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }
 iamb                	                    = "~/.config/iamb"
 nushell                       = { target  = "~/.config/nushell",                    type = "template" }
@@ -57,6 +57,7 @@ depends = ["default"]
 "opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
+username                              = "chanderson"
 playdate_sdk_enabled                  = true
 opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
 opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
@@ -69,6 +70,7 @@ depends = ["default"]
 "opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
 
 [work.variables]
+username                              = "chandler.anderson"
 lsp_salesforce_disabled               = false
 mcp_atlassian_enabled                 = true
 mcp_gitlab_enabled                    = true
@@ -82,8 +84,14 @@ mcp_odaseva_enabled                   = true
 hypr                	                = "~/.config/hypr"
 # "waybar"                            = "~/.config/waybar"
 
+[linux.variables]
+shell_bin_path = "/usr/bin"
+
 [mac.files]
 "aerospace.toml"             	        = "~/.aerospace.toml"
+
+[mac.variables]
+shell_bin_path = "/opt/homebrew/bin"
 
 [monokai.variables]
 ghostty_theme                         = "Monokai Pro"
@@ -101,6 +109,9 @@ set -g @monokai-show-powerline true
 set -g @monokai-show-left-sep ''
 set -g @monokai-show-right-sep ''
 """
+# Nushell prompt colors
+nu_prompt_insert_color                = "green_bold"
+nu_prompt_normal_color                = "yellow_bold"
 
 [nightowl.variables]
 ghostty_theme                         = "Night Owl"
@@ -121,6 +132,9 @@ set -g @nightowl-ram-usage true
 set -g @nightowl-show-timezone true
 set -g @nightowl-border-contrast true
 """
+# Nushell prompt colors
+nu_prompt_insert_color                = "light_blue_bold"
+nu_prompt_normal_color                = "light_purple_bold"
 
 [tokyonight.variables]
 ghostty_theme                         = "TokyoNight Night"
@@ -178,6 +192,9 @@ set -g @tokyo-night-tmux_show_music 0
 # Hostname widget
 set -g @tokyo-night-tmux_show_hostname 0
 """
+# Nushell prompt colors
+nu_prompt_insert_color                = "cyan_bold"
+nu_prompt_normal_color                = "blue_bold"
 
 [settings]
 default_target_type                   = "automatic"

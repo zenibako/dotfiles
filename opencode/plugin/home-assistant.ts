@@ -92,7 +92,7 @@
 
 import type { Plugin } from '@opencode-ai/plugin';
 // @ts-ignore - Using local dev version
-import { createAgentNotificationPlugin } from '/Users/chanderson/Projects/opencode-webhooks/dist/index.js';
+import { createAgentNotificationPlugin } from '/Users/{{ username }}/Projects/opencode-webhooks/dist/index.js';
 
 // ============================================================================
 // Configuration (Preserved from your dotfiles)
