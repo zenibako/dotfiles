@@ -26,6 +26,8 @@ ${custom.jj_empty}\
 ${custom.jj_desc}\
 $all"""
 
+right_format = """$shell"""
+
 command_timeout = 750
 
 # Replace the '❯' symbol in the prompt with '➜'
@@ -73,3 +75,7 @@ when            = ''' zsh -c 'test -n "$(jj status)" || exit 1' '''
 format          = '$symbol [($output)]($style) '
 symbol          = '|'
 ignore_timeout  = true
+
+[shell]
+disabled = false
+format = '[$indicator]($style) '

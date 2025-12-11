@@ -1,5 +1,5 @@
 [default.files]
-"shared/env.toml"                         = "~/.config/shared/env.toml"
+"shared/env.toml"                         = { target = "~/.config/shared/env.toml", type = "template" }
 "atuin/bin"                               = "~/.atuin/bin"
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
 "alacritty.toml"    	                    = "~/.alacritty.toml"
@@ -59,6 +59,7 @@ depends = ["default"]
 [personal.variables]
 username                              = "chanderson"
 playdate_sdk_enabled                  = true
+mcp_backlog_enabled                   = true
 opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
 opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
 
@@ -73,6 +74,7 @@ depends = ["default"]
 username                              = "chandler.anderson"
 lsp_salesforce_disabled               = false
 mcp_atlassian_enabled                 = true
+mcp_backlog_enabled                   = false
 mcp_gitlab_enabled                    = true
 opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
 opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"

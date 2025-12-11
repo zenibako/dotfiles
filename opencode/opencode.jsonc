@@ -78,6 +78,15 @@
       ],
       "enabled": {{#if mcp_atlassian_enabled}}true{{else}}false{{/if}},
     },
+    "Backlog": {
+      "type": "local",
+      "command": [
+        "backlog",
+        "mcp",
+        "start"
+      ],
+      "enabled": {{#if mcp_backlog_enabled}}true{{else}}false{{/if}}
+    },
     "Neovim": {
       "type": "local",
       "command": [

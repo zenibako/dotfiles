@@ -38,6 +38,8 @@ $env.config.show_banner = false
 $env.STARSHIP_SHELL = "nu"
 
 def create_left_prompt [] {
+    # Set window title to current directory name (OSC 2)
+    print -n $"\e]2;($env.PWD | path basename)\a"
     starship prompt --cmd-duration $env.CMD_DURATION_MS $'--status=($env.LAST_EXIT_CODE)'
 }
 

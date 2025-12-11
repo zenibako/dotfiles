@@ -46,6 +46,23 @@ if ($shared_env_path | path exists) {
     }
 }
 
+# NVM Setup
+# Must run before tool init commands since it replaces $env.PATH
+$env.NVM_DIR = ($env.HOME | path join ".nvm")
+# Load nvm environment variables (if nvm exists)
+if ("/opt/homebrew/opt/nvm/nvm.sh" | path exists) {
+    let cmd = $"export NVM_DIR='($env.NVM_DIR)'; source \"/opt/homebrew/opt/nvm/nvm.sh\"; jq -n --arg nvm_dir \"\$NVM_DIR\" --arg nvm_bin \"\$NVM_BIN\" --arg nvm_inc \"\$NVM_INC\" --arg path \"\$PATH\" '{NVM_DIR: \$nvm_dir, NVM_BIN: \$nvm_bin, NVM_INC: \$nvm_inc, PATH: \$path}'"
+    let nvm_vars = (bash -c $cmd | from json)
+
+    load-env {
+        NVM_DIR: $nvm_vars.NVM_DIR
+        NVM_BIN: $nvm_vars.NVM_BIN
+        NVM_INC: $nvm_vars.NVM_INC
+    }
+
+    $env.PATH = ($nvm_vars.PATH | split row (char esep))
+}
+
 zoxide init nushell | save -f ~/.zoxide.nu
 starship init nu | save -f ~/.starship.nu
 
@@ -69,20 +86,3 @@ $env.PATH = ($env.PATH | append $"($env.PLAYDATE_SDK_PATH)/bin/")
 {{/if}}
 
 $env.GPG_TTY = (try { tty } catch { "" })
-
-
-# NVM Setup
-$env.NVM_DIR = ($env.HOME | path join ".nvm")
-# Load nvm environment variables (if nvm exists)
-if ("/opt/homebrew/opt/nvm/nvm.sh" | path exists) {
-    let cmd = $"export NVM_DIR='($env.NVM_DIR)'; source \"/opt/homebrew/opt/nvm/nvm.sh\"; jq -n --arg nvm_dir \"\$NVM_DIR\" --arg nvm_bin \"\$NVM_BIN\" --arg nvm_inc \"\$NVM_INC\" --arg path \"\$PATH\" '{NVM_DIR: \$nvm_dir, NVM_BIN: \$nvm_bin, NVM_INC: \$nvm_inc, PATH: \$path}'"
-    let nvm_vars = (bash -c $cmd | from json)
-
-    load-env {
-        NVM_DIR: $nvm_vars.NVM_DIR
-        NVM_BIN: $nvm_vars.NVM_BIN
-        NVM_INC: $nvm_vars.NVM_INC
-    }
-
-    $env.PATH = ($nvm_vars.PATH | split row (char esep))
-}

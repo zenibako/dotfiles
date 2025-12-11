@@ -1,3 +1,4 @@
 fjira: cobra
 opencode: yargs
 cuejitsu: cobra
+backlog: bash

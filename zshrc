@@ -257,7 +257,8 @@ then
 fi
 
 [[ -d ~/.zsh/completion ]] || mkdir -p ~/.zsh/completion
-fpath=(~/.zsh/completion $fpath)
+[[ -d ~/.zsh/completions ]] || mkdir -p ~/.zsh/completions
+fpath=(~/.zsh/completion ~/.zsh/completions $fpath)
 
 if (( ${+commands[workmux]} ))
 then
@@ -267,6 +268,11 @@ fi
 if (( ${+commands[opencode]} ))
 then
   opencode completion zsh > ~/.zsh/completion/_opencode 2>/dev/null
+fi
+
+if (( ${+commands[backlog]} ))
+then
+  backlog completion install --shell zsh >/dev/null 2>&1
 fi
 
 autoload -U compinit
