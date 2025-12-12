@@ -70,8 +70,18 @@ jobs:
         run: |
           echo "Testing deployment for profile: ${{ matrix.profile }}, theme: ${{ matrix.theme }}"
           
+          # Determine platform package based on OS
+          case "$RUNNER_OS" in
+            Linux)
+              PLATFORM_PKG="linux"
+              ;;
+            macOS)
+              PLATFORM_PKG="mac"
+              ;;
+          esac
+          
           # Build package list for this combination
-          PACKAGES=("${{ matrix.profile }}" "${{ matrix.theme }}")
+          PACKAGES=("${{ matrix.profile }}" "$PLATFORM_PKG" "${{ matrix.theme }}")
           if [ -n "${{ matrix.extra_packages }}" ]; then
             PACKAGES+=("${{ matrix.extra_packages }}")
           fi
@@ -116,14 +126,6 @@ jobs:
               cat >> .dotter/local.toml <<'EOF'
           email = "test@default.example.com"
           github_personal_access_token = "ghp_test123456789"
-          lsp_salesforce_disabled = true
-          mcp_atlassian_enabled = false
-          mcp_gitlab_enabled = false
-          mcp_postman_enabled = false
-          mcp_salesforce_enabled = false
-          mcp_sonarqube_enabled = false
-          opencode_build_agent_model = "anthropic:claude-sonnet-4-5"
-          opencode_plan_agent_model = "anthropic:claude-opus-4-5"
           EOF
               ;;
           esac
@@ -217,16 +219,6 @@ jobs:
           # Create local.toml for default + linux + monokai packages
           cat > .dotter/local.toml <<'EOF'
           packages = ["default", "linux", "monokai"]
-          
-          [variables]
-          lsp_salesforce_disabled = true
-          mcp_atlassian_enabled = false
-          mcp_gitlab_enabled = false
-          mcp_postman_enabled = false
-          mcp_salesforce_enabled = false
-          mcp_sonarqube_enabled = false
-          opencode_build_agent_model = "anthropic:claude-sonnet-4-5"
-          opencode_plan_agent_model = "anthropic:claude-opus-4-5"
           EOF
           
           echo "Deploying configs for validation"
