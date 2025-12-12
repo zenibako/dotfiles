@@ -62,7 +62,6 @@ depends = ["default"]
 
 [personal.variables]
 playdate_sdk_enabled                  = true
-mcp_backlog_enabled                   = true
 
 [work]
 depends = ["default"]

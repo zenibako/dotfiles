@@ -201,7 +201,7 @@ jobs:
           for profile in default personal work; do
             echo "Testing $profile profile..."
             cat > .dotter/local.toml <<EOF
-          packages = ["$profile", "monokai"]
+          packages = ["$profile", "linux", "monokai"]
           EOF
             
             if ! dotter deploy --dry-run --force 2>&1 | tee /tmp/dotter-$profile.log; then
@@ -214,9 +214,9 @@ jobs:
 
       - name: Deploy with dotter (for Lua validation)
         run: |
-          # Create local.toml for default + monokai packages
+          # Create local.toml for default + linux + monokai packages
           cat > .dotter/local.toml <<'EOF'
-          packages = ["default", "monokai"]
+          packages = ["default", "linux", "monokai"]
           
           [variables]
           lsp_salesforce_disabled = true
