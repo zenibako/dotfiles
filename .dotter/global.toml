@@ -61,7 +61,6 @@ depends = ["default"]
 "opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
-playdate_sdk_enabled                  = true
 
 [work]
 depends = ["default"]
@@ -71,17 +70,10 @@ depends = ["default"]
 "opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
 
 [work.variables]
-username                              = "chandler.anderson"
-lsp_salesforce_disabled               = false
-mcp_atlassian_enabled                 = true
-mcp_gitlab_enabled                    = true
-opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
-opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"
 
 [oda-mcp]
 
 [oda-mcp.variables]
-mcp_odaseva_enabled                   = true
 
 [linux.files]
 hypr                	                = "~/.config/hypr"

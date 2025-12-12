@@ -109,9 +109,15 @@ jobs:
             work)
               cat >> .dotter/local.toml <<'EOF'
           email = "test@work.example.com"
+          username = "test.user"
           apex_lsp_jar_path = "/test/path/apex-jorje-lsp.jar"
           gitlab_personal_access_token = "glpat-test123456789"
           gitlab_api_url = "https://gitlab.example.com/api/v4"
+          lsp_salesforce_disabled = false
+          mcp_atlassian_enabled = true
+          mcp_gitlab_enabled = true
+          opencode_build_agent_model = "github-copilot/claude-sonnet-4.5"
+          opencode_plan_agent_model = "github-copilot/claude-opus-4.5"
           EOF
               ;;
             personal)
@@ -120,6 +126,8 @@ jobs:
           github_personal_access_token = "ghp_test123456789"
           home_assistant_url = "https://test.hass.example.com"
           home_assistant_token = "test_token_123"
+          playdate_sdk_enabled = true
+          mcp_backlog_enabled = true
           EOF
               ;;
             default)

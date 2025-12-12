@@ -21,17 +21,30 @@ packages = ["personal", "mac", "monokai"]
 # Profile-specific email (overrides default.variables.email)
 email = "your@email.com"
 
+# Username for system paths (override based on your actual username)
+# username = "your-username"
+
 # Apex LSP jar path (if using Salesforce development)
 # Set to your actual path or leave as empty string if not needed
 apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 
-# Enable/disable LSP for Salesforce (work profile sets this to false by default)
-# lsp_salesforce_disabled = true
+# Profile-specific overrides:
+# For 'work' profile, uncomment and set these:
+# lsp_salesforce_disabled = false
+# mcp_atlassian_enabled = true
+# mcp_gitlab_enabled = true
+# opencode_build_agent_model = "github-copilot/claude-sonnet-4.5"
+# opencode_plan_agent_model = "github-copilot/claude-opus-4.5"
 
-# Enable/disable MCP servers (work profile enables some by default)
-# mcp_atlassian_enabled = false
-# mcp_gitlab_enabled = false
+# For 'personal' profile, uncomment and set these:
+# playdate_sdk_enabled = true
+# mcp_backlog_enabled = true
+
+# Other MCP servers (can be enabled for any profile)
+# mcp_postman_enabled = false
 # mcp_salesforce_enabled = false
+# mcp_sonarqube_enabled = false
+# mcp_odaseva_enabled = false
 
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
