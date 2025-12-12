@@ -8,7 +8,6 @@ vimrc                         = { target  = "~/.vimrc",                         
 # "wezterm.lua"       	                  = "~/.wezterm.lua"
 zshrc                         = { target  = "~/.zshrc",                             type = "template" }
 carapace            	                    = "~/.config/carapace"
-fish                          = { target  = "~/.config/fish",                       type = "template" }
 "ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }
 iamb                	                    = "~/.config/iamb"
 nushell                       = { target  = "~/.config/nushell",                    type = "template" }
