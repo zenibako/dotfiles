@@ -28,6 +28,7 @@ gitlogue                                  = "~/.config/gitlogue"
 [default.variables]
 name                                  = "Chandler Anderson"
 email                                 = "chanderson90@proton.me"
+username                              = "chanderson"
 vim_set_num_relnum                    = "set number relativenumber"
 apex_lsp_jar_path                     = ""
 postman_api_key                       = ""
@@ -40,13 +41,17 @@ home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 opencode_slack_webhook_url            = ""
+playdate_sdk_enabled                  = false
 mcp_atlassian_enabled                 = false
+mcp_backlog_enabled                   = false
 mcp_gitlab_enabled                    = false
 mcp_postman_enabled                   = false
 mcp_salesforce_enabled                = false
 mcp_sonarqube_enabled                 = false
 mcp_odaseva_enabled                   = false
 lsp_salesforce_disabled               = true
+opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
+opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
 
 [personal]
 depends = ["default"]
@@ -56,11 +61,8 @@ depends = ["default"]
 "opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
-username                              = "chanderson"
 playdate_sdk_enabled                  = true
 mcp_backlog_enabled                   = true
-opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
-opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
 
 [work]
 depends = ["default"]
@@ -73,10 +75,11 @@ depends = ["default"]
 username                              = "chandler.anderson"
 lsp_salesforce_disabled               = false
 mcp_atlassian_enabled                 = true
-mcp_backlog_enabled                   = false
 mcp_gitlab_enabled                    = true
 opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
 opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"
+
+[oda-mcp]
 
 [oda-mcp.variables]
 mcp_odaseva_enabled                   = true
