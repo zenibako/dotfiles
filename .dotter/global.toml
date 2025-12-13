@@ -43,7 +43,6 @@ home_assistant_webhook_id             = ""
 opencode_slack_webhook_url            = ""
 playdate_sdk_enabled                  = false
 mcp_atlassian_enabled                 = false
-mcp_backlog_enabled                   = false
 mcp_gitlab_enabled                    = false
 mcp_postman_enabled                   = false
 mcp_salesforce_enabled                = false
@@ -61,6 +60,7 @@ depends = ["default"]
 "opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
+mcp_backlog_enabled                   = true
 
 [work]
 depends = ["default"]
@@ -70,6 +70,7 @@ depends = ["default"]
 "opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
 
 [work.variables]
+mcp_backlog_enabled                   = false
 
 [oda-mcp]
 
