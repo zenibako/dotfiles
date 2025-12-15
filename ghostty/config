@@ -18,15 +18,12 @@ keybind = super+r=reload_config
 # Trying to fly without tmux temporarily
 # command = zsh -l -c "tmux attach || tmux"
 
-# Default shell: Nushell
-command = {{ shell_bin_path }}/nu -l
+# Default shell: Nushell (via sh to set XDG_CONFIG_HOME before exec)
+command = /bin/sh -c 'XDG_CONFIG_HOME=$HOME/.config exec {{ shell_bin_path }}/nu -l'
 
-# Fallback: Use zsh to set up PATH before launching nu
-# command = /bin/zsh -l -c 'exec nu -l'
-
-# Set XDG_CONFIG_HOME so Nushell finds config at ~/.config/nushell
-# instead of ~/Library/Application Support/nushell
-env = XDG_CONFIG_HOME=/Users/{{ username }}/.config
+# Direct launch (may fail with permission errors through /usr/bin/login)
+# command = {{ shell_bin_path }}/nu -l
+# env = XDG_CONFIG_HOME=/Users/{{ username }}/.config
 
 # Allow tmux to set window title
 window-title-font-family = "MesloLGMDZ Nerd Font Mono"

@@ -63,12 +63,13 @@ if ("/opt/homebrew/opt/nvm/nvm.sh" | path exists) {
     $env.PATH = ($nvm_vars.PATH | split row (char esep))
 }
 
-zoxide init nushell | save -f ~/.zoxide.nu
-starship init nu | save -f ~/.starship.nu
+# Generate shell integration files with error handling
+try { zoxide init nushell | save -f ~/.zoxide.nu } catch { }
+try { starship init nu | save -f ~/.starship.nu } catch { }
 
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
-mkdir ~/.cache/carapace
-carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
+try { mkdir ~/.cache/carapace } catch { }  # May already exist
+try { carapace _carapace nushell | save --force ~/.cache/carapace/init.nu } catch { }
 
 # $env.JAVA_HOME = "/opt/homebrew/opt/openjdk"
 # $env.PATH = ($env.PATH | prepend $"($env.JAVA_HOME)/bin/")
