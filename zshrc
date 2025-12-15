@@ -286,6 +286,13 @@ then
   source "${GHCUP_DIR}/env"
 fi
 
+# Rust/Cargo environment
+CARGO_ENV="${HOME}/.cargo/env"
+if [[ -f $CARGO_ENV ]]
+then
+  source "$CARGO_ENV"
+fi
+
 BREW_NVM_DIR="/opt/homebrew/opt/nvm/"
 if [[ -d $GHCUP_DIR ]]
 then
@@ -315,6 +322,12 @@ function _gpg-agent-update-tty {
 autoload -Uz add-zsh-hook
 add-zsh-hook preexec _gpg-agent-update-tty
 
+
+{{#if opencode_profile_work}}
+# Netskope CA certificate for Node.js (work profile)
+export NODE_EXTRA_CA_CERTS="{{node_extra_ca_certs}}"
+export REQUESTS_CA_BUNDLE="{{node_extra_ca_certs}}"
+{{/if}}
 
 # opencode
 export PATH=/Users/{{ username }}/.opencode/bin:$PATH

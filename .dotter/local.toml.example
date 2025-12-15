@@ -35,6 +35,14 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # mcp_gitlab_enabled = true
 # opencode_build_agent_model = "github-copilot/claude-sonnet-4.5"
 # opencode_plan_agent_model = "github-copilot/claude-opus-4.5"
+# jira_browser = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+# jira_api_token = "your-jira-token"
+# jira_workspace_url = "yourcompany.atlassian.net"
+# jira_user_email = "your.email@company.com"
+# jira_project_key = "PROJECT"
+# node_extra_ca_certs = "/Library/Application Support/Netskope/STAgent/download/nscacert_combined.pem"
+# requests_ca_bundle = "$node_extra_ca_certs"
+# p10k_root_dir = "/opt/homebrew/share/powerlevel10k"
 
 # For 'personal' profile, uncomment and set these:
 # playdate_sdk_enabled = true
@@ -50,9 +58,12 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # Create at: https://github.com/settings/tokens
 github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
 
-# GitLab Personal Access Token (for gitlab.nvim plugin)
+# GitLab Personal Access Token (for gitlab.nvim plugin and MCP)
 # Create at: https://gitlab.com/-/user_settings/personal_access_tokens
 gitlab_personal_access_token = ""
+
+# GitLab API URL (for work instances)
+gitlab_api_url = "https://gitlab.com/api/v4"
 
 # Home Assistant Long-Lived Access Token
 # Create at: http://YOUR_HA_URL/profile/security

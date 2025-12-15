@@ -86,4 +86,24 @@ $env.PLAYDATE_SDK_PATH = $"($env.HOME)/Developer/PlaydateSDK"
 $env.PATH = ($env.PATH | append $"($env.PLAYDATE_SDK_PATH)/bin/")
 {{/if}}
 
+{{#if opencode_profile_work}}
+# Netskope CA certificate for Node.js (work profile)
+$env.NODE_EXTRA_CA_CERTS = "{{node_extra_ca_certs}}"
+$env.REQUESTS_CA_BUNDLE = "{{node_extra_ca_certs}}"
+{{/if}}
+
+# Rust/Cargo environment
+let cargo_env = ($env.HOME | path join ".cargo/env")
+if ($cargo_env | path exists) {
+    # Source the cargo env by executing it through bash
+    let cargo_vars = (bash -c $"source ($cargo_env) && env" | lines | parse "{key}={value}")
+    for var in $cargo_vars {
+        if $var.key starts-with "PATH" {
+            $env.PATH = ($var.value | split row (char esep))
+        } else if $var.key starts-with "CARGO" or $var.key starts-with "RUST" {
+            load-env { ($var.key): $var.value }
+        }
+    }
+}
+
 $env.GPG_TTY = (try { tty } catch { "" })

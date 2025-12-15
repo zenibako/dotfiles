@@ -30,47 +30,50 @@ name                                  = "Chandler Anderson"
 email                                 = "chanderson90@proton.me"
 username                              = "chanderson"
 vim_set_num_relnum                    = "set number relativenumber"
-apex_lsp_jar_path                     = ""
-postman_api_key                       = ""
-sonarqube_url                         = ""
-sonarqube_token                       = ""
 github_personal_access_token          = ""
-gitlab_personal_access_token          = ""
-gitlab_api_url                        = "https://gitlab.com/api/v4"
 home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
-opencode_slack_webhook_url            = ""
 playdate_sdk_enabled                  = false
-mcp_atlassian_enabled                 = false
-mcp_gitlab_enabled                    = false
-mcp_postman_enabled                   = false
-mcp_salesforce_enabled                = false
-mcp_sonarqube_enabled                 = false
-mcp_odaseva_enabled                   = false
-lsp_salesforce_disabled               = true
-opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
-opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
 
 [personal]
 depends = ["default"]
 
 [personal.files]
-"nvim/personal"           = { target  = "~/.config/nvim",                     type = "template" }
-"opencode/plugin/home-assistant.ts" = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
+"nvim/personal"                       = { target  = "~/.config/nvim",                              type = "template" }
+"opencode/plugin/home-assistant.ts"   = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
-mcp_backlog_enabled                   = true
+opencode_profile_personal             = true
+opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
+opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
 
 [work]
 depends = ["default"]
 
 [work.files]
-"nvim/work"               = { target  = "~/.config/nvim",                     type = "template" }
-"opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
+"nvim/work"                           = { target  = "~/.config/nvim",                              type = "template" }
+"opencode/plugin/slack-workflow.ts"   = { target  = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
 
 [work.variables]
-mcp_backlog_enabled                   = false
+opencode_profile_work                 = true
+postman_api_key                       = ""
+sonarqube_url                         = ""
+sonarqube_token                       = ""
+gitlab_personal_access_token          = ""
+gitlab_api_url                        = "https://gitlab.com/api/v4"
+gitlab_url                            = ""
+opencode_slack_webhook_url            = ""
+apex_lsp_jar_path                     = ""
+opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
+opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"
+jira_browser                          = ""
+jira_api_token                        = ""
+jira_workspace_url                    = ""
+jira_user_email                       = ""
+jira_project_key                      = ""
+node_extra_ca_certs                   = ""
+p10k_root_dir                         = ""
 
 [oda-mcp]
 
