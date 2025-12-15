@@ -2,7 +2,7 @@ font-family = "MesloLGMDZ Nerd Font Mono"
 
 theme = "{{ ghostty_theme }}"
 
-background-opacity  = 0.5
+background-opacity  = 0.85
 background-blur     = true
 background          = "#000000"
 
@@ -14,6 +14,12 @@ copy-on-select = true
 window-save-state = always
 
 keybind = super+r=reload_config
+
+# Split navigation with vim-style hjkl
+keybind = super+h=goto_split:left
+keybind = super+j=goto_split:bottom
+keybind = super+k=goto_split:top
+keybind = super+l=goto_split:right
 
 # Trying to fly without tmux temporarily
 # command = zsh -l -c "tmux attach || tmux"
