@@ -128,12 +128,16 @@ jobs:
           home_assistant_token = "test_token_123"
           playdate_sdk_enabled = true
           mcp_backlog_enabled = true
+          opencode_build_agent_model = "anthropic/claude-sonnet-4-5"
+          opencode_plan_agent_model = "anthropic/claude-opus-4-5"
           EOF
               ;;
             default)
               cat >> .dotter/local.toml <<'EOF'
           email = "test@default.example.com"
           github_personal_access_token = "ghp_test123456789"
+          opencode_build_agent_model = "anthropic/claude-sonnet-4-5"
+          opencode_plan_agent_model = "anthropic/claude-opus-4-5"
           EOF
               ;;
           esac

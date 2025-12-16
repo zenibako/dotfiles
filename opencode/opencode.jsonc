@@ -238,10 +238,10 @@
   },
   "agent": {
     "build": {
-      "model": "{{opencode_build_agent_model}}"
+      "model": "{{#if opencode_build_agent_model}}{{opencode_build_agent_model}}{{else}}anthropic/claude-sonnet-4-5{{/if}}"
     },
     "plan": {
-      "model": "{{opencode_plan_agent_model}}"
+      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-5{{/if}}"
     }
   }
 }
