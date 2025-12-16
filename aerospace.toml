@@ -198,6 +198,7 @@ run = 'move-node-to-workspace 2'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
     alt-shift-semicolon = 'mode service'
+    alt-shift-p = 'mode passthrough'  # Toggle passthrough mode for Screen Sharing
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -214,3 +215,7 @@ run = 'move-node-to-workspace 2'
     alt-shift-j = ['join-with down', 'mode main']
     alt-shift-k = ['join-with up', 'mode main']
     alt-shift-l = ['join-with right', 'mode main']
+
+# 'passthrough' binding mode - disables all Aerospace keybinds for Screen Sharing
+[mode.passthrough.binding]
+    alt-shift-p = 'mode main'  # Exit passthrough mode back to main

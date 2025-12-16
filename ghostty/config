@@ -21,6 +21,11 @@ keybind = super+j=goto_split:bottom
 keybind = super+k=goto_split:top
 keybind = super+l=goto_split:right
 
+# Split pane visual distinction
+unfocused-split-opacity = 0.7
+unfocused-split-fill = {{ ghostty_unfocused_split_fill }}
+split-divider-color = {{ ghostty_split_divider_color }}
+
 # Trying to fly without tmux temporarily
 # command = zsh -l -c "tmux attach || tmux"
 
