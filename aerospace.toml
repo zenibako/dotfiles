@@ -55,31 +55,59 @@ on-mode-changed = []
 # Workspace to application assignments
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace 1'
+if.during-aerospace-startup = true
+run = [ 
+  'layout h_accordion',
+  'move-node-to-workspace 1', 
+]
 
 [[on-window-detected]]
 if.app-id = 'app.zen-browser.zen'
-run = 'move-node-to-workspace 1'
+if.during-aerospace-startup = true
+run = [
+  'layout h_accordion',
+  'move-node-to-workspace 1',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
-run = 'move-node-to-workspace 1'
+if.during-aerospace-startup = true
+run = [
+  'layout h_accordion',
+  'move-node-to-workspace 1',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace 2'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.hnc.Discord'
-run = 'move-node-to-workspace 2'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 [[on-window-detected]]
+if.during-aerospace-startup = true
 if.app-id = 'com.apple.MobileSMS'
-run = 'move-node-to-workspace 2'
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.google.Gmail'
-run = 'move-node-to-workspace 2'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 # Possible values: (qwerty|dvorak|colemak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
