@@ -18,6 +18,7 @@ jj                            = { target  = "~/.config/jj",                     
 "opencode/.gitignore"         = { target  = "~/.config/opencode/.gitignore",        type = "symbolic" }
 "opencode/AGENTS.md"          = { target  = "~/.config/opencode/AGENTS.md",         type = "symbolic" }
 "opencode/command"            = { target  = "~/.config/opencode/command",           type = "symbolic" }
+"opencode/prompt"             = { target  = "~/.config/opencode/prompt",            type = "symbolic" }
 "opencode/opencode.jsonc"     = { target  = "~/.config/opencode/opencode.jsonc",    type = "template" }
 "opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }
 "opencode/package-lock.json"  = { target  = "~/.config/opencode/package-lock.json", type = "symbolic" }
@@ -47,6 +48,7 @@ depends = ["default"]
 opencode_profile_personal             = true
 opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
 opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
+opencode_admin_agent_model            = "anthropic/claude-haiku-4-5"
 
 [work]
 depends = ["default"]
@@ -67,6 +69,7 @@ opencode_slack_webhook_url            = ""
 apex_lsp_jar_path                     = ""
 opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
 opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"
+opencode_admin_agent_model            = "github-copilot/claude-haiku-4.5"
 jira_browser                          = ""
 jira_api_token                        = ""
 jira_workspace_url                    = ""

@@ -243,6 +243,32 @@
     },
     "plan": {
       "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-5{{/if}}"
+    },
+    "admin": {
+      "description": "Handles project administration: Git/Jujutsu history, pushing to remotes, and editing configuration files",
+      "mode": "primary",
+      "model": "{{#if opencode_admin_agent_model}}{{opencode_admin_agent_model}}{{else}}anthropic/claude-haiku-4-20250514{{/if}}",
+      "prompt": "{file:./prompt/admin.txt}",
+      "permission": {
+        "bash": {
+          "git push*": "ask",
+          "git push --force*": "ask",
+          "git reset --hard*": "ask",
+          "git clean*": "ask",
+          "git rebase*": "ask",
+          "git merge*": "ask",
+          "git checkout -f*": "ask",
+          "git branch -D*": "ask",
+          "jj git push*": "ask",
+          "jj abandon*": "ask",
+          "jj rebase*": "ask",
+          "jj squash*": "ask",
+          "rm -rf*": "deny",
+          "rm -r*": "ask",
+          "*": "allow"
+        },
+        "edit": "allow"
+      }
     }
   }
 }
