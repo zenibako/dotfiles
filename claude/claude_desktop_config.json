@@ -10,8 +10,8 @@
     },
 {{/if}}
     "Chrome DevTools": {
-      "command": "npx",
-      "args": ["chrome-devtools-mcp@latest"]
+      "command": "zsh",
+      "args": ["-c", "source ~/.nvm/nvm.sh && nvm use --lts >&2 && npx chrome-devtools-mcp@latest"]
     }{{#if mcp_odaseva_enabled}},
     "Odaseva": {
       "command": "oda-mcp",
