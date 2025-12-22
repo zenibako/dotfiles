@@ -8,9 +8,10 @@ email = "{{email}}"
 default-command = "log"
 diff-editor = ":builtin"
 
-# [signing]
-# behavior = "own"
-# backend = "gpg"
+[signing]
+sign-all = true
+backend = "gpg"
+key = "{{gpg_key}}"
 
 [templates]
 duplicate_description = '''
