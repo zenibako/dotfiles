@@ -21,6 +21,11 @@ packages = ["personal", "mac", "monokai"]
 # Profile-specific email (overrides default.variables.email)
 email = "your@email.com"
 
+# GPG signing key for Jujutsu commits
+# Set to your GPG key ID (e.g., "ABCD1234EFGH5678" or "your.email@example.com")
+# Leave as empty string to disable GPG signing
+gpg_key = ""
+
 # Username for system paths (override based on your actual username)
 # username = "your-username"
 
