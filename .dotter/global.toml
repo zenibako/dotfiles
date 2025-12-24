@@ -57,9 +57,15 @@ depends = ["default"]
 [work.files]
 "nvim/work"                           = { target  = "~/.config/nvim",                              type = "template" }
 "opencode/plugin/slack-workflow.ts"   = { target  = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
+"opencode/script/lwc-lsp-wrapper.sh"  = { target  = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
 
 [work.variables]
 opencode_profile_work                 = true
+mcp_salesforce_dx                     = false
+mcp_atlassian                         = false
+mcp_odaseva                           = true
+mcp_postman                           = true
+mcp_sonarqube                         = true
 postman_api_key                       = ""
 sonarqube_url                         = ""
 sonarqube_token                       = ""
