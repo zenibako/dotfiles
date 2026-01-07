@@ -18,7 +18,8 @@ packages = ["personal", "mac", "monokai"]
 # IMPORTANT: Variables in local.toml override ALL package variables
 # This allows you to customize settings per-machine without editing global.toml
 
-# Profile-specific email (overrides default.variables.email)
+# REQUIRED: Email for Git/Jujutsu commits
+# Use your work email for work profile, personal email for personal profile
 email = "your@email.com"
 
 # GPG signing key for Jujutsu commits

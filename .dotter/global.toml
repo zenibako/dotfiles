@@ -28,7 +28,7 @@ gitlogue                                  = "~/.config/gitlogue"
 
 [default.variables]
 name                                  = "Chandler Anderson"
-email                                 = "chanderson90@proton.me"
+email                                 = ""
 username                              = "chanderson"
 vim_set_num_relnum                    = "set number relativenumber"
 gpg_key                               = ""
