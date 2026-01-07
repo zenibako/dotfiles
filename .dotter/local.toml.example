@@ -45,8 +45,8 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # jira_workspace_url = "yourcompany.atlassian.net"
 # jira_user_email = "your.email@company.com"
 # jira_project_key = "PROJECT"
+# gitlab_url = "https://gitlab.yourcompany.com"
 # node_extra_ca_certs = "/Library/Application Support/Netskope/STAgent/download/nscacert_combined.pem"
-# requests_ca_bundle = "$node_extra_ca_certs"
 # p10k_root_dir = "/opt/homebrew/share/powerlevel10k"
 
 # For 'personal' profile, uncomment and set these:
