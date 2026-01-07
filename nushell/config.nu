@@ -26,6 +26,7 @@ source ~/.cache/atuin.nu
 source ~/.zoxide.nu
 source ~/.cache/carapace/init.nu
 source ~/.starship.nu
+source ~/.config/nushell/atuin-exec.nu
 
 # Set config options AFTER sourcing third-party scripts
 # (atuin init and starship init reset $env.config)
