@@ -53,11 +53,16 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # playdate_sdk_enabled = true
 # mcp_backlog_enabled = true
 
-# Other MCP servers (can be enabled for any profile)
-# mcp_postman_enabled = false
-# mcp_salesforce_enabled = false
-# mcp_sonarqube_enabled = false
-# mcp_odaseva_enabled = false
+# Other MCP servers (disabled by default, can be enabled per-machine)
+# Note: work profile has mcp_odaseva and mcp_sonarqube disabled by default
+# To enable, add these to your local.toml:
+# mcp_odaseva = true
+# mcp_sonarqube = true
+# sonarqube_url = "https://sonarqube.yourcompany.com"
+# sonarqube_token = "squ_YOUR_TOKEN_HERE"
+# mcp_postman = false  # Enabled by default in work profile
+# mcp_salesforce_dx = true  # Disabled by default in work profile
+# mcp_atlassian = true  # Disabled by default in work profile
 
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
