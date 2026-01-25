@@ -1,3 +1,4 @@
+
 [default.files]
 "shared/env.toml"                         = { target = "~/.config/shared/env.toml", type = "template" }
 "atuin/bin"                               = "~/.atuin/bin"
@@ -37,6 +38,22 @@ home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 playdate_sdk_enabled                  = false
+
+# Bluesky
+bluesky_handle                        = ""
+bluesky_app_password                  = ""
+
+# Plex
+plex_user_token                       = ""
+plex_server_token                     = ""
+plex_url                              = ""
+
+# TMDB
+tmdb_key                              = ""
+
+# Reddit
+reddit_session                        = ""
+reddit_token_v2                       = ""
 
 [personal]
 depends = ["default"]
@@ -213,3 +230,4 @@ nu_prompt_normal_color                = "blue_bold"
 
 [settings]
 default_target_type                   = "automatic"
+
