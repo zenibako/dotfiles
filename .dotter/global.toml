@@ -1,6 +1,7 @@
 
 [default.files]
 "shared/env.toml"                         = { target = "~/.config/shared/env.toml", type = "template" }
+"shared/completions.toml"                 = "~/.config/shared/completions.toml"
 "atuin/bin"                               = "~/.atuin/bin"
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
 "alacritty.toml"    	                    = "~/.alacritty.toml"
@@ -51,6 +52,14 @@ plex_url                              = ""
 # TMDB
 tmdb_key                              = ""
 
+# Google APIs
+youtube_api_key                       = ""
+google_places_api_key                 = ""
+
+# Slack
+slack_d_cookie                        = ""
+slack_token                           = ""
+
 # Reddit
 reddit_session                        = ""
 reddit_token_v2                       = ""
@@ -60,7 +69,7 @@ depends = ["default"]
 
 [personal.files]
 "nvim/personal"                       = { target  = "~/.config/nvim",                              type = "template" }
-"opencode/plugin/home-assistant.ts"   = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
+# "opencode/plugin/home-assistant.ts"   = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
 opencode_profile_personal             = true

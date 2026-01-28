@@ -1,0 +1,75 @@
+
+# Shared completion definitions for zsh and nushell
+# This file is the single source of truth for CLI tool completions.
+#
+# Usage:
+#   - zsh: parsed with a helper function, outputs to ~/.zsh/completion/_<tool>
+#   - nushell: parsed natively, outputs to ~/.cache/completions/<tool>.nu
+#
+# Each tool has:
+#   - zsh: command to generate zsh completions (piped to a file or sourced)
+#   - nu: command to generate nushell completions (piped to a cache file)
+#
+# Empty string means:
+#   - Handled by carapace bridge (nushell)
+#   - Handled by oh-my-zsh plugin (zsh)
+#   - Manual completions already exist
+#   - Tool doesn't support that shell
+#
+# Tools are automatically skipped if not found in PATH.
+
+[atuin]
+zsh = ""  # oh-my-zsh plugin + atuin init
+nu = "atuin gen-completions --shell nushell"
+
+[backlog]
+zsh = "backlog completion install --shell zsh"
+nu = ""  # via carapace bridge (bash)
+
+[carapace]
+zsh = ""  # carapace handles zsh via bridges
+nu = "carapace _carapace nushell"
+
+[clawdbot]
+zsh = ""  # no native completion support
+nu = ""   # no native completion support
+
+[dotter]
+zsh = "dotter gen-completions --shell zsh"
+nu = ""  # via carapace bridge (zsh)
+
+[gog]
+zsh = "gog completion zsh"
+nu = ""  # via carapace bridge (zsh)
+
+[ha]
+zsh = "ha completion zsh"
+nu = ""  # via carapace
+
+[jj]
+zsh = "jj util completion zsh"
+nu = "jj util completion nushell"
+
+[opencode]
+zsh = "opencode completion zsh"
+nu = ""  # via carapace bridge (yargs)
+
+[pixlet]
+zsh = "pixlet completion zsh"
+nu = ""  # via carapace
+
+[sf]
+zsh = ""  # uses SF_AC_ZSH_SETUP_PATH from oh-my-zsh plugin
+nu = ""   # via carapace spec (carapace/specs/sf.yaml)
+
+[starship]
+zsh = "starship completions zsh"
+nu = ""  # starship init nu handles completions
+
+[workmux]
+zsh = "workmux completions zsh"
+nu = ""  # manual completions in config.nu
+
+[zoxide]
+zsh = ""  # zoxide init zsh handles completions
+nu = ""  # manual completions in config.nu

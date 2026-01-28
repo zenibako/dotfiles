@@ -20,13 +20,13 @@
 # Source third-party integrations first (some reset $env.config)
 # Note: These files are generated in env.nu which runs before config.nu
 source ~/.local/share/atuin/init.nu
-atuin gen-completions --shell nushell | save -f ~/.cache/atuin.nu
-source ~/.cache/atuin.nu
-
 source ~/.zoxide.nu
 source ~/.cache/carapace/init.nu
 source ~/.starship.nu
 source ~/.config/nushell/atuin-exec.nu
+
+# Source shared completions (generated from completions.toml in env.nu)
+source ~/.cache/completions/init.nu
 
 # Set config options AFTER sourcing third-party scripts
 # (atuin init and starship init reset $env.config)
