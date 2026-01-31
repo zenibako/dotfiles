@@ -264,7 +264,7 @@ _load_shared_completions() {
         [[ -z "${line// }" ]] && continue
         
         # Detect tool section [toolname]
-        if [[ "$line" =~ ^\[([a-z_-]+)\]$ ]]; then
+        if [[ "$line" =~ "^\[([a-z_-]+)\]$" ]]; then
             current_tool="${match[1]}"
             in_tool=1
             zsh_cmd=""
@@ -279,7 +279,7 @@ _load_shared_completions() {
         fi
         
         # Parse zsh command
-        if (( in_tool )) && [[ "$line" =~ ^zsh[[:space:]]*=[[:space:]]*\"(.*)\"$ ]]; then
+        if (( in_tool )) && [[ "$line" =~ '^zsh[[:space:]]*=[[:space:]]*"(.*)"$' ]]; then
             zsh_cmd="${match[1]}"
             
             # Generate completion if tool exists and has a command
