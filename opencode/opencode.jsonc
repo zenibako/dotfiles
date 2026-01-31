@@ -274,7 +274,7 @@
           "rm -r*": "ask",
           "*": "allow"
         },
-        "edit": "allow"
+        "edit": "ask"
       }
     }
   }
