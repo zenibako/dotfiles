@@ -88,3 +88,7 @@ home_assistant_webhook_id = "your-webhook-id"
 
 # Slack Workflow Webhook URL (for OpenCode plugin)
 opencode_slack_webhook_url = "https://hooks.slack.com/triggers/..."
+
+# Brave Search API key (for OpenClaw web search)
+# Create at: https://brave.com/search/api/ (choose "Data for Search" plan)
+brave_search_api_key = "BSA_YOUR_API_KEY_HERE"

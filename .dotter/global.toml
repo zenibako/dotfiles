@@ -65,6 +65,9 @@ slack_token                           = ""
 reddit_session                        = ""
 reddit_token_v2                       = ""
 
+# Brave Search API
+brave_search_api_key                  = ""
+
 [personal]
 depends = ["default"]
 
