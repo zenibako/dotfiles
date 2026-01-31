@@ -1,0 +1,337 @@
+# yaml-language-server: $schema=https://carapace.sh/schemas/command.json
+name: gog
+description: Google CLI for Gmail/Calendar/Chat/Classroom/Drive/Contacts/Tasks/Sheets/Docs/Slides/People
+flags:
+  -h, --help: Show context-sensitive help.
+  --color=: "Color output: auto|always|never"
+  --account=: Account email for API commands
+  --client=: OAuth client name
+  --enable-commands=: Comma-separated list of enabled top-level commands
+  --json: Output JSON to stdout
+  --plain: Output stable, parseable text to stdout
+  --force: Skip confirmations for destructive commands
+  --no-input: Never prompt; fail instead
+  --verbose: Enable verbose logging
+  --version: Print version and exit
+completion:
+  flag:
+    color:
+      - auto
+      - always
+      - never
+commands:
+  - name: auth
+    description: Auth and credentials
+    commands:
+      - name: add
+        description: Authorize and store a refresh token
+      - name: services
+        description: List supported auth services and scopes
+      - name: list
+        description: List stored accounts
+      - name: status
+        description: Show auth configuration and keyring backend
+      - name: keyring
+        description: Configure keyring backend
+      - name: remove
+        description: Remove a stored refresh token
+      - name: manage
+        description: Open accounts manager in browser
+      - name: credentials
+        description: Manage OAuth client credentials
+        commands:
+          - name: add
+            description: Add OAuth client credentials
+          - name: list
+            description: List OAuth client credentials
+          - name: remove
+            description: Remove OAuth client credentials
+      - name: alias
+        description: Manage account aliases
+      - name: tokens
+        description: Manage stored refresh tokens
+      - name: service-account
+        description: Configure service account
+      - name: keep
+        description: Configure service account for Google Keep
+  - name: groups
+    description: Google Groups
+    commands:
+      - name: list
+        description: List groups you belong to
+      - name: members
+        description: List members of a group
+  - name: drive
+    description: Google Drive
+    commands:
+      - name: ls
+        description: List files in a folder
+      - name: search
+        description: Full-text search across Drive
+      - name: get
+        description: Get file metadata
+      - name: download
+        description: Download a file
+      - name: copy
+        description: Copy a file
+      - name: upload
+        description: Upload a file
+      - name: mkdir
+        description: Create a folder
+      - name: delete
+        description: Delete a file
+      - name: move
+        description: Move a file to a different folder
+      - name: rename
+        description: Rename a file or folder
+      - name: share
+        description: Share a file or folder
+      - name: unshare
+        description: Remove a permission from a file
+      - name: permissions
+        description: List permissions on a file
+      - name: url
+        description: Print web URLs for files
+      - name: comments
+        description: Manage comments on files
+      - name: drives
+        description: List shared drives
+  - name: docs
+    description: Google Docs
+    commands:
+      - name: export
+        description: Export a Google Doc
+      - name: info
+        description: Get Google Doc metadata
+      - name: create
+        description: Create a Google Doc
+      - name: copy
+        description: Copy a Google Doc
+      - name: cat
+        description: Print a Google Doc as plain text
+  - name: slides
+    description: Google Slides
+    commands:
+      - name: export
+        description: Export a Google Slides deck
+      - name: info
+        description: Get presentation metadata
+      - name: create
+        description: Create a presentation
+      - name: copy
+        description: Copy a presentation
+  - name: calendar
+    description: Google Calendar
+    commands:
+      - name: calendars
+        description: List calendars
+      - name: acl
+        description: List calendar ACL
+      - name: events
+        description: List events from a calendar
+      - name: event
+        description: Get event
+      - name: create
+        description: Create an event
+      - name: update
+        description: Update an event
+      - name: delete
+        description: Delete an event
+      - name: freebusy
+        description: Get free/busy
+      - name: respond
+        description: Respond to an event invitation
+      - name: colors
+        description: Show calendar colors
+      - name: conflicts
+        description: Find conflicts
+      - name: search
+        description: Search events
+      - name: time
+        description: Show server time
+      - name: users
+        description: List workspace users
+      - name: team
+        description: Show events for all members of a Google Group
+      - name: focus-time
+        description: Create a Focus Time block
+      - name: out-of-office
+        description: Create an Out of Office event
+      - name: working-location
+        description: Set working location
+  - name: classroom
+    description: Google Classroom
+    commands:
+      - name: courses
+        description: Courses
+      - name: students
+        description: Course students
+      - name: teachers
+        description: Course teachers
+      - name: roster
+        description: Course roster
+      - name: coursework
+        description: Coursework
+      - name: materials
+        description: Coursework materials
+      - name: submissions
+        description: Student submissions
+      - name: announcements
+        description: Announcements
+      - name: topics
+        description: Topics
+      - name: invitations
+        description: Invitations
+      - name: guardians
+        description: Guardians
+      - name: guardian-invitations
+        description: Guardian invitations
+      - name: profile
+        description: User profiles
+  - name: time
+    description: Local time utilities
+    commands:
+      - name: now
+        description: Show current time
+  - name: gmail
+    description: Gmail
+    commands:
+      - name: search
+        description: Search threads using Gmail query syntax
+      - name: messages
+        description: Message operations
+      - name: get
+        description: Get a message
+      - name: attachment
+        description: Download a single attachment
+      - name: url
+        description: Print Gmail web URLs for threads
+      - name: history
+        description: Gmail history
+      - name: thread
+        description: Thread operations
+      - name: labels
+        description: Label operations
+      - name: batch
+        description: Batch operations
+      - name: send
+        description: Send an email
+      - name: track
+        description: Email open tracking
+      - name: drafts
+        description: Draft operations
+      - name: settings
+        description: Settings and admin
+  - name: chat
+    description: Google Chat
+    commands:
+      - name: spaces
+        description: Chat spaces
+      - name: messages
+        description: Chat messages
+      - name: threads
+        description: Chat threads
+      - name: dm
+        description: Direct messages
+  - name: contacts
+    description: Google Contacts
+    commands:
+      - name: search
+        description: Search contacts
+      - name: list
+        description: List contacts
+      - name: get
+        description: Get a contact
+      - name: create
+        description: Create a contact
+      - name: update
+        description: Update a contact
+      - name: delete
+        description: Delete a contact
+      - name: directory
+        description: Directory contacts
+      - name: other
+        description: Other contacts
+  - name: tasks
+    description: Google Tasks
+    commands:
+      - name: lists
+        description: List task lists
+      - name: list
+        description: List tasks
+      - name: get
+        description: Get a task
+      - name: add
+        description: Add a task
+      - name: update
+        description: Update a task
+      - name: done
+        description: Mark task completed
+      - name: undo
+        description: Mark task needs action
+      - name: delete
+        description: Delete a task
+      - name: clear
+        description: Clear completed tasks
+  - name: people
+    description: Google People
+    commands:
+      - name: me
+        description: Show your profile
+      - name: get
+        description: Get a user profile by ID
+      - name: search
+        description: Search the Workspace directory
+      - name: relations
+        description: Get user relations
+  - name: keep
+    description: Google Keep (Workspace only)
+    commands:
+      - name: list
+        description: List notes
+      - name: get
+        description: Get a note
+      - name: search
+        description: Search notes by text
+      - name: attachment
+        description: Download an attachment
+  - name: sheets
+    description: Google Sheets
+    commands:
+      - name: get
+        description: Get values from a range
+      - name: update
+        description: Update values in a range
+      - name: append
+        description: Append values to a range
+      - name: clear
+        description: Clear values in a range
+      - name: format
+        description: Apply cell formatting
+      - name: metadata
+        description: Get spreadsheet metadata
+      - name: create
+        description: Create a new spreadsheet
+      - name: copy
+        description: Copy a Google Sheet
+      - name: export
+        description: Export a Google Sheet
+  - name: config
+    description: Manage configuration
+    commands:
+      - name: get
+        description: Get a config value
+      - name: keys
+        description: List available config keys
+      - name: set
+        description: Set a config value
+      - name: unset
+        description: Unset a config value
+      - name: list
+        description: List all config values
+      - name: path
+        description: Print config file path
+  - name: version
+    description: Print version
+  - name: completion
+    description: Generate shell completion scripts
