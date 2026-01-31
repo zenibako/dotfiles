@@ -23,7 +23,7 @@ zsh = ""  # oh-my-zsh plugin + atuin init
 nu = "atuin gen-completions --shell nushell"
 
 [backlog]
-zsh = "backlog completion install --shell zsh"
+zsh = ""  # uses install cmd: backlog completion install --shell zsh
 nu = ""  # via carapace bridge (bash)
 
 [carapace]

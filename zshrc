@@ -254,8 +254,9 @@ _load_shared_completions() {
     [[ -f "$comp_file" ]] || return
     
     [[ -d ~/.zsh/completion ]] || mkdir -p ~/.zsh/completion
+    [[ -d ~/.zsh/completion-bash ]] || mkdir -p ~/.zsh/completion-bash
     
-    local current_tool="" zsh_cmd=""
+    local current_tool="" zsh_cmd="" comp_output=""
     local in_tool=0
     
     while IFS= read -r line; do
@@ -284,16 +285,29 @@ _load_shared_completions() {
             
             # Generate completion if tool exists and has a command
             if [[ -n "$zsh_cmd" ]] && (( ${+commands[$current_tool]} )); then
-                eval "$zsh_cmd" > ~/.zsh/completion/_${current_tool} 2>/dev/null
+                comp_output=$(eval "$zsh_cmd" 2>/dev/null)
+                if [[ "$comp_output" == *"complete -F"* || "$comp_output" == *"bashcompinit"* ]]; then
+                    # Bash-style completion: source after bashcompinit, not via fpath
+                    echo "$comp_output" > ~/.zsh/completion-bash/${current_tool}.bash
+                else
+                    echo "$comp_output" > ~/.zsh/completion/_${current_tool}
+                fi
             fi
         fi
     done < "$comp_file"
 }
 
 _load_shared_completions
-fpath=(~/.zsh/completion $fpath)
+fpath=(~/.zsh/completion ~/.zsh/completions $fpath)
 autoload -U compinit
 compinit
+
+# Source bash-style completions via bashcompinit
+autoload -Uz bashcompinit
+bashcompinit
+for f in ~/.zsh/completion-bash/*.bash(N); do
+    source "$f"
+done
 
 eval "$(starship init zsh)"
 
