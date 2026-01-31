@@ -58,6 +58,10 @@ nu = ""  # via carapace bridge (yargs)
 zsh = "pixlet completion zsh"
 nu = ""  # via carapace
 
+[pnpm]
+zsh = "pnpm completion zsh"
+nu = ""  # via carapace bridge (bash)
+
 [sf]
 zsh = ""  # uses SF_AC_ZSH_SETUP_PATH from oh-my-zsh plugin
 nu = ""   # via carapace spec (carapace/specs/sf.yaml)

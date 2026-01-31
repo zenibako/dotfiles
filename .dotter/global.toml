@@ -4,6 +4,7 @@
 "shared/completions.toml"                 = "~/.config/shared/completions.toml"
 "atuin/bin"                               = "~/.atuin/bin"
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
+"pnpm/rc"                                 = "~/.config/pnpm/rc"
 "alacritty.toml"    	                    = "~/.alacritty.toml"
 "tmux.conf"                   = { target  = "~/.tmux.conf",                         type = "template" }
 vimrc                         = { target  = "~/.vimrc",                             type = "template" }

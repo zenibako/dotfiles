@@ -9,6 +9,7 @@ Personal configuration files for various development tools and shell environment
 - **Multiplexer**: Tmux with custom theme support
 - **Editor**: Neovim with LSP, plugins, and profile variants (default, work, personal)
 - **CLI Tools**: Starship prompt, Atuin (shell history), Carapace (completions), Jujutsu (VCS), iamb (Matrix client)
+- **Package Managers**: pnpm, npm, yarn support with shared configuration
 - **OpenCode**: Custom commands and plugins for OpenCode AI assistant
 - **Claude**: MCP server configurations
 - **Window Management**: AeroSpace (macOS), Hyprland (Linux)
@@ -80,6 +81,21 @@ dotter deploy -f
 
 - **macOS**: Full support via Homebrew
 - **Linux**: Supports Arch (pacman), Debian/Ubuntu (apt), Fedora (dnf), CentOS/RHEL (yum), openSUSE (zypper), and Alpine (apk)
+
+## Package Managers
+
+### pnpm
+
+pnpm is configured as the recommended Node.js package manager with:
+- Global store location: `~/Library/pnpm/store` (default)
+- Global binaries: `~/Library/pnpm`
+- Configuration: `~/.config/pnpm/rc`
+- Shell completions for zsh and nushell
+- Integrated with Atuin history search
+
+### npm & yarn
+
+npm and yarn are also supported with completion integration.
 
 ## Customization
 
