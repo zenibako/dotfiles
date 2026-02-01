@@ -37,6 +37,15 @@
       },
       "enabled": true
     },
+    "Backlog": {
+      "type": "local",
+      "command": [
+        "backlog",
+        "mcp",
+        "start"
+      ],
+      "enabled": true
+    },
 {{#if opencode_profile_work}}
     "GitLab": {
       "type": "local",
@@ -121,15 +130,6 @@
       "enabled": true
     },
 {{/if}}
-    "Backlog": {
-      "type": "local",
-      "command": [
-        "backlog",
-        "mcp",
-        "start"
-      ],
-      "enabled": true
-    },
     "Neovim": {
       "type": "local",
       "command": [
