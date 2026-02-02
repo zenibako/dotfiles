@@ -374,6 +374,12 @@ commands:
         description: Interactive update wizard
       - name: status
         description: Show update channel and version status
+  - name: completion
+    description: Generate shell completion script
+    flags:
+      -s, --shell=: Shell to generate completion for (zsh, bash, powershell, fish)
+      -i, --install: Install completion script to shell profile
+      -y, --yes: Skip confirmation (non-interactive)
   - name: status
     description: Show channel health and recent session recipients
   - name: health
