@@ -68,6 +68,13 @@ reddit_token_v2                       = ""
 # Brave Search API
 brave_search_api_key                  = ""
 
+# Proton Mail Bridge credentials
+proton_user                           = ""
+proton_password                       = ""
+
+# Telegram Bot Token
+telegram_bot_token                    = ""
+
 [personal]
 depends = ["default"]
 
