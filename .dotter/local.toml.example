@@ -92,3 +92,38 @@ opencode_slack_webhook_url = "https://hooks.slack.com/triggers/..."
 # Brave Search API key (for OpenClaw web search)
 # Create at: https://brave.com/search/api/ (choose "Data for Search" plan)
 brave_search_api_key = "BSA_YOUR_API_KEY_HERE"
+
+# Bluesky credentials (personal profile)
+bluesky_handle = "your.handle.bsky.social"
+bluesky_app_password = "xxxx-xxxx-xxxx-xxxx"
+
+# Plex credentials (personal profile)
+plex_user_token = "YOUR_PLEX_USER_TOKEN"
+plex_server_token = "YOUR_PLEX_SERVER_TOKEN"
+plex_url = "https://YOUR_PLEX_SERVER:32400"
+
+# TMDB API key (for Plex watchlist)
+tmdb_key = "YOUR_TMDB_API_KEY"
+
+# Google API keys
+youtube_api_key = "YOUR_YOUTUBE_API_KEY"
+google_places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"
+
+# Slack (cookie auth)
+slack_d_cookie = "xoxd-..."
+slack_token = "xoxc-..."
+
+# Reddit credentials (personal profile)
+reddit_session = "eyJhbGci..."
+reddit_token_v2 = "eyJhbGci..."
+
+# Proton Mail Bridge credentials
+proton_user = "your@email.com"
+proton_password = "YOUR_PROTON_BRIDGE_PASSWORD"
+
+# Telegram Bot Token
+telegram_bot_token = "1234567890:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+# Grampsweb Credentials
+grampsweb_username = "your@email.com"
+grampsweb_password = "YOUR_GRAMPSWEB_PASSWORD"
