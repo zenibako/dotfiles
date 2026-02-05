@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@opencode-ai/plugin": "1.1.51",
+    "@opencode-ai/plugin": "1.1.52",
     "opencode-webhooks": "^0.0.5"
   }
 }
