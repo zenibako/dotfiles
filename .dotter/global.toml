@@ -77,8 +77,8 @@ depends = ["default"]
 
 [personal.variables]
 opencode_profile_personal             = true
-opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
-opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
+opencode_build_agent_model            = "anthropic/claude-opus-4-6"
+opencode_plan_agent_model             = "anthropic/claude-opus-4-6"
 opencode_admin_agent_model            = "anthropic/claude-haiku-4-5"
 
 [work]
@@ -104,8 +104,8 @@ gitlab_api_url                        = "https://gitlab.com/api/v4"
 gitlab_url                            = ""
 opencode_slack_webhook_url            = ""
 apex_lsp_jar_path                     = ""
-opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
-opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"
+opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
+opencode_plan_agent_model             = "anthropic/claude-opus-4-6"
 opencode_admin_agent_model            = "github-copilot/claude-haiku-4.5"
 jira_browser                          = ""
 jira_api_token                        = ""

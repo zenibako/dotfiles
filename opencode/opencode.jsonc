@@ -249,12 +249,12 @@
       "model": "{{#if opencode_build_agent_model}}{{opencode_build_agent_model}}{{else}}anthropic/claude-sonnet-4-5{{/if}}"
     },
     "plan": {
-      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-5{{/if}}"
+      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-6{{/if}}"
     },
     "admin": {
       "description": "Handles project administration: Git/Jujutsu history, pushing to remotes, and editing configuration files",
       "mode": "primary",
-      "model": "{{#if opencode_admin_agent_model}}{{opencode_admin_agent_model}}{{else}}anthropic/claude-haiku-4-20250514{{/if}}",
+      "model": "{{#if opencode_admin_agent_model}}{{opencode_admin_agent_model}}{{else}}anthropic/claude-haiku-4-5{{/if}}",
       "prompt": "{file:./prompt/admin.txt}",
       "permission": {
         "bash": {
