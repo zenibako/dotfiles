@@ -17,5 +17,8 @@
       "command": "oda-mcp",
       "args": ["-env", "/Users/{{ username }}/Projects/oda-mcp/.env"]
     }{{/if}}
+  },
+  "preferences": {
+    "sidebarMode": "code"
   }
 }
