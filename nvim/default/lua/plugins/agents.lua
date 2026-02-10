@@ -50,9 +50,9 @@ return {
         env = {
           HOME = vim.fn.getenv("HOME"),
           USER = vim.fn.getenv("USER"),
-          NODE_EXTRA_CA_CERTS = vim.fn.getenv("NODE_EXTRA_CA_CERTS"),
-          XDG_CONFIG_HOME = vim.fn.getenv("XDG_CONFIG_HOME"),
-          NVM_DIR = vim.fn.getenv("NVM_DIR"),
+          NODE_EXTRA_CA_CERTS = vim.env.NODE_EXTRA_CA_CERTS,
+          XDG_CONFIG_HOME = vim.env.XDG_CONFIG_HOME,
+          NVM_DIR = vim.env.NVM_DIR,
         },
       },
     },
