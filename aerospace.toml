@@ -109,6 +109,80 @@ run = [
   'move-node-to-workspace 2',
 ]
 
+[[on-window-detected]]
+if.app-id = 'com.automattic.beeper.desktop'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
+
+# Workspace 3: Utilities
+[[on-window-detected]]
+if.app-id = 'com.apple.iCal'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'io.robbie.HomeAssistant'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Photos'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.calibre'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+# Workspace 4: Media & Gaming
+[[on-window-detected]]
+if.app-id = 'com.valvesoftware.steam'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 4',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.valvesoftware.steam.helper'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 4',
+]
+
+[[on-window-detected]]
+if.app-id = 'org.videolan.vlc'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 4',
+]
+
 # Possible values: (qwerty|dvorak|colemak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 [key-mapping]
