@@ -9,6 +9,8 @@
 ## Version Control
 - Config in `jj/config.toml`
 - **Merge tool**: `jj-diffconflicts` via nvim (`merge-tools.diffconflicts`)
+- **GPG Signing**: ALL commits must be GPG signed
+- **Agent Commits**: Agents MUST NOT commit changes directly. Instead, prompt the user to commit manually with: `jj commit -m "message"`
 
 ## Repository Structure
 - Profiles: `nvim/{default,work,personal}` deployed via dotter (don't edit `~/.config/nvim` directly!)

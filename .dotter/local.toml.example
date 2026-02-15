@@ -18,8 +18,14 @@ packages = ["personal", "mac", "monokai"]
 # IMPORTANT: Variables in local.toml override ALL package variables
 # This allows you to customize settings per-machine without editing global.toml
 
-# Profile-specific email (overrides default.variables.email)
+# REQUIRED: Email for Git/Jujutsu commits
+# Use your work email for work profile, personal email for personal profile
 email = "your@email.com"
+
+# GPG signing key for Jujutsu commits
+# Set to your GPG key ID (e.g., "ABCD1234EFGH5678" or "your.email@example.com")
+# Leave as empty string to disable GPG signing
+gpg_key = ""
 
 # Username for system paths (override based on your actual username)
 # username = "your-username"
@@ -40,19 +46,24 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # jira_workspace_url = "yourcompany.atlassian.net"
 # jira_user_email = "your.email@company.com"
 # jira_project_key = "PROJECT"
+# gitlab_url = "https://gitlab.yourcompany.com"
 # node_extra_ca_certs = "/Library/Application Support/Netskope/STAgent/download/nscacert_combined.pem"
-# requests_ca_bundle = "$node_extra_ca_certs"
 # p10k_root_dir = "/opt/homebrew/share/powerlevel10k"
 
 # For 'personal' profile, uncomment and set these:
 # playdate_sdk_enabled = true
 # mcp_backlog_enabled = true
 
-# Other MCP servers (can be enabled for any profile)
-# mcp_postman_enabled = false
-# mcp_salesforce_enabled = false
-# mcp_sonarqube_enabled = false
-# mcp_odaseva_enabled = false
+# Other MCP servers (disabled by default, can be enabled per-machine)
+# Note: work profile has mcp_odaseva and mcp_sonarqube disabled by default
+# To enable, add these to your local.toml:
+# mcp_odaseva = true
+# mcp_sonarqube = true
+# sonarqube_url = "https://sonarqube.yourcompany.com"
+# sonarqube_token = "squ_YOUR_TOKEN_HERE"
+# mcp_postman = false  # Enabled by default in work profile
+# mcp_salesforce_dx = true  # Disabled by default in work profile
+# mcp_atlassian = true  # Disabled by default in work profile
 
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
@@ -77,3 +88,42 @@ home_assistant_webhook_id = "your-webhook-id"
 
 # Slack Workflow Webhook URL (for OpenCode plugin)
 opencode_slack_webhook_url = "https://hooks.slack.com/triggers/..."
+
+# Brave Search API key (for OpenClaw web search)
+# Create at: https://brave.com/search/api/ (choose "Data for Search" plan)
+brave_search_api_key = "BSA_YOUR_API_KEY_HERE"
+
+# Bluesky credentials (personal profile)
+bluesky_handle = "your.handle.bsky.social"
+bluesky_app_password = "xxxx-xxxx-xxxx-xxxx"
+
+# Plex credentials (personal profile)
+plex_user_token = "YOUR_PLEX_USER_TOKEN"
+plex_server_token = "YOUR_PLEX_SERVER_TOKEN"
+plex_url = "https://YOUR_PLEX_SERVER:32400"
+
+# TMDB API key (for Plex watchlist)
+tmdb_key = "YOUR_TMDB_API_KEY"
+
+# Google API keys
+youtube_api_key = "YOUR_YOUTUBE_API_KEY"
+google_places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"
+
+# Slack (cookie auth)
+slack_d_cookie = "xoxd-..."
+slack_token = "xoxc-..."
+
+# Reddit credentials (personal profile)
+reddit_session = "eyJhbGci..."
+reddit_token_v2 = "eyJhbGci..."
+
+# Proton Mail Bridge credentials
+proton_user = "your@email.com"
+proton_password = "YOUR_PROTON_BRIDGE_PASSWORD"
+
+# Telegram Bot Token
+telegram_bot_token = "1234567890:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+# Grampsweb Credentials
+grampsweb_username = "your@email.com"
+grampsweb_password = "YOUR_GRAMPSWEB_PASSWORD"

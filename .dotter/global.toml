@@ -1,7 +1,10 @@
+
 [default.files]
 "shared/env.toml"                         = { target = "~/.config/shared/env.toml", type = "template" }
+"shared/completions.toml"                 = "~/.config/shared/completions.toml"
 "atuin/bin"                               = "~/.atuin/bin"
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
+"pnpm/rc"                                 = "~/.config/pnpm/rc"
 "alacritty.toml"    	                    = "~/.alacritty.toml"
 "tmux.conf"                   = { target  = "~/.tmux.conf",                         type = "template" }
 vimrc                         = { target  = "~/.vimrc",                             type = "template" }
@@ -18,6 +21,7 @@ jj                            = { target  = "~/.config/jj",                     
 "opencode/.gitignore"         = { target  = "~/.config/opencode/.gitignore",        type = "symbolic" }
 "opencode/AGENTS.md"          = { target  = "~/.config/opencode/AGENTS.md",         type = "symbolic" }
 "opencode/command"            = { target  = "~/.config/opencode/command",           type = "symbolic" }
+"opencode/prompt"             = { target  = "~/.config/opencode/prompt",            type = "symbolic" }
 "opencode/opencode.jsonc"     = { target  = "~/.config/opencode/opencode.jsonc",    type = "template" }
 "opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }
 "opencode/package-lock.json"  = { target  = "~/.config/opencode/package-lock.json", type = "symbolic" }
@@ -27,26 +31,62 @@ gitlogue                                  = "~/.config/gitlogue"
 
 [default.variables]
 name                                  = "Chandler Anderson"
-email                                 = "chanderson90@proton.me"
+email                                 = ""
 username                              = "chanderson"
 vim_set_num_relnum                    = "set number relativenumber"
+gpg_key                               = ""
 github_personal_access_token          = ""
 home_assistant_url                    = ""
 home_assistant_token                  = ""
 home_assistant_webhook_id             = ""
 playdate_sdk_enabled                  = false
 
+# Bluesky
+bluesky_handle                        = ""
+bluesky_app_password                  = ""
+
+# Plex
+plex_user_token                       = ""
+plex_server_token                     = ""
+plex_url                              = ""
+
+# TMDB
+tmdb_key                              = ""
+
+# Google APIs
+youtube_api_key                       = ""
+google_places_api_key                 = ""
+
+# Slack
+slack_d_cookie                        = ""
+slack_token                           = ""
+
+# Reddit
+reddit_session                        = ""
+reddit_token_v2                       = ""
+
+# Brave Search API
+brave_search_api_key                  = ""
+
+# Proton Mail Bridge credentials
+proton_user                           = ""
+proton_password                       = ""
+
+# Telegram Bot Token
+telegram_bot_token                    = ""
+
 [personal]
 depends = ["default"]
 
 [personal.files]
 "nvim/personal"                       = { target  = "~/.config/nvim",                              type = "template" }
-"opencode/plugin/home-assistant.ts"   = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
+# "opencode/plugin/home-assistant.ts"   = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
 
 [personal.variables]
 opencode_profile_personal             = true
-opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
-opencode_plan_agent_model             = "anthropic/claude-opus-4-5"
+opencode_build_agent_model            = "anthropic/claude-opus-4-6"
+opencode_plan_agent_model             = "anthropic/claude-opus-4-6"
+opencode_admin_agent_model            = "anthropic/claude-haiku-4-5"
 
 [work]
 depends = ["default"]
@@ -54,9 +94,15 @@ depends = ["default"]
 [work.files]
 "nvim/work"                           = { target  = "~/.config/nvim",                              type = "template" }
 "opencode/plugin/slack-workflow.ts"   = { target  = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
+"opencode/script/lwc-lsp-wrapper.sh"  = { target  = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
 
 [work.variables]
 opencode_profile_work                 = true
+mcp_salesforce_dx                     = false
+mcp_atlassian                         = false
+mcp_odaseva                           = false
+mcp_postman                           = true
+mcp_sonarqube                         = false
 postman_api_key                       = ""
 sonarqube_url                         = ""
 sonarqube_token                       = ""
@@ -65,8 +111,9 @@ gitlab_api_url                        = "https://gitlab.com/api/v4"
 gitlab_url                            = ""
 opencode_slack_webhook_url            = ""
 apex_lsp_jar_path                     = ""
-opencode_build_agent_model            = "github-copilot/claude-sonnet-4.5"
-opencode_plan_agent_model             = "github-copilot/claude-opus-4.5"
+opencode_build_agent_model            = "anthropic/claude-sonnet-4-5"
+opencode_plan_agent_model             = "anthropic/claude-opus-4-6"
+opencode_admin_agent_model            = "github-copilot/claude-haiku-4.5"
 jira_browser                          = ""
 jira_api_token                        = ""
 jira_workspace_url                    = ""
@@ -94,6 +141,8 @@ shell_bin_path = "/opt/homebrew/bin"
 
 [monokai.variables]
 ghostty_theme                         = "Monokai Pro"
+ghostty_unfocused_split_fill          = "#221f22"
+ghostty_split_divider_color           = "#727072"
 nvim_colorscheme_plugin               = "sainnhe/sonokai"
 nvim_colorscheme_config               = """      vim.g.sonokai_enable_italic = true
       vim.g.sonokai_transparent_background = 1
@@ -114,6 +163,8 @@ nu_prompt_normal_color                = "yellow_bold"
 
 [nightowl.variables]
 ghostty_theme                         = "Night Owl"
+ghostty_unfocused_split_fill          = "#011627"
+ghostty_split_divider_color           = "#5f7e97"
 nvim_colorscheme_plugin               = "oxfist/night-owl.nvim"
 nvim_colorscheme_config               = """      require('night-owl').setup()
       vim.cmd.colorscheme('night-owl')"""
@@ -137,6 +188,8 @@ nu_prompt_normal_color                = "light_purple_bold"
 
 [tokyonight.variables]
 ghostty_theme                         = "TokyoNight Night"
+ghostty_unfocused_split_fill          = "#1a1b26"
+ghostty_split_divider_color           = "#283457"
 nvim_colorscheme_plugin               = "folke/tokyonight.nvim"
 nvim_colorscheme_config               = """      require('tokyonight').setup({
         style = 'night',
@@ -197,3 +250,4 @@ nu_prompt_normal_color                = "blue_bold"
 
 [settings]
 default_target_type                   = "automatic"
+

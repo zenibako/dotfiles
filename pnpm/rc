@@ -1,0 +1,25 @@
+# pnpm configuration
+# See: https://pnpm.io/npmrc
+
+# Store location for pnpm packages
+# Using default location: ~/Library/pnpm/store
+# Commented out to use pnpm's default store location
+# store-dir=~/.pnpm-store
+
+# Auto-install peers
+auto-install-peers=true
+
+# Hoist all dependencies to node_modules/.pnpm
+hoist=true
+
+# Use strict peer dependencies
+strict-peer-dependencies=false
+
+# Lockfile settings
+lockfile=true
+
+# Registry
+registry=https://registry.npmjs.org/
+
+# JSR registry for @jsr scope
+@jsr:registry=https://npm.jsr.io/

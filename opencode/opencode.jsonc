@@ -12,6 +12,9 @@
  */
 {
   "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-anthropic-auth@latest",
+  ],
   "mcp": {
     "Jujutsu": {
       "type": "local",
@@ -34,6 +37,15 @@
       },
       "enabled": true
     },
+    "Backlog": {
+      "type": "local",
+      "command": [
+        "backlog",
+        "mcp",
+        "start"
+      ],
+      "enabled": true
+    },
 {{#if opencode_profile_work}}
     "GitLab": {
       "type": "local",
@@ -48,6 +60,7 @@
       },
       "enabled": true
     },
+{{#if mcp_salesforce_dx}}
     "Salesforce DX": {
       "type": "local",
       "command": [
@@ -60,8 +73,10 @@
         "all",
         "--allow-non-ga-tools"
       ],
-      "enabled": false
+      "enabled": true
     },
+{{/if}}
+{{#if mcp_odaseva}}
     "Odaseva": {
       "type": "local",
       "command": [
@@ -69,6 +84,8 @@
       ],
       "enabled": true
     },
+{{/if}}
+{{#if mcp_atlassian}}
     "Atlassian": {
       "type": "local",
       "command": [
@@ -77,8 +94,10 @@
         "mcp-remote",
         "https://mcp.atlassian.com/v1/sse"
       ],
-      "enabled": false
+      "enabled": true
     },
+{{/if}}
+{{#if mcp_postman}}
     "Postman": {
       "type": "remote",
       "url": "https://mcp.postman.com/mcp",
@@ -87,6 +106,8 @@
       },
       "enabled": true
     },
+{{/if}}
+{{#if mcp_sonarqube}}
     "SonarQube": {
       "type": "local",
       "command": [
@@ -109,15 +130,6 @@
       "enabled": true
     },
 {{/if}}
-    "Backlog": {
-      "type": "local",
-      "command": [
-        "backlog",
-        "mcp",
-        "start"
-      ],
-      "enabled": true
-    },
     "Neovim": {
       "type": "local",
       "command": [
@@ -134,11 +146,13 @@
     "Chrome DevTools": {
       "type": "local",
       "command": [
-        "npx",
-        "chrome-devtools-mcp@latest"
+        "zsh",
+        "-c",
+        "source ~/.nvm/nvm.sh && nvm use --lts >&2 && npx chrome-devtools-mcp@latest"
       ],
       "enabled": true
     }
+{{/if}}
   },
   "lsp": {
 {{#if opencode_profile_work}}
@@ -166,9 +180,7 @@
     },
     "lwc-language-server": {
       "command": [
-        "npx",
-        "@salesforce/lwc-language-server",
-        "--stdio"
+        "~/.config/opencode/script/lwc-lsp-wrapper.sh"
       ],
       "extensions": [
         ".js",
@@ -218,10 +230,6 @@
       ]
     }
   },
-  "keybinds": {
-    "leader": "ctrl+space",
-    "command_list": "<leader>p"
-  },
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -241,7 +249,33 @@
       "model": "{{#if opencode_build_agent_model}}{{opencode_build_agent_model}}{{else}}anthropic/claude-sonnet-4-5{{/if}}"
     },
     "plan": {
-      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-5{{/if}}"
+      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-6{{/if}}"
+    },
+    "admin": {
+      "description": "Handles project administration: Git/Jujutsu history, pushing to remotes, and editing configuration files",
+      "mode": "primary",
+      "model": "{{#if opencode_admin_agent_model}}{{opencode_admin_agent_model}}{{else}}anthropic/claude-haiku-4-5{{/if}}",
+      "prompt": "{file:./prompt/admin.txt}",
+      "permission": {
+        "bash": {
+          "git push*": "ask",
+          "git push --force*": "ask",
+          "git reset --hard*": "ask",
+          "git clean*": "ask",
+          "git rebase*": "ask",
+          "git merge*": "ask",
+          "git checkout -f*": "ask",
+          "git branch -D*": "ask",
+          "jj git push*": "ask",
+          "jj abandon*": "ask",
+          "jj rebase*": "ask",
+          "jj squash*": "ask",
+          "rm -rf*": "deny",
+          "rm -r*": "ask",
+          "*": "allow"
+        },
+        "edit": "ask"
+      }
     }
   }
 }

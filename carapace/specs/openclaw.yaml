@@ -1,0 +1,392 @@
+# yaml-language-server: $schema=https://carapace.sh/schemas/command.json
+name: openclaw
+description: If it's repetitive, I'll automate it; if it's hard, I'll bring jokes and a rollback plan
+flags:
+  -V, --version: Output the version number
+  --dev: Dev profile
+  --profile=: Use a named profile
+  --no-color: Disable ANSI colors
+  -h, --help: Display help for command
+commands:
+  - name: setup
+    description: Initialize ~/.openclaw/openclaw.json and the agent workspace
+  - name: onboard
+    description: Interactive wizard to set up the gateway, workspace, and skills
+  - name: configure
+    description: Interactive prompt to set up credentials, devices, and agent defaults
+  - name: config
+    description: Config helpers (get/set/unset)
+    commands:
+      - name: get
+        description: Get a config value by dot path
+      - name: set
+        description: Set a config value by dot path
+      - name: unset
+        description: Remove a config value by dot path
+  - name: doctor
+    description: Health checks + quick fixes for the gateway and channels
+  - name: dashboard
+    description: Open the Control UI with your current token
+  - name: reset
+    description: Reset local config/state (keeps the CLI installed)
+  - name: uninstall
+    description: Uninstall the gateway service + local data (CLI remains)
+  - name: message
+    description: Send messages and channel actions
+    commands:
+      - name: send
+        description: Send a message
+      - name: broadcast
+        description: Broadcast a message to multiple targets
+      - name: poll
+        description: Send a poll
+      - name: react
+        description: Add or remove a reaction
+      - name: reactions
+        description: List reactions on a message
+      - name: read
+        description: Read recent messages
+      - name: edit
+        description: Edit a message
+      - name: delete
+        description: Delete a message
+      - name: pin
+        description: Pin a message
+      - name: unpin
+        description: Unpin a message
+      - name: pins
+        description: List pinned messages
+      - name: permissions
+        description: Fetch channel permissions
+      - name: search
+        description: Search Discord messages
+      - name: thread
+        description: Thread actions
+      - name: emoji
+        description: Emoji actions
+      - name: sticker
+        description: Sticker actions
+      - name: role
+        description: Role actions
+      - name: channel
+        description: Channel actions
+      - name: member
+        description: Member actions
+      - name: voice
+        description: Voice actions
+      - name: event
+        description: Event actions
+      - name: timeout
+        description: Timeout a member
+      - name: kick
+        description: Kick a member
+      - name: ban
+        description: Ban a member
+  - name: memory
+    description: Memory search tools
+    commands:
+      - name: status
+        description: Show memory search index status
+      - name: index
+        description: Reindex memory files
+      - name: search
+        description: Search memory files
+  - name: agent
+    description: Run an agent turn via the Gateway (use --local for embedded)
+  - name: agents
+    description: Manage isolated agents (workspaces + auth + routing)
+    commands:
+      - name: list
+        description: List configured agents
+      - name: add
+        description: Add a new isolated agent
+      - name: set-identity
+        description: Update an agent identity
+      - name: delete
+        description: Delete an agent and prune workspace/state
+  - name: acp
+    description: Agent Control Protocol tools
+    commands:
+      - name: client
+        description: Run an interactive ACP client
+  - name: gateway
+    description: Gateway control
+    commands:
+      - name: run
+        description: Run the WebSocket Gateway (foreground)
+      - name: status
+        description: Show gateway service status + probe
+      - name: install
+        description: Install the Gateway service
+      - name: uninstall
+        description: Uninstall the Gateway service
+      - name: start
+        description: Start the Gateway service
+      - name: stop
+        description: Stop the Gateway service
+      - name: restart
+        description: Restart the Gateway service
+      - name: call
+        description: Call a Gateway method
+      - name: usage-cost
+        description: Fetch usage cost summary from session logs
+      - name: health
+        description: Fetch Gateway health
+      - name: probe
+        description: Show gateway reachability + discovery + health
+      - name: discover
+        description: Discover gateways via Bonjour
+  - name: daemon
+    description: Gateway service (legacy alias)
+  - name: logs
+    description: Gateway logs
+  - name: system
+    description: System events, heartbeat, and presence
+    commands:
+      - name: event
+        description: Enqueue a system event
+      - name: heartbeat
+        description: Heartbeat controls
+      - name: presence
+        description: List system presence entries
+  - name: models
+    description: Model configuration
+    commands:
+      - name: list
+        description: List models
+      - name: status
+        description: Show configured model state
+      - name: set
+        description: Set the default model
+      - name: set-image
+        description: Set the image model
+      - name: aliases
+        description: Manage model aliases
+      - name: fallbacks
+        description: Manage model fallback list
+      - name: image-fallbacks
+        description: Manage image model fallback list
+      - name: scan
+        description: Scan OpenRouter free models
+      - name: auth
+        description: Manage model auth profiles
+  - name: approvals
+    description: Exec approvals
+    commands:
+      - name: get
+        description: Fetch exec approvals snapshot
+      - name: set
+        description: Replace exec approvals with a JSON file
+      - name: allowlist
+        description: Edit the per-agent allowlist
+  - name: nodes
+    description: Node commands
+    commands:
+      - name: status
+        description: List known nodes with connection status
+      - name: describe
+        description: Describe a node
+      - name: list
+        description: List pending and paired nodes
+      - name: pending
+        description: List pending pairing requests
+      - name: approve
+        description: Approve a pending pairing request
+      - name: reject
+        description: Reject a pending pairing request
+      - name: rename
+        description: Rename a paired node
+      - name: invoke
+        description: Invoke a command on a paired node
+      - name: run
+        description: Run a shell command on a node
+      - name: notify
+        description: Send a local notification on a node
+      - name: canvas
+        description: Capture or render canvas content
+      - name: camera
+        description: Capture camera media from a paired node
+      - name: screen
+        description: Capture screen recordings from a paired node
+      - name: location
+        description: Fetch location from a paired node
+  - name: devices
+    description: Device pairing + token management
+    commands:
+      - name: list
+        description: List pending and paired devices
+      - name: approve
+        description: Approve a pending device pairing request
+      - name: reject
+        description: Reject a pending device pairing request
+      - name: rotate
+        description: Rotate a device token for a role
+      - name: revoke
+        description: Revoke a device token for a role
+  - name: node
+    description: Node control
+    commands:
+      - name: run
+        description: Run the headless node host (foreground)
+      - name: status
+        description: Show node host status
+      - name: install
+        description: Install the node host service
+      - name: uninstall
+        description: Uninstall the node host service
+      - name: stop
+        description: Stop the node host service
+      - name: restart
+        description: Restart the node host service
+  - name: sandbox
+    description: Sandbox tools
+    commands:
+      - name: list
+        description: List sandbox containers and their status
+      - name: recreate
+        description: Remove containers to force recreation
+      - name: explain
+        description: Explain effective sandbox/tool policy
+  - name: tui
+    description: Terminal UI
+  - name: cron
+    description: Cron scheduler
+    commands:
+      - name: status
+        description: Show cron scheduler status
+      - name: list
+        description: List cron jobs
+      - name: add
+        description: Add a cron job
+      - name: rm
+        description: Remove a cron job
+      - name: enable
+        description: Enable a cron job
+      - name: disable
+        description: Disable a cron job
+      - name: runs
+        description: Show cron run history
+      - name: run
+        description: Run a cron job now (debug)
+      - name: edit
+        description: Edit a cron job
+  - name: dns
+    description: DNS helpers
+    commands:
+      - name: setup
+        description: Set up CoreDNS for openclaw.internal
+  - name: docs
+    description: Docs helpers
+  - name: hooks
+    description: Hooks tooling
+    commands:
+      - name: list
+        description: List all hooks
+      - name: info
+        description: Show detailed information about a hook
+      - name: check
+        description: Check hooks eligibility status
+      - name: enable
+        description: Enable a hook
+      - name: disable
+        description: Disable a hook
+      - name: install
+        description: Install a hook pack
+      - name: update
+        description: Update installed hooks
+  - name: webhooks
+    description: Webhook helpers
+    commands:
+      - name: gmail
+        description: Gmail Pub/Sub hooks
+  - name: pairing
+    description: Pairing helpers
+    commands:
+      - name: list
+        description: List pending pairing requests
+      - name: approve
+        description: Approve a pairing code
+  - name: plugins
+    description: Plugin management
+    commands:
+      - name: list
+        description: List discovered plugins
+      - name: info
+        description: Show plugin details
+      - name: enable
+        description: Enable a plugin in config
+      - name: disable
+        description: Disable a plugin in config
+      - name: install
+        description: Install a plugin
+      - name: update
+        description: Update installed plugins
+      - name: doctor
+        description: Report plugin load issues
+  - name: channels
+    description: Channel management
+    commands:
+      - name: list
+        description: List configured channels + auth profiles
+      - name: status
+        description: Show gateway channel status
+      - name: capabilities
+        description: Show provider capabilities
+      - name: resolve
+        description: Resolve channel/user names to IDs
+      - name: logs
+        description: Show recent channel logs
+      - name: add
+        description: Add or update a channel account
+      - name: remove
+        description: Disable or delete a channel account
+      - name: login
+        description: Link a channel account
+      - name: logout
+        description: Log out of a channel session
+  - name: directory
+    description: Directory commands
+    commands:
+      - name: self
+        description: Show the current account user
+      - name: peers
+        description: Peer directory (contacts/users)
+      - name: groups
+        description: Group directory
+  - name: security
+    description: Security helpers
+    commands:
+      - name: audit
+        description: Audit config + local state for security foot-guns
+  - name: skills
+    description: Skills management
+    commands:
+      - name: list
+        description: List all available skills
+      - name: info
+        description: Show detailed information about a skill
+      - name: check
+        description: Check which skills are ready vs missing requirements
+  - name: update
+    description: CLI update helpers
+    commands:
+      - name: wizard
+        description: Interactive update wizard
+      - name: status
+        description: Show update channel and version status
+  - name: completion
+    description: Generate shell completion script
+    flags:
+      -s, --shell=: Shell to generate completion for (zsh, bash, powershell, fish)
+      -i, --install: Install completion script to shell profile
+      -y, --yes: Skip confirmation (non-interactive)
+  - name: status
+    description: Show channel health and recent session recipients
+  - name: health
+    description: Fetch health from the running gateway
+  - name: sessions
+    description: List stored conversation sessions
+  - name: browser
+    description: Manage OpenClaw's dedicated browser (Chrome/Chromium)
+  - name: help
+    description: Display help for command

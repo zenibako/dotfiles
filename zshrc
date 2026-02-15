@@ -240,15 +240,6 @@ fi
 if (( ${+commands[brew]} ))
 then
   export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_FALLBACK_LIBRARY_PATH"
-  if (( ${+commands[pixlet]} ))
-  then
-    pixlet completion zsh > $(brew --prefix)/share/zsh/site-functions/_pixlet
-  fi
-fi
-
-if (( ${+commands[ha]} ))
-then
-  source <(ha completion zsh) && compdef _ha ha
 fi
 
 if (( ${+commands[deno]} ))
@@ -256,27 +247,67 @@ then
   [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 fi
 
-[[ -d ~/.zsh/completion ]] || mkdir -p ~/.zsh/completion
-[[ -d ~/.zsh/completions ]] || mkdir -p ~/.zsh/completions
+# Load shared completions from completions.toml
+# This is the single source of truth for CLI tool completions shared with nushell
+_load_shared_completions() {
+    local comp_file="$HOME/.config/shared/completions.toml"
+    [[ -f "$comp_file" ]] || return
+    
+    [[ -d ~/.zsh/completion ]] || mkdir -p ~/.zsh/completion
+    [[ -d ~/.zsh/completion-bash ]] || mkdir -p ~/.zsh/completion-bash
+    
+    local current_tool="" zsh_cmd="" comp_output=""
+    local in_tool=0
+    
+    while IFS= read -r line; do
+        # Skip comments and empty lines
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// }" ]] && continue
+        
+        # Detect tool section [toolname]
+        if [[ "$line" =~ "^\[([a-z_-]+)\]$" ]]; then
+            current_tool="${match[1]}"
+            in_tool=1
+            zsh_cmd=""
+            continue
+        fi
+        
+        # Exit tool section when hitting another section
+        if [[ "$line" == "["* ]]; then
+            in_tool=0
+            current_tool=""
+            continue
+        fi
+        
+        # Parse zsh command
+        if (( in_tool )) && [[ "$line" =~ '^zsh[[:space:]]*=[[:space:]]*"(.*)"$' ]]; then
+            zsh_cmd="${match[1]}"
+            
+            # Generate completion if tool exists and has a command
+            if [[ -n "$zsh_cmd" ]] && (( ${+commands[$current_tool]} )); then
+                comp_output=$(eval "$zsh_cmd" 2>/dev/null)
+                if [[ "$comp_output" == *"complete -F"* || "$comp_output" == *"bashcompinit"* ]]; then
+                    # Bash-style completion: source after bashcompinit, not via fpath
+                    echo "$comp_output" > ~/.zsh/completion-bash/${current_tool}.bash
+                else
+                    echo "$comp_output" > ~/.zsh/completion/_${current_tool}
+                fi
+            fi
+        fi
+    done < "$comp_file"
+}
+
+_load_shared_completions
 fpath=(~/.zsh/completion ~/.zsh/completions $fpath)
-
-if (( ${+commands[workmux]} ))
-then
-  workmux completions zsh > ~/.zsh/completion/_workmux
-fi
-
-if (( ${+commands[opencode]} ))
-then
-  opencode completion zsh > ~/.zsh/completion/_opencode 2>/dev/null
-fi
-
-if (( ${+commands[backlog]} ))
-then
-  backlog completion install --shell zsh >/dev/null 2>&1
-fi
-
 autoload -U compinit
 compinit
+
+# Source bash-style completions via bashcompinit
+autoload -Uz bashcompinit
+bashcompinit
+for f in ~/.zsh/completion-bash/*.bash(N); do
+    source "$f"
+done
 
 eval "$(starship init zsh)"
 

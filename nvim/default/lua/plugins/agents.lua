@@ -6,6 +6,39 @@ return {
       or "make",
   event = "VeryLazy",
   version = false, -- Never set this value to "*"! Never!
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "MunifTanjim/nui.nvim",
+    "ibhagwan/fzf-lua",           -- for file_selector provider fzf
+    "folke/snacks.nvim",          -- for input provider snacks
+    "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+    "zbirenbaum/copilot.lua",     -- for providers='copilot'
+    {
+      -- support for image pasting
+      "HakonHarnes/img-clip.nvim",
+      event = "VeryLazy",
+      opts = {
+        -- recommended settings
+        default = {
+          embed_image_as_base64 = false,
+          prompt_for_file_name = false,
+          drag_and_drop = {
+            insert_mode = true,
+          },
+          -- required for Windows users
+          use_absolute_path = true,
+        },
+      },
+    },
+    {
+      -- Make sure to set this up properly if you have lazy=true
+      "MeanderingProgrammer/render-markdown.nvim",
+      opts = {
+        file_types = { "markdown", "Avante" },
+      },
+      ft = { "markdown", "Avante" },
+    },
+  },
   ---@module 'avante'
   ---@type avante.Config
   opts = {
@@ -14,6 +47,13 @@ return {
       ["opencode"] = {
         command = "opencode",
         args = { "acp" },
+        env = {
+          HOME = vim.fn.getenv("HOME"),
+          USER = vim.fn.getenv("USER"),
+          NODE_EXTRA_CA_CERTS = vim.env.NODE_EXTRA_CA_CERTS,
+          XDG_CONFIG_HOME = vim.env.XDG_CONFIG_HOME,
+          NVM_DIR = vim.env.NVM_DIR,
+        },
       },
     },
     behaviour = {
@@ -46,39 +86,6 @@ return {
       submit = {
         normal = "<CR>",
         insert = "<C-s>",
-      },
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-      "ibhagwan/fzf-lua",           -- for file_selector provider fzf
-      "folke/snacks.nvim",          -- for input provider snacks
-      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-      "zbirenbaum/copilot.lua",     -- for providers='copilot'
-      {
-        -- support for image pasting
-        "HakonHarnes/img-clip.nvim",
-        event = "VeryLazy",
-        opts = {
-          -- recommended settings
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-            -- required for Windows users
-            use_absolute_path = true,
-          },
-        },
-      },
-      {
-        -- Make sure to set this up properly if you have lazy=true
-        "MeanderingProgrammer/render-markdown.nvim",
-        opts = {
-          file_types = { "markdown", "Avante" },
-        },
-        ft = { "markdown", "Avante" },
       },
     },
   },

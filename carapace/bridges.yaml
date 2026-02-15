@@ -2,3 +2,5 @@ fjira: cobra
 opencode: yargs
 cuejitsu: cobra
 backlog: bash
+gog: bash
+workmux: zsh

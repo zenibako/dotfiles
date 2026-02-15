@@ -55,31 +55,133 @@ on-mode-changed = []
 # Workspace to application assignments
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace 1'
+if.during-aerospace-startup = true
+run = [ 
+  'layout h_accordion',
+  'move-node-to-workspace 1', 
+]
 
 [[on-window-detected]]
 if.app-id = 'app.zen-browser.zen'
-run = 'move-node-to-workspace 1'
+if.during-aerospace-startup = true
+run = [
+  'layout h_accordion',
+  'move-node-to-workspace 1',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
-run = 'move-node-to-workspace 1'
+if.during-aerospace-startup = true
+run = [
+  'layout h_accordion',
+  'move-node-to-workspace 1',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace 2'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.hnc.Discord'
-run = 'move-node-to-workspace 2'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 [[on-window-detected]]
+if.during-aerospace-startup = true
 if.app-id = 'com.apple.MobileSMS'
-run = 'move-node-to-workspace 2'
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.google.Gmail'
-run = 'move-node-to-workspace 2'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.automattic.beeper.desktop'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 2',
+]
+
+# Workspace 3: Utilities
+[[on-window-detected]]
+if.app-id = 'com.apple.iCal'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'io.robbie.HomeAssistant'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Photos'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.calibre'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 3',
+]
+
+# Workspace 4: Media & Gaming
+[[on-window-detected]]
+if.app-id = 'com.valvesoftware.steam'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 4',
+]
+
+[[on-window-detected]]
+if.app-id = 'com.valvesoftware.steam.helper'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 4',
+]
+
+[[on-window-detected]]
+if.app-id = 'org.videolan.vlc'
+if.during-aerospace-startup = true
+run = [
+  'layout h_tiles',
+  'move-node-to-workspace 4',
+]
 
 # Possible values: (qwerty|dvorak|colemak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -198,6 +300,7 @@ run = 'move-node-to-workspace 2'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
     alt-shift-semicolon = 'mode service'
+    alt-shift-p = 'mode passthrough'  # Toggle passthrough mode for Screen Sharing
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -214,3 +317,7 @@ run = 'move-node-to-workspace 2'
     alt-shift-j = ['join-with down', 'mode main']
     alt-shift-k = ['join-with up', 'mode main']
     alt-shift-l = ['join-with right', 'mode main']
+
+# 'passthrough' binding mode - disables all Aerospace keybinds for Screen Sharing
+[mode.passthrough.binding]
+    alt-shift-p = 'mode main'  # Exit passthrough mode back to main
