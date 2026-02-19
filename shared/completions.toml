@@ -52,7 +52,7 @@ nu = "jj util completion nushell"
 
 [opencode]
 zsh = "opencode completion zsh"
-nu = ""  # via carapace bridge (yargs)
+nu = ""  # via carapace spec (carapace/specs/opencode.yaml)
 
 [openclaw]
 zsh = "cat ~/.openclaw/completions/openclaw.zsh"

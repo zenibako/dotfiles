@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=https://carapace.sh/schemas/command.json
+name: opencode
+description: AI coding assistant
+flags:
+  -h, --help: show help
+  -v, --version: show version number
+  --print-logs: print logs to stderr
+  --log-level=: log level
+  -m, --model=: model to use in the format of provider/model
+  -c, --continue: continue the last session
+  -s, --session=: session id to continue
+  --fork: fork the session when continuing
+  --prompt=: prompt to use
+  --agent=: agent to use
+  --port=: port to listen on
+  --hostname=: hostname to listen on
+  --mdns: enable mDNS service discovery
+  --mdns-domain=: custom domain name for mDNS service
+  --cors=: additional domains to allow for CORS
+commands:
+  - name: completion
+    description: generate shell completion script
+  - name: acp
+    description: start ACP (Agent Client Protocol) server
+  - name: mcp
+    description: manage MCP (Model Context Protocol) servers
+    commands:
+      - name: add
+        description: add an MCP server
+      - name: list
+        description: list MCP servers and their status
+        aliases: [ls]
+      - name: auth
+        description: authenticate with an OAuth-enabled MCP server
+      - name: logout
+        description: remove OAuth credentials for an MCP server
+      - name: debug
+        description: debug OAuth connection for an MCP server
+  - name: attach
+    description: attach to a running opencode server
+  - name: run
+    description: run opencode with a message
+  - name: debug
+    description: debugging and troubleshooting tools
+    commands:
+      - name: config
+        description: show resolved configuration
+      - name: lsp
+        description: LSP debugging utilities
+        commands:
+          - name: diagnostics
+            description: get diagnostics for a file
+          - name: symbols
+            description: search workspace symbols
+          - name: document-symbols
+            description: get symbols from a document
+      - name: rg
+        description: ripgrep debugging utilities
+        commands:
+          - name: tree
+            description: show file tree using ripgrep
+          - name: files
+            description: list files using ripgrep
+          - name: search
+            description: search file contents using ripgrep
+      - name: file
+        description: file system debugging utilities
+        commands:
+          - name: read
+            description: read file contents as JSON
+          - name: status
+            description: show file status information
+          - name: list
+            description: list files in a directory
+          - name: search
+            description: search files by query
+          - name: tree
+            description: show directory tree
+      - name: scrap
+        description: list all known projects
+      - name: skill
+        description: list all available skills
+      - name: snapshot
+        description: snapshot debugging utilities
+        commands:
+          - name: track
+            description: track current snapshot state
+          - name: patch
+            description: show patch for a snapshot hash
+          - name: diff
+            description: show diff for a snapshot hash
+      - name: agent
+        description: show agent configuration details
+      - name: paths
+        description: show global paths (data, config, cache, state)
+      - name: wait
+        description: wait indefinitely (for debugging)
+  - name: auth
+    description: manage credentials
+    commands:
+      - name: login
+        description: log in to a provider
+      - name: logout
+        description: log out from a configured provider
+      - name: list
+        description: list providers
+        aliases: [ls]
+  - name: agent
+    description: manage agents
+    commands:
+      - name: create
+        description: create a new agent
+      - name: list
+        description: list all available agents
+  - name: upgrade
+    description: upgrade opencode to the latest or a specific version
+  - name: uninstall
+    description: uninstall opencode and remove all related files
+  - name: serve
+    description: starts a headless opencode server
+  - name: web
+    description: start opencode server and open web interface
+  - name: models
+    description: list all available models
+  - name: stats
+    description: show token usage and cost statistics
+  - name: export
+    description: export session data as JSON
+  - name: import
+    description: import session data from JSON file or URL
+  - name: github
+    description: manage GitHub agent
+    commands:
+      - name: install
+        description: install the GitHub agent
+      - name: run
+        description: run the GitHub agent
+  - name: pr
+    description: fetch and checkout a GitHub PR branch, then run opencode
+  - name: session
+    description: manage sessions
+    commands:
+      - name: list
+        description: list sessions
+  - name: db
+    description: database tools
+    flags:
+      --format=: output format
+    commands:
+      - name: path
+        description: print the database path
+      - name: migrate
+        description: migrate JSON data to SQLite
