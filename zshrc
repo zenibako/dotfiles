@@ -289,6 +289,9 @@ _load_shared_completions() {
                 if [[ "$comp_output" == *"complete -F"* || "$comp_output" == *"bashcompinit"* ]]; then
                     # Bash-style completion: source after bashcompinit, not via fpath
                     echo "$comp_output" > ~/.zsh/completion-bash/${current_tool}.bash
+                elif [[ "$comp_output" == *"compdef "* ]]; then
+                    # Zsh completion with explicit compdef call: must be sourced, not autoloaded via fpath
+                    echo "$comp_output" > ~/.zsh/completion-bash/${current_tool}.zsh
                 else
                     echo "$comp_output" > ~/.zsh/completion/_${current_tool}
                 fi
@@ -305,7 +308,7 @@ compinit
 # Source bash-style completions via bashcompinit
 autoload -Uz bashcompinit
 bashcompinit
-for f in ~/.zsh/completion-bash/*.bash(N); do
+for f in ~/.zsh/completion-bash/*.{bash,zsh}(N); do
     source "$f"
 done
 
