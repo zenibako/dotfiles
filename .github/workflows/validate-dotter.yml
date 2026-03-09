@@ -119,11 +119,6 @@ jobs:
           mcp_gitlab_enabled = true
           opencode_build_agent_model = "github-copilot/claude-sonnet-4.5"
           opencode_plan_agent_model = "github-copilot/claude-opus-4.5"
-          jira_browser = "chrome"
-          jira_api_token = "test_jira_token_123"
-          jira_workspace_url = "https://test.atlassian.net"
-          jira_user_email = "test@work.example.com"
-          jira_project_key = "TEST"
           node_extra_ca_certs = "/test/path/ca-bundle.crt"
           p10k_root_dir = "$HOME/.p10k"
           sonarqube_token = "test_sonar_token_123"

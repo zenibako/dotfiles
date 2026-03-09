@@ -28,6 +28,19 @@ source ~/.config/nushell/atuin-exec.nu
 # Source shared completions (generated from completions.toml in env.nu)
 source ~/.cache/completions/init.nu
 
+let existing_external_completer = (($env.config? | default {} | get completions?.external?.completer?) | default null)
+if ((scope commands | where name == "acli-completer") | is-not-empty) {
+    $env.config.completions.external.completer = {|spans|
+        if ($spans | is-not-empty) and ($spans.0 == "acli") {
+            acli-completer $spans
+        } else if $existing_external_completer != null {
+            do $existing_external_completer $spans
+        } else {
+            null
+        }
+    }
+}
+
 # Set config options AFTER sourcing third-party scripts
 # (atuin init and starship init reset $env.config)
 $env.config.buffer_editor = "nvim"

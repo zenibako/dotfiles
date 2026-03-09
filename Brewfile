@@ -1,4 +1,4 @@
-tap "ankitpokhrel/jira-cli"
+tap "atlassian/acli"
 tap "borkdude/brew"
 tap "browsh-org/browsh"
 tap "clojure/tools"
@@ -26,6 +26,8 @@ brew "readline"
 brew "node"
 # AWS Cloud Development Kit - framework for defining AWS infra as code
 brew "aws-cdk"
+# Atlassian command-line interface for Jira and Confluence
+brew "acli"
 # Core application library for C
 brew "glib"
 # Parser generator
@@ -100,8 +102,6 @@ brew "imagemagick"
 brew "openjdk"
 # Java language specific implementation of the Language Server Protocol
 brew "jdtls"
-# Feature-rich interactive Jira CLI
-brew "jira-cli"
 # Git-compatible distributed version control system
 brew "jj"
 # Development kit for the Java programming language
@@ -222,8 +222,6 @@ brew "zsh"
 brew "zsh-autosuggestions"
 # Additional completion definitions for zsh
 brew "zsh-completions"
-# Feature-rich interactive Jira command-line
-brew "ankitpokhrel/jira-cli/jira-cli"
 # Native, fast starting Clojure interpreter for scripting.
 brew "borkdude/brew/babashka"
 # The modern, text-based browser

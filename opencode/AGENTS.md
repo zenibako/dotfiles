@@ -11,6 +11,15 @@
 - **Prefer MCPs over CLIs**: When available, use the Jujutsu, GitHub, and GitLab MCP tools instead of their command-line interfaces for better integration and error handling
 - **Always commit changes**: Before moving on to another topic or task, commit all changes with an appropriate conventional commit message
 
+## Atlassian CLI
+- **Use `acli`** for all Jira and Confluence operations (replaces legacy `jira-cli`)
+- **Authentication**: Use `acli auth login` or product-specific `acli {jira|rovodev} auth login`; token-based auth is supported where applicable
+- **Work items**: Use `acli jira workitem` commands (not `jira issue`)
+  - Search: `acli jira workitem search --jql "JQL_QUERY" --json`
+  - View: `acli jira workitem view WORK-ITEM-ID --json`
+  - Create: `acli jira workitem create --project KEY --type Task --summary "..." --json`
+- **All commands support `--json`** for structured output parsing
+
 ## Task Management with Backlog.md
 
 This project uses Backlog.md MCP for all task and project management activities when enabled.

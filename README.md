@@ -111,7 +111,7 @@ Enable by including the corresponding section in `.dotter/local.toml`.
 ### MCP Servers
 
 Enable optional MCP servers for Claude Desktop:
-- Atlassian (Jira)
+- Atlassian (Jira/Confluence)
 - GitLab
 - Odaseva
 - Postman

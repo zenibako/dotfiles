@@ -18,6 +18,10 @@
 #
 # Tools are automatically skipped if not found in PATH.
 
+[acli]
+zsh = "acli completion zsh"
+nu = "open ~/.config/nushell/completions/acli.nu --raw"
+
 [atuin]
 zsh = ""  # oh-my-zsh plugin + atuin init
 nu = "atuin gen-completions --shell nushell"

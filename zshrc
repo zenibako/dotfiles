@@ -120,7 +120,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(extract git git-extras jira tmux git-commit nmap nvm gitignore encode64 brew rsync)
+plugins=(extract git git-extras tmux git-commit nmap nvm gitignore encode64 brew rsync)
 
 source $ZSH/oh-my-zsh.sh
 
