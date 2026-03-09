@@ -28,7 +28,7 @@ nu = "atuin gen-completions --shell nushell"
 
 [backlog]
 zsh = ""  # uses install cmd: backlog completion install --shell zsh
-nu = ""  # via carapace bridge (bash)
+nu = "open ~/.config/nushell/completions/backlog.nu --raw"
 
 [carapace]
 zsh = ""  # carapace handles zsh via bridges

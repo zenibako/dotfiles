@@ -29,10 +29,22 @@ source ~/.config/nushell/atuin-exec.nu
 source ~/.cache/completions/init.nu
 
 let existing_external_completer = (($env.config? | default {} | get completions?.external?.completer?) | default null)
-if ((scope commands | where name == "acli-completer") | is-not-empty) {
+let acli_external_completer = if ((scope commands | where name == "acli-completer") | is-not-empty) {
+    {|spans| acli-completer $spans }
+} else {
+    null
+}
+let backlog_external_completer = if ((scope commands | where name == "backlog-completer") | is-not-empty) {
+    {|spans| backlog-completer $spans }
+} else {
+    null
+}
+if ($acli_external_completer != null) or ($backlog_external_completer != null) {
     $env.config.completions.external.completer = {|spans|
-        if ($spans | is-not-empty) and ($spans.0 == "acli") {
-            acli-completer $spans
+        if ($spans | is-not-empty) and ($spans.0 == "acli") and ($acli_external_completer != null) {
+            do $acli_external_completer $spans
+        } else if ($spans | is-not-empty) and ($spans.0 == "backlog") and ($backlog_external_completer != null) {
+            do $backlog_external_completer $spans
         } else if $existing_external_completer != null {
             do $existing_external_completer $spans
         } else {
