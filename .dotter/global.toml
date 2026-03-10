@@ -20,7 +20,8 @@ jj                            = { target  = "~/.config/jj",                     
 "nvim/default"                = { target  = "~/.config/nvim",                       type = "template" }
 "opencode/.gitignore"         = { target  = "~/.config/opencode/.gitignore",        type = "symbolic" }
 "opencode/AGENTS.md"          = { target  = "~/.config/opencode/AGENTS.md",         type = "symbolic" }
-"opencode/command"            = { target  = "~/.config/opencode/command",           type = "symbolic" }
+"opencode/command/fix-pipeline.md" = { target  = "~/.config/opencode/command/fix-pipeline.md", type = "symbolic" }
+"opencode/command/go.md"      = { target  = "~/.config/opencode/command/go.md",     type = "symbolic" }
 "opencode/prompt"             = { target  = "~/.config/opencode/prompt",            type = "symbolic" }
 "opencode/opencode.jsonc"     = { target  = "~/.config/opencode/opencode.jsonc",    type = "template" }
 "opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }
@@ -245,4 +246,3 @@ nu_prompt_normal_color                = "blue_bold"
 
 [settings]
 default_target_type                   = "automatic"
-
