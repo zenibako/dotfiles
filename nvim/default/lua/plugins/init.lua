@@ -5,22 +5,6 @@ return {
   },
   "eandrju/cellular-automaton.nvim",
   {
-    "nvim-treesitter/nvim-treesitter",
-    branch = "master",
-    lazy = false,
-    build = ":TSUpdate",
-    config = function()
-      local configs = require("nvim-treesitter.configs")
-
-      configs.setup({
-        ensure_installed = { "c", "cue", "lua", "vim", "vimdoc", "query", "pkl", "javascript", "html" },
-        sync_install = false,
-        highlight = { enable = true },
-        indent = { enable = true },
-      })
-    end,
-  },
-  {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
@@ -103,13 +87,13 @@ return {
     },
     opts_extend = { "sources.default" },
   },
-  {
-    "norcalli/nvim-colorizer.lua",
-    config = function()
-      vim.opt.termguicolors = true
-      require("colorizer").setup()
-    end,
-  },
+  -- {
+  --   "norcalli/nvim-colorizer.lua",
+  --   config = function()
+  --     vim.opt.termguicolors = true
+  --     require("colorizer").setup()
+  --   end,
+  -- },
   {
     'zenibako/lazyjj.nvim',
     dependencies = 'nvim-lua/plenary.nvim',
