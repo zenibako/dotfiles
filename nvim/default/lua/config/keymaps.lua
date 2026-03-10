@@ -7,7 +7,7 @@ vim.keymap.set("n", "<leader>fr", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
 local fzf = require("fzf-lua")
 vim.keymap.set("n", "<leader>pf", fzf.files, {})
 vim.keymap.set("n", "<leader>lg", fzf.live_grep, {})
-vim.keymap.set('n', '<C-p>', "<cmd>FzfLua git_files<CR>", {})
+vim.keymap.set('n', '<C-p>', "<cmd>FzfLua vcs_files<CR>", {})
 vim.keymap.set("n", "<leader>pws", fzf.grep_cword, {})
 vim.keymap.set("n", "<leader>pWs", fzf.grep_cWORD, {})
 vim.keymap.set("n", "<leader>fg", fzf.live_grep, {})

@@ -3,7 +3,7 @@ return {
 
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
-    "ibhagwan/fzf-lua", -- no need if you don't use listing metadata feature
+    -- "ibhagwan/fzf-lua", -- no need if you don't use listing metadata feature
     "stevearc/overseer.nvim",
   },
 
