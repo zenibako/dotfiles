@@ -39,7 +39,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
-automatically-unhide-macos-hidden-apps = false
+automatically-unhide-macos-hidden-apps = true
 
 # List of workspaces that should stay alive even when they contain no windows,
 # even when they are invisible.
@@ -56,132 +56,76 @@ on-mode-changed = []
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
 if.during-aerospace-startup = true
-run = [ 
-  'layout h_accordion',
-  'move-node-to-workspace 1', 
-]
+run = 'move-node-to-workspace 1'
 
 [[on-window-detected]]
 if.app-id = 'app.zen-browser.zen'
 if.during-aerospace-startup = true
-run = [
-  'layout h_accordion',
-  'move-node-to-workspace 1',
-]
+run = 'move-node-to-workspace 1'
 
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
 if.during-aerospace-startup = true
-run = [
-  'layout h_accordion',
-  'move-node-to-workspace 1',
-]
+run = 'move-node-to-workspace 1'
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
 if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 2',
-]
+run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.hnc.Discord'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 2',
-]
+run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.during-aerospace-startup = true
-if.app-id = 'com.apple.MobileSMS'
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 2',
-]
+run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.google.Gmail'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 2',
-]
+run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.automattic.beeper.desktop'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 2',
-]
+run = 'move-node-to-workspace 2'
 
 # Workspace 3: Utilities
 [[on-window-detected]]
 if.app-id = 'com.apple.iCal'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 3',
-]
+run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.finder'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 3',
-]
+run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
 if.app-id = 'io.robbie.HomeAssistant'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 3',
-]
+run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Photos'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 3',
-]
+run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
 if.app-id = 'net.kovidgoyal.calibre'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 3',
-]
+run = 'move-node-to-workspace 3'
 
 # Workspace 4: Media & Gaming
 [[on-window-detected]]
 if.app-id = 'com.valvesoftware.steam'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 4',
-]
+run = 'move-node-to-workspace 4'
 
 [[on-window-detected]]
 if.app-id = 'com.valvesoftware.steam.helper'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 4',
-]
+run = 'move-node-to-workspace 4'
 
 [[on-window-detected]]
 if.app-id = 'org.videolan.vlc'
-if.during-aerospace-startup = true
-run = [
-  'layout h_tiles',
-  'move-node-to-workspace 4',
-]
+run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^.*$'
+run = 'move-node-to-workspace 4'
 
 # Possible values: (qwerty|dvorak|colemak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -321,3 +265,11 @@ run = [
 # 'passthrough' binding mode - disables all Aerospace keybinds for Screen Sharing
 [mode.passthrough.binding]
     alt-shift-p = 'mode main'  # Exit passthrough mode back to main
+
+[workspace-to-monitor-force-assignment]
+    '1' = 'main'
+    '2' = 'main'
+    '3' = 'main'
+    '4' = 'main'
+    '5' = 'main'
+    '6' = 'secondary'
