@@ -2,6 +2,7 @@ acli: cobra
 cuejitsu: cobra
 backlog: bash
 gog: bash
+netlify: zsh
 openclaw: zsh
 opencode: zsh
 workmux: zsh

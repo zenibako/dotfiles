@@ -54,6 +54,11 @@ nu = ""  # via carapace
 zsh = "jj util completion zsh"
 nu = "jj util completion nushell"
 
+[netlify]
+# after running: netlify completion:install
+zsh = "cat ~/.config/tabtab/zsh/netlify.zsh"
+nu = ""  # via carapace bridge (zsh)
+
 [opencode]
 zsh = "opencode completion zsh"
 nu = ""  # via carapace spec (carapace/specs/opencode.yaml)

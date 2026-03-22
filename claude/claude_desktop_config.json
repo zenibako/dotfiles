@@ -16,6 +16,9 @@
     "Odaseva": {
       "command": "oda-mcp",
       "args": ["-env", "/Users/{{ username }}/Projects/oda-mcp/.env"]
+    }{{/if}}{{#if mcp_jujutsu_enabled}},
+    "Jujutsu": {
+      "command": "jj-mcp-server"
     }{{/if}}
   },
   "preferences": {
