@@ -235,7 +235,7 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama",
       "options": {
-        "baseURL": "http://10.0.7.73:11434/v1"
+        "baseURL": "http://mac-mini.local:11434/v1"
       },
       "models": {
         "qwen3-coder:latest": {

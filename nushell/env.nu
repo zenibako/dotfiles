@@ -102,8 +102,6 @@ if ($completions_path | path exists) {
 # Shell-specific additions can still be added here:
 $env.PATH = ($env.PATH | append $"($env.HOME)/.opencode/bin/")
 
-$env.OLLAMA_HOST = "http://10.0.7.73:11434"
-
 {{#if playdate_sdk_enabled}}
 # Playdate SDK
 $env.PLAYDATE_SDK_PATH = $"($env.HOME)/Developer/PlaydateSDK"
