@@ -256,6 +256,9 @@
         "baseURL": "http://mac-mini.local:11434/v1"
       },
       "models": {
+        "gemma4:latest": {
+          "name": "Gemma 4"
+        },
         "qwen3-coder:latest": {
           "name": "Qwen3 Coder"
         }
