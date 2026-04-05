@@ -5,7 +5,7 @@ vim.cmd("set expandtab")
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
 -- Native insert-mode autocompletion (Neovim 0.12)
-vim.o.autocomplete = "popup"
+vim.o.autocomplete = true
 vim.o.completeopt = "menu,menuone,noselect,popup,nearest"
 vim.o.pumborder = "rounded"
 
