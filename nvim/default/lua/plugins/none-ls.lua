@@ -1,5 +1,7 @@
-vim.pack.add("https://github.com/nvimtools/none-ls-extras.nvim")
-vim.pack.add("https://github.com/nvimtools/none-ls.nvim")
+vim.pack.add({
+  "https://github.com/nvimtools/none-ls-extras.nvim",
+  "https://github.com/nvimtools/none-ls.nvim",
+})
 
 local null_ls = require("null-ls")
 

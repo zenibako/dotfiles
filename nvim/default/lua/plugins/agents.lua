@@ -1,7 +1,9 @@
-vim.pack.add("https://github.com/folke/snacks.nvim")
-require("snacks").setup({ input = {}, picker = {}, terminal = {} })
+vim.pack.add({
+  "https://github.com/folke/snacks.nvim",
+  "https://github.com/nickjvandyke/opencode.nvim",
+})
 
-vim.pack.add("https://github.com/nickjvandyke/opencode.nvim")
+require("snacks").setup({ input = {}, picker = {}, terminal = {} })
 
 ---@type opencode.Opts
 vim.g.opencode_opts = {}
