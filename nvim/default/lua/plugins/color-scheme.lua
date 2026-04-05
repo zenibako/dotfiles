@@ -1,10 +1,2 @@
-return {
-  {
-    '{{ nvim_colorscheme_plugin }}',
-    lazy = false,
-    priority = 1000,
-    config = function()
+vim.pack.add("https://github.com/{{ nvim_colorscheme_plugin }}")
 {{{ nvim_colorscheme_config }}}
-    end
-  }
-}
