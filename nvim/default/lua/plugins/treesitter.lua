@@ -2,6 +2,23 @@ vim.pack.add("https://github.com/nvim-treesitter/nvim-treesitter")
 
 require("nvim-treesitter").setup({})
 
+-- Register custom parsers so they're available at startup and during TSUpdate
+local parsers = require("nvim-treesitter.parsers")
+
+parsers.templ = {
+  install_info = {
+    url = "https://github.com/vrischmann/tree-sitter-templ.git",
+    branch = "master",
+  },
+}
+
+parsers.fountain = {
+  install_info = {
+    url = "https://github.com/zenibako/tree-sitter-fountain",
+    branch = "master",
+  },
+}
+
 -- Install parsers (no-op if already installed)
 require("nvim-treesitter").install({
   "c",
@@ -27,25 +44,10 @@ require("nvim-treesitter").install({
   "query",
 })
 
--- Register custom parsers via TSUpdate autocmd
-vim.api.nvim_create_autocmd("User", {
-  pattern = "TSUpdate",
+-- Enable treesitter highlighting for all filetypes with available parsers
+vim.api.nvim_create_autocmd("FileType", {
   callback = function()
-    local parsers = require("nvim-treesitter.parsers")
-
-    parsers.templ = {
-      install_info = {
-        url = "https://github.com/vrischmann/tree-sitter-templ.git",
-        branch = "master",
-      },
-    }
-
-    parsers.fountain = {
-      install_info = {
-        url = "https://github.com/zenibako/tree-sitter-fountain",
-        branch = "master",
-      },
-    }
+    pcall(vim.treesitter.start)
   end,
 })
 

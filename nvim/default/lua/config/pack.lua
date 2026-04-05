@@ -19,14 +19,14 @@ vim.api.nvim_create_autocmd("PackChanged", {
       end
       require("go.install").update_all_sync()
     elseif name == "fff.nvim" then
-      vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path })
+      vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
     elseif name == "gitlab.nvim" then
       if not ev.data.active then
         vim.cmd.packadd("gitlab.nvim")
       end
       require("gitlab.server").build(true)
     elseif name == "swagger-preview.nvim" then
-      vim.system({ "npm", "i" }, { cwd = ev.data.path })
+      vim.system({ "npm", "i" }, { cwd = ev.data.path }):wait()
     end
   end,
 })
