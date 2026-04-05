@@ -1,3 +1,1 @@
-return {
-  "tpope/vim-unimpaired"
-}
+vim.pack.add("https://github.com/tpope/vim-unimpaired")
