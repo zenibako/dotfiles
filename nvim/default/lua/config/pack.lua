@@ -13,8 +13,6 @@ vim.api.nvim_create_autocmd("PackChanged", {
         vim.cmd.packadd("nvim-treesitter")
       end
       vim.cmd("TSUpdate")
-    elseif name == "blink.cmp" then
-      vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path })
     elseif name == "go.nvim" then
       if not ev.data.active then
         vim.cmd.packadd("go.nvim")
