@@ -19,29 +19,34 @@ parsers.fountain = {
   },
 }
 
--- Install parsers (no-op if already installed)
-require("nvim-treesitter").install({
-  "c",
-  "vimdoc",
-  "apex",
-  "soql",
-  "sosl",
-  "jsdoc",
-  "json",
-  "javascript",
-  "typescript",
-  "tsx",
-  "yaml",
-  "html",
-  "css",
-  "markdown",
-  "markdown_inline",
-  "bash",
-  "lua",
-  "vim",
-  "dockerfile",
-  "gitignore",
-  "query",
+-- Install parsers after startup (no-op if already installed)
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    require("nvim-treesitter").install({
+      "c",
+      "vimdoc",
+      "apex",
+      "soql",
+      "sosl",
+      "jsdoc",
+      "json",
+      "javascript",
+      "typescript",
+      "tsx",
+      "yaml",
+      "html",
+      "css",
+      "markdown",
+      "markdown_inline",
+      "bash",
+      "lua",
+      "vim",
+      "dockerfile",
+      "gitignore",
+      "query",
+    })
+  end,
 })
 
 -- Enable treesitter highlighting for all filetypes with available parsers
