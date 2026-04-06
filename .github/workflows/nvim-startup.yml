@@ -114,13 +114,37 @@ jobs:
       - name: Test Neovim startup
         run: |
           export HOME="$DEPLOY_DIR"
-          export NVIM_CI=1
 
-          # Run Neovim headless and capture all output
-          nvim --headless +"lua vim.cmd('qa!')" 2>&1 | tee /tmp/nvim-output.txt
+          # Write a small Lua script that:
+          # 1. First startup: plugins install via vim.pack, then :restart
+          # 2. After restart: plugins already loaded, quit cleanly
+          cat > /tmp/ci-startup-test.lua <<'LUA'
+          local flag = vim.fn.stdpath('data') .. '/ci_restart_done'
+          if vim.fn.filereadable(flag) == 1 then
+            vim.fn.delete(flag)
+            vim.cmd('qa!')
+          else
+            vim.fn.mkdir(vim.fn.stdpath('data'), 'p')
+            vim.fn.writefile({}, flag)
+            vim.cmd('restart')
+          end
+          LUA
 
-          # Check for errors, filtering expected "module not found" from skipped plugins
-          if grep -i "error" /tmp/nvim-output.txt | grep -v "module.*not found" > /tmp/unexpected-errors.txt 2>/dev/null; then
+          # Build hooks (cargo, npm) may fail in CI — that's expected.
+          timeout 300 nvim --headless -c "luafile /tmp/ci-startup-test.lua" \
+            2>&1 | tee /tmp/nvim-output.txt
+          NVIM_EXIT=$?
+
+          echo "Neovim output:"
+          cat /tmp/nvim-output.txt
+
+          if [ $NVIM_EXIT -ne 0 ]; then
+            echo "::error::Neovim exited with code $NVIM_EXIT"
+            exit 1
+          fi
+
+          # Check for errors, filtering expected build-tool warnings
+          if grep -iE "^E[0-9]+:|error.*lua" /tmp/nvim-output.txt | grep -v "cargo\|npm\|build" > /tmp/unexpected-errors.txt 2>/dev/null; then
             if [ -s /tmp/unexpected-errors.txt ]; then
               echo "::error::Unexpected errors during Neovim startup:"
               cat /tmp/unexpected-errors.txt

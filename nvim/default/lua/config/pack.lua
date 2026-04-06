@@ -1,8 +1,3 @@
--- In CI: skip plugin loading (no vim.pack operations or plugin require() calls)
-if vim.env.NVIM_CI then
-  return
-end
-
 -- PackChanged hooks for plugins that need build steps
 -- Must be registered BEFORE vim.pack.add() calls
 vim.api.nvim_create_autocmd("PackChanged", {
