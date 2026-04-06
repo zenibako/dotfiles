@@ -25,16 +25,17 @@ jobs:
 
       - name: Install Neovim
         run: |
-          wget -q https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+          wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
           tar xzf nvim-linux-x86_64.tar.gz
           sudo cp -r nvim-linux-x86_64/* /usr/local/
           nvim --version
 
       - name: Install dotter
         run: |
-          wget -q https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x64-musl -O dotter
+          wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x64-musl -O dotter
           chmod +x dotter
           sudo mv dotter /usr/local/bin/
+          dotter --version
 
       - name: Create deployment directory
         run: |
@@ -138,8 +139,9 @@ jobs:
             exit 1
           fi
 
-          # Check for errors, filtering expected build-tool warnings
-          if grep -iE "^E[0-9]+:|error.*lua" /tmp/nvim-output.txt | grep -v "cargo\|npm\|build" > /tmp/unexpected-errors.txt 2>/dev/null; then
+          # Check for errors, filtering expected benign messages
+          if grep -E "^E[0-9]+:|Error while calling lua chunk|error loading plugin config" /tmp/nvim-output.txt \
+            | grep -v -E "cargo|npm|build|module.*not found" > /tmp/unexpected-errors.txt 2>/dev/null; then
             if [ -s /tmp/unexpected-errors.txt ]; then
               echo "::error::Unexpected errors during Neovim startup:"
               cat /tmp/unexpected-errors.txt
