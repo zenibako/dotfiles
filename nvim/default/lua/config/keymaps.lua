@@ -6,12 +6,15 @@ vim.keymap.set("n", "<leader>fr", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
 
 local function with_fzf(method)
   return function(...)
-    local ok, fzf = pcall(require, "fzf-lua")
-    if not ok then
-      vim.notify("fzf-lua is not available yet", vim.log.levels.WARN)
-      return
-    end
-    return fzf[method](...)
+    local args = { ... }
+    vim.schedule(function()
+      local ok, fzf = pcall(require, "fzf-lua")
+      if not ok then
+        vim.notify("fzf-lua is not available yet", vim.log.levels.WARN)
+        return
+      end
+      fzf[method](unpack(args))
+    end)
   end
 end
 
