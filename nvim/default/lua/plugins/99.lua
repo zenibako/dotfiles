@@ -2,12 +2,12 @@ vim.pack.add({"https://github.com/ThePrimeagen/99"})
 
 local _99 = require("99")
 
-local cwd = vim.uv.cwd()
+local cwd = vim.uv.cwd() or vim.fn.getcwd()
 local basename = vim.fs.basename(cwd)
 _99.setup({
   logger = {
     level = _99.DEBUG,
-    path = "/tmp/" .. basename .. ".99.debug",
+    path = vim.fs.joinpath(vim.fn.stdpath("log"), basename .. ".99.debug"),
     print_on_error = true,
   },
 

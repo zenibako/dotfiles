@@ -60,10 +60,6 @@ jobs:
           esac
 
           PACKAGES=("${{ matrix.profile }}" "$PLATFORM_PKG" "monokai")
-          # default profile gets extra platform package
-          if [ "${{ matrix.profile }}" = "default" ]; then
-            PACKAGES+=("$PLATFORM_PKG")
-          fi
 
           cat > .dotter/local.toml <<'EOF'
           packages = [
@@ -175,11 +171,12 @@ jobs:
       - name: Test Neovim startup
         if: runner.os == 'Linux'
         run: |
+          set -o pipefail
           export HOME="$DEPLOY_DIR"
 
           # Second run: all plugins already installed, verify clean startup.
           timeout 60 nvim --headless +"qa!" 2>&1 | tee /tmp/nvim-output.txt
-          NVIM_EXIT=$?
+          NVIM_EXIT=${PIPESTATUS[0]}
 
           echo "Neovim output:"
           cat /tmp/nvim-output.txt
