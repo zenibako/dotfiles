@@ -116,9 +116,19 @@ jobs:
         run: |
           export HOME="$DEPLOY_DIR"
 
-          # First run: vim.pack.add() clones all plugins, then quit.
-          # Build hooks (cargo, npm) may fail — that's expected in CI.
-          timeout 300 nvim --headless +"qa!" 2>&1 | tee /tmp/nvim-install.txt || true
+          # vim.pack.add() clones asynchronously, so we can't use +"qa!".
+          # Instead, poll until all git clones finish, then quit.
+          timeout 300 nvim --headless -c "lua vim.defer_fn(function()
+            local timer = vim.uv.new_timer()
+            timer:start(0, 3000, vim.schedule_wrap(function()
+              local result = vim.system({'pgrep', '-f', 'git.*clone'}):wait()
+              if result.code ~= 0 then
+                timer:stop()
+                timer:close()
+                vim.cmd('qa!')
+              end
+            end))
+          end, 5000)" 2>&1 | tee /tmp/nvim-install.txt || true
 
           echo "Plugin installation output:"
           cat /tmp/nvim-install.txt
