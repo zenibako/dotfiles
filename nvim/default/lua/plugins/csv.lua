@@ -1,1 +1,1 @@
-vim.pack.add("https://github.com/chrisbra/csv.vim")
+vim.pack.add({"https://github.com/chrisbra/csv.vim"})

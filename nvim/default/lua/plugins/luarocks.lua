@@ -1,2 +1,2 @@
-vim.pack.add("https://github.com/vhyrro/luarocks.nvim")
+vim.pack.add({"https://github.com/vhyrro/luarocks.nvim"})
 require("luarocks-nvim").setup({})

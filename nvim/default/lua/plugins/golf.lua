@@ -1,1 +1,1 @@
-vim.pack.add("https://github.com/vuciv/golf")
+vim.pack.add({"https://github.com/vuciv/golf"})

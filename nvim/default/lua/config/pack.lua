@@ -1,3 +1,10 @@
+-- Auto-confirm plugin installs (all plugins are explicitly listed in config)
+local _pack_add = vim.pack.add
+vim.pack.add = function(specs, opts)
+  opts = vim.tbl_extend("keep", opts or {}, { confirm = false })
+  return _pack_add(specs, opts)
+end
+
 -- PackChanged hooks for plugins that need build steps
 -- Must be registered BEFORE vim.pack.add() calls
 vim.api.nvim_create_autocmd("PackChanged", {

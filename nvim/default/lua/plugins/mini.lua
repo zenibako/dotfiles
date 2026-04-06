@@ -1,4 +1,4 @@
-vim.pack.add("https://github.com/echasnovski/mini.nvim")
+vim.pack.add({"https://github.com/echasnovski/mini.nvim"})
 
 require("mini.ai").setup()
 require("mini.files").setup({

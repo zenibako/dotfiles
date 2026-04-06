@@ -1,4 +1,4 @@
-vim.pack.add("https://github.com/ThePrimeagen/99")
+vim.pack.add({"https://github.com/ThePrimeagen/99"})
 
 local _99 = require("99")
 
