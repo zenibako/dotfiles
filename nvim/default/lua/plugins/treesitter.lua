@@ -19,10 +19,14 @@ parsers.fountain = {
   },
 }
 
--- Install parsers after startup (no-op if already installed)
+-- Install parsers after startup (no-op if already installed).
+-- Requires tree-sitter CLI on PATH; skip if unavailable.
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
+    if vim.fn.executable("tree-sitter") ~= 1 then
+      return
+    end
     require("nvim-treesitter").install({
       "c",
       "vimdoc",
