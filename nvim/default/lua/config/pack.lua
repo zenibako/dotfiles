@@ -22,7 +22,10 @@ vim.api.nvim_create_autocmd("PackChanged", {
       require("go.install").update_all_sync()
     elseif name == "fff.nvim" then
       if vim.fn.executable("cargo") == 1 then
-        vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
+        local result = vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
+        if result.code ~= 0 then
+          vim.notify("fff.nvim: cargo build failed (exit " .. result.code .. ")", vim.log.levels.ERROR)
+        end
       end
     elseif name == "gitlab.nvim" then
       if not ev.data.active then
@@ -31,7 +34,10 @@ vim.api.nvim_create_autocmd("PackChanged", {
       require("gitlab.server").build(true)
     elseif name == "swagger-preview.nvim" then
       if vim.fn.executable("npm") == 1 then
-        vim.system({ "npm", "i" }, { cwd = ev.data.path }):wait()
+        local result = vim.system({ "npm", "i" }, { cwd = ev.data.path }):wait()
+        if result.code ~= 0 then
+          vim.notify("swagger-preview.nvim: npm install failed (exit " .. result.code .. ")", vim.log.levels.ERROR)
+        end
       end
     end
   end,

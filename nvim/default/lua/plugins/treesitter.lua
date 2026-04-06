@@ -28,6 +28,8 @@ vim.api.nvim_create_autocmd("VimEnter", {
       return
     end
     require("nvim-treesitter").install({
+      "templ",
+      "fountain",
       "c",
       "vimdoc",
       "apex",
