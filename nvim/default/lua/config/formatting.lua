@@ -6,7 +6,7 @@ vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
 -- Native insert-mode autocompletion (Neovim 0.12)
 vim.o.autocomplete = true
-vim.o.completeopt = "menu,menuone,noselect,popup,nearest"
+vim.o.completeopt = "menu,menuone,popup,nearest"
 vim.o.pumborder = "rounded"
 
 vim.diagnostic.config({
