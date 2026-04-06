@@ -139,9 +139,9 @@ jobs:
             exit 1
           fi
 
-          # Check for errors, filtering expected benign messages
+          # Check for errors — no filters needed, all errors are genuine
           if grep -E "^E[0-9]+:|Error while calling lua chunk|error loading plugin config" /tmp/nvim-output.txt \
-            | grep -v -E "cargo|npm|build|module.*not found" > /tmp/unexpected-errors.txt 2>/dev/null; then
+            > /tmp/unexpected-errors.txt 2>/dev/null; then
             if [ -s /tmp/unexpected-errors.txt ]; then
               echo "::error::Unexpected errors during Neovim startup:"
               cat /tmp/unexpected-errors.txt
