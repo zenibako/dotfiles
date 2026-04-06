@@ -19,7 +19,9 @@ vim.api.nvim_create_autocmd("PackChanged", {
       if not ev.data.active then
         vim.cmd.packadd("nvim-treesitter")
       end
-      vim.cmd("TSUpdate")
+      if vim.fn.executable("tree-sitter") == 1 then
+        vim.cmd("TSUpdate")
+      end
     elseif name == "go.nvim" then
       if not ev.data.active then
         vim.cmd.packadd("go.nvim")
@@ -46,7 +48,13 @@ vim.api.nvim_create_autocmd("PackChanged", {
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/nvim-tree/nvim-web-devicons",
+  "https://github.com/b0o/schemastore.nvim",
 })
+
+-- Force core deps onto rtp now (vim.pack.add during init doesn't load by default)
+for _, name in ipairs({"plenary.nvim", "nvim-web-devicons", "schemastore.nvim"}) do
+  pcall(vim.cmd.packadd, name)
+end
 
 -- Auto-discover and load all plugin configs from lua/plugins/
 local plugins_dir = vim.fn.stdpath("config") .. "/lua/plugins"

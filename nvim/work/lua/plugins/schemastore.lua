@@ -1,1 +1,1 @@
-vim.pack.add({"https://github.com/b0o/schemastore.nvim"})
+-- schemastore.nvim is loaded as a core dep in config/pack.lua
