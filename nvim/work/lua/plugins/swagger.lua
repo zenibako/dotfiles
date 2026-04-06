@@ -1,6 +1,2 @@
-return {
-	"vinnymeller/swagger-preview.nvim",
-	cmd = { "SwaggerPreview", "SwaggerPreviewStop", "SwaggerPreviewToggle" },
-	build = "npm i",
-	config = true,
-}
+vim.pack.add({"https://github.com/vinnymeller/swagger-preview.nvim"})
+require("swagger-preview").setup({})

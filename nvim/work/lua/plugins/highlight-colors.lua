@@ -1,7 +1,2 @@
-return {
-  "brenoprata10/nvim-highlight-colors",
-  setup = function ()
-    -- Ensure termguicolors is enabled if not already
-    require('nvim-highlight-colors').setup({})
-  end
-}
+vim.pack.add({"https://github.com/brenoprata10/nvim-highlight-colors"})
+require("nvim-highlight-colors").setup({})

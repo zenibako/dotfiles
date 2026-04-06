@@ -1,4 +1,4 @@
-name: Validate Dotter Deployment
+name: Validate
 
 on:
   push:
@@ -8,41 +8,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  validate-dotter:
-    name: Validate ${{ matrix.profile }}/${{ matrix.theme }} on ${{ matrix.os }}
+  validate:
+    name: ${{ matrix.profile }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         profile: [default, personal, work]
-        theme: [monokai, nightowl, tokyonight]
-        exclude:
-          # Exclude default+monokai from base matrix for platform-specific testing
-          - os: ubuntu-latest
-            profile: default
-            theme: monokai
-          - os: macos-latest
-            profile: default
-            theme: monokai
-        include:
-          # Test linux package on Ubuntu with default+monokai
-          - os: ubuntu-latest
-            profile: default
-            theme: monokai
-            extra_packages: linux
-          # Test mac package on macOS with default+monokai
-          - os: macos-latest
-            profile: default
-            theme: monokai
-            extra_packages: mac
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Install Neovim
+        if: runner.os == 'Linux'
+        run: |
+          wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+          tar xzf nvim-linux-x86_64.tar.gz
+          sudo cp -r nvim-linux-x86_64/* /usr/local/
+          nvim --version
 
       - name: Install dotter
         run: |
@@ -56,55 +44,37 @@ jobs:
               brew install dotter
               ;;
           esac
+          dotter --version
 
-      - name: Verify dotter installation
-        run: dotter --version
-
-      - name: Create temporary deployment directory
+      - name: Create deployment directory
         run: |
           DEPLOY_DIR=$(mktemp -d)
           echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
-          echo "Created deployment directory: $DEPLOY_DIR"
 
-      - name: Test dotter deployment
+      - name: Deploy config with dotter
         run: |
-          echo "Testing deployment for profile: ${{ matrix.profile }}, theme: ${{ matrix.theme }}"
-          
-          # Determine platform package based on OS
+          # Determine platform package
           case "$RUNNER_OS" in
-            Linux)
-              PLATFORM_PKG="linux"
-              ;;
-            macOS)
-              PLATFORM_PKG="mac"
-              ;;
+            Linux)  PLATFORM_PKG="linux" ;;
+            macOS)  PLATFORM_PKG="mac" ;;
           esac
-          
-          # Build package list for this combination
-          PACKAGES=("${{ matrix.profile }}" "$PLATFORM_PKG" "${{ matrix.theme }}")
-          if [ -n "${{ matrix.extra_packages }}" ]; then
-            PACKAGES+=("${{ matrix.extra_packages }}")
-          fi
-          
-          echo "Package combination: ${PACKAGES[@]}"
-          
-          # Create a local.toml for this test with profile-specific variable overrides
+
+          PACKAGES=("${{ matrix.profile }}" "$PLATFORM_PKG" "monokai")
+
           cat > .dotter/local.toml <<'EOF'
           packages = [
           EOF
-          
+
           for pkg in "${PACKAGES[@]}"; do
             echo "  \"$pkg\"," >> .dotter/local.toml
           done
-          
+
           cat >> .dotter/local.toml <<'EOF'
           ]
 
           [variables]
-          # Test variable overrides based on profile
           EOF
-          
-          # Add profile-specific variables to test templating
+
           case "${{ matrix.profile }}" in
             work)
               cat >> .dotter/local.toml <<'EOF'
@@ -164,12 +134,10 @@ jobs:
           EOF
               ;;
           esac
-          
+
           echo "Generated local.toml:"
           cat .dotter/local.toml
-          
-          # Perform deployment to the temporary directory by overriding HOME
-          # The --force flag allows overwriting files from the depends chain
+
           HOME="$DEPLOY_DIR" dotter deploy --force --verbose
 
       - name: Verify deployment
@@ -178,18 +146,109 @@ jobs:
           ls -la "$DEPLOY_DIR" || true
           find "$DEPLOY_DIR" -type f | head -20 || true
 
+      - name: Install plugins
+        if: runner.os == 'Linux'
+        run: |
+          export HOME="$DEPLOY_DIR"
+
+          # vim.pack.add() clones asynchronously, so we can't use +"qa!".
+          # Instead, poll until all git clones finish, then quit.
+          timeout 300 nvim --headless -c "lua vim.defer_fn(function()
+            local timer = vim.uv.new_timer()
+            timer:start(0, 3000, vim.schedule_wrap(function()
+              local result = vim.system({'pgrep', '-f', 'git.*clone'}):wait()
+              if result.code ~= 0 then
+                timer:stop()
+                timer:close()
+                vim.cmd('qa!')
+              end
+            end))
+          end, 5000)" 2>&1 | tee /tmp/nvim-install.txt || true
+
+          echo "Plugin installation output:"
+          cat /tmp/nvim-install.txt
+
+      - name: Test Neovim startup
+        if: runner.os == 'Linux'
+        run: |
+          set -o pipefail
+          export HOME="$DEPLOY_DIR"
+
+          # Second run: all plugins already installed, verify clean startup.
+          timeout 60 nvim --headless +"qa!" 2>&1 | tee /tmp/nvim-output.txt
+          NVIM_EXIT=${PIPESTATUS[0]}
+
+          echo "Neovim output:"
+          cat /tmp/nvim-output.txt
+
+          if [ $NVIM_EXIT -ne 0 ]; then
+            echo "::error::Neovim exited with code $NVIM_EXIT"
+            exit 1
+          fi
+
+          # Check for errors — no filters needed, all errors are genuine
+          if grep -E "^E[0-9]+:|Error while calling lua chunk|Error loading plugin config" /tmp/nvim-output.txt \
+            > /tmp/unexpected-errors.txt 2>/dev/null; then
+            if [ -s /tmp/unexpected-errors.txt ]; then
+              echo "::error::Unexpected errors during Neovim startup:"
+              cat /tmp/unexpected-errors.txt
+              exit 1
+            fi
+          fi
+
+          echo "Neovim started successfully for ${{ matrix.profile }} profile"
+
       - name: Cleanup
         if: always()
         run: |
           if [ -n "$DEPLOY_DIR" ] && [ -d "$DEPLOY_DIR" ]; then
             rm -rf "$DEPLOY_DIR"
-            echo "Cleaned up deployment directory"
           fi
+
+  validate-themes:
+    name: Theme ${{ matrix.theme }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: [nightowl, tokyonight]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dotter
+        run: |
+          wget https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x64-musl -O dotter
+          chmod +x dotter
+          sudo mv dotter /usr/local/bin/
+          dotter --version
+
+      - name: Test theme deployment
+        run: |
+          DEPLOY_DIR=$(mktemp -d)
+
+          cat > .dotter/local.toml <<EOF
+          packages = ["default", "linux", "${{ matrix.theme }}"]
+
+          [variables]
+          email = "test@default.example.com"
+          github_personal_access_token = "ghp_test123456789"
+          opencode_build_agent_model = "anthropic/claude-sonnet-4-5"
+          opencode_plan_agent_model = "anthropic/claude-opus-4-5"
+          shell_bin_path = "\$HOME/bin"
+          EOF
+
+          HOME="$DEPLOY_DIR" dotter deploy --force --verbose
+          rm -rf "$DEPLOY_DIR"
 
   validate-syntax:
     name: Validate Configuration Syntax
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -204,14 +263,14 @@ jobs:
           import toml
           import sys
           from pathlib import Path
-          
+
           files = [
               '.dotter/global.toml',
               'atuin/config.toml',
               'iamb/config.toml',
               'jj/config.toml',
           ]
-          
+
           failed = False
           for file in files:
               try:
@@ -221,7 +280,7 @@ jobs:
               except Exception as e:
                   print(f"✗ {file} failed: {e}")
                   failed = True
-          
+
           sys.exit(1 if failed else 0)
           EOF
 
@@ -234,13 +293,13 @@ jobs:
       - name: Test global.toml for duplicate variables
         run: |
           echo "Testing each profile without variable overrides to catch conflicts in global.toml"
-          
+
           for profile in default personal work; do
             echo "Testing $profile profile..."
             cat > .dotter/local.toml <<EOF
           packages = ["$profile", "linux", "monokai"]
           EOF
-            
+
             if ! dotter deploy --dry-run --force 2>&1 | tee /tmp/dotter-$profile.log; then
               echo "✗ Failed to deploy $profile profile"
               cat /tmp/dotter-$profile.log
@@ -255,7 +314,7 @@ jobs:
           cat > .dotter/local.toml <<'EOF'
           packages = ["default", "linux", "monokai"]
           EOF
-          
+
           echo "Deploying configs for validation"
           dotter deploy --force --verbose
 
@@ -264,7 +323,7 @@ jobs:
           # Install luac for syntax checking
           sudo apt-get update
           sudo apt-get install -y lua5.4
-          
+
           # Check deployed Lua files (after dotter processing)
           if [ -d "$HOME/.config/nvim" ]; then
             find "$HOME/.config/nvim" -name "*.lua" -type f | while read -r file; do

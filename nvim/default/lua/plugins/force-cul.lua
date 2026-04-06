@@ -1,6 +1,2 @@
-return {
-	"jake-stewart/force-cul.nvim",
-	config = function()
-		require("force-cul").setup()
-	end,
-}
+vim.pack.add({"https://github.com/jake-stewart/force-cul.nvim"})
+require("force-cul").setup()

@@ -1,3 +1,1 @@
-return {
-  'tidalcycles/vim-tidal'
-}
+vim.pack.add({"https://github.com/tidalcycles/vim-tidal"})

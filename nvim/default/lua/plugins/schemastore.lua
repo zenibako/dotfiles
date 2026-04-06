@@ -1,3 +1,2 @@
-return {
-  "b0o/schemastore.nvim",
-}
+-- schemastore.nvim is loaded as a core dep in config/pack.lua
+-- (must be on rtp before mason-lspconfig triggers yamlls setup)

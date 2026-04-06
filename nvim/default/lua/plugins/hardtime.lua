@@ -1,8 +1,9 @@
-return {
-	"m4xshen/hardtime.nvim",
-	dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-	opts = {
-    disable_mouse = false,
-    disabled_filetypes = { fujjitive = true, fujjitiveblame = true },
-  },
-}
+vim.pack.add({
+  "https://github.com/MunifTanjim/nui.nvim",
+  "https://github.com/m4xshen/hardtime.nvim",
+})
+
+require("hardtime").setup({
+  disable_mouse = false,
+  disabled_filetypes = { fujjitive = true, fujjitiveblame = true },
+})
