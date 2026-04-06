@@ -42,6 +42,12 @@ vim.api.nvim_create_autocmd("PackChanged", {
   end,
 })
 
+-- Core dependencies (must load before plugin configs that depend on them)
+vim.pack.add({
+  "https://github.com/nvim-lua/plenary.nvim",
+  "https://github.com/nvim-tree/nvim-web-devicons",
+})
+
 -- Auto-discover and load all plugin configs from lua/plugins/
 local plugins_dir = vim.fn.stdpath("config") .. "/lua/plugins"
 local files = vim.fn.glob(plugins_dir .. "/*.lua", true, true)
