@@ -111,26 +111,23 @@ jobs:
 
           HOME="$DEPLOY_DIR" dotter deploy --force --verbose
 
+      - name: Install plugins
+        run: |
+          export HOME="$DEPLOY_DIR"
+
+          # First run: vim.pack.add() clones all plugins, then quit.
+          # Build hooks (cargo, npm) may fail — that's expected in CI.
+          timeout 300 nvim --headless +"qa!" 2>&1 | tee /tmp/nvim-install.txt || true
+
+          echo "Plugin installation output:"
+          cat /tmp/nvim-install.txt
+
       - name: Test Neovim startup
         run: |
           export HOME="$DEPLOY_DIR"
 
-          # Place a site plugin that auto-loads on every startup (including
-          # after :restart). On first launch it sets a flag and restarts;
-          # after the restart it detects the flag and quits.
-          SITE_PLUGIN="$DEPLOY_DIR/.local/share/nvim/site/plugin"
-          mkdir -p "$SITE_PLUGIN"
-          cat > "$SITE_PLUGIN/ci-startup-test.lua" <<'LUA'
-          if vim.env.NVIM_CI_RESTARTED then
-            vim.cmd('qa!')
-          else
-            vim.env.NVIM_CI_RESTARTED = '1'
-            vim.cmd('restart')
-          end
-          LUA
-
-          # Build hooks (cargo, npm) may fail in CI — that's expected.
-          timeout 300 nvim --headless 2>&1 | tee /tmp/nvim-output.txt
+          # Second run: all plugins already installed, verify clean startup.
+          timeout 60 nvim --headless +"qa!" 2>&1 | tee /tmp/nvim-output.txt
           NVIM_EXIT=$?
 
           echo "Neovim output:"
