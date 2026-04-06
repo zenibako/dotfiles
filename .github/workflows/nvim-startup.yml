@@ -115,24 +115,22 @@ jobs:
         run: |
           export HOME="$DEPLOY_DIR"
 
-          # Write a small Lua script that:
-          # 1. First startup: plugins install via vim.pack, then :restart
-          # 2. After restart: plugins already loaded, quit cleanly
-          cat > /tmp/ci-startup-test.lua <<'LUA'
-          local flag = vim.fn.stdpath('data') .. '/ci_restart_done'
-          if vim.fn.filereadable(flag) == 1 then
-            vim.fn.delete(flag)
+          # Place a site plugin that auto-loads on every startup (including
+          # after :restart). On first launch it sets a flag and restarts;
+          # after the restart it detects the flag and quits.
+          SITE_PLUGIN="$DEPLOY_DIR/.local/share/nvim/site/plugin"
+          mkdir -p "$SITE_PLUGIN"
+          cat > "$SITE_PLUGIN/ci-startup-test.lua" <<'LUA'
+          if vim.env.NVIM_CI_RESTARTED then
             vim.cmd('qa!')
           else
-            vim.fn.mkdir(vim.fn.stdpath('data'), 'p')
-            vim.fn.writefile({}, flag)
+            vim.env.NVIM_CI_RESTARTED = '1'
             vim.cmd('restart')
           end
           LUA
 
           # Build hooks (cargo, npm) may fail in CI — that's expected.
-          timeout 300 nvim --headless -c "luafile /tmp/ci-startup-test.lua" \
-            2>&1 | tee /tmp/nvim-output.txt
+          timeout 300 nvim --headless 2>&1 | tee /tmp/nvim-output.txt
           NVIM_EXIT=$?
 
           echo "Neovim output:"
