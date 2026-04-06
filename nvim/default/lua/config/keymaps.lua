@@ -1,4 +1,4 @@
-vim.keymap.set("n", "<leader>pv", "<cmd>lua MiniFiles.open()<CR>")
+vim.keymap.set("n", "<leader>pv", "<cmd>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<CR>")
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<leader>glmr", "<cmd>!glab mr create --web --no-editor --fill<CR>")
