@@ -15,14 +15,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
       return
     end
 
-    if name == "nvim-treesitter" then
-      if not ev.data.active then
-        vim.cmd.packadd("nvim-treesitter")
-      end
-      if vim.fn.executable("tree-sitter") == 1 then
-        vim.cmd("TSUpdate")
-      end
-    elseif name == "go.nvim" then
+    if name == "go.nvim" then
       if not ev.data.active then
         vim.cmd.packadd("go.nvim")
       end
