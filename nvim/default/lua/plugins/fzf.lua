@@ -1,4 +1,5 @@
 vim.pack.add({ { src = "https://github.com/zenibako/fzf-lua", version = "feat/jj-workspace-support" } })
+pcall(vim.cmd.packadd, "fzf-lua")
 
 require("fzf-lua").setup({
   keymap = {
