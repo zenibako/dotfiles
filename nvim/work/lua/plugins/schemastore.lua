@@ -1,1 +1,0 @@
--- schemastore.nvim is loaded as a core dep in config/pack.lua
