@@ -1,4 +1,4 @@
-vim.pack.add({ { src = "https://github.com/zenibako/fzf-lua", version = "feat/jj-workspace-support" } })
+vim.pack.add({ { src = "https://github.com/zenibako/fzf-lua" } })
 pcall(vim.cmd.packadd, "fzf-lua")
 
 require("fzf-lua").setup({
