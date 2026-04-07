@@ -53,7 +53,7 @@ ignore_timeout  = true
 [custom.jj_change]
 description     = "The working copy of the repo in your current directory: workspaces (if relevant), change ID, bookmarks"
 command         = ''' jj log --no-graph -r=@ -T='separate(" ", working_copies, change_id.shortest(), bookmarks,)' '''
-when            = ''' zsh -c 'test -n "$(jj status)" || exit 1' '''
+when            = ''' jj root '''
 format          = 'on [$symbol ($output)]($style) '
 symbol          = '🐦'
 style           = 'bold purple'
@@ -62,7 +62,7 @@ ignore_timeout  = true
 [custom.jj_empty]
 description     = "Shows (empty) in green if the working copy has no changes"
 command         = ''' echo "(empty)" '''
-when            = ''' zsh -c 'test -n "$(jj status)" -a -z "$(jj diff -s -r=@)" || exit 1' '''
+when            = ''' jj log --no-graph -r=@ -T='if(empty, "y", "")' '''
 format          = '[$output]($style) '
 style           = 'bold green'
 ignore_timeout  = true
@@ -71,7 +71,7 @@ ignore_timeout  = true
 description     = "The description of your working copy, if set"
 # command         = ''' jj log --no-graph -r=@ -T="description.first_line()" | awk '{if(length($0) > 25) {s = substr($0, 1, 25); sub(/[ \t\r\n]+$/, "", s); print s "…"} else {print $0}}' '''
 command         = ''' jj log --no-graph -r=@ -T='if(description, description.first_line(), "(no description)")' '''
-when            = ''' zsh -c 'test -n "$(jj status)" || exit 1' '''
+when            = ''' jj root '''
 format          = '$symbol [($output)]($style) '
 symbol          = '|'
 ignore_timeout  = true

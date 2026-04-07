@@ -5,10 +5,7 @@
 "atuin/bin"                               = "~/.atuin/bin"
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
 "pnpm/rc"                                 = "~/.config/pnpm/rc"
-"alacritty.toml"    	                    = "~/.alacritty.toml"
 "tmux.conf"                   = { target  = "~/.tmux.conf",                         type = "template" }
-vimrc                         = { target  = "~/.vimrc",                             type = "template" }
-# "wezterm.lua"       	                  = "~/.wezterm.lua"
 zshrc                         = { target  = "~/.zshrc",                             type = "template" }
 carapace            	                    = "~/.config/carapace"
 "ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }
@@ -112,9 +109,9 @@ gitlab_api_url                        = "https://gitlab.com/api/v4"
 gitlab_url                            = ""
 opencode_slack_webhook_url            = ""
 apex_lsp_jar_path                     = ""
-opencode_build_agent_model            = "openai/gpt-5.4"
-opencode_plan_agent_model             = "openai/gpt-5.4"
-opencode_admin_agent_model            = "openai/gpt-5.4"
+opencode_build_agent_model            = "openai/gpt-5"
+opencode_plan_agent_model             = "openai/gpt-5"
+opencode_admin_agent_model            = "openai/gpt-5"
 node_extra_ca_certs                   = ""
 p10k_root_dir                         = ""
 

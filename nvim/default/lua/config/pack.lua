@@ -1,4 +1,5 @@
--- Auto-confirm plugin installs (all plugins are explicitly listed in config)
+-- Auto-confirm plugin installs (specs are explicitly listed; prompts are noise).
+-- Patches vim.pack.add so that calls from lua/plugins/*.lua don't need to pass opts.
 local _pack_add = vim.pack.add
 vim.pack.add = function(specs, opts)
   opts = vim.tbl_extend("keep", opts or {}, { confirm = false })

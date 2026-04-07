@@ -1,51 +1,35 @@
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-# Load shared environment variables from env.toml
-# This is the single source of truth for env vars shared with nushell
+# Load shared environment variables from env.toml. Single source of truth for
+# vars shared with nushell. Uses `tomlq` (from python-yq) for proper TOML
+# parsing instead of fragile shell regex.
 _load_shared_env() {
     local env_file="$HOME/.config/shared/env.toml"
     [[ -f "$env_file" ]] || return
+    (( ${+commands[tomlq]} )) || return
 
-    local in_env=0 in_prepend=0 in_append=0
-    while IFS= read -r line; do
-        # Skip comments and empty lines
-        [[ "$line" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "${line// }" ]] && continue
+    local key value path_entry
+    # [env] section: KEY="value" pairs
+    while IFS=$'\t' read -r key value; do
+        [[ -z "$key" ]] && continue
+        value="${value//\$HOME/$HOME}"
+        export "$key"="$value"
+    done < <(tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
 
-        # Track sections
-        if [[ "$line" == "[env]" ]]; then
-            in_env=1; in_prepend=0; in_append=0; continue
-        elif [[ "$line" == "[path]" ]]; then
-            in_env=0; in_prepend=0; in_append=0; continue
-        elif [[ "$line" =~ ^prepend[[:space:]]*= ]]; then
-            in_prepend=1; in_append=0; in_env=0; continue
-        elif [[ "$line" =~ ^append[[:space:]]*= ]]; then
-            in_append=1; in_prepend=0; in_env=0; continue
-        elif [[ "$line" == "["* ]]; then
-            in_env=0; in_prepend=0; in_append=0; continue
-        fi
+    # [path] prepend (reverse so first entry has highest priority after the loop)
+    while IFS= read -r path_entry; do
+        [[ -z "$path_entry" ]] && continue
+        path_entry="${path_entry//\$HOME/$HOME}"
+        [[ -d "$path_entry" ]] && export PATH="$path_entry:$PATH"
+    done < <(tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
 
-        # Parse env vars
-        if (( in_env )) && [[ "$line" =~ ^([A-Z_]+)[[:space:]]*=[[:space:]]*\"(.*)\"$ ]]; then
-            local key="${match[1]}"
-            local value="${match[2]}"
-            value="${value//\$HOME/$HOME}"
-            export "$key"="$value"
-        fi
-
-        # Parse path entries
-        if (( in_prepend )) && [[ "$line" =~ \"(.+)\" ]]; then
-            local p="${match[1]}"
-            p="${p//\$HOME/$HOME}"
-            [[ -d "$p" ]] && export PATH="$p:$PATH"
-        fi
-        if (( in_append )) && [[ "$line" =~ \"(.+)\" ]]; then
-            local p="${match[1]}"
-            p="${p//\$HOME/$HOME}"
-            [[ -d "$p" ]] && export PATH="$PATH:$p"
-        fi
-    done < "$env_file"
+    # [path] append
+    while IFS= read -r path_entry; do
+        [[ -z "$path_entry" ]] && continue
+        path_entry="${path_entry//\$HOME/$HOME}"
+        [[ -d "$path_entry" ]] && export PATH="$PATH:$path_entry"
+    done < <(tomlq -r '.path.append // [] | .[]' "$env_file")
 }
 _load_shared_env
 

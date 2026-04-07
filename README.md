@@ -5,7 +5,7 @@ Personal configuration files for various development tools and shell environment
 ## What's Included
 
 - **Shell**: Zsh with Oh My Zsh, Fish, Nushell
-- **Terminal**: Alacritty, Ghostty, Wezterm configurations
+- **Terminal**: Ghostty
 - **Multiplexer**: Tmux with custom theme support
 - **Editor**: Neovim with LSP, plugins, and profile variants (default, work, personal)
 - **CLI Tools**: Starship prompt, Atuin (shell history), Carapace (completions), Jujutsu (VCS), iamb (Matrix client)
@@ -75,7 +75,9 @@ After editing source files, deploy them:
 dotter deploy -f
 ```
 
-**Note**: Always edit files in the repository root (e.g., `nvim/default/`), not in `~/.config/`. The `~/.config/` directory contains deployed configs that will be overwritten.
+**Note**: Always edit files in the repository root (e.g., `nvim/default/`), not in `~/.config/`. The `~/.config/` directory contains deployed configs that will be overwritten on the next `dotter deploy`.
+
+To remove deployed files (e.g. after pruning entries from `.dotter/global.toml`), run `dotter undeploy` before re-deploying so stale symlinks/copies don't linger.
 
 ## Platform Support
 
