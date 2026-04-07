@@ -146,6 +146,14 @@ jobs:
           ls -la "$DEPLOY_DIR" || true
           find "$DEPLOY_DIR" -type f | head -20 || true
 
+      - name: Install tree-sitter CLI
+        if: runner.os == 'Linux'
+        run: |
+          # Required by nvim/default/lua/plugins/treesitter.lua, which
+          # short-circuits parser installation if `tree-sitter` is missing.
+          npm install -g tree-sitter-cli
+          tree-sitter --version
+
       - name: Install plugins
         if: runner.os == 'Linux'
         run: |
@@ -167,6 +175,35 @@ jobs:
 
           echo "Plugin installation output:"
           cat /tmp/nvim-install.txt
+
+      - name: Test Apex tree-sitter parser compiles
+        if: runner.os == 'Linux'
+        run: |
+          set -o pipefail
+          export HOME="$DEPLOY_DIR"
+
+          # Force a synchronous install of the apex parser via nvim-treesitter
+          # so any compilation failure surfaces here instead of being silently
+          # swallowed by the async VimEnter autocmd.
+          timeout 300 nvim --headless -l "$GITHUB_WORKSPACE/.github/scripts/install-apex.lua" 2>&1 | tee /tmp/nvim-apex.txt
+          NVIM_EXIT=${PIPESTATUS[0]}
+
+          echo "Apex install output:"
+          cat /tmp/nvim-apex.txt
+
+          if [ $NVIM_EXIT -ne 0 ]; then
+            echo "::error::Apex tree-sitter parser failed to compile"
+            exit 1
+          fi
+
+          # Verify the compiled parser landed on disk.
+          PARSER_PATH=$(find "$HOME/.local/share/nvim" -name 'apex.so' -print -quit 2>/dev/null)
+          if [ -z "$PARSER_PATH" ]; then
+            echo "::error::apex.so not found under \$HOME/.local/share/nvim after install"
+            find "$HOME/.local/share/nvim" -name '*.so' 2>/dev/null || true
+            exit 1
+          fi
+          echo "Apex parser compiled at $PARSER_PATH"
 
       - name: Test Neovim startup
         if: runner.os == 'Linux'
