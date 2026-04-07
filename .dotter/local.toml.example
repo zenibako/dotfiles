@@ -31,7 +31,10 @@ gpg_key = ""
 # username = "your-username"
 
 # Apex LSP jar path (if using Salesforce development)
-# Set to your actual path or leave as empty string if not needed
+# Ships with the salesforce.salesforcedx-vscode-apex VSCode extension
+# (already in Brewfile). Find it with:
+#   ls ~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/out/apex-jorje-lsp.jar
+# Leave as an empty string if not doing Apex work.
 apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 
 # Profile-specific overrides:
