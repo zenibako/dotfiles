@@ -2,22 +2,23 @@ vim.pack.add({"https://github.com/nvim-treesitter/nvim-treesitter"})
 
 require("nvim-treesitter").setup({})
 
--- Register custom parsers so they're available at startup and during TSUpdate
-local parsers = require("nvim-treesitter.parsers")
-
-parsers.templ = {
-  install_info = {
-    url = "https://github.com/vrischmann/tree-sitter-templ.git",
-    branch = "master",
-  },
-}
-
-parsers.fountain = {
-  install_info = {
-    url = "https://github.com/zenibako/tree-sitter-fountain",
-    branch = "master",
-  },
-}
+-- Register custom parsers via the User TSUpdate autocmd. nvim-treesitter's
+-- install()/update() reload the parsers module, so registrations done at
+-- startup are wiped; the TSUpdate event is the supported hook for adding
+-- custom parser entries (see nvim-treesitter README "Adding custom languages").
+-- templ is officially supported by nvim-treesitter so it does not need to be
+-- registered here.
+vim.api.nvim_create_autocmd("User", {
+  pattern = "TSUpdate",
+  callback = function()
+    require("nvim-treesitter.parsers").fountain = {
+      install_info = {
+        url = "https://github.com/zenibako/tree-sitter-fountain",
+        branch = "master",
+      },
+    }
+  end,
+})
 
 -- Install parsers after startup (no-op if already installed).
 -- Requires tree-sitter CLI on PATH; skip if unavailable.

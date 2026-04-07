@@ -63,6 +63,12 @@ table.sort(files)
 for _, file in ipairs(files) do
   local ok, err = pcall(dofile, file)
   if not ok then
-    vim.notify("Error loading plugin config: " .. file .. "\n" .. err, vim.log.levels.ERROR)
+    -- Defer the notify so a multi-line error during init.lua evaluation
+    -- doesn't trigger the hit-enter prompt ("Press ENTER or type command to
+    -- continue"). The full error is still available via :messages.
+    local msg = "Error loading plugin config: " .. file .. "\n" .. err
+    vim.schedule(function()
+      vim.notify(msg, vim.log.levels.ERROR)
+    end)
   end
 end
