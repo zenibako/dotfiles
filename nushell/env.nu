@@ -46,12 +46,12 @@ if ($shared_env_path | path exists) {
     }
 }
 
-# NVM Setup
-# Must run before tool init commands since it replaces $env.PATH
+# NVM Setup (uses the official-installer location ~/.nvm; nvm is no longer
+# managed by Homebrew). Must run before tool init commands since it replaces $env.PATH.
 $env.NVM_DIR = ($env.HOME | path join ".nvm")
-# Load nvm environment variables (if nvm exists)
-if ("/opt/homebrew/opt/nvm/nvm.sh" | path exists) {
-    let cmd = $"export NVM_DIR='($env.NVM_DIR)'; source \"/opt/homebrew/opt/nvm/nvm.sh\"; jq -n --arg nvm_dir \"\$NVM_DIR\" --arg nvm_bin \"\$NVM_BIN\" --arg nvm_inc \"\$NVM_INC\" --arg path \"\$PATH\" '{NVM_DIR: \$nvm_dir, NVM_BIN: \$nvm_bin, NVM_INC: \$nvm_inc, PATH: \$path}'"
+let nvm_sh = ($env.NVM_DIR | path join "nvm.sh")
+if ($nvm_sh | path exists) {
+    let cmd = $"export NVM_DIR='($env.NVM_DIR)'; source \"($nvm_sh)\"; jq -n --arg nvm_dir \"\$NVM_DIR\" --arg nvm_bin \"\$NVM_BIN\" --arg nvm_inc \"\$NVM_INC\" --arg path \"\$PATH\" '{NVM_DIR: \$nvm_dir, NVM_BIN: \$nvm_bin, NVM_INC: \$nvm_inc, PATH: \$path}'"
     let nvm_vars = (bash -c $cmd | from json)
 
     load-env {
@@ -91,7 +91,7 @@ let completions_init = ($env.HOME | path join ".cache/completions/init.nu")
 def --env refresh-completions [] {
     let completions_path = ($env.HOME | path join ".config/shared/completions.toml")
     if not ($completions_path | path exists) { return }
-    try { mkdir ~/.cache/completions }
+    mkdir ~/.cache/completions
     let completions = (open $completions_path)
     mut init_lines = []
     for tool in ($completions | transpose name config) {

@@ -77,7 +77,7 @@ dotter deploy -f
 
 **Note**: Always edit files in the repository root (e.g., `nvim/default/`), not in `~/.config/`. The `~/.config/` directory contains deployed configs that will be overwritten on the next `dotter deploy`.
 
-To remove deployed files (e.g. after pruning entries from `.dotter/global.toml`), run `dotter undeploy` before re-deploying so stale symlinks/copies don't linger.
+To remove deployed files (e.g. after pruning entries from `.dotter/global.toml`), run `dotter undeploy -f` before re-deploying so stale symlinks/copies don't linger. The `-f` flag is non-interactive, matching `dotter deploy -f`.
 
 ## Platform Support
 

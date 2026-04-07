@@ -7,7 +7,13 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 _load_shared_env() {
     local env_file="$HOME/.config/shared/env.toml"
     [[ -f "$env_file" ]] || return
-    (( ${+commands[tomlq]} )) || return
+    if (( ! ${+commands[tomlq]} )); then
+        if [[ -z "$_TOMLQ_MISSING_WARNED" ]]; then
+            print -u2 "warning: tomlq not found; shared env (env.toml) will not be loaded. Install with: brew install python-yq"
+            _TOMLQ_MISSING_WARNED=1
+        fi
+        return
+    fi
 
     local key value path_entry
     # [env] section: KEY="value" pairs
@@ -309,14 +315,6 @@ CARGO_ENV="${HOME}/.cargo/env"
 if [[ -f $CARGO_ENV ]]
 then
   source "$CARGO_ENV"
-fi
-
-BREW_NVM_DIR="/opt/homebrew/opt/nvm/"
-if [[ -d $GHCUP_DIR ]]
-then
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$BREW_NVM_DIR/nvm.sh" ] && \. "$BREW_NVM_DIR/nvm.sh"  # This loads nvm
-  [ -s "$BREW_NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$BREW_NVM_DIR/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 fi
 
 # Note: Most PATH entries are now loaded from shared/env.toml

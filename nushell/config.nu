@@ -236,9 +236,14 @@ export extern "workmux help" [
     command?: string@"nu-complete workmux subcommands"
 ]
 
-# Custom nvm wrapper
+# Custom nvm wrapper. Looks for nvm in the official-installer location
+# (~/.nvm/nvm.sh); nvm is no longer managed via Homebrew.
 def --env --wrapped nvm [...args] {
-    let nvm_sh = "/opt/homebrew/opt/nvm/nvm.sh"
+    let nvm_sh = ($env.NVM_DIR? | default ($env.HOME | path join ".nvm") | path join "nvm.sh")
+    if not ($nvm_sh | path exists) {
+        print -e $"nvm: ($nvm_sh) not found. Install nvm from https://github.com/nvm-sh/nvm"
+        return
+    }
 
     if ($args | is-empty) {
         bash -c $"source ($nvm_sh); nvm"
