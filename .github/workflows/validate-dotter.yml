@@ -179,31 +179,48 @@ jobs:
       - name: Test Apex tree-sitter parser compiles
         if: runner.os == 'Linux'
         run: |
-          set -o pipefail
-          export HOME="$DEPLOY_DIR"
+          # Reproduces the parser compile step nvim-treesitter performs
+          # internally for `:TSInstall apex`, against the exact revision pinned
+          # in the nvim-treesitter parsers registry. Done out-of-process so any
+          # compile failure shows up here instead of being swallowed by the
+          # async VimEnter installer.
+          PARSERS_LUA=$(find "$DEPLOY_DIR/.local/share/nvim" -path '*/nvim-treesitter/lua/nvim-treesitter/parsers.lua' -print -quit 2>/dev/null)
+          if [ -z "$PARSERS_LUA" ]; then
+            echo "::error::Could not locate nvim-treesitter parsers.lua under \$DEPLOY_DIR"
+            find "$DEPLOY_DIR/.local/share/nvim" -name 'parsers.lua' 2>/dev/null || true
+            exit 1
+          fi
 
-          # Force a synchronous install of the apex parser via nvim-treesitter
-          # so any compilation failure surfaces here instead of being silently
-          # swallowed by the async VimEnter autocmd.
-          timeout 300 nvim --headless -l "$GITHUB_WORKSPACE/.github/scripts/install-apex.lua" 2>&1 | tee /tmp/nvim-apex.txt
-          NVIM_EXIT=${PIPESTATUS[0]}
+          REVISION=$(awk '
+            /^  apex = / { in_apex = 1 }
+            in_apex && /revision = / {
+              match($0, /[0-9a-f]{40}/)
+              print substr($0, RSTART, RLENGTH)
+              exit
+            }
+          ' "$PARSERS_LUA")
+          if [ -z "$REVISION" ]; then
+            echo "::error::Could not extract apex revision from $PARSERS_LUA"
+            exit 1
+          fi
+          echo "Building tree-sitter-sfapex apex parser at revision $REVISION"
 
-          echo "Apex install output:"
-          cat /tmp/nvim-apex.txt
+          WORKDIR=$(mktemp -d)
+          trap 'rm -rf "$WORKDIR"' EXIT
 
-          if [ $NVIM_EXIT -ne 0 ]; then
+          git clone --quiet https://github.com/aheber/tree-sitter-sfapex "$WORKDIR/sfapex"
+          git -C "$WORKDIR/sfapex" checkout --quiet "$REVISION"
+
+          if ! tree-sitter build -o "$WORKDIR/apex.so" "$WORKDIR/sfapex/apex"; then
             echo "::error::Apex tree-sitter parser failed to compile"
             exit 1
           fi
 
-          # Verify the compiled parser landed on disk.
-          PARSER_PATH=$(find "$HOME/.local/share/nvim" -name 'apex.so' -print -quit 2>/dev/null)
-          if [ -z "$PARSER_PATH" ]; then
-            echo "::error::apex.so not found under \$HOME/.local/share/nvim after install"
-            find "$HOME/.local/share/nvim" -name '*.so' 2>/dev/null || true
+          if [ ! -s "$WORKDIR/apex.so" ]; then
+            echo "::error::tree-sitter build reported success but apex.so is missing or empty"
             exit 1
           fi
-          echo "Apex parser compiled at $PARSER_PATH"
+          echo "Apex parser compiled successfully ($(stat -c%s "$WORKDIR/apex.so") bytes)"
 
       - name: Test Neovim startup
         if: runner.os == 'Linux'
