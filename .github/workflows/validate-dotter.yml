@@ -181,15 +181,13 @@ jobs:
         run: |
           # Reproduces the parser compile step nvim-treesitter performs
           # internally for `:TSInstall apex`, against the exact revision pinned
-          # in the nvim-treesitter parsers registry. Done out-of-process so any
-          # compile failure shows up here instead of being swallowed by the
-          # async VimEnter installer.
-          PARSERS_LUA=$(find "$DEPLOY_DIR/.local/share/nvim" -path '*/nvim-treesitter/lua/nvim-treesitter/parsers.lua' -print -quit 2>/dev/null)
-          if [ -z "$PARSERS_LUA" ]; then
-            echo "::error::Could not locate nvim-treesitter parsers.lua under \$DEPLOY_DIR"
-            find "$DEPLOY_DIR/.local/share/nvim" -name 'parsers.lua' 2>/dev/null || true
-            exit 1
-          fi
+          # in nvim-treesitter's upstream parsers registry. Done out-of-process
+          # and independent of the `Install plugins` step so any compile failure
+          # surfaces here cleanly.
+          PARSERS_LUA=$(mktemp)
+          trap 'rm -f "$PARSERS_LUA"' EXIT
+          curl -fsSL -o "$PARSERS_LUA" \
+            https://raw.githubusercontent.com/nvim-treesitter/nvim-treesitter/main/lua/nvim-treesitter/parsers.lua
 
           REVISION=$(awk '
             /^  apex = / { in_apex = 1 }
@@ -206,7 +204,7 @@ jobs:
           echo "Building tree-sitter-sfapex apex parser at revision $REVISION"
 
           WORKDIR=$(mktemp -d)
-          trap 'rm -rf "$WORKDIR"' EXIT
+          trap 'rm -rf "$WORKDIR" "$PARSERS_LUA"' EXIT
 
           git clone --quiet https://github.com/aheber/tree-sitter-sfapex "$WORKDIR/sfapex"
           git -C "$WORKDIR/sfapex" checkout --quiet "$REVISION"
