@@ -5,32 +5,32 @@ echo "Home is $HOME"
 
 platform="$(uname -s)"
 
-if [ platform == "Darwin" ]; then
-  if [ ! -f $(command -v brew) ]; then
+if [ "$platform" = "Darwin" ]; then
+  if ! command -v brew >/dev/null 2>&1; then
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
   brew bundle install
   echo "Installed Homebrew packages!"
 else
-  if [ -f $(command -v pacman) ]; then
+  if command -v pacman >/dev/null 2>&1; then
     sudo pacman -Syu --needed $(cat packages.txt)
-  elif [ -f $(command -v apt) ]; then
+  elif command -v apt >/dev/null 2>&1; then
     sudo apt update && sudo apt install -y $(cat packages.txt)
     echo "Installed Linux packages!"
-  elif [ -f $(command -v apk) ]; then
+  elif command -v apk >/dev/null 2>&1; then
     echo "Detected Alpine Linux; packages should already be installed."
-  elif [ -f $(command -v dnf) ]; then
+  elif command -v dnf >/dev/null 2>&1; then
     sudo dnf install -y $(cat packages.txt)
     echo "Installed Fedora packages!"
-  elif [ -f $(command -v yum) ]; then
+  elif command -v yum >/dev/null 2>&1; then
     sudo yum install -y $(cat packages.txt)
     echo "Installed CentOS/RHEL packages!"
-  elif [ -f $(command -v zypper) ]; then
+  elif command -v zypper >/dev/null 2>&1; then
     sudo zypper install -y $(cat packages.txt)
     echo "Installed openSUSE packages!"
   else
-    echo "Unsupported $Linux distro"
+    echo "Unsupported Linux distro"
     cat /etc/os-release
     exit 1
   fi

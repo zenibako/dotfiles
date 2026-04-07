@@ -1,9 +1,9 @@
 tap "atlassian/acli"
 tap "borkdude/brew"
+tap "hashicorp/tap"
 tap "browsh-org/browsh"
 tap "clojure/tools"
 tap "gcenx/wine"
-tap "heroku/brew"
 tap "jichu4n/palm-os"
 tap "jonathanruiz/tap"
 tap "koekeishiya/formulae"
@@ -82,6 +82,8 @@ brew "git-extras"
 brew "glab"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
+# Language server for Go
+brew "gopls"
 # Image manipulation
 brew "netpbm"
 # Graph visualization software from AT&T and Bell Labs
@@ -120,6 +122,14 @@ brew "libyaml"
 brew "lua"
 # Language Server for the Lua language
 brew "lua-language-server"
+# Language servers extracted from VS Code (html, json, css, eslint)
+brew "vscode-langservers-extracted"
+# YAML language server
+brew "yaml-language-server"
+# Language server for TypeScript/JavaScript
+brew "typescript-language-server"
+# Configuration language (provides `cue lsp`)
+brew "cue"
 # Package manager for the Lua programming language
 brew "luarocks"
 # Utility for directing compilation
@@ -134,8 +144,6 @@ brew "neovim"
 brew "nghttp2"
 # Modern shell for the GitHub era
 brew "nushell"
-# Manage multiple Node.js versions
-brew "nvm"
 # Create, run, and share large language models (LLMs)
 brew "ollama", restart_service: :changed
 # Swiss-army knife of markup format conversion
@@ -154,26 +162,12 @@ brew "postgresql@14"
 brew "prettier"
 # Protocol buffers (Google's data interchange format)
 brew "protobuf"
-# Implementation of Telnet and SSH
-brew "putty"
 # Python version management
 brew "pyenv"
-# Cross-platform application and UI framework
-brew "qt@5"
-# Python bindings for v5 of Qt
-brew "pyqt@5"
 # Command-line YAML and XML processor that wraps jq
 brew "python-yq", link: false
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.10"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.12"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.9"
-# Ruby version manager
-brew "rbenv"
+# Interpreted, interactive, object-oriented programming language (latest, additional versions managed via pyenv)
+brew "python@3.13"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # Powerful, clean, object-oriented scripting language
@@ -192,12 +186,12 @@ brew "sonar-scanner"
 brew "starship"
 # Opinionated Lua code formatter
 brew "stylua"
-# User interface to the TELNET protocol
-brew "telnet"
 # Feature rich terminal file transfer and explorer
 brew "termscp"
 # Tool to build, change, and version infrastructure
 brew "terraform"
+# Language server for Terraform
+brew "hashicorp/tap/terraform-ls"
 # Terminal multiplexer
 brew "tmux"
 # Incremental parsing library
@@ -228,8 +222,6 @@ brew "borkdude/brew/babashka"
 brew "browsh-org/browsh/browsh"
 # The Clojure Programming Language
 brew "clojure/tools/clojure"
-# Everything you need to get started with Heroku
-brew "heroku/brew/heroku"
 # Suite of tools for connecting to Palm OS devices
 brew "jichu4n/palm-os/pilot-link"
 # Sudoless performance monitoring CLI tool for Apple Silicon processors
@@ -242,8 +234,6 @@ brew "rsteube/tap/carapace-spec"
 brew "sst/tap/opencode"
 # A simple TUI tool to make your homebrew bold.
 brew "valkyrie00/bbrew/bbrew"
-# GPU-accelerated terminal emulator
-cask "alacritty"
 # Command-line tools for building and debugging Android apps
 cask "android-commandlinetools"
 # Android SDK component

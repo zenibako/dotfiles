@@ -4,8 +4,7 @@ require("config.formatting")
 require("config.pack")
 require("config.keymaps")
 
--- Conditionally load LSP config if it exists (provided by work/personal profiles)
-pcall(require, "config.lsp")
+require("config.lsp")
 
 vim.opt.hlsearch = true
 

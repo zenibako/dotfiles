@@ -31,7 +31,10 @@ gpg_key = ""
 # username = "your-username"
 
 # Apex LSP jar path (if using Salesforce development)
-# Set to your actual path or leave as empty string if not needed
+# Ships with the salesforce.salesforcedx-vscode-apex VSCode extension
+# (already in Brewfile). Find it with:
+#   ls ~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/out/apex-jorje-lsp.jar
+# Leave as an empty string if not doing Apex work.
 apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 
 # Profile-specific overrides:
@@ -39,9 +42,9 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # lsp_salesforce_disabled = false
 # mcp_atlassian_enabled = true
 # mcp_gitlab_enabled = true
-# opencode_build_agent_model = "openai/gpt-5.4"
-# opencode_plan_agent_model = "openai/gpt-5.4"
-# opencode_admin_agent_model = "openai/gpt-5.4"
+# opencode_build_agent_model = "openai/gpt-5"
+# opencode_plan_agent_model = "openai/gpt-5"
+# opencode_admin_agent_model = "openai/gpt-5"
 # gitlab_url = "https://gitlab.yourcompany.com"
 # node_extra_ca_certs = "/Library/Application Support/Netskope/STAgent/download/nscacert_combined.pem"
 # p10k_root_dir = "/opt/homebrew/share/powerlevel10k"
