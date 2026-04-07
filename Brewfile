@@ -1,5 +1,6 @@
 tap "atlassian/acli"
 tap "borkdude/brew"
+tap "hashicorp/tap"
 tap "browsh-org/browsh"
 tap "clojure/tools"
 tap "gcenx/wine"
@@ -81,6 +82,8 @@ brew "git-extras"
 brew "glab"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
+# Language server for Go
+brew "gopls"
 # Image manipulation
 brew "netpbm"
 # Graph visualization software from AT&T and Bell Labs
@@ -119,6 +122,14 @@ brew "libyaml"
 brew "lua"
 # Language Server for the Lua language
 brew "lua-language-server"
+# Language servers extracted from VS Code (html, json, css, eslint)
+brew "vscode-langservers-extracted"
+# YAML language server
+brew "yaml-language-server"
+# Language server for TypeScript/JavaScript
+brew "typescript-language-server"
+# Configuration language (provides `cue lsp`)
+brew "cue"
 # Package manager for the Lua programming language
 brew "luarocks"
 # Utility for directing compilation
@@ -179,6 +190,8 @@ brew "stylua"
 brew "termscp"
 # Tool to build, change, and version infrastructure
 brew "terraform"
+# Language server for Terraform
+brew "hashicorp/tap/terraform-ls"
 # Terminal multiplexer
 brew "tmux"
 # Incremental parsing library
