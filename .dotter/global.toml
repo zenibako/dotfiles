@@ -19,6 +19,7 @@ jj                            = { target  = "~/.config/jj",                     
 "opencode/AGENTS.md"          = { target  = "~/.config/opencode/AGENTS.md",         type = "symbolic" }
 "opencode/command/fix-pipeline.md" = { target  = "~/.config/opencode/command/fix-pipeline.md", type = "symbolic" }
 "opencode/command/go.md"      = { target  = "~/.config/opencode/command/go.md",     type = "symbolic" }
+"opencode/command/coderabbit-review.md" = { target  = "~/.config/opencode/command/coderabbit-review.md", type = "symbolic" }
 "opencode/prompt"             = { target  = "~/.config/opencode/prompt",            type = "symbolic" }
 "opencode/opencode.jsonc"     = { target  = "~/.config/opencode/opencode.jsonc",    type = "template" }
 "opencode/package.json"       = { target  = "~/.config/opencode/package.json",      type = "symbolic" }

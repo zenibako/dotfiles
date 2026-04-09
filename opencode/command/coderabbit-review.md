@@ -1,8 +1,8 @@
 ---
-description: Run CodeRabbit AI code review on current changes using structured agent output.
+description: Run CodeRabbit AI code review on current changes using structured agent output. Complements OpenCode's native /review command with CodeRabbit's specialized review.
 ---
 
-# Code Review
+# CodeRabbit Review
 
 Run CodeRabbit AI code review on the current working directory changes. Uses structured `--agent` output format optimized for AI consumption.
 
@@ -48,6 +48,14 @@ The `--agent` flag provides structured JSON-like output that includes:
 - Line-specific suggestions
 - Actionable recommendations
 - Category tags (security, performance, style, etc.)
+
+## Comparison to Native /review
+
+| Feature | OpenCode /review | /coderabbit-review |
+|---------|------------------|--------------------|
+| **Provider** | OpenCode's AI | CodeRabbit CLI |
+| **Output format** | Human-readable | Machine-readable (JSON) |
+| **Best for** | Human consumption | Programmatic processing |
 
 ## Examples
 
