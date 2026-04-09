@@ -46,6 +46,15 @@
       ],
       "enabled": true
     },
+    "Playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "enabled": true
+    },
 {{#if opencode_profile_work}}
     "GitLab": {
       "type": "local",
@@ -127,6 +136,28 @@
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       },
+      "enabled": true
+    },
+{{/if}}
+{{#if mcp_coderabbit}}
+    "CodeRabbit": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@coderabbitai/mcp-server"
+      ],
+      "enabled": true
+    },
+{{/if}}
+{{#if mcp_netlify}}
+    "Netlify": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@netlify/mcp"
+      ],
       "enabled": true
     },
 {{/if}}
