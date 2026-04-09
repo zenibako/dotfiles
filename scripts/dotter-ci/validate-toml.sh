@@ -6,21 +6,23 @@
 set -e
 
 # Check if we have toml support
+# Returns: 0=valid, 1=invalid, 2=no toml module
 check_toml() {
-  python3 -c "
+  python3 -c '
+import sys
 try:
     import tomllib
-    with open('$1', 'rb') as f:
+    with open(sys.argv[1], "rb") as f:
         tomllib.load(f)
 except ImportError:
     try:
         import toml
-        with open('$1', 'r') as f:
+        with open(sys.argv[1], "r") as f:
             toml.load(f)
     except ImportError:
-        exit(2)
-exit(0)
-" 2>/dev/null
+        sys.exit(2)
+sys.exit(0)
+' "$1"
 }
 
 FILES=("$@")
@@ -40,23 +42,27 @@ for file in "${FILES[@]}"; do
     continue
   fi
   
-  if check_toml "$file"; then
+  check_toml "$file"
+  rc=$?
+  
+  if [ $rc -eq 0 ]; then
     echo "✓ $file is valid TOML"
-  elif [ $? -eq 2 ]; then
+  elif [ $rc -eq 2 ]; then
     echo "⚠ Python toml module not available (install with: pip install toml)"
     exit 1
   else
     echo "✗ $file failed validation"
-    python3 -c "
+    python3 -c '
+import sys
 try:
     import tomllib
-    with open('$file', 'rb') as f:
+    with open(sys.argv[1], "rb") as f:
         tomllib.load(f)
 except ImportError:
     import toml
-    with open('$file', 'r') as f:
+    with open(sys.argv[1], "r") as f:
         toml.load(f)
-" 2>&1
+' "$file" 2>&1 || true
     FAILED=1
   fi
 done
