@@ -48,7 +48,7 @@ EOF
   # Copy global.toml to temp deploy dir so dotter can find it
   cp .dotter/global.toml "$DEPLOY_DIR/.dotter/global.toml"
   
-  if HOME="$DEPLOY_DIR" dotter --local "$DEPLOY_DIR/.dotter/local.toml" deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
+  if HOME="$DEPLOY_DIR" dotter --local-config "$DEPLOY_DIR/.dotter/local.toml" deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
     echo "✓ Theme $theme deployed successfully"
   else
     echo "✗ Theme $theme failed to deploy"
