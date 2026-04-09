@@ -139,17 +139,7 @@
       "enabled": true
     },
 {{/if}}
-{{#if mcp_coderabbit}}
-    "CodeRabbit": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@coderabbitai/mcp-server"
-      ],
-      "enabled": true
-    },
-{{/if}}
+
 {{#if mcp_netlify}}
     "Netlify": {
       "type": "local",

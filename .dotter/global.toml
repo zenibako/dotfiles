@@ -82,7 +82,7 @@ depends = ["default"]
 
 [personal.variables]
 opencode_profile_personal             = true
-mcp_coderabbit                        = true
+mcp_coderabbit                        = false
 mcp_netlify                           = true
 opencode_build_agent_model            = "anthropic/claude-opus-4-6"
 opencode_plan_agent_model             = "anthropic/claude-opus-4-6"
