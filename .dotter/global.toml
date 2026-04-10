@@ -27,6 +27,7 @@ jj                            = { target  = "~/.config/jj",                     
 "claude"                      = { target  = "~/Library/Application Support/Claude", type = "template" }
 workmux                                   = "~/.config/workmux"
 gitlogue                                  = "~/.config/gitlogue"
+"agents/skills"                           = { target = "~/.agents/skills", type = "symbolic" }
 
 [default.variables]
 name                                  = "Chandler Anderson"

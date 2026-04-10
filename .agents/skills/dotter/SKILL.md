@@ -1,0 +1,128 @@
+---
+name: dotter
+description: >
+  Deploy and manage dotfiles using dotter with profile inheritance, Handlebars templating,
+  and theme support. Use when deploying configs, adding new dotfiles, modifying profiles,
+  or troubleshooting deployment issues.
+compatibility: Requires dotter CLI installed.
+metadata:
+  author: chanderson
+  version: "1.0"
+---
+
+# Dotter Dotfiles Management
+
+## When to use
+
+- When deploying configuration changes
+- When adding new config files to the dotfiles repo
+- When modifying profiles or theme variables
+- When troubleshooting template rendering or deployment
+
+## Deploying Configs
+
+```bash
+# Deploy all configs (force overwrites)
+dotter deploy -f
+
+# Dry-run to preview changes
+dotter deploy --dry-run
+
+# Verbose output for debugging
+dotter deploy -f --verbose
+```
+
+## Repository Structure
+
+```
+dotfiles/
+├── .dotter/
+│   ├── global.toml      # Profiles, files, variables, themes
+│   ├── local.toml        # Machine-specific overrides (NEVER commit)
+│   └── local.toml.example
+├── nvim/
+│   ├── default/          # Base Neovim config (shared)
+│   ├── personal/         # Personal profile overlay
+│   └── work/             # Work profile overlay
+├── jj/                   # Jujutsu config (templated)
+├── ghostty/              # Ghostty terminal config
+├── zshrc                 # Zsh config (templated)
+└── ...
+```
+
+## Profiles
+
+Three profile types — select ONE from each category:
+
+| Category | Options |
+|----------|---------|
+| Profile  | `personal`, `work` |
+| Platform | `mac`, `linux` |
+| Theme    | `monokai`, `nightowl`, `tokyonight` |
+
+Both `personal` and `work` inherit from `default` via `depends = ["default"]`.
+
+### Profile Inheritance
+
+```
+default (base files + variables)
+├── personal (adds personal nvim, MCP configs)
+└── work (adds work nvim, Slack plugin, LWC LSP)
+```
+
+## Adding a New Config File
+
+1. Add the source file to the repo
+2. Map it in `.dotter/global.toml` under the appropriate profile's `[<profile>.files]`:
+
+```toml
+# Simple file copy
+"myapp/config" = "~/.config/myapp/config"
+
+# With templating
+"myapp/config" = { target = "~/.config/myapp/config", type = "template" }
+
+# Symbolic link
+"myapp/config" = { target = "~/.config/myapp/config", type = "symbolic" }
+```
+
+3. Add any required variables to `[<profile>.variables]`
+4. Deploy: `dotter deploy -f`
+
+## File Types
+
+| Type | Behavior |
+|------|----------|
+| `automatic` | Dotter auto-detects (default) |
+| `template` | Handlebars processing — `{{ variable }}` replaced |
+| `symbolic` | Creates a symlink to the source file |
+
+## Templating
+
+Templates use Handlebars syntax:
+
+```
+# Simple variable
+{{ email }}
+
+# Conditional block
+{{#if opencode_profile_work}}
+work-specific content
+{{/if}}
+
+# Multi-line variable (triple braces for raw)
+{{{ nvim_colorscheme_config }}}
+```
+
+## Configuration Files
+
+- **`global.toml`** — Defines all profiles, file mappings, and default variables. Committed to the repo.
+- **`local.toml`** — Machine-specific overrides: selected packages and secret values. **Never commit this file.** Use `local.toml.example` as a template.
+
+## Gotchas
+
+- Never edit files directly in `~/.config/` — dotter will overwrite them on next deploy. Edit the source in the dotfiles repo instead.
+- `local.toml` must define ALL variables referenced in templates, even if empty strings
+- Profile names in `local.toml` packages must match `global.toml` sections exactly
+- Template files with syntax errors will fail silently in some cases — use `--verbose` to debug
+- Nvim configs use overlay: `nvim/default` is deployed first, then `nvim/personal` or `nvim/work` merges on top
