@@ -72,6 +72,8 @@ def --env refresh-shell-init [] {
     try { starship init nu | save -f ~/.starship.nu }
     try { mkdir ~/.cache/carapace }
     try { carapace _carapace nushell | save --force ~/.cache/carapace/init.nu }
+    try { mkdir ~/.local/share/atuin }
+    try { atuin init nu | save --force ~/.local/share/atuin/init.nu }
 }
 
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
@@ -79,6 +81,7 @@ let _shell_init_missing = (
     (not ("~/.zoxide.nu" | path expand | path exists))
     or (not ("~/.starship.nu" | path expand | path exists))
     or (not ("~/.cache/carapace/init.nu" | path expand | path exists))
+    or (not ("~/.local/share/atuin/init.nu" | path expand | path exists))
 )
 if $_shell_init_missing { refresh-shell-init }
 
