@@ -4,10 +4,22 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # Load shared environment variables from env.toml. Single source of truth for
 # vars shared with nushell. Uses `tomlq` (from python-yq) for proper TOML
 # parsing instead of fragile shell regex.
+_tomlq() {
+    if (( ${+commands[tomlq]} )); then
+        command tomlq "$@"
+    elif [[ -x /opt/homebrew/bin/tomlq ]]; then
+        /opt/homebrew/bin/tomlq "$@"
+    elif [[ -x /usr/local/bin/tomlq ]]; then
+        /usr/local/bin/tomlq "$@"
+    else
+        return 1
+    fi
+}
+
 _load_shared_env() {
     local env_file="$HOME/.config/shared/env.toml"
     [[ -f "$env_file" ]] || return
-    if (( ! ${+commands[tomlq]} )); then
+    if ! _tomlq --version &>/dev/null; then
         if [[ -z "$_TOMLQ_MISSING_WARNED" ]]; then
             print -u2 "warning: tomlq not found; shared env (env.toml) will not be loaded. Install with: brew install python-yq"
             _TOMLQ_MISSING_WARNED=1
@@ -21,21 +33,21 @@ _load_shared_env() {
         [[ -z "$key" ]] && continue
         value="${value//\$HOME/$HOME}"
         export "$key"="$value"
-    done < <(tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
+    done < <(_tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
 
     # [path] prepend (reverse so first entry has highest priority after the loop)
     while IFS= read -r path_entry; do
         [[ -z "$path_entry" ]] && continue
         path_entry="${path_entry//\$HOME/$HOME}"
         [[ -d "$path_entry" ]] && export PATH="$path_entry:$PATH"
-    done < <(tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
+    done < <(_tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
 
     # [path] append
     while IFS= read -r path_entry; do
         [[ -z "$path_entry" ]] && continue
         path_entry="${path_entry//\$HOME/$HOME}"
         [[ -d "$path_entry" ]] && export PATH="$PATH:$path_entry"
-    done < <(tomlq -r '.path.append // [] | .[]' "$env_file")
+    done < <(_tomlq -r '.path.append // [] | .[]' "$env_file")
 }
 _load_shared_env
 
