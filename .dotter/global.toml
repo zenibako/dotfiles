@@ -6,6 +6,7 @@
 "atuin/config.toml"                       = "~/.config/atuin/config.toml"
 "pnpm/rc"                                 = "~/.config/pnpm/rc"
 "tmux.conf"                   = { target  = "~/.tmux.conf",                         type = "template" }
+zshenv                        = { target  = "~/.zshenv",                            type = "template" }
 zshrc                         = { target  = "~/.zshrc",                             type = "template" }
 carapace            	                    = "~/.config/carapace"
 "ghostty/config"              = { target  = "~/.config/ghostty/config",             type = "template" }

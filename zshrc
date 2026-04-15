@@ -4,52 +4,57 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # Load shared environment variables from env.toml. Single source of truth for
 # vars shared with nushell. Uses `tomlq` (from python-yq) for proper TOML
 # parsing instead of fragile shell regex.
-_tomlq() {
-    if (( ${+commands[tomlq]} )); then
-        command tomlq "$@"
-    elif [[ -x /opt/homebrew/bin/tomlq ]]; then
-        /opt/homebrew/bin/tomlq "$@"
-    elif [[ -x /usr/local/bin/tomlq ]]; then
-        /usr/local/bin/tomlq "$@"
-    else
-        return 1
-    fi
-}
-
-_load_shared_env() {
-    local env_file="$HOME/.config/shared/env.toml"
-    [[ -f "$env_file" ]] || return
-    if ! _tomlq --version &>/dev/null; then
-        if [[ -z "$_TOMLQ_MISSING_WARNED" ]]; then
-            print -u2 "warning: tomlq not found; shared env (env.toml) will not be loaded. Install with: brew install python-yq"
-            _TOMLQ_MISSING_WARNED=1
+#
+# Note: ~/.zshenv loads env.toml for ALL shells (including non-interactive).
+# If zshenv already ran, skip the duplicate load here.
+if [[ -z "$_ZSHENV_LOADED" ]]; then
+    _tomlq() {
+        if (( ${+commands[tomlq]} )); then
+            command tomlq "$@"
+        elif [[ -x /opt/homebrew/bin/tomlq ]]; then
+            /opt/homebrew/bin/tomlq "$@"
+        elif [[ -x /usr/local/bin/tomlq ]]; then
+            /usr/local/bin/tomlq "$@"
+        else
+            return 1
         fi
-        return
-    fi
+    }
 
-    local key value path_entry
-    # [env] section: KEY="value" pairs
-    while IFS=$'\t' read -r key value; do
-        [[ -z "$key" ]] && continue
-        value="${value//\$HOME/$HOME}"
-        export "$key"="$value"
-    done < <(_tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
+    _load_shared_env() {
+        local env_file="$HOME/.config/shared/env.toml"
+        [[ -f "$env_file" ]] || return
+        if ! _tomlq --version &>/dev/null; then
+            if [[ -z "$_TOMLQ_MISSING_WARNED" ]]; then
+                print -u2 "warning: tomlq not found; shared env (env.toml) will not be loaded. Install with: brew install python-yq"
+                _TOMLQ_MISSING_WARNED=1
+            fi
+            return
+        fi
 
-    # [path] prepend (reverse so first entry has highest priority after the loop)
-    while IFS= read -r path_entry; do
-        [[ -z "$path_entry" ]] && continue
-        path_entry="${path_entry//\$HOME/$HOME}"
-        [[ -d "$path_entry" ]] && export PATH="$path_entry:$PATH"
-    done < <(_tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
+        local key value path_entry
+        # [env] section: KEY="value" pairs
+        while IFS=$'\t' read -r key value; do
+            [[ -z "$key" ]] && continue
+            value="${value//\$HOME/$HOME}"
+            export "$key"="$value"
+        done < <(_tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
 
-    # [path] append
-    while IFS= read -r path_entry; do
-        [[ -z "$path_entry" ]] && continue
-        path_entry="${path_entry//\$HOME/$HOME}"
-        [[ -d "$path_entry" ]] && export PATH="$PATH:$path_entry"
-    done < <(_tomlq -r '.path.append // [] | .[]' "$env_file")
-}
-_load_shared_env
+        # [path] prepend (reverse so first entry has highest priority after the loop)
+        while IFS= read -r path_entry; do
+            [[ -z "$path_entry" ]] && continue
+            path_entry="${path_entry//\$HOME/$HOME}"
+            [[ -d "$path_entry" ]] && export PATH="$path_entry:$PATH"
+        done < <(_tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
+
+        # [path] append
+        while IFS= read -r path_entry; do
+            [[ -z "$path_entry" ]] && continue
+            path_entry="${path_entry//\$HOME/$HOME}"
+            [[ -d "$path_entry" ]] && export PATH="$path_entry:$PATH"
+        done < <(_tomlq -r '.path.append // [] | .[]' "$env_file")
+    }
+    _load_shared_env
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -212,10 +217,8 @@ rmvenv() {
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
 # Note: SF_USE_GENERIC_UNIX_KEYCHAIN and SF_BETA_TRACK_FILE_MOVES
-# are now loaded from shared/env.toml
+# are now loaded from shared/env.toml (via ~/.zshenv)
 export SF_AC_ZSH_SETUP_PATH=$HOME/Library/Caches/sf/autocomplete/zsh_setup && test -f $SF_AC_ZSH_SETUP_PATH && source $SF_AC_ZSH_SETUP_PATH; # sf autocomplete setup 
-
-export SF_USE_GENERIC_UNIX_KEYCHAIN=true
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 
@@ -349,13 +352,3 @@ function _gpg-agent-update-tty {
 
 autoload -Uz add-zsh-hook
 add-zsh-hook preexec _gpg-agent-update-tty
-
-
-{{#if opencode_profile_work}}
-# Netskope CA certificate for Node.js (work profile)
-export NODE_EXTRA_CA_CERTS="{{node_extra_ca_certs}}"
-export REQUESTS_CA_BUNDLE="{{node_extra_ca_certs}}"
-{{/if}}
-
-# opencode
-export PATH=/Users/{{ username }}/.opencode/bin:$PATH
