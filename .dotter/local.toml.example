@@ -53,6 +53,12 @@ apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # playdate_sdk_enabled = true
 # mcp_backlog_enabled = true
 
+# n8n MCP server (personal profile)
+# mcp_n8n = true
+n8n_mcp_url = "https://n8n.yourdomain.com/mcp-server/http"
+n8n_mcp_token = "eyJhbGci..."
+n8n_api_key = "eyJhbGci..."
+
 # Other MCP servers (disabled by default, can be enabled per-machine)
 # Note: work profile has mcp_odaseva and mcp_sonarqube disabled by default
 # To enable, add these to your local.toml:

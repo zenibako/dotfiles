@@ -9,6 +9,15 @@
                "--toolsets", "all"]
     },
 {{/if}}
+{{#if mcp_n8n}}
+    "n8n": {
+      "type": "http",
+      "url": "{{n8n_mcp_url}}",
+      "headers": {
+        "Authorization": "Bearer {{n8n_mcp_token}}"
+      }
+    },
+{{/if}}
     "Chrome DevTools": {
       "command": "zsh",
       "args": ["-c", "source ~/.nvm/nvm.sh && nvm use --lts >&2 && npx chrome-devtools-mcp@latest"]
