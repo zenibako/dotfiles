@@ -165,9 +165,9 @@
     "Chrome DevTools": {
       "type": "local",
       "command": [
-        "zsh",
-        "-c",
-        "source ~/.nvm/nvm.sh && nvm use --lts >&2 && npx chrome-devtools-mcp@latest"
+        "npx",
+        "chrome-devtools-mcp@latest",
+        "--launch"
       ],
       "enabled": true
     },
