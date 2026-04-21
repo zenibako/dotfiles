@@ -13,34 +13,38 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "opencode-cmux",
+    "opencode-cmux"
   ],
   "mcp": {
     "Jujutsu": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "jj-mcp-server"
       ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
       "enabled": true
     },
     "GitHub": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "@modelcontextprotocol/server-github"
       ],
       "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       },
       "enabled": true
     },
     "Backlog": {
       "type": "local",
       "command": [
-        "backlog",
+        "{{shell_bin_path}}/backlog",
         "mcp",
         "start"
       ],
@@ -49,23 +53,27 @@
     "Playwright": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "@playwright/mcp@latest"
       ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
       "enabled": true
     },
 {{#if opencode_profile_work}}
     "GitLab": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "@modelcontextprotocol/server-gitlab"
       ],
       "environment": {
         "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
-        "GITLAB_API_URL": "{{gitlab_api_url}}"
+        "GITLAB_API_URL": "{{gitlab_api_url}}",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       },
       "enabled": true
     },
@@ -73,7 +81,7 @@
     "Salesforce DX": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "@salesforce/mcp",
         "--orgs",
@@ -82,6 +90,9 @@
         "all",
         "--allow-non-ga-tools"
       ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
       "enabled": true
     },
 {{/if}}
@@ -98,11 +109,14 @@
     "Atlassian": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "mcp-remote",
         "https://mcp.atlassian.com/v1/sse"
       ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
       "enabled": true
     },
 {{/if}}
@@ -141,34 +155,52 @@
     "Netlify": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "@netlify/mcp"
       ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
       "enabled": true
     },
 {{/if}}
     "Neovim": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
         "-y",
         "mcp-neovim-server"
       ],
       "environment": {
         "ALLOW_SHELL_COMMANDS": "true",
-        "NVIM_SOCKET_PATH": "/tmp/nvim"
+        "NVIM_SOCKET_PATH": "/tmp/nvim",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       },
       "enabled": false
+    },
+{{/if}}
+{{#if mcp_n8n}}
+    "n8n": {
+      "type": "remote",
+      "url": "{{n8n_mcp_url}}",
+      "headers": {
+        "Authorization": "Bearer {{n8n_mcp_token}}"
+      },
+      "enabled": true
     },
 {{/if}}
     "Chrome DevTools": {
       "type": "local",
       "command": [
-        "npx",
+        "{{shell_bin_path}}/npx",
+        "-y",
         "chrome-devtools-mcp@latest",
         "--launch"
       ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
       "enabled": true
     },
   },
@@ -267,10 +299,10 @@
   },
   "agent": {
     "build": {
-      "model": "{{#if opencode_build_agent_model}}{{opencode_build_agent_model}}{{else}}anthropic/claude-sonnet-4-5{{/if}}"
+      "model": "{{#if opencode_build_agent_model}}{{opencode_build_agent_model}}{{else}}anthropic/claude-sonnet-4-6{{/if}}"
     },
     "plan": {
-      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-6{{/if}}"
+      "model": "{{#if opencode_plan_agent_model}}{{opencode_plan_agent_model}}{{else}}anthropic/claude-opus-4-7{{/if}}"
     },
     "admin": {
       "description": "Handles project administration: Git/Jujutsu history, pushing to remotes, and editing configuration files",
@@ -297,6 +329,19 @@
         },
         "edit": "ask"
       }
-    }
+    },
+    "test": {
+      "description": "Writes and runs tests, checks coverage, and fixes failing tests",
+      "mode": "subagent",
+      "model": "{{#if opencode_test_agent_model}}{{opencode_test_agent_model}}{{else}}anthropic/claude-sonnet-4-6{{/if}}"
+    },
+{{#if opencode_profile_personal}}
+    "code-review": {
+      "description": "Reviews code using AI analysis and CodeRabbit for comprehensive feedback",
+      "mode": "subagent",
+      "model": "{{#if opencode_review_agent_model}}{{opencode_review_agent_model}}{{else}}anthropic/claude-sonnet-4-6{{/if}}",
+      "prompt": "You are a code reviewer. First, run `coderabbit review --agent --type all` using bash to get CodeRabbit findings, then analyze the code yourself for additional issues. Focus on security, performance, maintainability, and correctness. Combine findings from both sources into actionable feedback."
+    },
+{{/if}}
   }
 }
