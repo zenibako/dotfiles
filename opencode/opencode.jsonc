@@ -123,13 +123,11 @@
         "docker",
         "run",
         "-i",
-        "--name",
-        "sonarqube-mcp-server",
         "--rm",
         "-e",
-        "SONARQUBE_TOKEN",
-        "-e",
         "SONARQUBE_URL",
+        "-e",
+        "SONARQUBE_TOKEN",
         "mcp/sonarqube"
       ],
       "environment": {
@@ -139,7 +137,6 @@
       "enabled": true
     },
 {{/if}}
-
 {{#if mcp_netlify}}
     "Netlify": {
       "type": "local",
