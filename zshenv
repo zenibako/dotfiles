@@ -78,7 +78,7 @@ if [ -z "$_ZSHENV_LOADED" ]; then
   unset -f _tomlq _load_shared_env
 
   # opencode
-  export PATH="/Users/{{ username }}/.opencode/bin:$PATH"
+  export PATH="$HOME/.opencode/bin:$PATH"
 
   {{#if opencode_profile_work}}
   # Netskope CA certificate for Node.js (work profile)

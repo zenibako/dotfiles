@@ -1,0 +1,12 @@
+[user]
+    name = {{name}}
+    email = {{email}}
+{{#if gpg_key}}
+    signingkey = {{gpg_key}}
+{{/if}}
+[init]
+    defaultBranch = main
+[commit]
+    gpgSign = {{#if gpg_key}}true{{else}}false{{/if}}
+[oh-my-zsh]
+    git-commit-alias = 349b9e49ced7682e27927ffb34b6522f011f3e74

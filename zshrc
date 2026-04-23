@@ -127,7 +127,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(extract git git-extras tmux git-commit nmap nvm gitignore encode64 brew rsync)
+plugins=(extract git git-extras tmux git-commit nmap nvm gitignore encode64 rsync)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -172,7 +172,7 @@ set -o vi
 # the following to
 # ~/.zprofile (for login shells)
 # and ~/.zshrc (for interactive shells) :
-if [ -e pyenv ]; then
+if command -v pyenv >/dev/null 2>&1; then
   export PYENV_ROOT="$HOME/.pyenv"
   [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init -)"
@@ -218,7 +218,10 @@ rmvenv() {
 
 # Note: SF_USE_GENERIC_UNIX_KEYCHAIN and SF_BETA_TRACK_FILE_MOVES
 # are now loaded from shared/env.toml (via ~/.zshenv)
-export SF_AC_ZSH_SETUP_PATH=$HOME/Library/Caches/sf/autocomplete/zsh_setup && test -f $SF_AC_ZSH_SETUP_PATH && source $SF_AC_ZSH_SETUP_PATH; # sf autocomplete setup 
+# Salesforce CLI autocomplete (macOS only)
+if [[ "$platform" == "darwin"* ]] && [[ -f "$HOME/Library/Caches/sf/autocomplete/zsh_setup" ]]; then
+    source "$HOME/Library/Caches/sf/autocomplete/zsh_setup"
+fi
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 
@@ -317,7 +320,9 @@ for f in ~/.zsh/completion-bash/*.{bash,zsh}(N); do
     source "$f"
 done
 
-eval "$(starship init zsh)"
+if (( ${+commands[starship]} )); then
+  eval "$(starship init zsh)"
+fi
 
 GHCUP_DIR="${HOME}/.ghcup"
 if [[ -d $GHCUP_DIR ]]
@@ -336,11 +341,17 @@ fi
 # Created by `pipx` on 2025-06-27 18:19:27
 # Shell-specific PATH additions below:
 
-eval "$(zoxide init zsh)"
+if (( ${+commands[zoxide]} )); then
+  eval "$(zoxide init zsh)"
+fi
 
-. "$HOME/.atuin/bin/env"
+if [[ -f "$HOME/.atuin/bin/env" ]]; then
+  . "$HOME/.atuin/bin/env"
+fi
 
-eval "$(atuin init zsh)"
+if (( ${+commands[atuin]} )); then
+  eval "$(atuin init zsh)"
+fi
 
 # Note: XDG_CONFIG_HOME is now loaded from shared/env.toml
 

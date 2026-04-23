@@ -1,0 +1,13 @@
+fzf
+fd-find
+ripgrep
+zsh
+tmux
+git
+gh
+jq
+curl
+wget
+snapd
+golang
+cargo

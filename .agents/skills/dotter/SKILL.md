@@ -18,6 +18,33 @@ metadata:
 - When adding new config files to the dotfiles repo
 - When modifying profiles or theme variables
 - When troubleshooting template rendering or deployment
+- When bootstrapping a new machine with `./init.sh`
+
+## Bootstrapping a New Machine
+
+```bash
+./init.sh
+```
+
+This script is **cross-distro** and handles:
+
+1. **Installing packages** from distro-specific `packages-<ID>.txt`:
+   - `packages-fedora.txt` for Fedora/RHEL/CentOS/Rocky/Alma
+   - `packages-arch.txt` for Arch/Manjaro
+   - `packages-debian.txt` for Debian/Ubuntu/Linux Mint/Pop!_OS
+   - `packages-alpine.txt` for Alpine
+   - `packages-opensuse.txt` for openSUSE/SUSE
+2. **Installing carapace** via Gemfury yum repo on RPM distros, else downloading the binary
+3. **Installing shells/tools**: `oh-my-zsh`, `zsh-completions`, `tpm` (tmux plugin manager), `zoxide`, `atuin`, `starship`
+4. **Dotter deploy**: `dotter deploy -f`
+
+### macOS
+
+Uses Homebrew and `Brewfile` instead of package lists.
+
+```bash
+brew bundle install
+```
 
 ## Deploying Configs
 
@@ -30,6 +57,35 @@ dotter deploy --dry-run
 
 # Verbose output for debugging
 dotter deploy -f --verbose
+```
+
+## Cross-Distro Package Management
+
+Package lists are stored as `packages-<distro>.txt` in the repo root:
+
+| File | Distros |
+|------|---------|
+| `packages-fedora.txt` | Fedora, RHEL, CentOS, Rocky, Alma |
+| `packages-arch.txt` | Arch, Manjaro |
+| `packages-debian.txt` | Debian, Ubuntu, Linux Mint, Pop!_OS |
+| `packages-alpine.txt` | Alpine |
+| `packages-opensuse.txt` | openSUSE, SUSE |
+
+Format: one package per line, `#` for comments, blank lines ignored.
+
+```
+# Example packages-fedora.txt
+fzf
+fd-find
+neovim
+ripgrep
+zsh
+tmux
+git
+gh
+jq
+curl
+wget
 ```
 
 ## Repository Structure

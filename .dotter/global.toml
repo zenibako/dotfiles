@@ -1,5 +1,6 @@
 
 [default.files]
+"gitconfig"                               = { target = "~/.gitconfig", type = "template" }
 "shared/env.toml"                         = { target = "~/.config/shared/env.toml", type = "template" }
 "shared/completions.toml"                 = "~/.config/shared/completions.toml"
 "atuin/bin"                               = "~/.atuin/bin"
