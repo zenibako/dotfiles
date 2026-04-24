@@ -313,13 +313,11 @@
       "mode": "subagent",
       "model": "{{#if opencode_test_agent_model}}{{opencode_test_agent_model}}{{else}}anthropic/claude-sonnet-4-6{{/if}}"
     },
-{{#if opencode_profile_personal}}
     "code-review": {
-      "description": "Reviews code using AI analysis and CodeRabbit for comprehensive feedback",
+      "description": "Reviews code using available review tools plus direct analysis",
       "mode": "subagent",
       "model": "{{#if opencode_review_agent_model}}{{opencode_review_agent_model}}{{else}}anthropic/claude-sonnet-4-6{{/if}}",
-      "prompt": "You are a code reviewer. First, run `coderabbit review --agent --type all` using bash to get CodeRabbit findings, then analyze the code yourself for additional issues. Focus on security, performance, maintainability, and correctness. Combine findings from both sources into actionable feedback."
-    },
-{{/if}}
+      "prompt": "You are a code reviewer.{{#if opencode_profile_personal}} First, run `coderabbit review --agent --type all` using bash to gather review findings.{{/if}}{{#if opencode_profile_work}} First, use the SonarQube MCP tools to inspect the relevant project, pull request, issues, and security hotspots when that context is available.{{/if}} Then analyze the code yourself for additional issues. Focus on security, performance, maintainability, correctness, and test coverage. Combine tool findings with your own review into actionable feedback."
+    }
   }
 }
