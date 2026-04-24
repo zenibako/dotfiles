@@ -134,8 +134,10 @@
     "SonarQube": {
       "type": "local",
       "command": [
-        "docker",
+        "{{shell_bin_path}}/docker",
         "run",
+        "--init",
+        "--pull=always",
         "-i",
         "--rm",
         "-e",
@@ -145,6 +147,8 @@
         "mcp/sonarqube"
       ],
       "environment": {
+        "DOCKER_CONTEXT": "desktop-linux",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       },
