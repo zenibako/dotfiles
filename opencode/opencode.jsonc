@@ -194,6 +194,21 @@
       "enabled": true
     },
 {{/if}}
+{{#if gitea_token}}
+    "Gitea": {
+      "type": "local",
+      "command": [
+        "/Users/{{username}}/go/bin/forgejo-mcp",
+        "stdio",
+        "--server", "{{gitea_url}}",
+        "--token", "{{gitea_token}}"
+      ],
+      "environment": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "enabled": true
+    },
+{{/if}}
     "Chrome DevTools": {
       "type": "local",
       "command": [
