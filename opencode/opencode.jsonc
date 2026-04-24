@@ -180,7 +180,7 @@
       "enabled": false
     },
 {{/if}}
-{{#if mcp_n8n}}
+{{#if n8n_mcp_token}}
     "n8n": {
       "type": "remote",
       "url": "{{n8n_mcp_url}}",
