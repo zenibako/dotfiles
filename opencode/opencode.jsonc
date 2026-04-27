@@ -77,7 +77,7 @@
       },
       "enabled": true
     },
-{{#if mcp_salesforce_dx}}
+{{#if mcp_salesforce_dx_enabled}}
     "Salesforce DX": {
       "type": "local",
       "command": [
@@ -96,7 +96,7 @@
       "enabled": true
     },
 {{/if}}
-{{#if mcp_odaseva}}
+{{#if mcp_odaseva_enabled}}
     "Odaseva": {
       "type": "local",
       "command": [
@@ -105,7 +105,7 @@
       "enabled": true
     },
 {{/if}}
-{{#if mcp_atlassian}}
+{{#if mcp_atlassian_enabled}}
     "Atlassian": {
       "type": "local",
       "command": [
@@ -120,17 +120,22 @@
       "enabled": true
     },
 {{/if}}
-{{#if mcp_postman}}
+{{#if mcp_postman_enabled}}
     "Postman": {
       "type": "remote",
       "url": "https://mcp.postman.com/mcp",
+{{#if postman_api_key}}
       "headers": {
         "Authorization": "Bearer {{postman_api_key}}"
       },
+      "oauth": false,
+{{/if}}
       "enabled": true
     },
 {{/if}}
-{{#if mcp_sonarqube}}
+{{#if mcp_sonarqube_enabled}}
+{{#if sonarqube_url}}
+{{#if sonarqube_token}}
     "SonarQube": {
       "type": "local",
       "command": [
@@ -154,6 +159,8 @@
       },
       "enabled": true
     },
+{{/if}}
+{{/if}}
 {{/if}}
 {{#if mcp_netlify}}
     "Netlify": {

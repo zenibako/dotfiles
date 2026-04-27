@@ -15,8 +15,9 @@ packages = ["personal", "mac", "monokai"]
 [files]
 
 [variables]
-# IMPORTANT: Variables in local.toml override ALL package variables
-# This allows you to customize settings per-machine without editing global.toml
+# Local variables override selected package variables. Keep all machine-specific
+# values here; local.toml does not support package-specific sections such as
+# [work.variables].
 
 # REQUIRED: Email for Git/Jujutsu commits
 # Use your work email for work profile, personal email for personal profile
@@ -30,45 +31,35 @@ gpg_key = ""
 # Username for system paths (override based on your actual username)
 # username = "your-username"
 
-# Apex LSP jar path (if using Salesforce development)
-# Ships with the salesforce.salesforcedx-vscode-apex VSCode extension
-# (already in Brewfile). Find it with:
-#   ls ~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/out/apex-jorje-lsp.jar
-# Leave as an empty string if not doing Apex work.
-apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
-
 # Profile-specific overrides:
 # For 'work' profile, uncomment and set these:
-# lsp_salesforce_disabled = false
+# apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # mcp_atlassian_enabled = true
-# mcp_gitlab_enabled = true
-# opencode_build_agent_model = "openai/gpt-5"
-# opencode_plan_agent_model = "openai/gpt-5"
-# opencode_admin_agent_model = "openai/gpt-5"
+# opencode_build_agent_model = "openai/gpt-5.5"
+# opencode_plan_agent_model = "openai/gpt-5.5"
 # gitlab_url = "https://gitlab.yourcompany.com"
+# gitlab_api_url = "https://gitlab.yourcompany.com/api/v4"
 # node_extra_ca_certs = "/Library/Application Support/Netskope/STAgent/download/nscacert_combined.pem"
 # p10k_root_dir = "/opt/homebrew/share/powerlevel10k"
 
 # For 'personal' profile, uncomment and set these:
 # playdate_sdk_enabled = true
-# mcp_backlog_enabled = true
 
 # n8n MCP server (personal profile)
-# mcp_n8n_token = true
 n8n_mcp_url = "https://n8n.yourdomain.com/mcp-server/http"
 n8n_mcp_token = "eyJhbGci..."
 n8n_api_key = "eyJhbGci..."
 
 # Other MCP servers (disabled by default, can be enabled per-machine)
 # Note: work profile has mcp_odaseva and mcp_sonarqube disabled by default
-# To enable, add these to your local.toml:
-# mcp_odaseva = true
-# mcp_sonarqube = true
+# To enable work-only services, add these to local.toml:
+# mcp_odaseva_enabled = true
+# mcp_sonarqube_enabled = true
 # sonarqube_url = "https://sonarqube.yourcompany.com"
 # sonarqube_token = "squ_YOUR_TOKEN_HERE"
-# mcp_postman = false  # Enabled by default in work profile
-# mcp_salesforce_dx = true  # Disabled by default in work profile
-# mcp_atlassian = true  # Disabled by default in work profile
+# mcp_postman_enabled = false  # Enabled by default in work profile
+# mcp_salesforce_dx_enabled = true  # Disabled by default in work profile
+# mcp_atlassian_enabled = true  # Disabled by default in work profile
 
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens

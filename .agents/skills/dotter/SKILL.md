@@ -175,10 +175,17 @@ work-specific content
 - **`global.toml`** — Defines all profiles, file mappings, and default variables. Committed to the repo.
 - **`local.toml`** — Machine-specific overrides: selected packages and secret values. **Never commit this file.** Use `local.toml.example` as a template.
 
+## Secret Safety
+
+- Never overwrite an existing `.dotter/local.toml` unless you are certain the current secrets are backed up elsewhere.
+- Prefer generating sample or CI configs to a temporary path like `/tmp/local.toml` instead of `.dotter/local.toml`.
+- `scripts/dotter-ci/create-local-toml.sh` refuses to overwrite an existing output file unless `--force` is passed explicitly.
+
 ## Gotchas
 
 - Never edit files directly in `~/.config/` — dotter will overwrite them on next deploy. Edit the source in the dotfiles repo instead.
 - `local.toml` must define ALL variables referenced in templates, even if empty strings
+- Treat `.dotter/local.toml` as a secrets file. Avoid replacing it with generated test data during validation.
 - Profile names in `local.toml` packages must match `global.toml` sections exactly
 - Template files with syntax errors will fail silently in some cases — use `--verbose` to debug
 - Nvim configs use overlay: `nvim/default` is deployed first, then `nvim/personal` or `nvim/work` merges on top

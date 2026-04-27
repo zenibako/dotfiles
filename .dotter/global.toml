@@ -111,11 +111,11 @@ depends = ["default"]
 
 [work.variables]
 opencode_profile_work                 = true
-mcp_salesforce_dx                     = false
-mcp_atlassian                         = false
-mcp_odaseva                           = false
-mcp_postman                           = true
-mcp_sonarqube                         = true
+mcp_salesforce_dx_enabled             = false
+mcp_atlassian_enabled                 = false
+mcp_odaseva_enabled                   = false
+mcp_postman_enabled                   = true
+mcp_sonarqube_enabled                 = true
 postman_api_key                       = ""
 sonarqube_url                         = ""
 sonarqube_token                       = ""
@@ -124,10 +124,10 @@ gitlab_api_url                        = "https://gitlab.com/api/v4"
 gitlab_url                            = ""
 opencode_slack_webhook_url            = ""
 apex_lsp_jar_path                     = ""
-opencode_build_agent_model            = "openai/gpt-5.4"
-opencode_plan_agent_model             = "openai/gpt-5.4"
-opencode_test_agent_model             = "openai/gpt-5.4"
-opencode_review_agent_model           = "openai/gpt-5.4"
+opencode_build_agent_model            = "openai/gpt-5.5"
+opencode_plan_agent_model             = "openai/gpt-5.5"
+opencode_test_agent_model             = "openai/gpt-5.5"
+opencode_review_agent_model           = "openai/gpt-5.5"
 node_extra_ca_certs                   = ""
 p10k_root_dir                         = ""
 

@@ -53,10 +53,12 @@ Generate `local.toml` for your desired profile and theme:
 ./scripts/dotter-ci/create-local-toml.sh <profile> [theme] [output-file]
 
 # Examples:
-./scripts/dotter-ci/create-local-toml.sh default monokai .dotter/local.toml
-./scripts/dotter-ci/create-local-toml.sh personal tokyonight .dotter/local.toml
-./scripts/dotter-ci/create-local-toml.sh work monokai .dotter/local.toml
+./scripts/dotter-ci/create-local-toml.sh default monokai /tmp/local.toml
+./scripts/dotter-ci/create-local-toml.sh personal tokyonight /tmp/local.toml
+./scripts/dotter-ci/create-local-toml.sh work monokai /tmp/local.toml
 ```
+
+Do not point this script at a real `.dotter/local.toml` unless you intend to replace it. The script refuses to overwrite an existing file unless `--force` is passed explicitly.
 
 ### 3. Deploy Configuration
 
