@@ -6,6 +6,11 @@
 - **Init setup**: `sh init.sh` (cross-distro package install, oh-my-zsh, tpm, carapace, zoxide, atuin, starship, dotter deploy)
 - **OpenCode plugins**: `cd ~/.config/opencode && npm install`
 
+## CI/CD
+- **GitHub Actions** stored in `.github/workflows/`; **Gitea Actions** stored in `.gitea/workflows/`
+- `validate-dotter.yml` runs on both platforms (mirrored)
+- `opencode.yml` is GitHub-only and currently NOT portable to Gitea Actions due to GitHub-specific triggers, custom actions, and event payloads (`issue_comment`, `pull_request_review_comment`, `anomalyco/opencode/github@latest`)
+
 ## Version Control
 - Config in `jj/config.toml`
 - **Merge tool**: `jj-diffconflicts` via nvim (`merge-tools.diffconflicts`)
