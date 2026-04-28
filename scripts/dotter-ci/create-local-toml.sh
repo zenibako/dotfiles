@@ -79,6 +79,7 @@ EOF
 case "$PROFILE" in
   work)
     cat >> "$OUTPUT" <<'EOF'
+name = "Test User"
 email = "test@work.example.com"
 username = "test.user"
 shell_bin_path = "$HOME/bin"
@@ -96,6 +97,7 @@ EOF
     ;;
   personal)
     cat >> "$OUTPUT" <<'EOF'
+name = "Test User"
 email = "test@personal.example.com"
 github_personal_access_token = "ghp_test123456789"
 shell_bin_path = "$HOME/bin"
@@ -124,6 +126,7 @@ EOF
     ;;
   default)
     cat >> "$OUTPUT" <<'EOF'
+name = "Test User"
 email = "test@default.example.com"
 github_personal_access_token = "ghp_test123456789"
 opencode_build_agent_model = "anthropic/claude-sonnet-4-5"

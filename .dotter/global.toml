@@ -34,7 +34,7 @@ gitlogue                                  = "~/.config/gitlogue"
 "agents/skills"                           = { target = "~/.agents/skills", type = "symbolic" }
 
 [default.variables]
-name                                  = "Chandler Anderson"
+name                                  = ""
 email                                 = ""
 username                              = "chanderson"
 vim_set_num_relnum                    = "set number relativenumber"

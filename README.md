@@ -64,8 +64,10 @@ Three Neovim profiles are available:
 
 Select your profile in `.dotter/local.toml`:
 ```toml
-includes = ["default", "monokai", "mac"]  # or "work", "personal"
+packages = ["personal", "mac", "monokai"]
 ```
+
+`name` and `email` are required. `dotter deploy` is blocked until you set both in `.dotter/local.toml`.
 
 ### Deploy Configuration Changes
 

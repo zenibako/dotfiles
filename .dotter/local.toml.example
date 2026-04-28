@@ -19,6 +19,9 @@ packages = ["personal", "mac", "monokai"]
 # values here; local.toml does not support package-specific sections such as
 # [work.variables].
 
+# REQUIRED: Name for Git/Jujutsu commits
+name = "Your Name"
+
 # REQUIRED: Email for Git/Jujutsu commits
 # Use your work email for work profile, personal email for personal profile
 email = "your@email.com"
@@ -35,8 +38,8 @@ gpg_key = ""
 # For 'work' profile, uncomment and set these:
 # apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # mcp_atlassian_enabled = true
-# opencode_build_agent_model = "openai/gpt-5.5"
-# opencode_plan_agent_model = "openai/gpt-5.5"
+# opencode_build_agent_model = "openai/gpt-5.4"
+# opencode_plan_agent_model = "openai/gpt-5.4"
 # gitlab_url = "https://gitlab.yourcompany.com"
 # gitlab_api_url = "https://gitlab.yourcompany.com/api/v4"
 # node_extra_ca_certs = "/Library/Application Support/Netskope/STAgent/download/nscacert_combined.pem"
