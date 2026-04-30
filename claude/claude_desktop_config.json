@@ -8,12 +8,13 @@
                "--toolsets", "all"]
     },
 {{/if}}
-{{#if n8n_mcp_token}}
-    "n8n": {
+{{#if mcp_home_assistant_enabled}}
+    "Home Assistant": {
       "type": "http",
-      "url": "{{n8n_mcp_url}}",
-      "headers": {
-        "Authorization": "Bearer {{n8n_mcp_token}}"
+      "url": "{{home_assistant_url}}/api/mcp",
+      "oauth": {
+        "clientId": "https://claude.ai",
+        "clientSecret": ""
       }
     },
 {{/if}}

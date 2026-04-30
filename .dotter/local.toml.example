@@ -48,10 +48,10 @@ gpg_key = ""
 # For 'personal' profile, uncomment and set these:
 # playdate_sdk_enabled = true
 
-# n8n MCP server (personal profile)
-n8n_mcp_url = "https://n8n.yourdomain.com/mcp-server/http"
-n8n_mcp_token = "eyJhbGci..."
-n8n_api_key = "eyJhbGci..."
+# Home Assistant MCP server (personal profile)
+# Claude Desktop uses OAuth natively. OpenCode uses the long-lived access token below.
+mcp_home_assistant_enabled = true
+home_assistant_url = "http://homeassistant.local:8123"
 
 # Other MCP servers (disabled by default, can be enabled per-machine)
 # Note: work profile has mcp_odaseva and mcp_sonarqube disabled by default
@@ -75,12 +75,9 @@ gitlab_personal_access_token = ""
 # GitLab API URL (for work instances)
 gitlab_api_url = "https://gitlab.com/api/v4"
 
-# Home Assistant Long-Lived Access Token
-# Create at: http://YOUR_HA_URL/profile/security
+# Home Assistant Long-Lived Access Token (used by OpenCode MCP)
+# Create at: http://homeassistant.local:8123/profile/security
 home_assistant_token = "eyJhbGci..."
-
-# Home Assistant Instance URL
-home_assistant_url = "https://your-instance.ui.nabu.casa"
 
 # Home Assistant Webhook ID (for OpenCode plugin)
 home_assistant_webhook_id = "your-webhook-id"

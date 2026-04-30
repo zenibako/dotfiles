@@ -9,7 +9,7 @@
 [commit]
     gpgSign = {{#if gpg_key}}true{{else}}false{{/if}}
 [oh-my-zsh]
-    git-commit-alias = 2d5841740a7555fe10b4592673c4069713e66aba
+    git-commit-alias = 061f773dd356df52a8bccd5e73377c012f97ef14
 
 {{#if github_personal_access_token}}
 [credential "https://github.com"]

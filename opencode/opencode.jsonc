@@ -191,14 +191,14 @@
       "enabled": false
     },
 {{/if}}
-{{#if n8n_mcp_token}}
-    "n8n": {
+{{#if home_assistant_token}}
+    "Home Assistant": {
       "type": "remote",
-      "url": "{{n8n_mcp_url}}",
+      "url": "{{home_assistant_url}}/api/mcp",
       "headers": {
-        "Authorization": "Bearer {{n8n_mcp_token}}"
+        "Authorization": "Bearer {{home_assistant_token}}"
       },
-      "enabled": true
+      "enabled": {{#if mcp_home_assistant_enabled}}true{{else}}false{{/if}}
     },
 {{/if}}
 {{#if gitea_token}}

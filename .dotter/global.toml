@@ -91,10 +91,7 @@ depends = ["default"]
 [personal.variables]
 opencode_profile_personal             = true
 mcp_coderabbit                        = false
-mcp_n8n_token                          = true
-n8n_mcp_url                            = ""
-n8n_mcp_token                          = ""
-n8n_api_key                            = ""
+mcp_home_assistant_enabled             = false
 mcp_netlify                           = true
 opencode_build_agent_model            = "ollama-cloud/kimi-k2.6:cloud"
 opencode_plan_agent_model             = "ollama-cloud/gemma4:31b"
