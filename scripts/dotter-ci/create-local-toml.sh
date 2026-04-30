@@ -132,6 +132,8 @@ github_personal_access_token = "ghp_test123456789"
 opencode_build_agent_model = "anthropic/claude-sonnet-4-5"
 opencode_plan_agent_model = "anthropic/claude-opus-4-5"
 shell_bin_path = "$HOME/bin"
+username = "test.user"
+gpg_key = ""
 EOF
     ;;
 esac

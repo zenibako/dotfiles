@@ -116,7 +116,7 @@ jobs:
 
           for profile in default personal work; do
             echo "Testing $profile profile..."
-            scripts/dotter-ci/create-local-toml.sh "$profile" monokai .dotter/local.toml
+            scripts/dotter-ci/create-local-toml.sh --force "$profile" monokai .dotter/local.toml
 
             if ! dotter deploy --dry-run --force 2>&1 | tee /tmp/dotter-$profile.log; then
               echo "✗ Failed to deploy $profile profile"

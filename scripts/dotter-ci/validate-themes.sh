@@ -40,9 +40,12 @@ for theme in "${THEMES[@]}"; do
 packages = ["default", "linux", "$theme"]
 
 [variables]
+name = "Test User"
 email = "test@default.example.com"
 github_personal_access_token = "ghp_test123456789"
 shell_bin_path = "\$HOME/bin"
+username = "test.user"
+gpg_key = ""
 EOF
   
   # Copy global.toml to temp deploy dir so dotter can find it

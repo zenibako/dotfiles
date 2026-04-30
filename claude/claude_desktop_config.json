@@ -1,4 +1,3 @@
-
 {
   "mcpServers": {
 {{#if mcp_salesforce_enabled}}
@@ -20,7 +19,10 @@
 {{/if}}
     "Chrome DevTools": {
       "command": "zsh",
-      "args": ["-c", "source ~/.nvm/nvm.sh && nvm use --lts >&2 && npx chrome-devtools-mcp@latest"]
+      "args": [
+        "-c",
+        "source ~/.nvm/nvm.sh && nvm use --lts >&2 && npx chrome-devtools-mcp@latest"
+      ]
     }{{#if mcp_odaseva_enabled}},
     "Odaseva": {
       "command": "oda-mcp",
@@ -31,6 +33,9 @@
     }{{/if}}
   },
   "preferences": {
-    "sidebarMode": "code"
+    "coworkScheduledTasksEnabled": true,
+    "ccdScheduledTasksEnabled": true,
+    "sidebarMode": "chat",
+    "coworkWebSearchEnabled": true
   }
 }
