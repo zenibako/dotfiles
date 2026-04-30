@@ -37,7 +37,10 @@ for theme in "${THEMES[@]}"; do
   
   # Copy the full repo so dotter can find global.toml, pre_deploy hook, and source files
   # Exclude .git and .dotter/cache.toml to keep it clean
-  rsync -a --exclude='.git' --exclude='.dotter/cache.toml' "$REPO_DIR/" "$DEPLOY_DIR/"
+  mkdir -p "$DEPLOY_DIR"
+  cp -r "$REPO_DIR/"* "$DEPLOY_DIR/"
+  cp -r "$REPO_DIR/.dotter" "$DEPLOY_DIR/"
+  rm -rf "$DEPLOY_DIR/.git" "$DEPLOY_DIR/.dotter/cache.toml"
   
   # Write local.toml in the copied repo
   cat > "$DEPLOY_DIR/.dotter/local.toml" <<EOF
