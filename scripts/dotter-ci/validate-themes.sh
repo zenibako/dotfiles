@@ -27,6 +27,7 @@ if [ ${#THEMES[@]} -eq 0 ]; then
 fi
 
 FAILED=0
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 for theme in "${THEMES[@]}"; do
   echo "Testing theme: $theme"
@@ -34,8 +35,11 @@ for theme in "${THEMES[@]}"; do
   DEPLOY_DIR=$(mktemp -d)
   DEPLOY_DIRS+=("$DEPLOY_DIR")
   
-  # Create .dotter directory and local.toml inside temp deploy dir
-  mkdir -p "$DEPLOY_DIR/.dotter"
+  # Copy the full repo so dotter can find global.toml, pre_deploy hook, and source files
+  # Exclude .git and .dotter/cache.toml to keep it clean
+  rsync -a --exclude='.git' --exclude='.dotter/cache.toml' "$REPO_DIR/" "$DEPLOY_DIR/"
+  
+  # Write local.toml in the copied repo
   cat > "$DEPLOY_DIR/.dotter/local.toml" <<EOF
 packages = ["default", "linux", "$theme"]
 
@@ -48,10 +52,7 @@ username = "test.user"
 gpg_key = ""
 EOF
   
-  # Copy global.toml to temp deploy dir so dotter can find it
-  cp .dotter/global.toml "$DEPLOY_DIR/.dotter/global.toml"
-  
-  if HOME="$DEPLOY_DIR" dotter --local-config "$DEPLOY_DIR/.dotter/local.toml" deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
+  if HOME="$DEPLOY_DIR" dotter deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
     echo "✓ Theme $theme deployed successfully"
   else
     echo "✗ Theme $theme failed to deploy"

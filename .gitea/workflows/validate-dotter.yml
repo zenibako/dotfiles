@@ -102,7 +102,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install TOML validator
-        run: pip install toml
+        run: pip install --break-system-packages toml
 
       - name: Validate TOML files
         run: scripts/dotter-ci/validate-toml.sh
@@ -128,7 +128,7 @@ jobs:
 
       - name: Deploy with dotter (for Lua validation)
         run: |
-          scripts/dotter-ci/create-local-toml.sh default monokai .dotter/local.toml
+          scripts/dotter-ci/create-local-toml.sh --force default monokai .dotter/local.toml
           dotter deploy --force --verbose --noconfirm
 
       - name: Validate Lua files
