@@ -55,13 +55,15 @@ username = "test.user"
 gpg_key = ""
 EOF
   
-  if HOME="$DEPLOY_DIR" (cd "$DEPLOY_DIR" && dotter deploy --force --verbose --noconfirm) 2>&1 | tee "/tmp/theme-$theme.log"; then
+  pushd "$DEPLOY_DIR" > /dev/null
+  if HOME="$DEPLOY_DIR" dotter deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
     echo "✓ Theme $theme deployed successfully"
   else
     echo "✗ Theme $theme failed to deploy"
     cat "/tmp/theme-$theme.log"
     FAILED=1
   fi
+  popd > /dev/null
 done
 
 if [ $FAILED -eq 1 ]; then

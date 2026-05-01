@@ -3,8 +3,11 @@
 node_modules/
 
 .dotter/local.toml
+.dotter/local.toml.bak
+.dotter/.local.toml.real.bak
 .dotter/cache.toml
 .dotter/cache
+.dotter/post_deploy.sh
 
 # Deployed config directory (dotter output)
 .config/
