@@ -8,16 +8,6 @@
                "--toolsets", "all"]
     },
 {{/if}}
-{{#if mcp_home_assistant_enabled}}
-    "Home Assistant": {
-      "type": "http",
-      "url": "{{home_assistant_url}}/api/mcp",
-      "oauth": {
-        "clientId": "https://claude.ai",
-        "clientSecret": ""
-      }
-    },
-{{/if}}
     "Chrome DevTools": {
       "command": "zsh",
       "args": [
