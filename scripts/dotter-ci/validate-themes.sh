@@ -27,7 +27,7 @@ if [ ${#THEMES[@]} -eq 0 ]; then
 fi
 
 FAILED=0
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 for theme in "${THEMES[@]}"; do
   echo "Testing theme: $theme"

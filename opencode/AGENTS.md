@@ -1,5 +1,38 @@
 # Agent Guidelines
 
+## Task Management with Backlog.md
+
+This project uses Backlog.md MCP for all task and project management activities when enabled.
+
+**CRITICAL GUIDANCE**
+
+- If your client supports MCP resources, read `backlog://workflow/overview` to understand when and how to use Backlog for this project.
+- If your client only supports tools or the above request fails, call `backlog.get_workflow_overview()` tool to load the tool-oriented overview (it lists the matching guide tools).
+
+- **First time working here?** Read the overview resource IMMEDIATELY to learn the workflow
+- **Already familiar?** You should have the overview cached ("## Backlog.md Overview (MCP)")
+- **When to read it**: BEFORE creating tasks, or when you're unsure whether to track work
+
+These guides cover:
+- Decision framework for when to create tasks
+- Search-first workflow to avoid duplicates
+- Links to detailed guides for task creation, execution, and completion
+- MCP tools reference
+
+You MUST read the overview resource to understand the complete workflow. The information is NOT summarized here.
+
+## Home Assistant Config Safety
+
+When working on this Home Assistant project, **NEVER** run operations that would destroy or overwrite the live Home Assistant configuration stored in `/config/.storage/`. This includes:
+
+- **Never run `git clean -fd`** on the HA host — this permanently deletes untracked files including `.storage/`, runtime data, Python libraries, and addon configs.
+- **Never run `git reset --hard`** on the HA host unless the working tree is confirmed safe.
+- **Never force-push git changes** to the HA host if it would overwrite local modifications.
+- **Always use `--dry-run` first** with any destructive git command (e.g., `git clean -fd -n`).
+- **Never delete `.storage/`**, `*.db`, or runtime files manually on the HA host.
+
+If you need to clean or reset the repository on the HA host, **only do so after stopping HA core first** and **after confirming a fresh backup exists**.
+
 ## Shell
 - Before running the first command, check which shell is being used.
 - **Important**: If the default shell is Nushell (`nu`), note that it is NOT POSIX compliant - use `help` command if an error is thrown for incompatible commands/syntax.
