@@ -33,9 +33,10 @@ Perform a comprehensive health check of the wiki and report findings.
    - **Missing pages** — important concepts or entities mentioned repeatedly but lacking their own page
    - **Thin pages** — pages with very little content that could be expanded
 
-5. **Check `wiki/index.base`**
-   - Ensure `wiki/index.base` is present and contains the Dataview query that generates `wiki/index.md`.
+5. **Check `wiki/index.md`**
+   - If `wiki/index.md` exists, verify it's up to date by running `python3 scripts/wiki-index-generator.py`. The script parses `wiki/index.base` and regenerates the catalog from frontmatter.
    - Flag any pages missing the `description:` frontmatter property, as that drives the auto-generated index.
+   - If `wiki/index.md` is missing, run the generator script to create it.
 
 6. **Check `raw/` coverage:**
    - Are there source documents in `raw/` that haven't been ingested (no corresponding `src-*.md` page)?

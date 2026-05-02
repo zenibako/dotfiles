@@ -60,7 +60,7 @@ Ingest the source specified by `$ARGUMENTS` into the wiki.
 
 ## Guidelines
 
-- Scan `wiki/` with Glob to discover existing pages. Read frontmatter (especially `description:`) to understand topics and avoid duplicates. The `wiki/index.base` file is an Obsidian Dataview config that generates the human-facing index — agents should not rely on it for discovery.
+- Scan `wiki/` with Glob to discover existing pages, or run `python3 scripts/wiki-index-generator.py` to regenerate `wiki/index.md` from `wiki/index.base`. Read frontmatter (especially `description:`) to understand topics and avoid duplicates. The `wiki/index.base` file is an Obsidian Dataview config that generates the human-facing index — agents should not rely on it for direct discovery.
 - Prefer updating existing pages over creating new ones when topics overlap
 - Use `[[wikilinks]]` liberally for cross-references
 - Use kebab-case filenames
