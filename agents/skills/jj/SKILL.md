@@ -126,6 +126,28 @@ Do not disable signing or bypass it. If signing fails, troubleshoot the GPG agen
 - Use `jj status` and `jj diff` to understand the current state before suggesting actions
 - Use `jj log` to understand recent history and branch structure
 
+## Commit Attribution (Co-authored-by)
+
+When prompting the user to commit (or if committing directly when allowed), ensure the commit includes proper AI co-author attribution.
+
+**For Jujutsu**, use the `jjc`/`jjd` shell helpers (defined in `zshrc`) which automatically respect the `$AI_CO_AUTHOR` environment variable. Alternatively, manually append the `Co-authored-by` line when using `jj commit` or `jj describe`:
+
+```bash
+# Preferred: use the shell helper with AI_CO_AUTHOR set
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+
+# Or manually append
+jj commit -m "feat: add new feature
+
+Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
+```
+
+| Profile | Model | Co-authored-by |
+|---|---|---|
+| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
+| Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
+| Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
+
 ## Gotchas
 
 - There is no `jj add` — all files in the working copy are automatically tracked

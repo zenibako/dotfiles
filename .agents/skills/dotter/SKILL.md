@@ -181,11 +181,35 @@ work-specific content
 - Prefer generating sample or CI configs to a temporary path like `/tmp/local.toml` instead of `.dotter/local.toml`.
 - `scripts/dotter-ci/create-local-toml.sh` refuses to overwrite an existing output file unless `--force` is passed explicitly.
 
-## Gotchas
+## Commit Attribution Templates
 
-- Never edit files directly in `~/.config/` — dotter will overwrite them on next deploy. Edit the source in the dotfiles repo instead.
-- `local.toml` must define ALL variables referenced in templates, even if empty strings
-- Treat `.dotter/local.toml` as a secrets file. Avoid replacing it with generated test data during validation.
-- Profile names in `local.toml` packages must match `global.toml` sections exactly
-- Template files with syntax errors will fail silently in some cases — use `--verbose` to debug
-- Nvim configs use overlay: `nvim/default` is deployed first, then `nvim/personal` or `nvim/work` merges on top
+The dotfiles repo includes Git and Jujutsu commit templates that automatically append `Co-authored-by` lines for AI attribution. The system supports **per-command model attribution** via the `$AI_CO_AUTHOR` shell environment variable.
+
+### Git
+
+The `prepare-commit-msg` hook in `~/.config/git/hooks/prepare-commit-msg` respects `$AI_CO_AUTHOR` if set, otherwise falls back to a generic placeholder.
+
+```bash
+# Commit with model-specific attribution
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" git commit -m "feat: add new feature"
+```
+
+### Jujutsu (jj)
+
+JJ configs do not support environment variable interpolation, but the `jjc`/`jjd` shell helpers (defined in `zshrc`) handle it automatically:
+
+```bash
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+```
+
+Alternatively, manually append the co-author line when using `jj commit -m`.
+
+### Model Identity Mapping
+
+| Profile | Model | Co-authored-by |
+|---|---|---|
+| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
+| Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
+| Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
+
+**Note**: Agents using Git don't need to edit template files — just setting `$AI_CO_AUTHOR` before committing is sufficient.

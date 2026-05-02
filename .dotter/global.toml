@@ -1,6 +1,8 @@
 
 [default.files]
 "gitconfig"                               = { target = "~/.gitconfig", type = "template" }
+"git/commit-template"                     = "~/.git-commit-template"
+"git/hooks/prepare-commit-msg"            = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
 "shared/env.toml"                         = { target = "~/.config/shared/env.toml", type = "template" }
 "shared/completions.toml"                 = "~/.config/shared/completions.toml"
 "atuin/bin"                               = "~/.atuin/bin"

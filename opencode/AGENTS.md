@@ -39,10 +39,75 @@ If you need to clean or reset the repository on the HA host, **only do so after 
 - If a POSIX shell is necessary, use `zsh`.
 
 ## Version Control
-- **Use Jujutsu (jj)** when available (i.e. if the root directory has a `.jj` folder) instead of Git.
+- **Use Jujutsu (jj)** when available (i.e., if the root directory has a `.jj` folder) instead of Git.
 - **Commit style**: Conventional commits (e.g., `fix:`, `feat:`, `chore:`)
 - **Prefer MCPs over CLIs**: When available, use the Jujutsu, GitHub, and GitLab MCP tools instead of their command-line interfaces for better integration and error handling
 - **Always commit changes**: Before moving on to another topic or task, commit all changes with an appropriate conventional commit message
+
+## Commit Attribution (Co-authored-by)
+
+When making commits on behalf of the user, **always include the AI co-author attribution** in the commit message body:
+
+```
+fat: add new feature
+
+Implementation details...
+
+Co-authored-by: Kimi <kimi-k2.6:cloud@ai>
+```
+
+- This must be the **last line** of the commit message body, separated by a blank line.
+- It applies to **all commits** made by the agent (Git or Jujutsu).
+
+### Git Commits
+
+The Git `prepare-commit-msg` hook automatically appends `Co-authored-by`. It respects the `$AI_CO_AUTHOR` environment variable if set, otherwise falls back to `Co-authored-by: AI Model <ai@example.com>`.
+
+**Before committing, set the env var:**
+
+```bash
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" git commit -m "feat: add new feature"
+
+# Or use the convenience wrapper (passes through to git commit)
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" gitc -m "feat: add new feature"
+```
+
+### Jujutsu (jj) Commits
+
+JJ configs do not support environment variable interpolation, but the shell helpers `jjc` and `jjd` handle attribution automatically using `$AI_CO_AUTHOR`:
+
+```bash
+# Commit with proper attribution
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+
+# Describe working copy without creating new commit
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjd "fix: correct typo"
+```
+
+If not using the wrappers, manually append the trailer:
+```bash
+jj commit -m "feat: add new feature
+
+Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
+```
+
+### Required Action Before Committing
+
+1. **Identify the active model**: Check the `opencode_*_agent_model` variables in `.dotter/global.toml` (e.g., `opencode_build_agent_model` for the build agent)
+2. **Set the env var**: Export `AI_CO_AUTHOR` with the correct identity
+3. **Commit**: Use `git commit`, `gitc`, `jjc`, or `jjd`
+
+### Model Identity Mapping
+
+| Profile | Model (as of current config) | Co-authored-by |
+|---|---|---|
+| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
+| Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
+| Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
+
+**Format**: Extract the model name from the config value. For `ollama-cloud/kimi-k2.6:cloud`, use `Kimi <kimi-k2.6:cloud@ai>`. For `openai/gpt-5.4`, use `GPT-5.4 <gpt-5.4@ai>`.
+
+**Note**: The `gitc`, `jjc`, and `jjd` shell functions are defined in `zshrc` and deployed via dotter. Reload your shell or source `~/.zshrc` to use them.
 
 ## Atlassian CLI
 - **Use `acli`** for all Jira and Confluence operations (replaces legacy `jira-cli`)

@@ -36,3 +36,58 @@
 - `~/.zshrc`: interactive-only, zsh-specific syntax (arithmetic expansion, `autoload`, `zstyle`)
 - `~/.bashrc` (if any): NEVER source `~/.zshrc` from bash — they are incompatible
 - Tools with init scripts (`zoxide init`, `atuin init`, `starship init`) must be guarded with `command -v` or `(( ${+commands[...]} ))` checks to avoid errors on missing binaries
+
+## Commit Attribution (Co-authored-by)
+
+When agents commit changes in this dotfiles repository or any other repo, they **must** include AI co-author attribution in the `Co-authored-by` trailer for transparency.
+
+The system supports **per-command model attribution** via the `AI_CO_AUTHOR` shell environment variable. Agents should set this variable before committing. If not set, a generic placeholder is used.
+
+### Git Commits
+
+The Git `prepare-commit-msg` hook in `~/.config/git/hooks/prepare-commit-msg` automatically appends `Co-authored-by`. It respects `$AI_CO_AUTHOR` if set, otherwise falls back to `Co-authored-by: AI Model <ai@example.com>`.
+
+```bash
+# Example: Commit with proper attribution
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" git commit -m "feat: add new feature"
+
+# Or use the convenience wrapper (passes through to git commit)
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" gitc -m "feat: add new feature"
+```
+
+### Jujutsu (jj) Commits
+
+JJ configs do not support environment variable interpolation, but the shell helpers `jjc` and `jjd` handle attribution automatically:
+
+```bash
+# Commit with proper attribution (uses AI_CO_AUTHOR env var)
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+
+# Describe current working copy without creating new commit
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjd "fix: correct typo"
+```
+
+If not using the wrappers, manually append the line:
+```bash
+jj commit -m "feat: add new feature
+
+Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
+```
+
+### Required Action Before Committing
+
+1. **Identify the active model**: Check the `opencode_*_agent_model` variables in `.dotter/global.toml`
+2. **Set the env var**: Export `AI_CO_AUTHOR` with the correct identity (see mapping below)
+3. **Commit**: Use `git commit`, `gitc`, `jjc`, or `jjd` as appropriate
+
+### Model Identity Mapping
+
+| Profile | Model (as of current config) | Co-authored-by |
+|---|---|---|
+| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
+| Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
+| Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
+
+**Format**: Extract the model name from the config value. For `ollama-cloud/kimi-k2.6:cloud`, use `Kimi <kimi-k2.6:cloud@ai>`. For `openai/gpt-5.4`, use `GPT-5.4 <gpt-5.4@ai>`.
+
+**Note**: The `gitc`, `jjc`, and `jjd` shell functions are defined in `zshrc` and are deployed via dotter. After deployment, reload your shell or source `~/.zshrc` to use them.

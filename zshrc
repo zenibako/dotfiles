@@ -358,8 +358,58 @@ fi
 # Updates the gpg-agent TTY before every command since
 # there's no way to detect this info in the ssh-agent protocol
 function _gpg-agent-update-tty {
-  gpg-connect-agent UPDATESTARTUPTTY /bye &>/dev/null
+  gpg-connect-agent UPDATESTARTUPTTY /bye >&amp;/dev/null
 }
 
 autoload -Uz add-zsh-hook
 add-zsh-hook preexec _gpg-agent-update-tty
+
+# --- AI Co-author Helpers ---
+# These allow per-command model-specific attribution via AI_CO_AUTHOR env var.
+# Usage: AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" gitc -m "feat: add feature"
+#        AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add feature"
+
+ai_coauthor() {
+    echo "${AI_CO_AUTHOR:-AI Model <ai@example.com>}"
+}
+
+# Git commit with AI co-author attribution (template-aware)
+gitc() {
+    # If AI_CO_AUTHOR is set, Git's prepare-commit-msg hook will respect it.
+    # If not, the hook uses the generic default.
+    # This wrapper just ensures the env var propagates.
+    git commit "$@"
+}
+
+# Jujutsu commit with AI co-author attribution
+jjc() {
+    local coauthor="${AI_CO_AUTHOR:-AI Model <ai@example.com>}"
+    local msg=""
+    
+    # Build message from arguments
+    if [ $# -eq 0 ]; then
+        echo "Usage: jjc <commit-message>"
+        return 1
+    fi
+    
+    msg="$1"
+    jj commit -m "${msg}
+
+Co-authored-by: ${coauthor}"
+}
+
+# Jujutsu describe with AI co-author attribution (for updating description without creating new commit)
+jjd() {
+    local coauthor="${AI_CO_AUTHOR:-AI Model <ai@example.com>}"
+    local msg=""
+    
+    if [ $# -eq 0 ]; then
+        echo "Usage: jjd <description>"
+        return 1
+    fi
+    
+    msg="$1"
+    jj describe -m "${msg}
+
+Co-authored-by: ${coauthor}"
+}

@@ -8,6 +8,9 @@
     defaultBranch = main
 [commit]
     gpgSign = {{#if gpg_key}}true{{else}}false{{/if}}
+    template = ~/.git-commit-template
+[core]
+    hooksPath = ~/.config/git/hooks
 [oh-my-zsh]
     git-commit-alias = 061f773dd356df52a8bccd5e73377c012f97ef14
 

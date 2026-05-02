@@ -1,0 +1,22 @@
+#!/bin/bash
+# Prepare commit message hook - adds AI co-author attribution
+# Triggers on: git commit (not jj, since jj writes directly to git)
+# Deployed via dotter from dotfiles/git/hooks/prepare-commit-msg
+#
+# To override the co-author identity per-commit, set the AI_CO_AUTHOR env var:
+#   AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" git commit -m "feat: add feature"
+#
+# Falls back to generic placeholder if not set.
+
+COMMIT_MSG_FILE=$1
+SOURCE=$2
+
+# Only add for non-merge commits and if not already present
+if [ "$SOURCE" != "merge" ] && [[ "$SOURCE" != "squash" ]]; then
+    if ! grep -q "Co-authored-by:" "$COMMIT_MSG_FILE"; then
+        # Use AI_CO_AUTHOR env var if set, otherwise generic default
+        COAUTHOR="${AI_CO_AUTHOR:-AI Model <ai@example.com>}"
+        echo "" >> "$COMMIT_MSG_FILE"
+        echo "Co-authored-by: $COAUTHOR" >> "$COMMIT_MSG_FILE"
+    fi
+fi
