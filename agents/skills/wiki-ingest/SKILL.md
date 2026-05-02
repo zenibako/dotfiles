@@ -49,6 +49,7 @@ Ingest the source specified by `$ARGUMENTS` into the wiki.
    python3 scripts/wiki-index-generator.py
    ```
    This parses `wiki/index.base`, scans all wiki pages, and regenerates `wiki/index.md` from frontmatter. The index drives human discovery in Obsidian.
+9. **Ensure every new or updated page has a `description:` frontmatter property.** This drives the auto-generated `wiki/index.md` via `wiki/index.base`.
 
 10. **Append to `wiki/log.md`** with format:
     ```
@@ -59,10 +60,14 @@ Ingest the source specified by `$ARGUMENTS` into the wiki.
 
 ## Guidelines
 
-- Read `wiki/index.md` first to understand what pages already exist
+- Scan `wiki/` with Glob to discover existing pages. Read frontmatter (especially `description:`) to understand topics and avoid duplicates. The `wiki/index.base` file is an Obsidian Dataview config that generates the human-facing index — agents should not rely on it for discovery.
 - Prefer updating existing pages over creating new ones when topics overlap
 - Use `[[wikilinks]]` liberally for cross-references
 - Use kebab-case filenames
 - A single source may touch 10-15 wiki pages — that's expected
 - Keep summaries concise but thorough
+
+## Index Note
+
+`wiki/index.md` is **auto-generated** from the `description:` frontmatter property on each wiki page via the Dataview query in `wiki/index.base`. **Do not edit `wiki/index.md` directly.** Only ensure every new or updated page has a `description:` property.
 

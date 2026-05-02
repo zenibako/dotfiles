@@ -15,7 +15,7 @@ Answer the question: **$ARGUMENTS**
 
 ## Workflow
 
-1. **Read `wiki/index.md`** to find relevant pages.
+1. **Scan `wiki/` with Glob and read frontmatter (especially `description:`) to find relevant pages.** The `wiki/index.base` file is an Obsidian Dataview config that generates the human-facing index — agents should not rely on it for discovery.
 
 2. **Read relevant wiki pages.** Follow `[[wikilinks]]` to gather additional context. If the index doesn't seem to cover the topic, search `wiki/` with Grep for keywords.
 
@@ -25,8 +25,7 @@ Answer the question: **$ARGUMENTS**
 
 5. **Offer to file the answer.** If the response is substantial, novel, or worth preserving (a comparison, analysis, synthesis, or connection), ask the user if they'd like it saved as a new wiki page. If yes:
    - Create the page in `wiki/` with appropriate type (`analysis` or `synthesis`)
-   - Add proper frontmatter
-   - Update `wiki/index.md`
+   - Add proper frontmatter (including a `description:` property)
    - Append to `wiki/log.md`:
      ```
      ## [YYYY-MM-DD] query | <Question Summary>

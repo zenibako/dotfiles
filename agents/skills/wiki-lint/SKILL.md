@@ -14,7 +14,7 @@ Perform a comprehensive health check of the wiki and report findings.
 
 ## Workflow
 
-1. **Read `wiki/index.md`** and **`wiki/log.md`** to understand the current state.
+1. **Scan `wiki/` with Glob and read frontmatter to build a catalog.** Also read `wiki/log.md` to understand recent activity. The `wiki/index.base` file is an Obsidian Dataview config — agents should not rely on it for discovery.
 
 2. **Read every wiki page** in `wiki/`. For each page, note:
    - Outbound `[[wikilinks]]` — do the targets exist?
@@ -32,13 +32,16 @@ Perform a comprehensive health check of the wiki and report findings.
    - **Stale claims** — information that newer sources may have superseded
    - **Missing pages** — important concepts or entities mentioned repeatedly but lacking their own page
    - **Thin pages** — pages with very little content that could be expanded
-   - **Index gaps** — wiki pages that exist but aren't listed in `wiki/index.md`
 
-5. **Check `raw/` coverage:**
+5. **Check `wiki/index.base`**
+   - Ensure `wiki/index.base` is present and contains the Dataview query that generates `wiki/index.md`.
+   - Flag any pages missing the `description:` frontmatter property, as that drives the auto-generated index.
+
+6. **Check `raw/` coverage:**
    - Are there source documents in `raw/` that haven't been ingested (no corresponding `src-*.md` page)?
    - Are there daily journal entries with substantial content that could be ingested?
 
-6. **Present a report** organized as:
+7. **Present a report** organized as:
 
    ```
    ## Wiki Health Report — YYYY-MM-DD
@@ -60,12 +63,13 @@ Perform a comprehensive health check of the wiki and report findings.
    - Questions worth investigating
    ```
 
-7. **Ask the user** which issues to fix, then fix them.
+8. **Ask the user** which issues to fix, then fix them.
 
-8. **Append to `wiki/log.md`**:
-   ```
-   ## [YYYY-MM-DD] lint | Wiki health check
+9. **Update `description:` on any fixed pages** so the auto-generated index stays current.
 
-   <Summary of findings and fixes applied.>
-   ```
+10. **Append to `wiki/log.md`**:
+    ```
+    ## [YYYY-MM-DD] lint | Wiki health check
 
+    <Summary of findings and fixes applied.>
+    ```
