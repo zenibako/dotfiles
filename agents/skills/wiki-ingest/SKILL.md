@@ -44,7 +44,11 @@ Ingest the source specified by `$ARGUMENTS` into the wiki.
 
 8. **Update cross-references** on any existing wiki pages that now relate to the new source. Add `[[wikilinks]]` where relevant.
 
-9. **Update `wiki/index.md`** — add new pages under the correct type heading. Keep entries in the format: `- [[page-name]] — one-line summary`
+9. **Ensure every new or updated page has a `description:` frontmatter property, then regenerate the index.** Run:
+   ```
+   python3 scripts/wiki-index-generator.py
+   ```
+   This parses `wiki/index.base`, scans all wiki pages, and regenerates `wiki/index.md` from frontmatter. The index drives human discovery in Obsidian.
 
 10. **Append to `wiki/log.md`** with format:
     ```
