@@ -358,7 +358,7 @@ fi
 # Updates the gpg-agent TTY before every command since
 # there's no way to detect this info in the ssh-agent protocol
 function _gpg-agent-update-tty {
-  gpg-connect-agent UPDATESTARTUPTTY /bye >&amp;/dev/null
+  gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null 2>&1
 }
 
 autoload -Uz add-zsh-hook
