@@ -1,6 +1,7 @@
 vim.g.mapleader = " "
 
 require("config.formatting")
+require("config.neovide")
 require("config.pack")
 require("config.keymaps")
 
