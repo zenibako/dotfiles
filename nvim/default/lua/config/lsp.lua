@@ -52,6 +52,7 @@ vim.lsp.enable({
   "gitlab_ci_ls",
 {{/if}}
   "gopls",
+  "basedpyright",
   "html",
   "jsonls",
   "lua_ls",
