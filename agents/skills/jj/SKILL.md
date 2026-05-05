@@ -130,13 +130,16 @@ Do not disable signing or bypass it. If signing fails, troubleshoot the GPG agen
 
 When prompting the user to commit (or if committing directly when allowed), ensure the commit includes proper AI co-author attribution.
 
-**For Jujutsu**, use the `jjc`/`jjd` shell helpers (defined in `zshrc`) which automatically respect the `$AI_CO_AUTHOR` environment variable. Alternatively, manually append the `Co-authored-by` line when using `jj commit` or `jj describe`:
+**For Jujutsu**, use the `jjc`/`jjd` shell helpers (defined in `zshrc`) which automatically respect the `$AI_CO_AUTHOR` environment variable. **Note**: `jjc` and `jjd` are zsh functions defined in `~/.zshrc`, so they are only available in interactive shells. In non-interactive contexts (e.g., MCP server execution), source `~/.zshrc` first or use the manual fallback.
 
 ```bash
-# Preferred: use the shell helper with AI_CO_AUTHOR set
+# Preferred (interactive shells only)
 AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
 
-# Or manually append
+# Non-interactive fallback — source zshrc first
+source ~/.zshrc && AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+
+# Or use the manual inline command (works everywhere)
 jj commit -m "feat: add new feature
 
 Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
@@ -155,3 +158,4 @@ Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
 - Bookmarks must be explicitly pushed with `jj git push`
 - The working copy commit (`@`) always exists and is mutable — use `jj describe` to update its message
 - Rebase is non-destructive; the old commits remain in the operation log
+- **`jjc` and `jjd` are interactive only**: These are zsh functions defined in `~/.zshrc`. In non-interactive contexts (e.g., MCP tools, scripts), they are not available. Use `source ~/.zshrc && jjc "..."` as a fallback, or use the manual `jj commit -m` / `jj describe -m` commands with the `Co-authored-by` line appended.

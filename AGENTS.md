@@ -63,21 +63,22 @@ AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" gitc -m "feat: add new feature"
 
 ### Jujutsu (jj) Commits
 
-JJ configs do not support environment variable interpolation, but the shell helpers `jjc` and `jjd` handle attribution automatically:
+JJ configs do not support environment variable interpolation, but the shell helpers `jjc` and `jjd` handle attribution automatically. **Important**: `jjc` and `jjd` are zsh functions defined in `~/.zshrc`, so they are only available in interactive shells. In non-interactive contexts (e.g., MCP server execution), source `~/.zshrc` first or use the manual fallback.
 
 ```bash
-# Commit with proper attribution (uses AI_CO_AUTHOR env var)
+# Interactive shells only
 AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
 
-# Describe current working copy without creating new commit
-AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjd "fix: correct typo"
-```
+# Non-interactive fallback — source zshrc first
+source ~/.zshrc && AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
 
-If not using the wrappers, manually append the line:
-```bash
+# Manual inline command (works everywhere, no shell helpers needed)
 jj commit -m "feat: add new feature
 
 Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
+
+# Describe current working copy without creating new commit (interactive)
+AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjd "fix: correct typo"
 ```
 
 ### Required Action Before Committing
@@ -97,3 +98,5 @@ Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
 **Format**: Extract the model name from the config value. For `ollama-cloud/kimi-k2.6:cloud`, use `Kimi <kimi-k2.6:cloud@ai>`. For `openai/gpt-5.4`, use `GPT-5.4 <gpt-5.4@ai>`.
 
 **Note**: The `gitc`, `jjc`, and `jjd` shell functions are defined in `zshrc` and are deployed via dotter. After deployment, reload your shell or source `~/.zshrc` to use them.
+
+In non-interactive contexts (e.g., MCP server tool execution), `jjc`/`jjd` are not available — either source `~/.zshrc` first or use the manual `jj commit -m` / `jj describe -m` commands with the `Co-authored-by` line appended.
