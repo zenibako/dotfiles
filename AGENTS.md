@@ -11,6 +11,12 @@
 - `validate-dotter.yml` runs on both platforms (mirrored)
 - `opencode.yml` is GitHub-only and currently NOT portable to Gitea Actions due to GitHub-specific triggers, custom actions, and event payloads (`issue_comment`, `pull_request_review_comment`, `anomalyco/opencode/github@latest`)
 
+## E2E Testing
+When automating browsers or running end-to-end tests, use the `e2e-testing` skill:
+- **Preferred**: cmux (if installed). See `.agents/skills/e2e-testing/SKILL.md` → Backend 1.
+- **Test scripts available**: Playwright. See `.agents/skills/e2e-testing/SKILL.md` → Backend 2.
+- **Fallback**: Chrome DevTools MCP tools. See `.agents/skills/e2e-testing/SKILL.md` → Backend 3.
+
 ## Version Control
 - Config in `jj/config.toml`
 - **Merge tool**: `jj-diffconflicts` via nvim (`merge-tools.diffconflicts`)
