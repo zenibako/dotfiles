@@ -5,8 +5,9 @@ name = "{{name}}"
 email = "{{email}}"
 
 [ui]
-default-command = "log"
+default-command = ["log", "--limit", "5"]
 diff-editor = ":builtin"
+show-cryptographic-signatures = true
 
 [signing]
 sign-all = true
