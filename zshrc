@@ -356,9 +356,15 @@ fi
 # Note: XDG_CONFIG_HOME is now loaded from shared/env.toml
 
 # Updates the gpg-agent TTY before every command since
-# there's no way to detect this info in the ssh-agent protocol
+# there's no way to detect this info in the ssh-agent protocol.
+# Be defensive here because some shells/sessions can fail opening /dev/null,
+# which would otherwise print an error before every command.
 function _gpg-agent-update-tty {
-  gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null 2>&1
+  (( ${+commands[gpg-connect-agent]} )) || return 0
+  [[ -t 1 && -w /dev/null ]] || return 0
+
+  export GPG_TTY="$(tty)"
+  gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null 2>&1 || true
 }
 
 autoload -Uz add-zsh-hook
