@@ -256,4 +256,24 @@ fi
 echo "Deploying dotfiles..."
 dotter deploy -f
 
+# Setup dotter-managed gitconfig via include (avoids conflicts with gh auth setup-git)
+DOTTER_GITCONFIG="$HOME/.config/git/dotter-gitconfig"
+if [ -f "$DOTTER_GITCONFIG" ]; then
+    if [ -f "$HOME/.gitconfig" ]; then
+        if ! git config --global --get-all include.path 2>/dev/null | grep -qF "$DOTTER_GITCONFIG"; then
+            echo "Adding dotter gitconfig include to ~/.gitconfig..."
+            git config --global --add include.path "$DOTTER_GITCONFIG"
+        fi
+    else
+        echo "Creating ~/.gitconfig with dotter include..."
+        git config --global include.path "$DOTTER_GITCONFIG"
+    fi
+fi
+
+# Configure gh credential helper (writes to ~/.gitconfig, not the dotter-managed file)
+if command -v gh >/dev/null 2>&1; then
+    echo "Configuring gh credential helper..."
+    gh auth setup-git 2>/dev/null || echo "  (skipped: not authenticated with gh yet)"
+fi
+
 echo "Done! Start a new zsh session: exec zsh"
