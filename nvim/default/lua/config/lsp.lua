@@ -46,6 +46,14 @@ end
 
 -- Declarative LSP setup (Neovim 0.11+).
 -- Server configs are auto-loaded from `lsp/<name>.lua` directories on the runtimepath.
+
+-- Highlight unused variables/functions with a subtle strikethrough.
+vim.diagnostic.config({
+	underline = { severity = vim.diagnostic.severity.HINT },
+	virtual_text = { prefix = "●", spacing = 2 },
+	update_in_insert = false,
+})
+
 vim.lsp.enable({
 {{#if opencode_profile_work}}
   "apex-language-server",

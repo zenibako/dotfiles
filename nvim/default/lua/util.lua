@@ -22,6 +22,10 @@ function M.lua_ls_on_init(client)
                 }
                 -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
                 -- library = vim.api.nvim_get_runtime_file("", true)
+            },
+            diagnostics = {
+                unusedLocals = true,
+                unusedParameters = true,
             }
         }
     })
