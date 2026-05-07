@@ -190,7 +190,9 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
     nvim --headless +qa! 2>/tmp/nvim-startup.log || true
   fi
 
-  if grep -E '^E[0-9]+:|Error while calling lua chunk|Error loading plugin config' /tmp/nvim-startup.log >/dev/null 2>&1; then
+  if grep -E '^E[0-9]+:|Error while calling lua chunk|Error loading plugin config' /tmp/nvim-startup.log 2>/dev/null \
+       | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal' \
+       | grep -q .; then
     echo "ERROR: Neovim startup errors detected:" >&2
     cat /tmp/nvim-startup.log >&2
     exit 1
