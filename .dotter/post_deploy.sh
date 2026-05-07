@@ -80,7 +80,6 @@ PYEOF
   fi
 fi
 unset _dotfiles _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
-
 echo "==> Running post-deploy validation..."
 
 DEPLOYED="$HOME/.config"
