@@ -7,7 +7,7 @@ vim.keymap.set("n", "<leader>xu", function()
 	require("trouble").toggle({
 		mode = "diagnostics",
 		filter = function(diag)
-			return diag.message:lower():match("unused") ~= nil
+			return (diag.message or ""):lower():match("unused") ~= nil
 		end
 	})
 end, { desc = "Unused code (Trouble)" })
