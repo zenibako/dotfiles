@@ -1,6 +1,11 @@
 #!/bin/sh
 set -eu
 
+# Resolve dotfiles root from the git repo containing this script.
+# dotter runs post_deploy.sh from .dotter/cache/, so we use git to find the root.
+_dotfiles=$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null) || _dotfiles=""
+_scripts="$_dotfiles/.dotter/scripts"
+
 # Symlink shared commands into OpenCode (dotter can't map one source to two targets,
 # so we point opencode at the already-deployed ~/.claude/commands/ symlinks)
 _oc_cmd="$HOME/.config/opencode/command"
@@ -11,8 +16,6 @@ done
 unset _oc_cmd _cmd
 
 # Deploy skills to Claude Desktop
-# Use git to find dotfiles root reliably regardless of where dotter runs this script
-_dotfiles=$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null) || _dotfiles=""
 if [ -n "$_dotfiles" ]; then
   _claude_app="$HOME/Library/Application Support/Claude"
   _ops_file="$_claude_app/cowork-enabled-cli-ops.json"
@@ -40,46 +43,12 @@ except Exception:
         cp "$_sd/SKILL.md" "$_skills_dir/$_sname/SKILL.md"
         echo "  Copied skill: $_sname"
       done
-      python3 - "$_manifest" "$_dotfiles/claude-desktop/skills" <<'PYEOF'
-import json, os, sys, datetime
-
-manifest_path, skills_root = sys.argv[1], sys.argv[2]
-with open(manifest_path) as f:
-    manifest = json.load(f)
-existing = {s['skillId'] for s in manifest['skills']}
-changed = False
-for skill_name in sorted(os.listdir(skills_root)):
-    skill_md = os.path.join(skills_root, skill_name, 'SKILL.md')
-    if not os.path.isfile(skill_md) or skill_name in existing:
-        continue
-    desc = skill_name
-    with open(skill_md) as f:
-        content = f.read()
-    if content.startswith('---'):
-        for line in content.split('\n')[1:]:
-            if line.startswith('---'):
-                break
-            if line.lower().startswith('description:'):
-                desc = line.split(':', 1)[1].strip().strip('"\'')
-    manifest['skills'].append({
-        'skillId': skill_name,
-        'name': skill_name,
-        'description': desc,
-        'creatorType': 'user',
-        'updatedAt': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z',
-        'enabled': True
-    })
-    manifest['lastUpdated'] = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
-    print(f'  Registered skill: {skill_name}')
-    changed = True
-if changed:
-    with open(manifest_path, 'w') as f:
-        json.dump(manifest, f, indent=2)
-PYEOF
+      python3 "$_scripts/deploy_skills.py" "$_manifest" "$_dotfiles/claude-desktop/skills"
     fi
   fi
+  unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
 fi
-unset _dotfiles _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
+
 echo "==> Running post-deploy validation..."
 
 DEPLOYED="$HOME/.config"
@@ -87,8 +56,6 @@ DEPLOYED="$HOME/.config"
 # --- OpenCode JSONC validation ---
 if [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
   echo "Validating OpenCode config..."
-
-  # Prefer json5 CLI (brew install json5 / npm install -g json5) for proper JSON5/JSONC parsing
   if command -v json5 >/dev/null 2>&1; then
     if ! json5 -v "$DEPLOYED/opencode/opencode.jsonc" >/dev/null 2>&1; then
       echo "ERROR: OpenCode config validation failed (json5)" >&2
@@ -96,60 +63,11 @@ if [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
     fi
     echo "  OpenCode config OK (json5)"
   elif command -v python3 >/dev/null 2>&1; then
-    # Fallback: write Python script to a temp file to avoid shell-quoting hell
-    _pytmp=$(mktemp)
-    cat > "$_pytmp" <<'PYEOF'
-import json, re, sys
-path = sys.argv[1]
-with open(path, 'r') as f:
-    content = f.read()
-
-def strip_comments(text):
-    text = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
-    result = []
-    in_string = False
-    i = 0
-    while i < len(text):
-        ch = text[i]
-        if not in_string and ch == '"':
-            in_string = True
-            result.append(ch)
-        elif in_string and ch == '"':
-            # check for escaped
-            slashes = 0
-            j = len(result) - 1
-            while j >= 0 and result[j] == '\\':
-                slashes += 1
-                j -= 1
-            if slashes % 2 == 1:
-                result.append(ch)
-            else:
-                in_string = False
-                result.append(ch)
-        elif not in_string and ch == '/' and i + 1 < len(text) and text[i + 1] == '/':
-            while i < len(text) and text[i] not in '\r\n':
-                i += 1
-            continue
-        else:
-            result.append(ch)
-        i += 1
-    return ''.join(result)
-
-content = strip_comments(content)
-content = re.sub(r',(\s*[}\]])', r'\1', content)
-try:
-    json.loads(content)
-except json.JSONDecodeError as e:
-    print(f'Invalid JSONC in {path}: {e}', file=sys.stderr)
-    sys.exit(1)
-PYEOF
-    if ! python3 "$_pytmp" "$DEPLOYED/opencode/opencode.jsonc"; then
-      rm -f "$_pytmp"
-      echo "ERROR: OpenCode config validation failed (python fallback)" >&2
+    if ! python3 "$_scripts/validate_jsonc.py" "$DEPLOYED/opencode/opencode.jsonc"; then
+      echo "ERROR: OpenCode config validation failed" >&2
       exit 1
     fi
-    rm -f "$_pytmp"
-    echo "  OpenCode config OK (python fallback)"
+    echo "  OpenCode config OK"
   else
     echo "  Skipping OpenCode validation (no json5 or python3 available)"
   fi
@@ -182,7 +100,7 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
 
     if [ "$failed" -gt 0 ]; then
       echo "WARNING: $failed MCP server(s) appear failed or disconnected" >&2
-      echo "$mcp_clean" | grep -E '^[[:space:]]*\u25cf[[:space:]]+\u2717' >&2 || true
+      echo "$mcp_clean" | grep -E '^[[:space:]]*●[[:space:]]+✗' >&2 || true
     fi
 
     if [ "$connected" -eq 0 ] && [ "$total" -gt 0 ]; then
@@ -199,32 +117,14 @@ fi
 
 # --- Claude Code settings.json validation ---
 _cc_settings="$HOME/.claude/settings.json"
-if [ -f "$_cc_settings" ]; then
+if [ -f "$_cc_settings" ] && command -v python3 >/dev/null 2>&1; then
   echo "Validating Claude Code settings..."
-  if command -v python3 >/dev/null 2>&1; then
-    _pytmp=$(mktemp)
-    cat > "$_pytmp" <<'PYEOF'
-import json, sys
-path = sys.argv[1]
-try:
-    with open(path) as f:
-        data = json.load(f)
-except json.JSONDecodeError as e:
-    print(f'ERROR: Invalid JSON in {path}: {e}', file=sys.stderr)
-    sys.exit(1)
-servers = data.get('mcpServers', {})
-names = ', '.join(servers.keys())
-print(f'  Claude Code settings OK ({len(servers)} MCP servers: {names})')
-PYEOF
-    if ! python3 "$_pytmp" "$_cc_settings"; then
-      rm -f "$_pytmp"
-      echo "ERROR: Claude Code settings validation failed" >&2
-      exit 1
-    fi
-    rm -f "$_pytmp"
-  else
-    echo "  Skipping Claude Code settings validation (python3 not available)"
+  if ! python3 "$_scripts/validate_cc_settings.py" "$_cc_settings"; then
+    echo "ERROR: Claude Code settings validation failed" >&2
+    exit 1
   fi
+elif [ -f "$_cc_settings" ]; then
+  echo "  Skipping Claude Code settings validation (python3 not available)"
 fi
 unset _cc_settings
 
@@ -238,21 +138,7 @@ validate_toml() {
   fi
 
   rc=0
-  python3 -c "
-import sys
-try:
-    import tomllib
-    with open('$file', 'rb') as f:
-        tomllib.load(f)
-except ImportError:
-    try:
-        import toml
-        with open('$file', 'r') as f:
-            toml.load(f)
-    except ImportError:
-        sys.exit(2)
-sys.exit(0)
-  " >/dev/null 2>&1 || rc=$?
+  python3 "$_scripts/validate_toml.py" "$file" >/dev/null 2>&1 || rc=$?
 
   if [ "$rc" -eq 2 ]; then
     echo "  Skipping TOML validation (no toml module)"
