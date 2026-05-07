@@ -67,6 +67,7 @@ vim.lsp.enable({
   "ts_ls",
   "cuelang",
   "sourcekit",
+  "jinja-lsp",
 {{/if}}
 {{#if opencode_profile_work}}
   "cuelang",
