@@ -66,10 +66,10 @@ for skill_name in sorted(os.listdir(skills_root)):
         'name': skill_name,
         'description': desc,
         'creatorType': 'user',
-        'updatedAt': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z',
+        'updatedAt': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z',
         'enabled': True
     })
-    manifest['lastUpdated'] = int(datetime.datetime.utcnow().timestamp() * 1000)
+    manifest['lastUpdated'] = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
     print(f'  Registered skill: {skill_name}')
     changed = True
 if changed:
