@@ -6,8 +6,10 @@ vim.keymap.set("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<
 vim.keymap.set("n", "<leader>xu", function()
 	require("trouble").toggle({
 		mode = "diagnostics",
-		filter = function(diag)
-			return (diag.message or ""):lower():match("unused") ~= nil
+		filter = function(items)
+			return vim.tbl_filter(function(item)
+				return (item.message or ""):lower():match("unused") ~= nil
+			end, items)
 		end
 	})
 end, { desc = "Unused code (Trouble)" })
