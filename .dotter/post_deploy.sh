@@ -197,6 +197,37 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
   fi
 fi
 
+# --- Claude Code settings.json validation ---
+_cc_settings="$HOME/.claude/settings.json"
+if [ -f "$_cc_settings" ]; then
+  echo "Validating Claude Code settings..."
+  if command -v python3 >/dev/null 2>&1; then
+    _pytmp=$(mktemp)
+    cat > "$_pytmp" <<'PYEOF'
+import json, sys
+path = sys.argv[1]
+try:
+    with open(path) as f:
+        data = json.load(f)
+except json.JSONDecodeError as e:
+    print(f'ERROR: Invalid JSON in {path}: {e}', file=sys.stderr)
+    sys.exit(1)
+servers = data.get('mcpServers', {})
+names = ', '.join(servers.keys())
+print(f'  Claude Code settings OK ({len(servers)} MCP servers: {names})')
+PYEOF
+    if ! python3 "$_pytmp" "$_cc_settings"; then
+      rm -f "$_pytmp"
+      echo "ERROR: Claude Code settings validation failed" >&2
+      exit 1
+    fi
+    rm -f "$_pytmp"
+  else
+    echo "  Skipping Claude Code settings validation (python3 not available)"
+  fi
+fi
+unset _cc_settings
+
 # --- TOML validation ---
 validate_toml() {
   file="$1"
