@@ -1,7 +1,7 @@
 ---@type vim.lsp.Config
 return {
   cmd = { "jinja-lsp" },
-  filetypes = { "jinja", "html" },
-  root_markers = { ".git" },
+  filetypes = { "jinja", "jinja2", "rust", "python" },
+  root_markers = { ".git", "pyproject.toml", "Cargo.toml", "jinja-lsp.toml" },
   settings = {},
 }
