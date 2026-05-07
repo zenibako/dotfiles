@@ -1,0 +1,161 @@
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+          }
+        ]
+      }
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "lattice": {
+      "source": {
+        "source": "github",
+        "repo": "techygarg/lattice"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "lattice@lattice": true
+  },
+  "mcpServers": {
+    "Jujutsu": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": ["-y", "jj-mcp-server"],
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "GitHub": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "Backlog": {
+      "command": "{{shell_bin_path}}/backlog",
+      "args": ["mcp", "start"]
+    },
+    "Playwright": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+    {{#if opencode_profile_work}},
+    "GitLab": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "env": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
+        "GITLAB_API_URL": "{{gitlab_api_url}}",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+    {{#if mcp_atlassian_enabled}},
+    "Atlassian": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+    {{/if}}
+    {{#if mcp_sonarqube_enabled}}{{#if sonarqube_url}}{{#if sonarqube_token}},
+    "SonarQube": {
+      "command": "{{shell_bin_path}}/docker",
+      "args": [
+        "run", "--init", "--pull=always", "-i", "--rm",
+        "-e", "SONARQUBE_URL",
+        "-e", "SONARQUBE_TOKEN",
+        "mcp/sonarqube"
+      ],
+      "env": {
+        "DOCKER_CONTEXT": "desktop-linux",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
+        "SONARQUBE_URL": "{{sonarqube_url}}",
+        "SONARQUBE_TOKEN": "{{sonarqube_token}}"
+      }
+    }
+    {{/if}}{{/if}}{{/if}}
+    {{#if mcp_postman_enabled}}{{#if postman_api_key}},
+    "Postman": {
+      "url": "https://mcp.postman.com/mcp",
+      "headers": {
+        "Authorization": "Bearer {{postman_api_key}}"
+      }
+    }
+    {{/if}}{{/if}}
+    {{/if}},
+    "Chrome DevTools": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": ["-y", "chrome-devtools-mcp@latest", "--launch"],
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  }
+}

@@ -1,6 +1,86 @@
 #!/bin/sh
 set -eu
 
+# Symlink shared commands into OpenCode (dotter can't map one source to two targets,
+# so we point opencode at the already-deployed ~/.claude/commands/ symlinks)
+_oc_cmd="$HOME/.config/opencode/command"
+mkdir -p "$_oc_cmd"
+for _cmd in go.md fix-pipeline.md coderabbit-review.md; do
+  ln -sf "$HOME/.claude/commands/$_cmd" "$_oc_cmd/$_cmd"
+done
+unset _oc_cmd _cmd
+
+# Deploy skills to Claude Desktop
+# Use git to find dotfiles root reliably regardless of where dotter runs this script
+_dotfiles=$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null) || _dotfiles=""
+if [ -n "$_dotfiles" ]; then
+  _claude_app="$HOME/Library/Application Support/Claude"
+  _ops_file="$_claude_app/cowork-enabled-cli-ops.json"
+  if [ -f "$_ops_file" ] && command -v python3 >/dev/null 2>&1; then
+    _account_id=$(python3 -c "
+import json, sys
+try:
+    print(json.load(open('$_ops_file'))['ownerAccountId'])
+except Exception:
+    sys.exit(1)
+" 2>/dev/null) || _account_id=""
+    _plugin_dir="$_claude_app/local-agent-mode-sessions/skills-plugin"
+    _plugin_uuid=$(ls "$_plugin_dir" 2>/dev/null | head -1)
+
+    if [ -n "$_account_id" ] && [ -n "$_plugin_uuid" ]; then
+      _skills_base="$_plugin_dir/$_plugin_uuid/$_account_id"
+      _skills_dir="$_skills_base/skills"
+      _manifest="$_skills_base/manifest.json"
+      mkdir -p "$_skills_dir"
+      echo "Deploying Claude Desktop skills..."
+      for _sd in "$_dotfiles/claude-desktop/skills"/*/; do
+        [ -d "$_sd" ] || continue
+        _sname=$(basename "$_sd")
+        mkdir -p "$_skills_dir/$_sname"
+        cp "$_sd/SKILL.md" "$_skills_dir/$_sname/SKILL.md"
+        echo "  Copied skill: $_sname"
+      done
+      python3 - "$_manifest" "$_dotfiles/claude-desktop/skills" <<'PYEOF'
+import json, os, sys, datetime
+
+manifest_path, skills_root = sys.argv[1], sys.argv[2]
+with open(manifest_path) as f:
+    manifest = json.load(f)
+existing = {s['skillId'] for s in manifest['skills']}
+changed = False
+for skill_name in sorted(os.listdir(skills_root)):
+    skill_md = os.path.join(skills_root, skill_name, 'SKILL.md')
+    if not os.path.isfile(skill_md) or skill_name in existing:
+        continue
+    desc = skill_name
+    with open(skill_md) as f:
+        content = f.read()
+    if content.startswith('---'):
+        for line in content.split('\n')[1:]:
+            if line.startswith('---'):
+                break
+            if line.lower().startswith('description:'):
+                desc = line.split(':', 1)[1].strip().strip('"\'')
+    manifest['skills'].append({
+        'skillId': skill_name,
+        'name': skill_name,
+        'description': desc,
+        'creatorType': 'user',
+        'updatedAt': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z',
+        'enabled': True
+    })
+    manifest['lastUpdated'] = int(datetime.datetime.utcnow().timestamp() * 1000)
+    print(f'  Registered skill: {skill_name}')
+    changed = True
+if changed:
+    with open(manifest_path, 'w') as f:
+        json.dump(manifest, f, indent=2)
+PYEOF
+    fi
+  fi
+fi
+unset _dotfiles _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
+
 echo "==> Running post-deploy validation..."
 
 DEPLOYED="$HOME/.config"

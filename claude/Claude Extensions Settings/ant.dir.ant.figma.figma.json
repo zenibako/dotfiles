@@ -1,0 +1,1 @@
+{"isEnabled": {{#if opencode_profile_work}}true{{else}}false{{/if}}}
