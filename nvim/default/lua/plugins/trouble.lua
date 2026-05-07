@@ -6,9 +6,11 @@ vim.keymap.set("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<
 vim.keymap.set("n", "<leader>xu", function()
 	require("trouble").toggle({
 		mode = "diagnostics",
-		filter = { severity = vim.diagnostic.severity.HINT }
+		filter = function(diag)
+			return diag.message:lower():match("unused") ~= nil
+		end
 	})
-end, { desc = "Unused / Hints (Trouble)" })
+end, { desc = "Unused code (Trouble)" })
 vim.keymap.set("n", "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", { desc = "Symbols (Trouble)" })
 vim.keymap.set("n", "<leader>cl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", { desc = "LSP Definitions / references / ... (Trouble)" })
 vim.keymap.set("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" })
