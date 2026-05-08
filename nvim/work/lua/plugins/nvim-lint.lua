@@ -74,18 +74,11 @@ end
 lint.linters.pmd_apex = {
 	cmd = "pmd",
 	stdin = false,
-	args = {
-		"check",
-		"--format",
-		"json",
-		"--rulesets",
-		"", -- placeholder; resolved per-project before try_lint()
-		"--dir",
-		".",
-	},
+	args = {}, -- built dynamically per-buffer in the autocmd
 	stream = "stdout",
 	ignore_exitcode = true,
 	parser = parse_pmd_json,
+	timeout = 30000, -- 30s; PMD can be slow on first run
 }
 
 lint.linters_by_ft = {
@@ -110,17 +103,25 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Trigger linting on save, read, and filetype detection.
--- Set cwd to the buffer's directory so PMD only scans that folder.
+-- Build args dynamically per buffer so --dir points at the file's directory.
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "FileType" }, {
 	callback = function(args)
 		local ft = vim.bo[args.buf].filetype
 		if ft == "apex" and lint.linters_by_ft[ft] then
 			local bufname = vim.api.nvim_buf_get_name(args.buf)
 			if bufname ~= "" then
-				-- Narrow scan to the file's directory for speed
-				lint.linters.pmd_apex.cwd = vim.fn.fnamemodify(bufname, ":h")
+				local dir = vim.fn.fnamemodify(bufname, ":h")
+				local cache = vim.fn.stdpath("cache") .. "/pmd"
+				vim.fn.mkdir(cache, "p")
+
+				lint.linters.pmd_apex.args = {
+					"check",
+					"--format", "json",
+					"--rulesets", resolve_rulesets(args.buf),
+					"--dir", dir,
+					"--cache", cache,
+				}
 			end
-			lint.linters.pmd_apex.args[5] = resolve_rulesets(args.buf)
 			lint.try_lint()
 		end
 	end,
