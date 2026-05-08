@@ -1,7 +1,14 @@
 -- Auto-discover the Apex JAR from the VS Code Salesforce extension.
--- This is update-proof: it always picks the latest installed version.
+-- Override: set $NVIM_APEX_JAR_PATH to skip auto-discovery entirely.
 -- Debug: set $NVIM_APEX_JAR_DEBUG=1 to see discovery details.
 local function discover_apex_jar()
+	-- 1. Respect explicit override
+	local override = os.getenv("NVIM_APEX_JAR_PATH")
+	if override and override ~= "" then
+		return override
+	end
+
+	-- 2. Resolve home directory (multiple fallbacks)
 	local home = vim.uv.os_homedir() or os.getenv("HOME") or os.getenv("USERPROFILE")
 	if not home then
 		return nil
@@ -10,10 +17,16 @@ local function discover_apex_jar()
 	local ext_dir = home .. "/.vscode/extensions"
 	local debug = os.getenv("NVIM_APEX_JAR_DEBUG") == "1"
 
+	if debug then
+		vim.notify("Apex JAR: home=" .. home, vim.log.levels.DEBUG)
+		vim.notify("Apex JAR: scanning " .. ext_dir, vim.log.levels.DEBUG)
+	end
+
+	-- 3. Scan the extensions directory
 	local handle = vim.uv.fs_scandir(ext_dir)
 	if not handle then
 		if debug then
-			vim.notify("Apex JAR: cannot scan " .. ext_dir, vim.log.levels.DEBUG)
+			vim.notify("Apex JAR: cannot open " .. ext_dir, vim.log.levels.DEBUG)
 		end
 		return nil
 	end
@@ -30,7 +43,7 @@ local function discover_apex_jar()
 	end
 
 	if debug then
-		vim.notify("Apex JAR: found " .. tostring(#matches) .. " extension dirs", vim.log.levels.DEBUG)
+		vim.notify("Apex JAR: found " .. tostring(#matches) .. " dirs", vim.log.levels.DEBUG)
 		for _, m in ipairs(matches) do
 			vim.notify("Apex JAR:   - " .. m, vim.log.levels.DEBUG)
 		end
@@ -40,10 +53,11 @@ local function discover_apex_jar()
 		return nil
 	end
 
-	-- Sort to prefer the latest versioned directory
+	-- 4. Prefer the latest versioned directory
 	table.sort(matches)
 	local latest = matches[#matches]
 
+	-- 5. Check known JAR locations
 	local candidate_paths = {
 		latest .. "/dist/apex-jorje-lsp.jar",
 		latest .. "/out/apex-jorje-lsp.jar",
@@ -51,8 +65,10 @@ local function discover_apex_jar()
 	}
 
 	for _, p in ipairs(candidate_paths) do
-		local stat = vim.uv.fs_stat(p)
-		if stat and stat.type == "file" then
+		-- Use io.open as the most reliable existence check across platforms
+		local f = io.open(p, "r")
+		if f then
+			f:close()
 			if debug then
 				vim.notify("Apex JAR: found " .. p, vim.log.levels.DEBUG)
 			end
@@ -78,6 +94,7 @@ if not apex_jar_path then
 			vim.notify(
 				"Apex Language Server: apex-jorje-lsp.jar not found.\n"
 					.. "Searched: " .. searched .. "\n"
+					.. "Override: export NVIM_APEX_JAR_PATH=/path/to/apex-jorje-lsp.jar\n"
 					.. "Please install the Salesforce VS Code extension: salesforce.salesforcedx-vscode-apex",
 				vim.log.levels.WARN,
 				{ title = "Apex LSP" }
