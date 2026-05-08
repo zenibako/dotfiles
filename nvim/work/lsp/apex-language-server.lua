@@ -14,6 +14,7 @@ local function discover_apex_jar()
 	local latest = ext_dirs[#ext_dirs]
 
 	local candidate_paths = {
+		latest .. "/dist/apex-jorje-lsp.jar",
 		latest .. "/out/apex-jorje-lsp.jar",
 		latest .. "/apex-jorje-lsp.jar",
 	}
