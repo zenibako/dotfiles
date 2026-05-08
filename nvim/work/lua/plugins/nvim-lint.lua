@@ -22,6 +22,7 @@ end
 
 -- Parse PMD JSON output, filter to current-buffer violations only, and map
 -- PMD priority → vim diagnostic severity.
+-- NOTE: PMD JSON keys are lowercase: beginline, begincolumn, endline, endcolumn
 local function parse_pmd_json(output, bufnr, linter_cwd)
 	local ok, data = pcall(vim.json.decode, output)
 	if not ok or type(data) ~= "table" then
@@ -44,7 +45,7 @@ local function parse_pmd_json(output, bufnr, linter_cwd)
 
 	local diagnostics = {}
 	for _, file in ipairs(data.files or {}) do
-		local filepath = resolve_path(file.fileName)
+		local filepath = resolve_path(file.filename)
 		if filepath == bufpath then
 			for _, v in ipairs(file.violations or {}) do
 				local severity = vim.diagnostic.severity.HINT
@@ -57,9 +58,12 @@ local function parse_pmd_json(output, bufnr, linter_cwd)
 					severity = vim.diagnostic.severity.INFO
 				end
 
+				-- PMD JSON uses lowercase keys: beginline, begincolumn, etc.
 				table.insert(diagnostics, {
-					lnum = math.max(0, (v.beginLine or 1) - 1),
-					col = math.max(0, (v.beginColumn or 1) - 1),
+					lnum = math.max(0, (v.beginline or 1) - 1),
+					col = math.max(0, (v.begincolumn or 1) - 1),
+					end_lnum = (v.endline or v.beginline or 1) - 1,
+					end_col = (v.endcolumn or v.begincolumn or 1) - 1,
 					message = v.description or v.rule or "PMD violation",
 					severity = severity,
 					source = "pmd",
