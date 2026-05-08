@@ -4,61 +4,75 @@ vim.pack.add({
 
 local lint = require("lint")
 
--- Shared PMD parser for emacs-style output: file:line: message
-local function parse_pmd_output(output, severity)
+-- Resolve rulesets: prefer project-local apexRuleSets.xml.
+-- Falls back to built-in Apex categories when no project file exists.
+local function resolve_rulesets()
+	local bufname = vim.api.nvim_buf_get_name(0)
+	if bufname ~= "" then
+		local root = vim.fs.root(bufname, "sfdx-project.json")
+		if root then
+			local project_rulesets = root .. "/apexRuleSets.xml"
+			if vim.fn.filereadable(project_rulesets) == 1 then
+				return project_rulesets
+			end
+		end
+	end
+	return "category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml,category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml"
+end
+
+-- Parse PMD JSON output and map PMD priority → vim diagnostic severity.
+-- PMD priority: 1 = Highest → ERROR, 2 = High → WARN, 3 = Medium → INFO,
+--               4 = Low / 5 = Very Low → HINT
+local function parse_pmd_json(output, bufnr, linter_cwd)
+	local ok, data = pcall(vim.json.decode, output)
+	if not ok or type(data) ~= "table" or not data.processingErrors then
+		return {}
+	end
+
 	local diagnostics = {}
-	for line in output:gmatch("[^\r\n]+") do
-		local file, lnum, message = line:match("([^:]+):(%d+): (.+)")
-		if file and lnum and message then
+	for _, file in ipairs(data.files or {}) do
+		for _, v in ipairs(file.violations or {}) do
+			local severity = vim.diagnostic.severity.HINT
+			local priority = tonumber(v.priority)
+			if priority == 1 then
+				severity = vim.diagnostic.severity.ERROR
+			elseif priority == 2 then
+				severity = vim.diagnostic.severity.WARN
+			elseif priority == 3 then
+				severity = vim.diagnostic.severity.INFO
+			end
+
 			table.insert(diagnostics, {
-				lnum = tonumber(lnum) - 1,
-				col = 0,
-				message = message,
+				lnum = math.max(0, (v.beginLine or 1) - 1),
+				col = math.max(0, (v.beginColumn or 1) - 1),
+				message = v.description or v.rule or "PMD violation",
 				severity = severity,
 				source = "pmd",
+				code = v.rule,
 			})
 		end
 	end
 	return diagnostics
 end
 
--- Factory: build a PMD Apex linter with the given rulesets and severity.
-local function make_pmd_linter(name, rulesets, severity)
-	lint.linters[name] = {
-		cmd = "pmd",
-		stdin = false,
-		args = {
-			"check",
-			"--format",
-			"emacs",
-			"--rulesets",
-			rulesets,
-			"--dir",
-		},
-		stream = "stdout",
-		ignore_exitcode = true,
-		parser = function(output, bufnr, linter_cwd)
-			return parse_pmd_output(output, severity)
-		end,
-	}
-end
-
--- Core: critical rules shown as WARN (virtual_lines on current line).
-make_pmd_linter(
-	"pmd_apex_core",
-	"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml",
-	vim.diagnostic.severity.WARN
-)
-
--- Style: non-critical rules shown as HINT (subtle inline dots).
-make_pmd_linter(
-	"pmd_apex_style",
-	"category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml",
-	vim.diagnostic.severity.HINT
-)
+lint.linters.pmd_apex = {
+	cmd = "pmd",
+	stdin = false,
+	args = {
+		"check",
+		"--format",
+		"json",
+		"--rulesets",
+		"", -- placeholder; resolved per-project before try_lint()
+		"--dir",
+	},
+	stream = "stdout",
+	ignore_exitcode = true,
+	parser = parse_pmd_json,
+}
 
 lint.linters_by_ft = {
-	apex = { "pmd_apex_core", "pmd_apex_style" },
+	apex = { "pmd_apex" },
 }
 
 -- Warn once per session if PMD is not installed when opening an Apex file.
@@ -79,10 +93,12 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Trigger linting on save, read, and filetype detection.
+-- The rulesets placeholder is resolved per-project before each run.
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "FileType" }, {
 	callback = function(args)
 		local ft = vim.bo[args.buf].filetype
-		if lint.linters_by_ft[ft] then
+		if ft == "apex" and lint.linters_by_ft[ft] then
+			lint.linters.pmd_apex.args[5] = resolve_rulesets()
 			lint.try_lint()
 		end
 	end,
