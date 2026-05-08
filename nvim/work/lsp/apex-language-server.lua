@@ -13,10 +13,23 @@ local function discover_apex_jar()
 	return matches[#matches]
 end
 
+local apex_jar_path = discover_apex_jar()
+
+if not apex_jar_path then
+	vim.schedule(function()
+		vim.notify(
+			"Apex Language Server: apex-jorje-lsp.jar not found.\n"
+				.. "Please install the Salesforce VS Code extension: salesforce.salesforcedx-vscode-apex",
+			vim.log.levels.WARN,
+			{ title = "Apex LSP" }
+		)
+	end)
+end
+
 local config = {
 	filetypes = { "java", "trigger", "apex", "apexcode" },
 	root_markers = { "sfdx-project.json" },
-	apex_jar_path = discover_apex_jar(),
+	apex_jar_path = apex_jar_path,
 	apex_enable_semantic_errors = false, -- Disabled: PMD/SonarLint now provide Apex diagnostics
 	apex_enable_completion_statistics = true, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
 }

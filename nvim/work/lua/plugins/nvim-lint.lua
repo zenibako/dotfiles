@@ -46,6 +46,23 @@ lint.linters_by_ft = {
 	apex = { "pmd_apex" },
 }
 
+-- Warn once per session if PMD is not installed when opening an Apex file
+local pmd_warned = false
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "apex",
+	callback = function()
+		if not pmd_warned and vim.fn.executable("pmd") == 0 then
+			pmd_warned = true
+			vim.notify(
+				"PMD not found in PATH. Apex diagnostics will not work.\n"
+					.. "Install PMD, e.g. `brew install pmd`.",
+				vim.log.levels.WARN,
+				{ title = "nvim-lint (PMD)" }
+			)
+		end
+	end,
+})
+
 -- Trigger linting after saving or reading a buffer
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
 	callback = function()
