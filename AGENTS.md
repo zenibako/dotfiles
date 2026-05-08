@@ -7,9 +7,9 @@
 - **OpenCode plugins**: `cd ~/.config/opencode && npm install`
 
 ## CI/CD
-- **GitHub Actions** stored in `.github/workflows/`; **Gitea Actions** stored in `.gitea/workflows/`
-- `validate-dotter.yml` runs on both platforms (mirrored)
-- `opencode.yml` is GitHub-only and currently NOT portable to Gitea Actions due to GitHub-specific triggers, custom actions, and event payloads (`issue_comment`, `pull_request_review_comment`, `anomalyco/opencode/github@latest`)
+- **Gitea Actions** stored in `.gitea/workflows/`
+- `validate-dotter.yml` is present in `.gitea/workflows/` and runs on Gitea
+- `opencode.yml` is GitHub-only, not present in this repository, and currently NOT portable to Gitea Actions due to GitHub-specific triggers, custom actions, and event payloads (`issue_comment`, `pull_request_review_comment`, `anomalyco/opencode/github@latest`)
 
 ## E2E Testing
 When automating browsers or running end-to-end tests, use the `e2e-testing` skill:
