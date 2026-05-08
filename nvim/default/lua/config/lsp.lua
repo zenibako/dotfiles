@@ -47,10 +47,11 @@ end
 -- Declarative LSP setup (Neovim 0.11+).
 -- Server configs are auto-loaded from `lsp/<name>.lua` directories on the runtimepath.
 
--- Highlight unused variables/functions with a subtle strikethrough.
+-- Diagnostic display: compact inline dots on all lines, full multiline on current line only.
 vim.diagnostic.config({
 	underline = { severity = vim.diagnostic.severity.HINT },
 	virtual_text = { prefix = "●", spacing = 2 },
+	virtual_lines = { current_line = true },
 	update_in_insert = false,
 })
 

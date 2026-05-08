@@ -16,6 +16,3 @@ vim.keymap.set("i", "<S-Tab>", function()
 end, { expr = true })
 vim.o.pumborder = "rounded"
 
-vim.diagnostic.config({
-  virtual_lines = { current_line = true },
-})
