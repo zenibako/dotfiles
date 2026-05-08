@@ -6,8 +6,8 @@ local lint = require("lint")
 
 -- Resolve rulesets: prefer project-local apexRuleSets.xml.
 -- Falls back to built-in Apex categories when no project file exists.
-local function resolve_rulesets()
-	local bufname = vim.api.nvim_buf_get_name(0)
+local function resolve_rulesets(bufnr)
+	local bufname = vim.api.nvim_buf_get_name(bufnr)
 	if bufname ~= "" then
 		local root = vim.fs.root(bufname, "sfdx-project.json")
 		if root then
@@ -20,36 +20,52 @@ local function resolve_rulesets()
 	return "category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml,category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml"
 end
 
--- Parse PMD JSON output and map PMD priority → vim diagnostic severity.
--- PMD priority: 1 = Highest → ERROR, 2 = High → WARN, 3 = Medium → INFO,
---               4 = Low / 5 = Very Low → HINT
+-- Parse PMD JSON output, filter to current-buffer violations only, and map
+-- PMD priority → vim diagnostic severity.
 local function parse_pmd_json(output, bufnr, linter_cwd)
 	local ok, data = pcall(vim.json.decode, output)
 	if not ok or type(data) ~= "table" then
 		return {}
 	end
 
+	local bufname = vim.api.nvim_buf_get_name(bufnr)
+	local bufpath = vim.fn.fnamemodify(bufname, ":p")
+
+	local function resolve_path(name)
+		if not name or name == "" then
+			return ""
+		end
+		if vim.startswith(name, "/") then
+			return vim.fn.fnamemodify(name, ":p")
+		end
+		local base = linter_cwd or vim.fn.getcwd()
+		return vim.fn.fnamemodify(base .. "/" .. name, ":p")
+	end
+
 	local diagnostics = {}
 	for _, file in ipairs(data.files or {}) do
-		for _, v in ipairs(file.violations or {}) do
-			local severity = vim.diagnostic.severity.HINT
-			local priority = tonumber(v.priority)
-			if priority == 1 then
-				severity = vim.diagnostic.severity.ERROR
-			elseif priority == 2 then
-				severity = vim.diagnostic.severity.WARN
-			elseif priority == 3 then
-				severity = vim.diagnostic.severity.INFO
-			end
+		local filepath = resolve_path(file.fileName)
+		if filepath == bufpath then
+			for _, v in ipairs(file.violations or {}) do
+				local severity = vim.diagnostic.severity.HINT
+				local priority = tonumber(v.priority)
+				if priority == 1 then
+					severity = vim.diagnostic.severity.ERROR
+				elseif priority == 2 then
+					severity = vim.diagnostic.severity.WARN
+				elseif priority == 3 then
+					severity = vim.diagnostic.severity.INFO
+				end
 
-			table.insert(diagnostics, {
-				lnum = math.max(0, (v.beginLine or 1) - 1),
-				col = math.max(0, (v.beginColumn or 1) - 1),
-				message = v.description or v.rule or "PMD violation",
-				severity = severity,
-				source = "pmd",
-				code = v.rule,
-			})
+				table.insert(diagnostics, {
+					lnum = math.max(0, (v.beginLine or 1) - 1),
+					col = math.max(0, (v.beginColumn or 1) - 1),
+					message = v.description or v.rule or "PMD violation",
+					severity = severity,
+					source = "pmd",
+					code = v.rule,
+				})
+			end
 		end
 	end
 	return diagnostics
@@ -64,6 +80,8 @@ lint.linters.pmd_apex = {
 		"json",
 		"--rulesets",
 		"", -- placeholder; resolved per-project before try_lint()
+		"--dir",
+		".",
 	},
 	stream = "stdout",
 	ignore_exitcode = true,
@@ -92,12 +110,17 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Trigger linting on save, read, and filetype detection.
--- The rulesets placeholder is resolved per-project before each run.
+-- Set cwd to the buffer's directory so PMD only scans that folder.
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "FileType" }, {
 	callback = function(args)
 		local ft = vim.bo[args.buf].filetype
 		if ft == "apex" and lint.linters_by_ft[ft] then
-			lint.linters.pmd_apex.args[5] = resolve_rulesets()
+			local bufname = vim.api.nvim_buf_get_name(args.buf)
+			if bufname ~= "" then
+				-- Narrow scan to the file's directory for speed
+				lint.linters.pmd_apex.cwd = vim.fn.fnamemodify(bufname, ":h")
+			end
+			lint.linters.pmd_apex.args[5] = resolve_rulesets(args.buf)
 			lint.try_lint()
 		end
 	end,
