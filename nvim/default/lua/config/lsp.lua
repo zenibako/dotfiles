@@ -57,12 +57,7 @@ vim.diagnostic.config({
 			return ""
 		end,
 	},
-	virtual_lines = {
-		current_line = true,
-		format = function(diagnostic)
-			return diagnostic.message
-		end,
-	},
+	virtual_lines = true,
 	update_in_insert = false,
 })
 
