@@ -13,11 +13,14 @@ local function resolve_rulesets(bufnr)
 		if root then
 			local project_rulesets = root .. "/apexRuleSets.xml"
 			if vim.fn.filereadable(project_rulesets) == 1 then
-				return project_rulesets
+				-- Use project rulesets in addition to built-in categories for consistent coverage
+				return project_rulesets .. ",category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml,category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml"
 			end
 		end
 	end
-	return "category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml,category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml"
+	-- Fallback: always include all built-in categories plus project file if present
+	local fallback = "category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml,category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml"
+	return fallback
 end
 
 -- Parse PMD JSON output, filter to current-buffer violations only, and map
