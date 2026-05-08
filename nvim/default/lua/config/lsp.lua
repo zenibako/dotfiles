@@ -47,46 +47,15 @@ end
 -- Declarative LSP setup (Neovim 0.11+).
 -- Server configs are auto-loaded from `lsp/<name>.lua` directories on the runtimepath.
 
--- Diagnostic display: full multiline on current line, compact dots elsewhere.
--- Neovim 0.12+ does not support `current_line` for virtual_text, so we use
--- a CursorMoved autocmd to toggle virtual_text off when the cursor is on a
--- line with diagnostics, letting virtual_lines render everything inline.
-local ns = vim.api.nvim_create_namespace("diagnostic_toggle")
-
+-- Diagnostic display: full inline messages on current line only.
+-- virtual_lines renders ALL diagnostics for the current line as inline text.
+-- signs (gutter indicators) replace virtual_text to avoid visual doubling.
 vim.diagnostic.config({
 	underline = { severity = vim.diagnostic.severity.HINT },
-	virtual_text = { prefix = "●", spacing = 2 },
-	virtual_lines = { current_line = true },
+	virtual_text = false, -- Disabled: virtual_lines handles current line
+	virtual_lines = { current_line = true }, -- Full multiline on current line
+	signs = true, -- Gutter indicators on all lines with diagnostics
 	update_in_insert = false,
-})
-
--- Track lines with diagnostics per buffer
-local diag_lines = {}
-
-vim.api.nvim_create_autocmd({ "DiagnosticChanged", "BufEnter" }, {
-	callback = function(args)
-		local bufnr = args.buf
-		diag_lines[bufnr] = {}
-		for _, d in ipairs(vim.diagnostic.get(bufnr)) do
-			diag_lines[bufnr][d.lnum] = true
-		end
-	end,
-})
-
-vim.api.nvim_create_autocmd("CursorMoved", {
-	callback = function()
-		local bufnr = vim.api.nvim_get_current_buf()
-		local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
-		local has_diag = diag_lines[bufnr] and diag_lines[bufnr][lnum] or false
-
-		if has_diag then
-			-- Hide virtual_text on current line; virtual_lines takes over
-			vim.diagnostic.config({ virtual_text = false })
-		else
-			-- Show virtual_text on lines without diagnostics
-			vim.diagnostic.config({ virtual_text = { prefix = "●", spacing = 2 } })
-		end
-	end,
 })
 
 vim.lsp.enable({
