@@ -50,8 +50,19 @@ end
 -- Highlight unused variables/functions with a subtle strikethrough.
 vim.diagnostic.config({
 	underline = { severity = vim.diagnostic.severity.HINT },
-	virtual_text = { prefix = "●", spacing = 2 },
-	virtual_lines = { current_line = true },
+	virtual_text = {
+		prefix = "●",
+		spacing = 2,
+		format = function()
+			return ""
+		end,
+	},
+	virtual_lines = {
+		current_line = true,
+		format = function(diagnostic)
+			return diagnostic.message
+		end,
+	},
 	update_in_insert = false,
 })
 
