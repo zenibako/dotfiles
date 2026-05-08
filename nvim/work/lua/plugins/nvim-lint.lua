@@ -25,7 +25,7 @@ end
 --               4 = Low / 5 = Very Low → HINT
 local function parse_pmd_json(output, bufnr, linter_cwd)
 	local ok, data = pcall(vim.json.decode, output)
-	if not ok or type(data) ~= "table" or not data.processingErrors then
+	if not ok or type(data) ~= "table" then
 		return {}
 	end
 
@@ -64,7 +64,6 @@ lint.linters.pmd_apex = {
 		"json",
 		"--rulesets",
 		"", -- placeholder; resolved per-project before try_lint()
-		"--dir",
 	},
 	stream = "stdout",
 	ignore_exitcode = true,
