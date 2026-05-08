@@ -6,20 +6,20 @@ local lint = require("lint")
 
 -- Custom PMD linter definition for Apex.
 -- Requires `pmd` to be installed and available in $PATH (e.g. `brew install pmd`).
+-- Note: args must be a TABLE (not a function) for compatibility with the
+-- nvim-lint version distributed by vim.pack.add. The filename is appended
+-- automatically by nvim-lint after the `--dir` flag.
 lint.linters.pmd_apex = {
 	cmd = "pmd",
 	stdin = false,
-	args = function()
-		return {
-			"check",
-			"--format",
-			"emacs",
-			"--rulesets",
-			"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/security.xml,category/apex/bestpractices.xml",
-			"--dir",
-			vim.fn.expand("%:p"),
-		}
-	end,
+	args = {
+		"check",
+		"--format",
+		"emacs",
+		"--rulesets",
+		"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/security.xml,category/apex/bestpractices.xml",
+		"--dir",
+	},
 	stream = "stdout",
 	ignore_exitcode = true,
 	parser = function(output, bufnr, linter_cwd)
