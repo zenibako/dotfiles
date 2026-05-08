@@ -1,17 +1,32 @@
 -- Auto-discover the Apex JAR from the VS Code Salesforce extension.
 -- This is update-proof: it always picks the latest installed version.
+-- Debug: set $NVIM_APEX_JAR_DEBUG=1 to see discovery details.
 local function discover_apex_jar()
-	local ext_dirs = vim.fn.glob(
-		vim.fn.expand("~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*"),
-		false,
-		true
-	)
+	local home = vim.uv.os_homedir() or os.getenv("HOME") or os.getenv("USERPROFILE")
+	if not home then
+		return nil
+	end
+
+	local ext_path = home .. "/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*"
+	local ext_dirs = vim.fn.glob(ext_path, false, true)
+
+	local debug = os.getenv("NVIM_APEX_JAR_DEBUG") == "1"
+	if debug then
+		vim.notify("Apex JAR discovery: searching " .. ext_path, vim.log.levels.DEBUG)
+		vim.notify("Apex JAR discovery: found " .. tostring(#(ext_dirs or {})) .. " extension dirs", vim.log.levels.DEBUG)
+	end
+
 	if not ext_dirs or #ext_dirs == 0 then
 		return nil
 	end
+
 	-- Sort to prefer the latest versioned directory
 	table.sort(ext_dirs)
 	local latest = ext_dirs[#ext_dirs]
+
+	if debug then
+		vim.notify("Apex JAR discovery: latest dir = " .. latest, vim.log.levels.DEBUG)
+	end
 
 	local candidate_paths = {
 		latest .. "/dist/apex-jorje-lsp.jar",
@@ -21,7 +36,12 @@ local function discover_apex_jar()
 
 	for _, p in ipairs(candidate_paths) do
 		if vim.fn.filereadable(p) == 1 then
+			if debug then
+				vim.notify("Apex JAR discovery: found " .. p, vim.log.levels.DEBUG)
+			end
 			return p
+		elseif debug then
+			vim.notify("Apex JAR discovery: not found at " .. p, vim.log.levels.DEBUG)
 		end
 	end
 
@@ -36,8 +56,11 @@ if not apex_jar_path then
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = { "apex", "java", "trigger", "apexcode" },
 		callback = function()
+			local home = vim.uv.os_homedir() or os.getenv("HOME") or os.getenv("USERPROFILE")
+			local searched = home and (home .. "/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/{dist,out}/apex-jorje-lsp.jar") or "~/.vscode/extensions/..."
 			vim.notify(
 				"Apex Language Server: apex-jorje-lsp.jar not found.\n"
+					.. "Searched: " .. searched .. "\n"
 					.. "Please install the Salesforce VS Code extension: salesforce.salesforcedx-vscode-apex",
 				vim.log.levels.WARN,
 				{ title = "Apex LSP" }
