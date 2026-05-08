@@ -7,26 +7,42 @@ local function discover_apex_jar()
 		return nil
 	end
 
-	local ext_path = home .. "/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*"
-	local ext_dirs = vim.fn.glob(ext_path, false, true)
-
+	local ext_dir = home .. "/.vscode/extensions"
 	local debug = os.getenv("NVIM_APEX_JAR_DEBUG") == "1"
-	if debug then
-		vim.notify("Apex JAR discovery: searching " .. ext_path, vim.log.levels.DEBUG)
-		vim.notify("Apex JAR discovery: found " .. tostring(#(ext_dirs or {})) .. " extension dirs", vim.log.levels.DEBUG)
+
+	local handle = vim.uv.fs_scandir(ext_dir)
+	if not handle then
+		if debug then
+			vim.notify("Apex JAR: cannot scan " .. ext_dir, vim.log.levels.DEBUG)
+		end
+		return nil
 	end
 
-	if not ext_dirs or #ext_dirs == 0 then
+	local matches = {}
+	while true do
+		local name, typ = vim.uv.fs_scandir_next(handle)
+		if not name then
+			break
+		end
+		if typ == "directory" and name:match("^salesforce%.salesforcedx%-vscode%-apex%-") then
+			table.insert(matches, ext_dir .. "/" .. name)
+		end
+	end
+
+	if debug then
+		vim.notify("Apex JAR: found " .. tostring(#matches) .. " extension dirs", vim.log.levels.DEBUG)
+		for _, m in ipairs(matches) do
+			vim.notify("Apex JAR:   - " .. m, vim.log.levels.DEBUG)
+		end
+	end
+
+	if #matches == 0 then
 		return nil
 	end
 
 	-- Sort to prefer the latest versioned directory
-	table.sort(ext_dirs)
-	local latest = ext_dirs[#ext_dirs]
-
-	if debug then
-		vim.notify("Apex JAR discovery: latest dir = " .. latest, vim.log.levels.DEBUG)
-	end
+	table.sort(matches)
+	local latest = matches[#matches]
 
 	local candidate_paths = {
 		latest .. "/dist/apex-jorje-lsp.jar",
@@ -35,13 +51,14 @@ local function discover_apex_jar()
 	}
 
 	for _, p in ipairs(candidate_paths) do
-		if vim.fn.filereadable(p) == 1 then
+		local stat = vim.uv.fs_stat(p)
+		if stat and stat.type == "file" then
 			if debug then
-				vim.notify("Apex JAR discovery: found " .. p, vim.log.levels.DEBUG)
+				vim.notify("Apex JAR: found " .. p, vim.log.levels.DEBUG)
 			end
 			return p
 		elseif debug then
-			vim.notify("Apex JAR discovery: not found at " .. p, vim.log.levels.DEBUG)
+			vim.notify("Apex JAR: not found at " .. p, vim.log.levels.DEBUG)
 		end
 	end
 
