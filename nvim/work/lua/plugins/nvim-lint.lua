@@ -60,11 +60,13 @@ local function parse_pmd_json(output, bufnr, linter_cwd)
 					severity = vim.diagnostic.severity.INFO
 				end
 
-				-- PMD JSON uses lowercase keys: beginline, begincolumn, etc.
+				-- Make diagnostics single-line so virtual_lines renders at the
+				-- start line (Neovim places virtual_lines at end_lnum).
+				local lnum = math.max(0, (v.beginline or 1) - 1)
 				table.insert(diagnostics, {
-					lnum = math.max(0, (v.beginline or 1) - 1),
+					lnum = lnum,
 					col = math.max(0, (v.begincolumn or 1) - 1),
-					end_lnum = (v.endline or v.beginline or 1) - 1,
+					end_lnum = lnum,
 					end_col = (v.endcolumn or v.begincolumn or 1) - 1,
 					message = v.description or v.rule or "PMD violation",
 					severity = severity,
