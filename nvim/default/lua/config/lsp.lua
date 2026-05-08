@@ -47,14 +47,11 @@ end
 -- Declarative LSP setup (Neovim 0.11+).
 -- Server configs are auto-loaded from `lsp/<name>.lua` directories on the runtimepath.
 
--- Diagnostic display: full inline messages on current line only.
--- virtual_lines renders ALL diagnostics for the current line as inline text.
--- signs (gutter indicators) replace virtual_text to avoid visual doubling.
+-- Highlight unused variables/functions with a subtle strikethrough.
 vim.diagnostic.config({
 	underline = { severity = vim.diagnostic.severity.HINT },
-	virtual_text = false, -- Disabled: virtual_lines handles current line
-	virtual_lines = { current_line = true }, -- Full multiline on current line
-	signs = true, -- Gutter indicators on all lines with diagnostics
+	virtual_text = { prefix = "●", spacing = 2 },
+	virtual_lines = { current_line = true },
 	update_in_insert = false,
 })
 
