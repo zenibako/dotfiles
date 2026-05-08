@@ -17,7 +17,7 @@ lint.linters.pmd_apex = {
 		"--format",
 		"emacs",
 		"--rulesets",
-		"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/security.xml,category/apex/bestpractices.xml",
+		"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml",
 		"--dir",
 	},
 	stream = "stdout",
