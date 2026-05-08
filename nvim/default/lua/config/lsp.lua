@@ -47,10 +47,18 @@ end
 -- Declarative LSP setup (Neovim 0.11+).
 -- Server configs are auto-loaded from `lsp/<name>.lua` directories on the runtimepath.
 
--- Diagnostic display: compact inline dots on all lines, full multiline on current line only.
+-- Diagnostic display: full multiline on current line, compact dots on other lines.
+-- virtual_lines renders ALL diagnostics for the current line as inline text.
+-- virtual_text only shows on non-current lines to avoid visual clash.
 vim.diagnostic.config({
 	underline = { severity = vim.diagnostic.severity.HINT },
-	virtual_text = { prefix = "●", spacing = 2 },
+	virtual_text = {
+		prefix = "●",
+		spacing = 2,
+		-- Disable virtual_text on the current line so virtual_lines can
+		-- render all diagnostics inline without overlapping dots.
+		current_line = false,
+	},
 	virtual_lines = { current_line = true },
 	update_in_insert = false,
 })
