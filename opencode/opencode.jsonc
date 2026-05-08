@@ -235,11 +235,9 @@
     "apex-language-server": {
       "command": [
         "java",
-        "-cp",
-        "{{apex_lsp_jar_path}}",
         "-Ddebug.internal.errors=true",
-        "-Ddebug.semantic.errors=true",
-        "-Ddebug.completion.statistics=false",
+        "-Ddebug.semantic.errors={{#if apex_enable_semantic_errors}}true{{else}}false{{/if}}",
+        "-Ddebug.completion.statistics={{#if apex_enable_completion_statistics}}true{{else}}false{{/if}}",
         "-Dlwc.typegeneration.disabled=true",
         "apex.jorje.lsp.ApexLanguageServerLauncher"
       ],

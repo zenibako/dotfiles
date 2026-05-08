@@ -125,6 +125,7 @@ Do not disable signing or bypass it. If signing fails, troubleshoot the GPG agen
 - Always suggest descriptive commit messages following conventional commits format
 - Use `jj status` and `jj diff` to understand the current state before suggesting actions
 - Use `jj log` to understand recent history and branch structure
+- **Prefer `--git` format option:** When using `jj` commands that display output (e.g., `jj log`, `jj show`, `jj diff`, `jj status`), always pass `--git` to produce Git-compatible output. This ensures consistency with Git tooling and avoids confusing non-jj-native formats. Example: `jj log --git`, `jj diff --git`, `jj show --git`.
 
 ## Commit Attribution (Co-authored-by)
 

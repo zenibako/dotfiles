@@ -1,9 +1,24 @@
+-- Auto-discover the Apex JAR from the VS Code Salesforce extension.
+-- This is update-proof: it always picks the latest installed version.
+local function discover_apex_jar()
+	local matches = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/out/apex-jorje-lsp.jar"), false, true)
+	if not matches or #matches == 0 then
+		matches = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/apex-jorje-lsp.jar"), false, true)
+	end
+	if not matches or #matches == 0 then
+		return nil
+	end
+	-- Sort to prefer the latest versioned directory
+	table.sort(matches)
+	return matches[#matches]
+end
+
 local config = {
-  filetypes = { "java", "trigger", "apex", "apexcode" },
-  root_markers = { "sfdx-project.json" },
-  apex_jar_path = vim.fn.expand("{{apex_lsp_jar_path}}"),
-  apex_enable_semantic_errors = true, -- Whether to allow Apex Language Server to surface semantic errors
-  apex_enable_completion_statistics = true, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
+	filetypes = { "java", "trigger", "apex", "apexcode" },
+	root_markers = { "sfdx-project.json" },
+	apex_jar_path = discover_apex_jar(),
+	apex_enable_semantic_errors = false, -- Disabled: PMD/SonarLint now provide Apex diagnostics
+	apex_enable_completion_statistics = true, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
 }
 
 if not config.cmd and config.apex_jar_path then

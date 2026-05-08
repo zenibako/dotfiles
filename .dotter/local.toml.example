@@ -36,7 +36,6 @@ gpg_key = ""
 
 # Profile-specific overrides:
 # For 'work' profile, uncomment and set these:
-# apex_lsp_jar_path = "/path/to/apex-jorje-lsp.jar"
 # mcp_atlassian_enabled = true
 # opencode_build_agent_model = "openai/gpt-5.4"
 # opencode_plan_agent_model = "openai/gpt-5.4"

@@ -4,7 +4,7 @@ local sonarlint_jar = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/sonarsourc
 
 if sonarlint_jar ~= "" then
 	vim.pack.add({
-		"https://github.com/schrieveslaach/sonarlint.nvim",
+		"https://gitlab.com/schrieveslaach/sonarlint.nvim",
 	})
 
 	require("sonarlint").setup({
