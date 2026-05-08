@@ -4,79 +4,64 @@ vim.pack.add({
 
 local lint = require("lint")
 
--- Core PMD linter for Apex (critical rules: errors, performance, security, best practices)
--- Shown as WARN so they appear in virtual_lines on the current line.
-lint.linters.pmd_apex_core = {
-	cmd = "pmd",
-	stdin = false,
-	args = {
-		"check",
-		"--format",
-		"emacs",
-		"--rulesets",
-		"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml",
-		"--dir",
-	},
-	stream = "stdout",
-	ignore_exitcode = true,
-	parser = function(output, bufnr, linter_cwd)
-		local diagnostics = {}
-		local pattern = "([^:]+):(%d+): (.+)"
-		for line in output:gmatch("[^\r\n]+") do
-			local file, lnum, message = line:match(pattern)
-			if file and lnum and message then
-				table.insert(diagnostics, {
-					lnum = tonumber(lnum) - 1,
-					col = 0,
-					message = message,
-					severity = vim.diagnostic.severity.WARN,
-					source = "pmd",
-				})
-			end
+-- Shared PMD parser for emacs-style output: file:line: message
+local function parse_pmd_output(output, severity)
+	local diagnostics = {}
+	for line in output:gmatch("[^\r\n]+") do
+		local file, lnum, message = line:match("([^:]+):(%d+): (.+)")
+		if file and lnum and message then
+			table.insert(diagnostics, {
+				lnum = tonumber(lnum) - 1,
+				col = 0,
+				message = message,
+				severity = severity,
+				source = "pmd",
+			})
 		end
-		return diagnostics
-	end,
-}
+	end
+	return diagnostics
+end
 
--- Style PMD linter for Apex (code style, design, documentation)
--- Shown as HINT so they appear less prominently.
-lint.linters.pmd_apex_style = {
-	cmd = "pmd",
-	stdin = false,
-	args = {
-		"check",
-		"--format",
-		"emacs",
-		"--rulesets",
-		"category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml",
-		"--dir",
-	},
-	stream = "stdout",
-	ignore_exitcode = true,
-	parser = function(output, bufnr, linter_cwd)
-		local diagnostics = {}
-		local pattern = "([^:]+):(%d+): (.+)"
-		for line in output:gmatch("[^\r\n]+") do
-			local file, lnum, message = line:match(pattern)
-			if file and lnum and message then
-				table.insert(diagnostics, {
-					lnum = tonumber(lnum) - 1,
-					col = 0,
-					message = message,
-					severity = vim.diagnostic.severity.HINT,
-					source = "pmd",
-				})
-			end
-		end
-		return diagnostics
-	end,
-}
+-- Factory: build a PMD Apex linter with the given rulesets and severity.
+local function make_pmd_linter(name, rulesets, severity)
+	lint.linters[name] = {
+		cmd = "pmd",
+		stdin = false,
+		args = {
+			"check",
+			"--format",
+			"emacs",
+			"--rulesets",
+			rulesets,
+			"--dir",
+		},
+		stream = "stdout",
+		ignore_exitcode = true,
+		parser = function(output, bufnr, linter_cwd)
+			return parse_pmd_output(output, severity)
+		end,
+	}
+end
+
+-- Core: critical rules shown as WARN (virtual_lines on current line).
+make_pmd_linter(
+	"pmd_apex_core",
+	"category/apex/errorprone.xml,category/apex/performance.xml,category/apex/bestpractices.xml,category/apex/security.xml",
+	vim.diagnostic.severity.WARN
+)
+
+-- Style: non-critical rules shown as HINT (subtle inline dots).
+make_pmd_linter(
+	"pmd_apex_style",
+	"category/apex/codestyle.xml,category/apex/design.xml,category/apex/documentation.xml",
+	vim.diagnostic.severity.HINT
+)
 
 lint.linters_by_ft = {
 	apex = { "pmd_apex_core", "pmd_apex_style" },
 }
 
--- Warn once per session if PMD is not installed when opening an Apex file
+-- Warn once per session if PMD is not installed when opening an Apex file.
 local pmd_warned = false
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "apex",
@@ -93,7 +78,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Trigger linting on save, read, and filetype detection
+-- Trigger linting on save, read, and filetype detection.
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "FileType" }, {
 	callback = function(args)
 		local ft = vim.bo[args.buf].filetype
