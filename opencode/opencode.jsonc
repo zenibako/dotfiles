@@ -15,6 +15,12 @@
   "plugin": [
     "opencode-cmux"
   ],
+  "permission": {
+    "external_directory": {
+      "/tmp/**": "allow",
+      "/private/tmp/**": "allow"
+    }
+  },
   "mcp": {
     "Jujutsu": {
       "type": "local",
@@ -274,6 +280,93 @@
       "disabled": false
     },
 {{/if}}
+    "basedpyright": {
+      "command": [
+        "basedpyright-langserver",
+        "--stdio"
+      ],
+      "extensions": [
+        ".py"
+      ]
+    },
+    "gopls": {
+      "command": [
+        "gopls"
+      ],
+      "extensions": [
+        ".go"
+      ]
+    },
+    "html": {
+      "command": [
+        "vscode-html-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".html",
+        ".templ"
+      ]
+    },
+    "jsonls": {
+      "command": [
+        "vscode-json-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".json",
+        ".jsonc"
+      ]
+    },
+    "lua_ls": {
+      "command": [
+        "lua-language-server"
+      ],
+      "extensions": [
+        ".lua"
+      ]
+    },
+{{#if opencode_profile_work}}
+    "gitlab-ci-ls": {
+      "command": [
+        "gitlab-ci-ls"
+      ],
+      "extensions": [
+        ".gitlab-ci.yml",
+        ".gitlab-ci.yaml"
+      ]
+    },
+    "terraform-ls": {
+      "command": [
+        "terraform-ls",
+        "serve"
+      ],
+      "extensions": [
+        ".tf",
+        ".tfvars",
+        ".hcl"
+      ]
+    },
+{{/if}}
+    "yamlls": {
+      "command": [
+        "yaml-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".yml",
+        ".yaml"
+      ]
+    },
+{{#if opencode_profile_personal}}
+    "jinja-lsp": {
+      "command": [
+        "jinja-lsp"
+      ],
+      "extensions": [
+        ".jinja",
+        ".jinja2"
+      ]
+    },
     "sourcekit-lsp": {
       "command": [
         "sourcekit-lsp"
@@ -282,6 +375,7 @@
         ".swift"
       ]
     },
+{{/if}}
     "cue": {
       "command": [
         "cue",

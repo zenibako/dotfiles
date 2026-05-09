@@ -101,8 +101,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install TOML validator
-        run: pip install --break-system-packages toml
+      - name: Install syntax validators
+        run: pip install --break-system-packages toml jsonschema
 
       - name: Validate TOML files
         run: scripts/dotter-ci/validate-toml.sh
@@ -126,10 +126,18 @@ jobs:
             echo "✓ $profile profile deploys successfully"
           done
 
-      - name: Deploy with dotter (for Lua validation)
+      - name: Deploy with dotter
         run: |
           scripts/dotter-ci/create-local-toml.sh --force default monokai .dotter/local.toml
           dotter deploy --force --verbose --noconfirm
+
+      - name: Validate OpenCode config against schema
+        run: |
+          python3 .dotter/scripts/validate_jsonc_schema.py "$HOME/.config/opencode/opencode.jsonc" || {
+            echo "WARNING: Schema validation failed or schema unreachable"
+            # Don't fail CI if network/schema is unreachable
+            python3 .dotter/scripts/validate_jsonc.py "$HOME/.config/opencode/opencode.jsonc"
+          }
 
       - name: Validate Lua files
         run: |

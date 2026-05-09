@@ -56,20 +56,28 @@ DEPLOYED="$HOME/.config"
 # --- OpenCode JSONC validation ---
 if [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
   echo "Validating OpenCode config..."
-  if command -v json5 >/dev/null 2>&1; then
+  if command -v python3 >/dev/null 2>&1; then
+    # Schema validation (requires jsonschema + network)
+    if python3 -c "import jsonschema" 2>/dev/null; then
+      if python3 "$_scripts/validate_jsonc_schema.py" "$DEPLOYED/opencode/opencode.jsonc"; then
+        echo "  OpenCode schema validation OK"
+      fi
+      # Falls through to basic JSONC validation on schema failure
+    fi
+    # Always run basic JSONC syntax parsing
+    if ! python3 "$_scripts/validate_jsonc.py" "$DEPLOYED/opencode/opencode.jsonc"; then
+      echo "ERROR: OpenCode config JSONC syntax validation failed" >&2
+      exit 1
+    fi
+    echo "  OpenCode config syntax OK"
+  elif command -v json5 >/dev/null 2>&1; then
     if ! json5 -v "$DEPLOYED/opencode/opencode.jsonc" >/dev/null 2>&1; then
       echo "ERROR: OpenCode config validation failed (json5)" >&2
       exit 1
     fi
     echo "  OpenCode config OK (json5)"
-  elif command -v python3 >/dev/null 2>&1; then
-    if ! python3 "$_scripts/validate_jsonc.py" "$DEPLOYED/opencode/opencode.jsonc"; then
-      echo "ERROR: OpenCode config validation failed" >&2
-      exit 1
-    fi
-    echo "  OpenCode config OK"
   else
-    echo "  Skipping OpenCode validation (no json5 or python3 available)"
+    echo "  Skipping OpenCode validation (no python3 or json5 available)"
   fi
 fi
 
