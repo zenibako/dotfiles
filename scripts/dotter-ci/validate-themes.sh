@@ -40,7 +40,7 @@ for theme in "${THEMES[@]}"; do
   mkdir -p "$DEPLOY_DIR"
   cp -r "$REPO_DIR/"* "$DEPLOY_DIR/"
   cp -r "$REPO_DIR/.dotter" "$DEPLOY_DIR/"
-  rm -rf "$DEPLOY_DIR/.git" "$DEPLOY_DIR/.dotter/cache.toml"
+  rm -rf "$DEPLOY_DIR/.git" "$DEPLOY_DIR/.dotter/cache" "$DEPLOY_DIR/.dotter/cache.toml"
   
   # Write local.toml in the copied repo
   cat > "$DEPLOY_DIR/.dotter/local.toml" <<EOF
@@ -54,7 +54,8 @@ shell_bin_path = "\$HOME/bin"
 username = "test.user"
 gpg_key = ""
 EOF
-  
+
+  # Run dotter from the copied repo so post_deploy.sh can resolve scripts/
   pushd "$DEPLOY_DIR" > /dev/null
   if HOME="$DEPLOY_DIR" dotter deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
     echo "✓ Theme $theme deployed successfully"

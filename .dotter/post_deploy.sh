@@ -4,6 +4,13 @@ set -eu
 # Resolve dotfiles root from the git repo containing this script.
 # dotter runs post_deploy.sh from .dotter/cache/, so we use git to find the root.
 _dotfiles=$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null) || _dotfiles=""
+
+# Fallback: in CI the repo may be copied without .git; dotter runs from the repo
+# root so the current working directory is the correct dotfiles root.
+if [ -z "$_dotfiles" ]; then
+  _dotfiles=$(pwd)
+fi
+
 _scripts="$_dotfiles/.dotter/scripts"
 
 # Symlink shared commands into OpenCode (dotter can't map one source to two targets,
