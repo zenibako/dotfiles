@@ -37,12 +37,26 @@ let backlog_external_completer = if ((scope commands | where name == "backlog-co
 } else {
     null
 }
-if ($acli_external_completer != null) or ($backlog_external_completer != null) {
+let pixlet_external_completer = if ((scope commands | where name == "pixlet-completer") | is-not-empty) {
+    {|spans| pixlet-completer $spans }
+} else {
+    null
+}
+let opencode_external_completer = if ((scope commands | where name == "opencode-completer") | is-not-empty) {
+    {|spans| opencode-completer $spans }
+} else {
+    null
+}
+if ($acli_external_completer != null) or ($backlog_external_completer != null) or ($pixlet_external_completer != null) or ($opencode_external_completer != null) {
     $env.config.completions.external.completer = {|spans|
         if ($spans | is-not-empty) and ($spans.0 == "acli") and ($acli_external_completer != null) {
             do $acli_external_completer $spans
         } else if ($spans | is-not-empty) and ($spans.0 == "backlog") and ($backlog_external_completer != null) {
             do $backlog_external_completer $spans
+        } else if ($spans | is-not-empty) and ($spans.0 == "pixlet") and ($pixlet_external_completer != null) {
+            do $pixlet_external_completer $spans
+        } else if ($spans | is-not-empty) and ($spans.0 == "opencode") and ($opencode_external_completer != null) {
+            do $opencode_external_completer $spans
         } else if $existing_external_completer != null {
             do $existing_external_completer $spans
         } else {

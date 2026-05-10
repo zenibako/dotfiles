@@ -40,15 +40,11 @@ nu = ""   # no native completion support
 
 [dotter]
 zsh = "dotter gen-completions --shell zsh"
-nu = ""  # via carapace bridge (zsh)
+nu = "open ~/.config/nushell/completions/dotter.nu --raw"
 
-[gog]
-zsh = "gog completion zsh"
-nu = ""  # via carapace bridge (zsh)
-
-[ha]
-zsh = "ha completion zsh"
-nu = ""  # via carapace
+[pixlet]
+zsh = "pixlet completion zsh"
+nu = "open ~/.config/nushell/completions/pixlet.nu --raw"
 
 [jj]
 zsh = "jj util completion zsh"
@@ -61,15 +57,11 @@ nu = ""  # via carapace bridge (zsh)
 
 [opencode]
 zsh = "opencode completion zsh"
-nu = ""  # via carapace spec (carapace/specs/opencode.yaml)
+nu = "open ~/.config/nushell/completions/opencode.nu --raw"
 
 [openclaw]
 zsh = "cat ~/.openclaw/completions/openclaw.zsh"
 nu = ""  # via carapace bridge (zsh)
-
-[pixlet]
-zsh = "pixlet completion zsh"
-nu = ""  # via carapace
 
 [pnpm]
 zsh = "pnpm completion zsh"
