@@ -1,22 +1,31 @@
 #!/bin/bash
 # Generate local.toml for a specific profile
-# Usage: create-local-toml.sh [--force] <profile> [theme] [output-file]
+# Usage: create-local-toml.sh [--force] [--ci] <profile> [theme] [output-file]
 # Example: create-local-toml.sh work monokai /tmp/local.toml
+#
+# Safety: refuses to overwrite an existing output file unless --force is passed.
+#         refuses to write to the repository's real .dotter/local.toml unless
+#         --ci (or CI env var) is set, to prevent test data from overwriting
+#         real secrets.
 
 set -e
 
 FORCE=0
+CI_MODE=0
 
 usage() {
   cat <<'EOF'
-Usage: create-local-toml.sh [--force] <profile> [theme] [output-file]
+Usage: create-local-toml.sh [--force] [--ci] <profile> [theme] [output-file]
 
 Generates a sample dotter local.toml for CI or temporary validation.
 Refuses to overwrite an existing output file unless --force is passed.
+Refuses to write to the repository's real .dotter/local.toml unless
+--ci (or the CI environment variable) is set.
 
 Examples:
   create-local-toml.sh work monokai /tmp/local.toml
-  create-local-toml.sh --force personal tokyonight /tmp/local.toml
+  create-local-toml.sh --ci personal tokyonight .dotter/local.toml
+  create-local-toml.sh --force --ci default monokai .dotter/local.toml
 EOF
 }
 
@@ -24,6 +33,10 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --force)
       FORCE=1
+      shift
+      ;;
+    --ci)
+      CI_MODE=1
       shift
       ;;
     -h|--help)
@@ -48,6 +61,39 @@ done
 PROFILE="${1:-default}"
 THEME="${2:-monokai}"
 OUTPUT="${3:-.dotter/local.toml}"
+
+# --- safety check: prevent test scripts from overwriting real local.toml ---
+REAL_LOCAL=""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null) || REPO_ROOT=""
+if [ -n "$REPO_ROOT" ]; then
+  REAL_LOCAL="$REPO_ROOT/.dotter/local.toml"
+fi
+
+# Resolve output to absolute path
+OUTPUT_DIR=$(cd "$(dirname "$OUTPUT" 2>/dev/null || echo .)" && pwd) || OUTPUT_DIR=""
+if [ -n "$OUTPUT_DIR" ]; then
+  OUTPUT_ABS="$OUTPUT_DIR/$(basename "$OUTPUT")"
+else
+  OUTPUT_ABS="$OUTPUT"
+fi
+
+if [ -n "$REAL_LOCAL" ] && [ "$OUTPUT_ABS" = "$REAL_LOCAL" ]; then
+  # Writing to the real local.toml — only allowed in CI/testing context
+  if [ "$CI_MODE" -ne 1 ] && [ -z "${CI:-}" ] && [ -z "${DOTTER_TESTING:-}" ]; then
+    echo "SAFETY BLOCKED: refusing to overwrite real .dotter/local.toml with test data." >&2
+    echo "" >&2
+    echo "Target: $OUTPUT_ABS" >&2
+    echo "This script generates sample/test values that will destroy your secrets." >&2
+    echo "" >&2
+    echo "Options:" >&2
+    echo "  1. Run inside CI (CI env var set)" >&2
+    echo "  2. Pass --ci flag explicitly: create-local-toml.sh --ci ..." >&2
+    echo "  3. Set DOTTER_TESTING=1" >&2
+    echo "  4. Use a temporary output path instead, e.g. /tmp/local.toml" >&2
+    exit 2
+  fi
+fi
 
 if [ -e "$OUTPUT" ] && [ "$FORCE" -ne 1 ]; then
   echo "Refusing to overwrite existing file: $OUTPUT" >&2

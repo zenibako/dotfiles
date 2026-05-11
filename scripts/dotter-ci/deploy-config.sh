@@ -15,7 +15,7 @@ export HOME="$DEPLOY_DIR"
 
 echo "Deploying to: $DEPLOY_DIR" >&2
 
-# Create local.toml
+# Create local.toml (CI context)
 "$(dirname "$0")/create-local-toml.sh" "$PROFILE" "$THEME" .dotter/local.toml
 
 echo "Generated local.toml:" >&2

@@ -3,7 +3,7 @@ set -eu
 
 # Resolve dotfiles root from the git repo containing this script.
 # dotter runs post_deploy.sh from .dotter/cache/, so we use git to find the root.
-_dotfiles=$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null) || _dotfiles=""
+_dotfiles=$(git -C "$(dirname "0")" rev-parse --show-toplevel 2>/dev/null) || _dotfiles=""
 
 # Fallback: in CI the repo may be copied without .git; dotter runs from the repo
 # root so the current working directory is the correct dotfiles root.
@@ -57,35 +57,10 @@ except Exception:
 fi
 
 echo "==> Running post-deploy validation..."
-
 DEPLOYED="$HOME/.config"
 
-# --- OpenCode JSONC validation ---
-if [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
-  echo "Validating OpenCode config..."
-  if command -v python3 >/dev/null 2>&1; then
-    # Schema validation (requires jsonschema + network)
-    if python3 -c "import jsonschema" 2>/dev/null; then
-      if python3 "$_scripts/validate_jsonc_schema.py" "$DEPLOYED/opencode/opencode.jsonc"; then
-        echo "  OpenCode schema validation OK"
-      fi
-      # Falls through to basic JSONC validation on schema failure
-    fi
-    # Always run basic JSONC syntax parsing
-    if ! python3 "$_scripts/validate_jsonc.py" "$DEPLOYED/opencode/opencode.jsonc"; then
-      echo "ERROR: OpenCode config JSONC syntax validation failed" >&2
-      exit 1
-    fi
-    echo "  OpenCode config syntax OK"
-  elif command -v json5 >/dev/null 2>&1; then
-    if ! json5 -v "$DEPLOYED/opencode/opencode.jsonc" >/dev/null 2>&1; then
-      echo "ERROR: OpenCode config validation failed (json5)" >&2
-      exit 1
-    fi
-    echo "  OpenCode config OK (json5)"
-  else
-    echo "  Skipping OpenCode validation (no python3 or json5 available)"
-  fi
+if [ -d "$_dotfiles" ]; then
+  REPO_ROOT="$_dotfiles" "$_scripts/validate_schema.sh" --post-deploy || exit 1
 fi
 
 # --- OpenCode MCP health check ---
@@ -105,12 +80,10 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
     mcp_clean=$(sed 's/\x1b\[[0-9;]*m//g' < "$mcp_out")
 
     # Count servers by matching server header lines (● ✓ or ● ✗)
-    # Use awk to avoid set -e issues: grep -c exits 1 on zero matches
     total=$(echo "$mcp_clean" | awk 'BEGIN{c=0} /^[[:space:]]*●[[:space:]]+[✓✗]/ {c++} END {print c}')
     connected=$(echo "$mcp_clean" | awk 'BEGIN{c=0} /^[[:space:]]*●[[:space:]]+✓/ {c++} END {print c}')
     failed=$(echo "$mcp_clean" | awk 'BEGIN{c=0} /^[[:space:]]*●[[:space:]]+✗/ {c++} END {print c}')
 
-    # awk may print an empty string on zero matches; default to 0 for arithmetic
     : "${total:=0}" "${connected:=0}" "${failed:=0}"
 
     if [ "$failed" -gt 0 ]; then
@@ -130,62 +103,19 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
   fi
 fi
 
-# --- Claude Code settings.json validation ---
-_cc_settings="$HOME/.claude/settings.json"
-if [ -f "$_cc_settings" ] && command -v python3 >/dev/null 2>&1; then
-  echo "Validating Claude Code settings..."
-  if ! python3 "$_scripts/validate_cc_settings.py" "$_cc_settings"; then
-    echo "ERROR: Claude Code settings validation failed" >&2
-    exit 1
-  fi
-elif [ -f "$_cc_settings" ]; then
-  echo "  Skipping Claude Code settings validation (python3 not available)"
-fi
-unset _cc_settings
-
-# --- TOML validation ---
-validate_toml() {
-  file="$1"
-  if [ ! -f "$file" ]; then return 0; fi
-  if ! command -v python3 >/dev/null 2>&1; then
-    echo "  Skipping TOML validation (python3 not available)"
-    return 0
-  fi
-
-  rc=0
-  python3 "$_scripts/validate_toml.py" "$file" >/dev/null 2>&1 || rc=$?
-
-  if [ "$rc" -eq 2 ]; then
-    echo "  Skipping TOML validation (no toml module)"
-    return 0
-  elif [ "$rc" -ne 0 ]; then
-    echo "ERROR: TOML validation failed: $file" >&2
-    return 1
-  fi
-  echo "  TOML OK: $file"
-}
-
-for toml_file in \
-  "$DEPLOYED/atuin/config.toml" \
-  "$DEPLOYED/jj/config.toml" \
-  "$DEPLOYED/iamb/config.toml" \
-  "$DEPLOYED/starship.toml"
-do
-  validate_toml "$toml_file" || exit 1
-done
-
 # --- Lua validation ---
 if [ -d "$DEPLOYED/nvim" ]; then
   if command -v luac >/dev/null 2>&1; then
     echo "Validating Lua files..."
-    failed=0
-    find "$DEPLOYED/nvim" -name '*.lua' -type f | while IFS= read -r lua_file; do
-      if ! luac -p "$lua_file" >/dev/null 2>&1; then
-        echo "ERROR: Lua syntax error in $lua_file" >&2
-        failed=1
+    _failed=0
+    while IFS= read -r _lua_file; do
+      if ! luac -p "$_lua_file" >/dev/null 2>&1; then
+        echo "ERROR: Lua syntax error in $_lua_file" >&2
+        _failed=1
       fi
-    done || true
-    if [ "$failed" -eq 1 ]; then
+    done < <(find "$DEPLOYED/nvim" -name '*.lua' -type f 2>/dev/null)
+
+    if [ "$_failed" -eq 1 ]; then
       exit 1
     fi
     echo "  All Lua files OK"

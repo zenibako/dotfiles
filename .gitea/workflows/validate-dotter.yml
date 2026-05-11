@@ -35,13 +35,17 @@ jobs:
       - name: Install dotter
         run: scripts/dotter-ci/install-dotter.sh
 
+      - name: Pre-deploy validation
+        run: |
+          REPO_ROOT=$(pwd) ./.dotter/scripts/validate_schema.sh --pre-deploy
+
       - name: Create deployment directory
         run: |
           DEPLOY_DIR=$(mktemp -d)
           echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
 
       - name: Deploy config with dotter
-        run: scripts/dotter-ci/create-local-toml.sh "${{ matrix.profile }}" monokai .dotter/local.toml
+        run: scripts/dotter-ci/create-local-toml.sh --force --ci "${{ matrix.profile }}" monokai .dotter/local.toml
 
       - name: Run dotter deploy
         run: |
@@ -116,7 +120,7 @@ jobs:
 
           for profile in default personal work; do
             echo "Testing $profile profile..."
-            scripts/dotter-ci/create-local-toml.sh --force "$profile" monokai .dotter/local.toml
+            scripts/dotter-ci/create-local-toml.sh --force --ci "$profile" monokai .dotter/local.toml
 
             if ! dotter deploy --dry-run --force 2>&1 | tee /tmp/dotter-$profile.log; then
               echo "✗ Failed to deploy $profile profile"
@@ -128,7 +132,7 @@ jobs:
 
       - name: Deploy with dotter
         run: |
-          scripts/dotter-ci/create-local-toml.sh --force default monokai .dotter/local.toml
+          scripts/dotter-ci/create-local-toml.sh --force --ci default monokai .dotter/local.toml
           dotter deploy --force --verbose --noconfirm
 
       - name: Validate OpenCode config against schema

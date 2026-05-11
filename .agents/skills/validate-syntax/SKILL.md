@@ -62,7 +62,8 @@ Run dotter in dry-run mode for each profile to catch variable conflicts:
 ```bash
 for profile in default personal work; do
   echo "Testing $profile profile..."
-  ./scripts/dotter-ci/create-local-toml.sh "$profile" monokai .dotter/local.toml
+  # Use --ci to allow writing test data to .dotter/local.toml
+  ./scripts/dotter-ci/create-local-toml.sh --ci "$profile" monokai .dotter/local.toml
 
   if ! dotter deploy --dry-run --force 2>&1 | tee /tmp/dotter-$profile.log; then
     echo "✗ Failed to deploy $profile profile"
