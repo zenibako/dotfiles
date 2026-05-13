@@ -74,6 +74,9 @@ def --env refresh-shell-init [] {
     try { carapace _carapace nushell | save --force ~/.cache/carapace/init.nu }
     try { mkdir ~/.local/share/atuin }
     try { atuin init nu | save --force ~/.local/share/atuin/init.nu }
+    # Workaround: atuin init nu generates `e>| complete` which only captures stderr,
+    # losing the history ID from stdout. Replace with `| complete` to fix history recording.
+    try { open ~/.local/share/atuin/init.nu | str replace 'e>| complete' '| complete' | save --force ~/.local/share/atuin/init.nu }
 }
 
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional

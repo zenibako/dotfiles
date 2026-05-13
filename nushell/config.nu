@@ -18,10 +18,11 @@
 #     config nu --doc | nu-highlight | less -R
 
 # Source third-party integrations first (some reset $env.config)
-source ~/.local/share/atuin/init.nu
+# Atuin must be sourced AFTER starship, as starship resets $env.config hooks
 source ~/.zoxide.nu
 source ~/.cache/carapace/init.nu
 source ~/.starship.nu
+source ~/.local/share/atuin/init.nu
 
 # Source shared completions (generated from completions.toml in env.nu)
 source ~/.cache/completions/init.nu
