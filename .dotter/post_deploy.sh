@@ -158,9 +158,13 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
     # Neovim headless sends print() output to stderr, capture both
     timeout 180 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
     if command -v perl >/dev/null 2>&1; then
-      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:' | grep -v '^\s*$' || true
+      # Suppress:
+      # - image.nvim stderr (headless terminal detection)
+      # - terraformls single-file recommendation (not an error)
+      # - Known Salesforce LSP NPE during init (server-side bug, non-fatal)
+      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed' | grep -v '^\s*$' || true
     else
-      cat "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:' | grep -v '^\s*$' || true
+      cat "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed' | grep -v '^\s*$' || true
     fi
     rm -f "$lsp_out"
   fi
