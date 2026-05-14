@@ -87,6 +87,7 @@ local lsp_tests = {
     content = "export default class Test extends LightningElement {}\n",
     root_markers = { "sfdx-project.json" },
     root_content = '{ "packageDirectories": [{ "path": "force-app" }] }\n',
+    grace_period_ms = 15000,
   },
   terraformls = {
     filetype = "terraform",
@@ -94,11 +95,12 @@ local lsp_tests = {
     content = 'resource "null_resource" "test" {}\n',
   },
   visualforce_ls = {
-    filetype = "html",
+    filetype = "visualforce",
     filename = "test.page",
     content = "<apex:page></apex:page>\n",
     root_markers = { "sfdx-project.json" },
     root_content = '{ "packageDirectories": [{ "path": "force-app" }] }\n',
+    grace_period_ms = 15000,
   },
   ["typescript-tools"] = {
     filetype = "typescript",
@@ -114,7 +116,8 @@ local name_aliases = {
 }
 
 local results = {}
-local timeout_ms = 20000  -- 20 seconds per LSP (basedpyright and tsserver can be slow)
+local default_timeout_ms = 40000  -- 40 seconds per LSP (Salesforce servers can take 15-20s)
+local timeout_ms = default_timeout_ms
 
 -- Collect enabled LSP names
 local enabled_lsps = {}
@@ -220,7 +223,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
       end
 
       -- Give a grace period after first client attaches for other clients to arrive
-      if vim.loop.now() - first_attach_time > 2000 then
+      if vim.loop.now() - first_attach_time > (test.grace_period_ms or 2000) then
         break  -- Grace period exceeded
       end
     end
