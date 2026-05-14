@@ -4,6 +4,7 @@ title: Fix dotter deploy validation failures
 status: In Progress
 assignee: []
 created_date: '2026-05-14 00:20'
+updated_date: '2026-05-14 00:21'
 labels:
   - bug
   - dotter
@@ -28,6 +29,15 @@ Fix three validation failures blocking dotter deploy:
 - [ ] #3 Post-deploy validation completes without errors
 - [ ] #4 Deployed configs are syntactically valid
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Fix pre_deploy.sh path resolution: Use `git rev-parse --show-toplevel` instead of relative path walking from cache directory
+2. Fix AeroSpace validation: Replace `--config-path` flag with `AEROSPACE_CONFIG` environment variable
+3. Clean up JSONC schema warning: Redirect Python stderr to avoid printing the huge schema error (validation already falls through gracefully)
+4. Test with `dotter deploy` to verify all validations pass
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
