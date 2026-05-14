@@ -63,6 +63,18 @@ home_assistant_url = "http://homeassistant.local:8123"
 # mcp_salesforce_dx_enabled = true  # Disabled by default in work profile
 # mcp_atlassian_enabled = true  # Disabled by default in work profile
 
+# Corporate SSL certificate configuration (work profile)
+# If your network uses a corporate proxy with custom SSL certificates (e.g. Netskope),
+# set the host path to the CA certificate file and the container mount path.
+# Leave empty if not behind a corporate proxy.
+ca_cert_host_path = ""
+ca_cert_container_path = "/tmp/corp-ca.pem"
+
+# Java SSL trust store options for MCP servers running in Docker
+# Used when SonarQube MCP needs to trust a corporate CA cert
+# Example: "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
+java_tool_options = ""
+
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
 github_personal_access_token = "ghp_YOUR_TOKEN_HERE"

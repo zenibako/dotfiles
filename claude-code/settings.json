@@ -145,15 +145,22 @@
       "command": "{{shell_bin_path}}/docker",
       "args": [
         "run", "--init", "--pull=always", "-i", "--rm",
+        {{#if node_extra_ca_certs}}{{#if ca_cert_container_path}}
+        "-v", "{{node_extra_ca_certs}}:{{ca_cert_container_path}}:ro",
+        {{/if}}{{/if}}
         "-e", "SONARQUBE_URL",
         "-e", "SONARQUBE_TOKEN",
+        {{#if java_tool_options}}
+        "-e", "JAVA_TOOL_OPTIONS",
+        {{/if}}
         "mcp/sonarqube"
       ],
       "env": {
         "DOCKER_CONTEXT": "desktop-linux",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
         "SONARQUBE_URL": "{{sonarqube_url}}",
-        "SONARQUBE_TOKEN": "{{sonarqube_token}}"
+        "SONARQUBE_TOKEN": "{{sonarqube_token}}"{{#if java_tool_options}},
+        "JAVA_TOOL_OPTIONS": "{{java_tool_options}}"{{/if}}
       }
     }
     {{/if}}{{/if}}{{/if}}
