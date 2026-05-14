@@ -88,10 +88,12 @@
     "typescript-lsp@claude-plugins-official": true,
     "yaml-lsp@claude-plugins-official": true,
     "chrome-devtools-mcp@claude-plugins-official": true{{#if opencode_profile_work}},
-    "apex-lsp@claude-plugins-official": true{{/if}}
+    "apex-lsp@claude-plugins-official": true,
+    "sonarqube@claude-plugins-official": true{{/if}}
   },
   "autoUpdatesChannel": "stable",
   "editorMode": "vim",
+  "skipAutoPermissionPrompt": true,
   "mcpServers": {
     "Jujutsu": {
       "command": "{{shell_bin_path}}/npx",
