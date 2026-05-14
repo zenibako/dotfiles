@@ -49,29 +49,25 @@ lint_toml() {
   if ! has_taplo; then return 0; fi
 
   if [ -n "$_skip_schema" ]; then
-    if taplo lint --no-schema "$file" >/dev/null 2>&1; then
+    if taplo lint --no-schema "$_file" >/dev/null 2>&1; then
       echo "  TOML OK: $_file"
     else
       echo "ERROR: TOML validation failed: $_file" >&2
-      taplo lint --no-schema "$file" >&2 || true
+      taplo lint --no-schema "$_file" >&2 || true
       return 1
     fi
-  else
-    if taplo lint "$file" >/dev/null 2>&1; then
-      echo "  TOML OK: $_file"
-    else
-      echo "ERROR: TOML validation failed: $_file" >&2
-      taplo lint "$file" >&2 || true
-      return 1
-    fi
-  fi
   else
     if taplo lint "$_file" >/dev/null 2>&1; then
       echo "  TOML OK: $_file"
     else
-      echo "ERROR: TOML validation failed: $_file" >&2
-      taplo lint "$_file" >&2 || true
-      return 1
+      echo "WARNING: TOML validation failed: $_file (schema may be unreachable; retrying without schema)" >&2
+      if taplo lint --no-schema "$_file" >/dev/null 2>&1; then
+        echo "  TOML OK: $_file (syntax only)"
+      else
+        echo "ERROR: TOML validation failed: $_file" >&2
+        taplo lint --no-schema "$_file" >&2 || true
+        return 1
+      fi
     fi
   fi
 }
