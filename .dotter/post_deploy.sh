@@ -76,8 +76,12 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
     fi
     rm -f "$mcp_out" "$mcp_err"
   else
-    # Strip ANSI escape codes for parsing
-    mcp_clean=$(sed 's/\x1b\[[0-9;]*m//g' < "$mcp_out")
+    # Strip ANSI escape codes for parsing (use perl for cross-platform support)
+    if command -v perl >/dev/null 2>&1; then
+      mcp_clean=$(perl -pe 's/\e\[[0-9;]*m//g' < "$mcp_out")
+    else
+      mcp_clean=$(cat "$mcp_out")
+    fi
 
     # Count servers by matching server header lines (● ✓ or ● ✗)
     total=$(echo "$mcp_clean" | awk 'BEGIN{c=0} /^[[:space:]]*●[[:space:]]+[✓✗]/ {c++} END {print c}')
@@ -151,16 +155,14 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
   if [ -f "$_scripts/validate_lsp.lua" ]; then
     echo "Validating LSP attachments..."
     lsp_out=$(mktemp)
-    lsp_err=$(mktemp)
-    if timeout 180 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" >"$lsp_out" 2>"$lsp_err"; then
-      sed 's/\x1b\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal' | grep -v '^\s*$' || true
+    # Neovim headless sends print() output to stderr, capture both
+    timeout 180 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
+    if command -v perl >/dev/null 2>&1; then
+      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:' | grep -v '^\s*$' || true
     else
-      echo "WARNING: LSP validation timed out or failed" >&2
-      if [ -s "$lsp_err" ]; then
-        cat "$lsp_err" >&2
-      fi
+      cat "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:' | grep -v '^\s*$' || true
     fi
-    rm -f "$lsp_out" "$lsp_err"
+    rm -f "$lsp_out"
   fi
 fi
 
