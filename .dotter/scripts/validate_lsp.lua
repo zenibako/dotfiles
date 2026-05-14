@@ -42,6 +42,11 @@ local lsp_tests = {
     filename = "test.yaml",
     content = "key: value\n",
   },
+  taplo = {
+    filetype = "toml",
+    filename = "test.toml",
+    content = "key = \"value\"\n",
+  },
   ts_ls = {
     filetype = "typescript",
     filename = "test.ts",

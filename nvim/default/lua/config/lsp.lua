@@ -78,6 +78,7 @@ vim.lsp.enable({
   "visualforce_ls",
 {{/if}}
   "yamlls",
+  "taplo",
 {{#if opencode_profile_personal}}
   "ts_ls",
   "cue",
