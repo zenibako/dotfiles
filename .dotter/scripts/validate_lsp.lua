@@ -147,7 +147,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
   if not binary_available then
     table.insert(results, {
       name = lsp_name,
-      status = "SKIP",
+      status = "WARN",
       reason = binary_name and ("not installed: " .. binary_name) or "no cmd",
     })
     goto continue
