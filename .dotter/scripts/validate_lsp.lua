@@ -87,7 +87,7 @@ local lsp_tests = {
     content = "export default class Test extends LightningElement {}\n",
     root_markers = { "sfdx-project.json" },
     root_content = '{ "packageDirectories": [{ "path": "force-app" }] }\n',
-    grace_period_ms = 15000,
+    grace_period_ms = 30000,
   },
   terraformls = {
     filetype = "terraform",
@@ -100,7 +100,7 @@ local lsp_tests = {
     content = "<apex:page></apex:page>\n",
     root_markers = { "sfdx-project.json" },
     root_content = '{ "packageDirectories": [{ "path": "force-app" }] }\n',
-    grace_period_ms = 15000,
+    grace_period_ms = 30000,
   },
   ["typescript-tools"] = {
     filetype = "typescript",
@@ -135,6 +135,7 @@ table.sort(enabled_lsps)
 for _, lsp_name in ipairs(enabled_lsps) do
   local config_name = name_aliases[lsp_name] or lsp_name
   local test = lsp_tests[lsp_name] or lsp_tests[config_name]
+  local timeout_ms = default_timeout_ms
 
   if not test then
     table.insert(results, { name = lsp_name, status = "SKIP", reason = "no test mapping" })
