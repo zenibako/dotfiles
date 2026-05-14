@@ -8,23 +8,6 @@
 local test_dir = vim.fn.tempname() .. "-nvim-lsp-test"
 vim.fn.mkdir(test_dir, "p")
 
--- Suppress noisy LSP error callbacks during headless validation
--- (Salesforce servers throw 'Cannot read properties of null' in test env)
-local orig_notify = vim.notify
-vim.notify = function(msg, level, opts)
-  if type(msg) == "string" and (
-    msg:match("Cannot read properties of null")
-    or msg:match("vim%.schedule callback")
-    or msg:match("RPC%[Error%]")
-    or msg:match("Request initialize failed")
-    or msg:match("ignoreSingleFileWarning")
-    or msg:match("Some capabilities may be reduced")
-  ) then
-    return
-  end
-  orig_notify(msg, level, opts)
-end
-
 -- Test file definitions per LSP
 local lsp_tests = {
   gopls = {
