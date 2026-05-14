@@ -80,11 +80,11 @@ vim.lsp.enable({
   "yamlls",
 {{#if opencode_profile_personal}}
   "ts_ls",
-  "cuelang",
+  "cue",
   "sourcekit",
   "jinja-lsp",
 {{/if}}
 {{#if opencode_profile_work}}
-  "cuelang",
+  "cue",
 {{/if}}
 })

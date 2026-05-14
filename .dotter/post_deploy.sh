@@ -146,6 +146,22 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
     exit 1
   fi
   echo "  Neovim startup OK"
+
+  # --- LSP validation ---
+  if [ -f "$_scripts/validate_lsp.lua" ]; then
+    echo "Validating LSP attachments..."
+    lsp_out=$(mktemp)
+    lsp_err=$(mktemp)
+    if timeout 180 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" >"$lsp_out" 2>"$lsp_err"; then
+      sed 's/\x1b\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal' | grep -v '^\s*$' || true
+    else
+      echo "WARNING: LSP validation timed out or failed" >&2
+      if [ -s "$lsp_err" ]; then
+        cat "$lsp_err" >&2
+      fi
+    fi
+    rm -f "$lsp_out" "$lsp_err"
+  fi
 fi
 
 echo "==> Post-deploy validation complete."
