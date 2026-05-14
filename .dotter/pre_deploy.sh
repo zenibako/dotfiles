@@ -32,6 +32,8 @@ require_var email
 
 # Pre-deploy schema validation
 echo "==> Running pre-deploy schema validation..."
-_script_dir="$(cd "$(dirname "$0")" && pwd)"
-_repo_root="$(cd "$_script_dir/.." && pwd)"
+_repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$_repo_root" ]; then
+  _repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+fi
 "$_repo_root/.dotter/scripts/validate_schema.sh" --pre-deploy || true

@@ -108,12 +108,15 @@ if [ -d "$DEPLOYED/nvim" ]; then
   if command -v luac >/dev/null 2>&1; then
     echo "Validating Lua files..."
     _failed=0
+    _lua_files=$(mktemp)
+    find "$DEPLOYED/nvim" -name '*.lua' -type f 2>/dev/null > "$_lua_files"
     while IFS= read -r _lua_file; do
       if ! luac -p "$_lua_file" >/dev/null 2>&1; then
         echo "ERROR: Lua syntax error in $_lua_file" >&2
         _failed=1
       fi
-    done < <(find "$DEPLOYED/nvim" -name '*.lua' -type f 2>/dev/null)
+    done < "$_lua_files"
+    rm -f "$_lua_files"
 
     if [ "$_failed" -eq 1 ]; then
       exit 1

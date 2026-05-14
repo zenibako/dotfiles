@@ -117,10 +117,10 @@ validate_jsonc_schema() {
   fi
 
   if python3 -c "import jsonschema" 2>/dev/null; then
-    if python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file"; then
+    if python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
-      echo "WARNING: JSONC schema validation failed: $_file" >&2
+      echo "WARNING: JSONC schema validation failed: $_file (schema may be outdated)" >&2
       # Fall through to basic validation
     fi
   else
@@ -138,7 +138,7 @@ validate_aerospace() {
     return 0
   fi
 
-  if ! _modes=$(aerospace list-modes --config-path "$_file" 2>/dev/null); then
+  if ! _modes=$(AEROSPACE_CONFIG="$_file" aerospace list-modes 2>/dev/null); then
     echo "ERROR: AeroSpace config validation failed: $_file" >&2
     return 1
   fi
