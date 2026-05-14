@@ -20,6 +20,16 @@ fi
 
 has_taplo() { command -v taplo >/dev/null 2>&1; }
 has_python3() { command -v python3 >/dev/null 2>&1; }
+
+# Use venv python if available (for packages like pyyaml that may not be on the host)
+_python3() {
+  if [ -s "$_SCRIPTS/.venv/bin/python3" ]; then
+    "$_SCRIPTS/.venv/bin/python3" "$@"
+  else
+    python3 "$@"
+  fi
+}
+
 has_aerospace() { command -v aerospace >/dev/null 2>&1; }
 has_ghostty() { command -v ghostty >/dev/null 2>&1; }
 has_starship() { command -v starship >/dev/null 2>&1; }
@@ -67,14 +77,14 @@ python_toml() {
   fi
 
   rc=0
-  python3 "$_SCRIPTS/validate_toml.py" "$_file" >/dev/null 2>&1 || rc=$?
+  ${_python3} "$_file" >/dev/null 2>&1 || rc=$?
 
   if [ "$rc" -eq 2 ]; then
     echo "  Skipping TOML validation (no toml module)"
     return 0
   elif [ "$rc" -ne 0 ]; then
     echo "ERROR: TOML validation failed: $_file" >&2
-    python3 "$_SCRIPTS/validate_toml.py" "$_file" >&2 || true
+    ${_python3} "$_file" >&2 || true
     return 1
   fi
   echo "  TOML OK: $_file"
@@ -99,7 +109,7 @@ validate_jsonc() {
     return 0
   fi
 
-  if python3 "$_SCRIPTS/validate_jsonc.py" "$_file"; then
+  if ${_python3} "$_SCRIPTS/validate_jsonc.py" "$_file"; then
     echo "  JSONC OK: $_file"
   else
     echo "ERROR: JSONC validation failed: $_file" >&2
@@ -116,8 +126,8 @@ validate_jsonc_schema() {
     return 0
   fi
 
-  if python3 -c "import jsonschema" 2>/dev/null; then
-    if python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
+  if $_python3 -c "import jsonschema" 2>/dev/null; then
+    if ${_python3} "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
       echo "WARNING: JSONC schema validation failed: $_file (schema may be outdated)" >&2
@@ -222,13 +232,13 @@ if [ "$MODE" = "--pre-deploy" ]; then
     fi
 
     rc=0
-    python3 -c "import yaml; yaml.safe_load(open('$_file'))" 2>/dev/null || rc=$?
+    $_python3 -c "import yaml; yaml.safe_load(open('$_file'))" 2>/dev/null || rc=$?
 
     if [ "$rc" -eq 0 ]; then
       echo "  YAML OK: $_file"
     else
       echo "ERROR: YAML validation failed: $_file" >&2
-      python3 -c "import yaml; yaml.safe_load(open('$_file'))" >&2 || true
+      $_python3 -c "import yaml; yaml.safe_load(open('$_file'))" >&2 || true
       FAILED=1
     fi
   done
@@ -272,7 +282,7 @@ elif [ "$MODE" = "--post-deploy" ]; then
   # Claude Code settings.json
   _cc_settings="$HOME/.claude/settings.json"
   if [ -f "$_cc_settings" ] && has_python3; then
-    if python3 "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings"; then
+    if ${_python3} "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings"; then
       echo "  Claude Code settings OK"
     else
       echo "ERROR: Claude Code settings validation failed" >&2
