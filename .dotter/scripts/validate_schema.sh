@@ -42,32 +42,38 @@ is_template_file() {
 }
 
 # Taplo lint — optionally skip schema for source files that are Handlebars templates.
+# Strips '#:schema' directives when validating deployed files (corporate proxies
+# often block schema fetch URLs).
 lint_toml() {
   _file="$1"
   _skip_schema="${2:-}"
   if [ ! -f "$_file" ]; then return 0; fi
   if ! has_taplo; then return 0; fi
 
+  # Remove inline schema directives for validation; some schemas are unreachable
+  # behind corporate proxies, and `taplo lint --no-schema` still reads them.
+  _tmp=$(mktemp)
+  sed '/^[[:space:]]*#:schema/d' "$_file" > "$_tmp"
+
   if [ -n "$_skip_schema" ]; then
-    if taplo lint --no-schema "$_file" >/dev/null 2>&1; then
-      echo "  TOML OK: $_file"
+    _taplo_opts="--no-schema"
+  else
+    _taplo_opts=""
+  fi
+
+  if taplo lint $_taplo_opts "$_tmp" >/dev/null 2>&1; then
+    echo "  TOML OK: $_file"
+    rm -f "$_tmp"
+  else
+    echo "WARNING: TOML validation failed: $_file (schema may be unreachable; retrying without schema)" >&2
+    if taplo lint --no-schema "$_tmp" >/dev/null 2>&1; then
+      echo "  TOML OK: $_file (syntax only)"
+      rm -f "$_tmp"
     else
       echo "ERROR: TOML validation failed: $_file" >&2
-      taplo lint --no-schema "$_file" >&2 || true
+      taplo lint --no-schema "$_tmp" >&2 || true
+      rm -f "$_tmp"
       return 1
-    fi
-  else
-    if taplo lint "$_file" >/dev/null 2>&1; then
-      echo "  TOML OK: $_file"
-    else
-      echo "WARNING: TOML validation failed: $_file (schema may be unreachable; retrying without schema)" >&2
-      if taplo lint --no-schema "$_file" >/dev/null 2>&1; then
-        echo "  TOML OK: $_file (syntax only)"
-      else
-        echo "ERROR: TOML validation failed: $_file" >&2
-        taplo lint --no-schema "$_file" >&2 || true
-        return 1
-      fi
     fi
   fi
 }
