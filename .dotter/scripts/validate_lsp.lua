@@ -21,6 +21,8 @@ local lsp_tests = {
     filetype = "python",
     filename = "main.py",
     content = "def main():\n    pass\n",
+    root_markers = { "pyproject.toml" },
+    root_content = "[tool.basedpyright]\n",
   },
   ["lua_ls"] = {
     filetype = "lua",
@@ -83,6 +85,8 @@ local lsp_tests = {
     filetype = "javascript",
     filename = "test.js",
     content = "export default class Test extends LightningElement {}\n",
+    root_markers = { "sfdx-project.json" },
+    root_content = '{ "packageDirectories": [{ "path": "force-app" }] }\n',
   },
   terraformls = {
     filetype = "terraform",
@@ -93,6 +97,8 @@ local lsp_tests = {
     filetype = "html",
     filename = "test.page",
     content = "<apex:page></apex:page>\n",
+    root_markers = { "sfdx-project.json" },
+    root_content = '{ "packageDirectories": [{ "path": "force-app" }] }\n',
   },
   ["typescript-tools"] = {
     filetype = "typescript",
@@ -108,7 +114,7 @@ local name_aliases = {
 }
 
 local results = {}
-local timeout_ms = 15000  -- 15 seconds per LSP (tsserver can be slow)
+local timeout_ms = 20000  -- 20 seconds per LSP (basedpyright and tsserver can be slow)
 
 -- Collect enabled LSP names
 local enabled_lsps = {}
