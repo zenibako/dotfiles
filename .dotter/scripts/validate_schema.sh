@@ -21,8 +21,16 @@ fi
 
 get_profile() {
   if [ ! -f "$LOCAL_CONFIG" ]; then return 0; fi
-  # Read packages from local.toml, extract profile
-  _packages=$(grep -E '^[[:space:]]*packages[[:space:]]*=' "$LOCAL_CONFIG" | tail -n 1 | sed 's/.*=//' | tr -d '[]" ')
+  # Parse packages array from local.toml (handles multi-line arrays)
+  _packages=$(python3 -c "
+import re
+with open('$LOCAL_CONFIG', 'r') as f:
+    content = f.read()
+m = re.search(r'^\\s*packages\\s*=\\s*(\\[[^\\]]*\\])', content, re.MULTILINE)
+if m:
+    arr = m.group(1)
+    print(' '.join(re.findall(r'\"([^\"]+)\"', arr)))
+" 2>/dev/null)
   case "$_packages" in
     *work*)    echo "work" ;;
     *personal*) echo "personal" ;;
