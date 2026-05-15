@@ -272,21 +272,29 @@ for i, line in enumerate(lines, 1):
                 inactive_ranges.append((start, i))
 
 # Find placeholders outside inactive ranges that are missing or empty
+optional_vars = {
+    'reddit_token_v2', 'brave_search_api_key',
+    'proton_user', 'proton_password',
+    'telegram_bot_token', 'youtube_api_key', 'google_places_api_key',
+    'slack_d_cookie', 'slack_token',
+}
+
 issues = []
 for i, line in enumerate(lines, 1):
     in_inactive = any(start <= i <= end for start, end in inactive_ranges)
     if in_inactive:
         continue
-    for m in re.finditer(r'\{\{\\s*([^{#/][^}]*)\\s*\}\}', line):
+    for m in re.finditer(r'\{\{\s*([^{#/][^}]*)\s*\}\}', line):
         placeholder = m.group(1).strip()
         if not placeholder or placeholder.startswith('!'):
             continue
         val = local_vars.get(placeholder)
         if val is None:
             issues.append((i, placeholder, 'NOT SET in local.toml'))
-        elif val == '':
-            issues.append((i, placeholder, 'EMPTY in local.toml'))
-        # else: defined and non-empty -> OK, no warning
+        elif val == '' and placeholder not in optional_vars:
+            issues.append((i, placeholder, 'EMPTY in local.toml (set a value or omit line)'))
+        # elif val == '' and placeholder in optional_vars -> OK, no warning
+        # elif val != '' -> OK, no warning
 
 if issues:
     print('WARNING: Possible unreplaced Handlebars in %s:' % file_path, file=sys.stderr)
