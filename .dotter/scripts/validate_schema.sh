@@ -9,6 +9,7 @@ MODE="${1:---pre-deploy}"
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 _SCRIPTS="$REPO_ROOT/.dotter/scripts"
 DEPLOYED="$HOME/.config"
+LOCAL_CONFIG="${DOTTER_LOCAL_CONFIG:-$REPO_ROOT/.dotter/local.toml}"
 
 if [ ! -d "$_SCRIPTS" ]; then
   echo "Could not locate .dotter/scripts at $_SCRIPTS" >&2
@@ -17,6 +18,19 @@ if [ ! -d "$_SCRIPTS" ]; then
 fi
 
 # --- helpers ---
+
+get_profile() {
+  if [ ! -f "$LOCAL_CONFIG" ]; then return 0; fi
+  # Read packages from local.toml, extract profile
+  _packages=$(grep -E '^[[:space:]]*packages[[:space:]]*=' "$LOCAL_CONFIG" | tail -n 1 | sed 's/.*=//' | tr -d '[]" ')
+  case "$_packages" in
+    *work*)    echo "work" ;;
+    *personal*) echo "personal" ;;
+    *)          echo "" ;;
+  esac
+}
+
+ACTIVE_PROFILE=$(get_profile)
 
 has_taplo() { command -v taplo >/dev/null 2>&1; }
 has_python3() { command -v python3 >/dev/null 2>&1; }
@@ -183,14 +197,70 @@ validate_ghostty() {
   echo "  Ghostty OK: $_file"
 }
 
-# Check templates for unresolvable Handlebars placeholders (pre-deploy only)
+# Check templates for unresolvable Handlebars placeholders (pre-deploy only).
+# Profile-aware: only warns about placeholders in blocks for the ACTIVE profile
+# or outside any conditional.
 validate_handlebars_placeholders() {
   _file="$1"
   if [ ! -f "$_file" ]; then return 0; fi
 
-  if grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >/dev/null 2>/dev/null; then
-    echo "WARNING: Possible unreplaced Handlebars in $_file:" >&2
-    grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >&2
+  if ! has_python3; then
+    # Fallback: naive grep for all placeholders
+    if grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >/dev/null 2>/dev/null; then
+      echo "WARNING: Possible unreplaced Handlebars in $_file:" >&2
+      grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >&2
+    fi
+    return 0
+  fi
+
+  _profile_aware=$(_python3 -c "
+import re, sys
+file_path = '$_file'
+
+# Active profile from local.toml
+profile = '$ACTIVE_PROFILE'
+if profile == '':
+    profile = None
+
+with open(file_path, 'r') as f:
+    lines = f.readlines()
+
+# Track which lines are inside inactive profile blocks
+inactive_ranges = []
+stack = []
+for i, line in enumerate(lines, 1):
+    m = re.search(r'\{\{#if\s+(opencode_profile_(\w+))\s*\}\}', line)
+    if m:
+        stack.append((i, m.group(1), m.group(2)))
+    if re.search(r'\{\{/if\s*\}\}', line):
+        if stack:
+            start, var, prof = stack.pop()
+            if profile and prof != profile:
+                inactive_ranges.append((start, i))
+
+# Find placeholders outside inactive ranges
+issues = []
+for i, line in enumerate(lines, 1):
+    # Skip lines inside inactive profile blocks
+    in_inactive = any(start <= i <= end for start, end in inactive_ranges)
+    if in_inactive:
+        continue
+    # Find placeholders (not conditionals)
+    for m in re.finditer(r'\{\{\s*([^{#/][^}]*)\s*\}\}', line):
+        placeholder = m.group(1).strip()
+        # Skip empty/missing defaults
+        if not placeholder or placeholder.startswith('!'):
+            continue
+        issues.append((i, placeholder, line.strip()))
+
+if issues:
+    print('WARNING: Possible unreplaced Handlebars in {}:'.format(file_path), file=sys.stderr)
+    for line_no, placeholder, ctx in issues:
+        print('  Line %d: {{%s}}  (%s)' % (line_no, placeholder, ctx[:60]), file=sys.stderr)
+" 2>&1) || _profile_aware=""
+
+  if [ -n "$_profile_aware" ]; then
+    echo "$_profile_aware" >&2
   fi
 }
 

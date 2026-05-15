@@ -3,16 +3,12 @@
 -- Usage: nvim --headless -c "luafile validate_lsp.lua" -c "qa!"
 --
 -- This checks that enabled LSPs have their binaries available and can attach
--- to test buffers. Warnings are expected for missing servers — exits 0.
+-- to test buffers.
 
 local test_dir = vim.fn.tempname() .. "-nvim-lsp-test"
 vim.fn.mkdir(test_dir, "p")
 
 -- Suppress known non-fatal Salesforce LSP stack traces during headless init.
--- The Salesforce servers (apex-language-server, lwc_ls, visualforce_ls) attach
--- successfully and report 15/15 OK, but their Java backend throws an internal
--- NPE during single-file test initialization that is harmless in real use.
--- See: https://github.com/forcedotcom/salesforcedx-vscode/issues (server-side bug)
 local orig_notify = vim.notify
 vim.notify = function(msg, level, opts)
   if type(msg) == "string" and (
@@ -25,6 +21,28 @@ vim.notify = function(msg, level, opts)
   end
   orig_notify(msg, level, opts)
 end
+
+-- Install command hints per LSP binary name.
+-- Format: { binary = "pkg-name", manager = "brew/npm/pipx/go/gem/...", cmd = "install command" }
+local install_hints = {
+  ["gopls"]                = { binary = "gopls", manager = "go", cmd = "go install golang.org/x/tools/gopls@latest" },
+  ["basedpyright-langserver"] = { binary = "basedpyright", manager = "pipx", cmd = "pipx install basedpyright" },
+  ["pyright-langserver"]   = { binary = "pyright", manager = "pipx", cmd = "pipx install pyright" },
+  ["lua-language-server"]  = { binary = "lua-language-server", manager = "brew", cmd = "brew install lua-language-server" },
+  ["vscode-html-language-server"] = { binary = "vscode-langservers-extracted", manager = "npm", cmd = "npm install -g vscode-langservers-extracted" },
+  ["vscode-json-language-server"] = { binary = "vscode-langservers-extracted", manager = "npm", cmd = "npm install -g vscode-langservers-extracted" },
+  ["yaml-language-server"] = { binary = "yaml-language-server", manager = "npm", cmd = "npm install -g yaml-language-server" },
+  ["taplo"]                = { binary = "taplo", manager = "brew", cmd = "brew install taplo" },
+  ["typescript-language-server"] = { binary = "typescript-language-server", manager = "npm", cmd = "npm install -g typescript-language-server" },
+  ["cue"]                  = { binary = "cue", manager = "brew", cmd = "brew install cue-lang/tap/cue" },
+  ["sourcekit-lsp"]        = { binary = "sourcekit-lsp", manager = "xcode", cmd = "Install Xcode Command Line Tools: xcode-select --install" },
+  ["apex-language-server"] = { binary = "apex-jorje-lsp.jar", manager = "mason", cmd = ":MasonInstall apex-language-server (in Neovim)" },
+  ["gitlab-ci-ls"]         = { binary = "gitlab-ci-ls", manager = "cargo", cmd = "cargo install gitlab-ci-ls" },
+  ["lwc-language-server"]  = { binary = "lwc-language-server", manager = "npm", cmd = "npm install -g @salesforce/lwc-language-server" },
+  ["terraform-ls"]         = { binary = "terraform-ls", manager = "brew", cmd = "brew install hashicorp/tap/terraform-ls" },
+  ["visualforce-language-server"] = { binary = "visualforceServer.js", manager = "vscode", cmd = "Install Salesforce Extension Pack in VS Code" },
+  ["tsc"]                  = { binary = "typescript", manager = "npm", cmd = "npm install -g typescript" },
+}
 
 -- Test file definitions per LSP
 local lsp_tests = {
@@ -99,11 +117,6 @@ local lsp_tests = {
     filename = ".gitlab-ci.yml",
     content = "stages:\n  - build\n",
   },
-  gitlab_ci_ls = {
-    filetype = "yaml",
-    filename = ".gitlab-ci.yml",
-    content = "stages:\n  - build\n",
-  },
   lwc_ls = {
     filetype = "javascript",
     filename = "lwc/myComponent/myComponent.js",
@@ -131,13 +144,13 @@ local lsp_tests = {
 }
 
 -- Name aliases: map from enable() name to actual config name when they differ.
--- Some LSP configs ship under a different name than what's passed to enable().
 local name_aliases = {
   cue = "cue",
 }
 
 local results = {}
-local default_timeout_ms = 40000  -- 40 seconds per LSP (Salesforce servers can take 15-20s)
+local missing_installs = {}
+local default_timeout_ms = 40000
 local timeout_ms = default_timeout_ms
 
 -- Collect enabled LSP names
@@ -163,7 +176,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
     goto continue
   end
 
-  -- Check binary availability (cmd may be a table or a function)
+  -- Check binary availability
   local config = vim.lsp.config[config_name] or vim.lsp.config[lsp_name] or {}
   local cmd = config.cmd
   local binary_name = nil
@@ -173,9 +186,6 @@ for _, lsp_name in ipairs(enabled_lsps) do
     binary_name = cmd[1]
     binary_available = binary_name and vim.fn.executable(binary_name) == 1
   elseif type(cmd) == "function" then
-    -- For wrapper plugins (e.g. typescript-tools.nvim), skip binary check
-    -- and rely on the attachment test. Assume available and let it timeout
-    -- if the underlying binary (tsserver) is missing.
     binary_available = true
     binary_name = "(function)"
   end
@@ -186,6 +196,13 @@ for _, lsp_name in ipairs(enabled_lsps) do
       status = "WARN",
       reason = binary_name and ("not installed: " .. binary_name) or "no cmd",
     })
+    -- Collect install hint
+    if binary_name then
+      local hint = install_hints[binary_name] or install_hints[lsp_name]
+      if hint then
+        table.insert(missing_installs, { lsp = lsp_name, binary = hint.binary, manager = hint.manager, cmd = hint.cmd })
+      end
+    end
     goto continue
   end
 
@@ -216,7 +233,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
   vim.cmd("edit " .. vim.fn.fnameescape(test_file))
   vim.bo.filetype = test.filetype
 
-  -- Wait for the expected LSP client to attach (with a grace period for slow servers)
+  -- Wait for the expected LSP client to attach
   local client_names = {}
   local first_attach_time = nil
   local found_expected = false
@@ -226,7 +243,6 @@ for _, lsp_name in ipairs(enabled_lsps) do
     local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() })
 
     if #clients > 0 then
-      -- Record all attached clients
       client_names = {}
       for _, c in ipairs(clients) do
         table.insert(client_names, c.name)
@@ -239,18 +255,15 @@ for _, lsp_name in ipairs(enabled_lsps) do
         first_attach_time = vim.loop.now()
       end
 
-      -- If expected client found, success
       if found_expected then
         break
       end
 
-      -- Give a grace period after first client attaches for other clients to arrive
       if vim.loop.now() - first_attach_time > (test.grace_period_ms or 2000) then
-        break  -- Grace period exceeded
+        break
       end
     end
 
-    -- Global timeout
     if vim.loop.now() - start_time > timeout_ms then
       break
     end
@@ -280,7 +293,6 @@ for _, lsp_name in ipairs(enabled_lsps) do
 
   -- Close buffer cleanly
   vim.cmd("bdelete!")
-  -- Small delay to let plugins clean up (typescript-tools buffers etc.)
   vim.wait(50, function() return false end, 50)
 
   ::continue::
@@ -304,3 +316,14 @@ for _, r in ipairs(results) do
 end
 
 print(string.format("\n%d OK, %d warnings, %d skipped", ok_count, warn_count, skip_count))
+
+-- Print install hints for missing binaries
+if #missing_installs > 0 then
+  print("\n╔══════════════════════════════════════════════════════════════════════╗")
+  print("║  MISSING LSP BINARIES — Install with:                                 ║")
+  print("╠══════════════════════════════════════════════════════════════════════╣")
+  for _, m in ipairs(missing_installs) do
+    print(string.format("║  %-20s → %s", m.lsp, m.cmd))
+  end
+  print("╚══════════════════════════════════════════════════════════════════════╝")
+end
