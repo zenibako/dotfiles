@@ -205,15 +205,18 @@ validate_ghostty() {
   echo "  Ghostty OK: $_file"
 }
 
-# Check templates for unresolvable Handlebars placeholders (pre-deploy only).
-# Profile-aware: only warns about placeholders in blocks for the ACTIVE profile
-# or outside any conditional.
+# Cross-reference Handlebars placeholders against local.toml variables.
+# Only warns about placeholders that:
+#   1. Are in the ACTIVE profile scope (or outside conditionals)
+#   2. Are NOT defined in local.toml, OR are defined but empty
+# Placeholders with non-empty values in local.toml are silently OK.
 validate_handlebars_placeholders() {
   _file="$1"
   if [ ! -f "$_file" ]; then return 0; fi
+  if [ ! -f "$LOCAL_CONFIG" ]; then return 0; fi
 
   if ! has_python3; then
-    # Fallback: naive grep for all placeholders
+    # Fallback: naive grep for all placeholders (no local.toml cross-reference)
     if grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >/dev/null 2>/dev/null; then
       echo "WARNING: Possible unreplaced Handlebars in $_file:" >&2
       grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >&2
@@ -224,11 +227,33 @@ validate_handlebars_placeholders() {
   _profile_aware=$(_python3 -c "
 import re, sys
 file_path = '$_file'
+local_config = '$LOCAL_CONFIG'
 
 # Active profile from local.toml
 profile = '$ACTIVE_PROFILE'
 if profile == '':
     profile = None
+
+# Parse variables from local.toml [variables] section
+local_vars = {}
+in_vars = False
+with open(local_config, 'r') as f:
+    for line in f:
+        stripped = line.strip()
+        if stripped == '[variables]':
+            in_vars = True
+            continue
+        if in_vars and stripped.startswith('['):
+            break
+        if in_vars:
+            # key = 'value' or key = \"value\"
+            m = re.match(r'^([a-zA-Z_][a-zA-Z0-9_]*)\\s*=\\s*\"(.*?)\"\\s*$', stripped)
+            if m:
+                local_vars[m.group(1)] = m.group(2)
+            # key = true / false / number
+            m = re.match(r'^([a-zA-Z_][a-zA-Z0-9_]*)\\s*=\\s*(true|false|[0-9]+)\\s*$', stripped)
+            if m:
+                local_vars[m.group(1)] = m.group(2)
 
 with open(file_path, 'r') as f:
     lines = f.readlines()
@@ -237,34 +262,36 @@ with open(file_path, 'r') as f:
 inactive_ranges = []
 stack = []
 for i, line in enumerate(lines, 1):
-    m = re.search(r'\{\{#if\s+(opencode_profile_(\w+))\s*\}\}', line)
+    m = re.search(r'\{\{#if\\s+(opencode_profile_(\\w+))\\s*\}\}', line)
     if m:
         stack.append((i, m.group(1), m.group(2)))
-    if re.search(r'\{\{/if\s*\}\}', line):
+    if re.search(r'\{\{/if\\s*\}\}', line):
         if stack:
             start, var, prof = stack.pop()
             if profile and prof != profile:
                 inactive_ranges.append((start, i))
 
-# Find placeholders outside inactive ranges
+# Find placeholders outside inactive ranges that are missing or empty
 issues = []
 for i, line in enumerate(lines, 1):
-    # Skip lines inside inactive profile blocks
     in_inactive = any(start <= i <= end for start, end in inactive_ranges)
     if in_inactive:
         continue
-    # Find placeholders (not conditionals)
-    for m in re.finditer(r'\{\{\s*([^{#/][^}]*)\s*\}\}', line):
+    for m in re.finditer(r'\{\{\\s*([^{#/][^}]*)\\s*\}\}', line):
         placeholder = m.group(1).strip()
-        # Skip empty/missing defaults
         if not placeholder or placeholder.startswith('!'):
             continue
-        issues.append((i, placeholder, line.strip()))
+        val = local_vars.get(placeholder)
+        if val is None:
+            issues.append((i, placeholder, 'NOT SET in local.toml'))
+        elif val == '':
+            issues.append((i, placeholder, 'EMPTY in local.toml'))
+        # else: defined and non-empty -> OK, no warning
 
 if issues:
-    print('WARNING: Possible unreplaced Handlebars in {}:'.format(file_path), file=sys.stderr)
-    for line_no, placeholder, ctx in issues:
-        print('  Line %d: {{%s}}  (%s)' % (line_no, placeholder, ctx[:60]), file=sys.stderr)
+    print('WARNING: Possible unreplaced Handlebars in %s:' % file_path, file=sys.stderr)
+    for line_no, placeholder, reason in issues:
+        print('  Line %d: {{%s}}  (%s)' % (line_no, placeholder, reason), file=sys.stderr)
 " 2>&1) || _profile_aware=""
 
   if [ -n "$_profile_aware" ]; then
