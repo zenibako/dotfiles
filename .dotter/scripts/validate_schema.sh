@@ -110,14 +110,38 @@ python_toml() {
   fi
 
   rc=0
-  _python3 "$_file" >/dev/null 2>&1 || rc=$?
+  _python3 -c "
+import sys
+try:
+    import tomllib
+    with open('$_file', 'rb') as f:
+        tomllib.load(f)
+except ImportError:
+    try:
+        import toml
+        toml.load('$_file')
+    except ImportError:
+        sys.exit(2)
+" >/dev/null 2>&1 || rc=$?
 
   if [ "$rc" -eq 2 ]; then
     echo "  Skipping TOML validation (no toml module)"
     return 0
   elif [ "$rc" -ne 0 ]; then
     echo "ERROR: TOML validation failed: $_file" >&2
-    _python3 "$_file" >&2 || true
+    _python3 -c "
+import sys
+try:
+    import tomllib
+    with open('$_file', 'rb') as f:
+        tomllib.load(f)
+except ImportError:
+    try:
+        import toml
+        toml.load('$_file')
+    except ImportError:
+        sys.exit(2)
+" >&2 || true
     return 1
   fi
   echo "  TOML OK: $_file"
@@ -356,14 +380,24 @@ if [ "$MODE" = "--pre-deploy" ]; then
     fi
 
     rc=0
-    _python3 -c "import yaml; yaml.safe_load(open('$_file'))" 2>/dev/null || rc=$?
+    _python3 -c "
+import sys
+try:
+    import yaml
+    yaml.safe_load(open('$_file'))
+except ImportError:
+    sys.exit(2)
+" 2>/dev/null || rc=$?
 
-    if [ "$rc" -eq 0 ]; then
-      echo "  YAML OK: $_file"
-    else
+    if [ "$rc" -eq 2 ]; then
+      echo "  Skipping YAML validation (no yaml module)"
+      continue
+    elif [ "$rc" -ne 0 ]; then
       echo "ERROR: YAML validation failed: $_file" >&2
       _python3 -c "import yaml; yaml.safe_load(open('$_file'))" >&2 || true
       FAILED=1
+    else
+      echo "  YAML OK: $_file"
     fi
   done
 
