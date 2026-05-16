@@ -153,6 +153,12 @@ local missing_installs = {}
 local default_timeout_ms = 40000
 local timeout_ms = default_timeout_ms
 
+local function quiet_wait(ms)
+  -- Headless Neovim 0.12 can surface non-fatal LSP init/shutdown assertions while
+  -- we're only using vim.wait() as a brief sleep between polling steps.
+  pcall(vim.wait, ms, function() return false end, ms)
+end
+
 -- Collect enabled LSP names
 local enabled_lsps = {}
 for name, _ in pairs(vim.lsp._enabled_configs or {}) do
@@ -268,7 +274,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
       break
     end
 
-    vim.wait(100, function() return false end, 100)
+    quiet_wait(100)
   end
 
   if found_expected then
@@ -293,7 +299,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
 
   -- Close buffer cleanly
   vim.cmd("bdelete!")
-  vim.wait(50, function() return false end, 50)
+  quiet_wait(50)
 
   ::continue::
 end

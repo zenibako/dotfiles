@@ -282,20 +282,6 @@ with open(local_config, 'r') as f:
 with open(file_path, 'r') as f:
     lines = f.readlines()
 
-# Track which lines are inside inactive profile blocks
-inactive_ranges = []
-stack = []
-for i, line in enumerate(lines, 1):
-    m = re.search(r'\{\{#if\\s+(opencode_profile_(\\w+))\\s*\}\}', line)
-    if m:
-        stack.append((i, m.group(1), m.group(2)))
-    if re.search(r'\{\{/if\\s*\}\}', line):
-        if stack:
-            start, var, prof = stack.pop()
-            if profile and prof != profile:
-                inactive_ranges.append((start, i))
-
-# Find placeholders outside inactive ranges that are missing or empty
 optional_vars = {
     'reddit_token_v2', 'brave_search_api_key',
     'proton_user', 'proton_password',
@@ -303,15 +289,63 @@ optional_vars = {
     'slack_d_cookie', 'slack_token',
 }
 
+def condition_is_active(condition_name):
+    if condition_name.startswith('opencode_profile_'):
+        expected_profile = condition_name[len('opencode_profile_'):]
+        return profile is None or profile == expected_profile
+
+    value = local_vars.get(condition_name)
+    if value is None:
+        return False
+
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        return lowered not in ('', 'false', '0', 'none', 'null')
+
+    return bool(value)
+
+
+def stack_is_active(stack):
+    return all(frame['active'] for frame in stack)
+
+
+token_re = re.compile(r'\{\{\s*(.*?)\s*\}\}')
 issues = []
+stack = []
 for i, line in enumerate(lines, 1):
-    in_inactive = any(start <= i <= end for start, end in inactive_ranges)
-    if in_inactive:
-        continue
-    for m in re.finditer(r'\{\{\s*([^{#/][^}]*)\s*\}\}', line):
-        placeholder = m.group(1).strip()
-        if not placeholder or placeholder.startswith('!'):
+    for m in token_re.finditer(line):
+        token = m.group(1).strip()
+
+        if not token or token.startswith('!'):
             continue
+
+        if token.startswith('#if '):
+            condition_name = token[4:].strip()
+            condition_result = condition_is_active(condition_name)
+            stack.append({
+                'condition_name': condition_name,
+                'condition_result': condition_result,
+                'active': condition_result,
+            })
+            continue
+
+        if token == 'else':
+            if stack:
+                stack[-1]['active'] = not stack[-1]['condition_result']
+            continue
+
+        if token.startswith('/if'):
+            if stack:
+                stack.pop()
+            continue
+
+        if token.startswith('#') or token.startswith('/'):
+            continue
+
+        if not stack_is_active(stack):
+            continue
+
+        placeholder = token
         val = local_vars.get(placeholder)
         if val is None:
             issues.append((i, placeholder, 'NOT SET in local.toml'))

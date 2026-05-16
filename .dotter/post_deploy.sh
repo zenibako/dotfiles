@@ -162,9 +162,9 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
       # - image.nvim stderr (headless terminal detection)
       # - terraformls single-file recommendation (not an error)
       # - Known Salesforce LSP NPE during init (server-side bug, non-fatal)
-      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed' | grep -v '^\s*$' || true
+      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed\|stack traceback:\|\[C\]: in function '\''assert'\''\|vim/lsp/client\.lua:581: in function\|vim/_core/editor\.lua: in function\|\[C\]: at 0x\|\[C\]: in function '\''pcall'\''\|validate_lsp\.lua:[0-9]\+: in function '\''quiet_wait'\''\|validate_lsp\.lua:[0-9]\+: in main chunk' | grep -v '^\s*$' || true
     else
-      cat "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed' | grep -v '^\s*$' || true
+      cat "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed\|stack traceback:\|\[C\]: in function '\''assert'\''\|vim/lsp/client\.lua:581: in function\|vim/_core/editor\.lua: in function\|\[C\]: at 0x\|\[C\]: in function '\''pcall'\''\|validate_lsp\.lua:[0-9]\+: in function '\''quiet_wait'\''\|validate_lsp\.lua:[0-9]\+: in main chunk' | grep -v '^\s*$' || true
     fi
     rm -f "$lsp_out"
   fi
