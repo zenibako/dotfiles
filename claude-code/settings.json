@@ -2,219 +2,215 @@
   "autoUpdatesChannel": "stable",
   "editorMode": "vim",
   "enabledPlugins": {
-    "lattice@lattice": true,
+    "chrome-devtools-mcp@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "html-lsp@claude-plugins-official": true,
     "json-lsp@claude-plugins-official": true,
+    "lattice@lattice": true,
     "lua-lsp@claude-plugins-official": true,
     "python-lsp@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "yaml-lsp@claude-plugins-official": true,
-    "chrome-devtools-mcp@claude-plugins-official": true
+    "yaml-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "lattice": {
       "source": {
-        "source": "github",
-        "repo": "techygarg/lattice"
+        "repo": "techygarg/lattice",
+        "source": "github"
       }
     }
   },
   "hooks": {
     "Notification": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Waiting # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Waiting # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Auto # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Auto # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "PostToolUseFailure": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' ToolFail # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' ToolFail # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Working # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Working # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "SessionEnd": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ".*"
       },
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Ended # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Ended # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ".*"
       },
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Idle # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Idle # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "Stop": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ".*"
       },
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Idle # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Idle # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ],
     "SubagentStart": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ".*"
       }
     ],
     "SubagentStop": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ".*"
       }
     ],
     "TaskCompleted": [
       {
-        "matcher": ".*",
         "hooks": [
           {
-            "type": "command",
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook"
+            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ".*"
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Working # notchbar-agents-claude-hook"
+            "command": "'/Users/{{username}}/Library/Application Support/Bartender/NotchBar/AgentStatus/hooks/claude-event-hook.sh' Working # notchbar-agents-claude-hook",
+            "type": "command"
           }
         ]
       }
     ]
   },
   "mcpServers": {
-    "Jujutsu": {
-      "command": "{{shell_bin_path}}/npx",
-      "args": [
-        "-y",
-        "jj-mcp-server"
-      ],
-      "env": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    },
-    "GitHub": {
-      "command": "{{shell_bin_path}}/npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    },
     "Backlog": {
-      "command": "{{shell_bin_path}}/backlog",
       "args": [
         "mcp",
         "start"
-      ]
-    },
-    "Playwright": {
-      "command": "{{shell_bin_path}}/npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest"
       ],
-      "env": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
+      "command": "{{shell_bin_path}}/backlog"
     },
     "Chrome DevTools": {
-      "command": "{{shell_bin_path}}/npx",
       "args": [
         "-y",
         "chrome-devtools-mcp@latest",
         "--launch"
       ],
+      "command": "{{shell_bin_path}}/npx",
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "GitHub": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "command": "{{shell_bin_path}}/npx",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "Jujutsu": {
+      "args": [
+        "-y",
+        "jj-mcp-server"
+      ],
+      "command": "{{shell_bin_path}}/npx",
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "Playwright": {
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "command": "{{shell_bin_path}}/npx",
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
