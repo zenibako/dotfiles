@@ -7,6 +7,7 @@ node_modules/
 .dotter/.local.toml.real.bak
 .dotter/cache.toml
 .dotter/cache
+.dotter/scripts/.venv
 
 # Deployed config directory (dotter output)
 .config/
