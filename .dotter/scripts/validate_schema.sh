@@ -53,6 +53,14 @@ _python3() {
 }
 
 has_aerospace() { command -v aerospace >/dev/null 2>&1; }
+
+# Pip command to recommend for installing missing Python packages
+_VENV_PIP="python3 -m pip"
+if [ -s "$_SCRIPTS/.venv/bin/pip" ]; then
+  _VENV_PIP="$_SCRIPTS/.venv/bin/pip"
+elif [ -s "$_SCRIPTS/.venv/bin/pip3" ]; then
+  _VENV_PIP="$_SCRIPTS/.venv/bin/pip3"
+fi
 has_ghostty() { command -v ghostty >/dev/null 2>&1; }
 has_starship() { command -v starship >/dev/null 2>&1; }
 
@@ -183,15 +191,15 @@ validate_jsonc_schema() {
     return 0
   fi
 
-    if _python3 -c "import jsonschema" 2>/dev/null; then
-    if _python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
+  if _python3 -c "import jsonschema" 2>/dev/null; then
+    if _python3 "$SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
       echo "WARNING: JSONC schema validation failed: $_file (schema may be outdated)" >&2
       # Fall through to basic validation
     fi
   else
-    echo "  Skipping JSONC schema validation (no jsonschema module)"
+    echo "  Skipping JSONC schema validation (no jsonschema module; install: ${_VENV_PIP:-python3 -m pip} install jsonschema)"
   fi
   validate_jsonc "$_file"
 }
@@ -401,6 +409,13 @@ if [ "$MODE" = "--pre-deploy" ]; then
   fi
 
   # YAML (basic syntax check via Python)
+  _has_yaml=""
+  if has_python3; then
+    if _python3 -c "import yaml" 2>/dev/null; then
+      _has_yaml=1
+    fi
+  fi
+
   for _file in \
     "$REPO_ROOT/carapace/bridges.yaml" \
     "$REPO_ROOT/carapace/specs/gog.yaml" \
@@ -410,6 +425,11 @@ if [ "$MODE" = "--pre-deploy" ]; then
     if [ ! -f "$_file" ]; then continue; fi
     if ! has_python3; then
       echo "  Skipping YAML validation (no python3)"
+      continue
+    fi
+
+    if [ -z "$_has_yaml" ]; then
+      echo "  Skipping YAML validation (no yaml module; install: ${_VENV_PIP:-python3 -m pip} install pyyaml)"
       continue
     fi
 

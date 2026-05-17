@@ -92,7 +92,7 @@ To remove deployed files (e.g. after pruning entries from `.dotter/global.toml`)
 
 pnpm is configured as the recommended Node.js package manager with:
 - Global store location: `~/Library/pnpm/store` (default)
-- Global binaries: `~/Library/pnpm`
+- Global binaries: `~/Library/pnpm/bin`
 - Configuration: `~/.config/pnpm/rc`
 - Shell completions for zsh and nushell
 - Integrated with Atuin history search
