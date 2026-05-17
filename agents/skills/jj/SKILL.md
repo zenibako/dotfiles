@@ -141,9 +141,34 @@ AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
 source ~/.zshrc && AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
 
 # Or use the manual inline command (works everywhere)
-jj commit -m "feat: add new feature
+jj new main && jj describe -m "feat: add new feature
 
 Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
+```
+
+### Full workflow: commit + advance bookmark + push
+
+After committing changes on a tracked bookmark (like `main`):
+
+1. **Check bookmark state**: `jj bookmark list`
+2. **Advance the bookmark** if it lags behind the latest commit: `jj bookmark move <bookmark> --to <new-head>`
+
+`jjc` / `jjd` helpers do step 2 automatically — they run `jj new <commit>` after committing, keeping the working copy on the latest change.
+
+### Pushing to remote
+
+After committing and advancing, push with:
+
+```bash
+jj git push
+```
+
+If the bookmark points to a new commit and is at the same commit as its remote tracking branch, jj will skip it. If it differs, it pushes the bookmark forward on the remote too.
+
+To push ALL bookmarks (and advance them on the remote):
+
+```bash
+jj git push --all
 ```
 
 | Profile | Model | Co-authored-by |
