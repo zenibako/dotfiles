@@ -2,14 +2,20 @@
   "mcpServers": {
     "Jujutsu": {
       "command": "{{shell_bin_path}}/npx",
-      "args": ["-y", "jj-mcp-server"],
+      "args": [
+        "-y",
+        "jj-mcp-server"
+      ],
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     },
     "GitHub": {
       "command": "{{shell_bin_path}}/npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -17,62 +23,28 @@
     },
     "Backlog": {
       "command": "{{shell_bin_path}}/backlog",
-      "args": ["mcp", "start"]
+      "args": [
+        "mcp",
+        "start"
+      ]
     },
     "Playwright": {
       "command": "{{shell_bin_path}}/npx",
-      "args": ["-y", "@playwright/mcp@latest"],
-      "env": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }
-    {{#if opencode_profile_work}},
-    "GitLab": {
-      "command": "{{shell_bin_path}}/npx",
-      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
-      "env": {
-        "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
-        "GITLAB_API_URL": "{{gitlab_api_url}}",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }
-    {{#if mcp_atlassian_enabled}},
-    "Atlassian": {
-      "command": "{{shell_bin_path}}/npx",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
-      "env": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }
-    {{/if}}
-    {{#if mcp_sonarqube_enabled}}{{#if sonarqube_url}}{{#if sonarqube_token}},
-    "SonarQube": {
-      "command": "{{shell_bin_path}}/docker",
       "args": [
-        "run", "--init", "--pull=always", "-i", "--rm",
-        {{#if node_extra_ca_certs}}{{#if ca_cert_container_path}}
-        "-v", "{{node_extra_ca_certs}}:{{ca_cert_container_path}}:ro",
-        {{/if}}{{/if}}
-        "-e", "SONARQUBE_URL",
-        "-e", "SONARQUBE_TOKEN",
-        {{#if java_tool_options}}
-        "-e", "JAVA_TOOL_OPTIONS",
-        {{/if}}
-        "mcp/sonarqube"
+        "-y",
+        "@playwright/mcp@latest"
       ],
       "env": {
-        "DOCKER_CONTEXT": "desktop-linux",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
-        "SONARQUBE_URL": "{{sonarqube_url}}",
-        "SONARQUBE_TOKEN": "{{sonarqube_token}}"{{#if java_tool_options}},
-        "JAVA_TOOL_OPTIONS": "{{java_tool_options}}"{{/if}}
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }
-    {{/if}}{{/if}}{{/if}}
-    {{/if}},
+    },
     "Chrome DevTools": {
       "command": "{{shell_bin_path}}/npx",
-      "args": ["-y", "chrome-devtools-mcp@latest", "--launch"],
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--launch"
+      ],
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
