@@ -56,7 +56,6 @@ except Exception:
   unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
 fi
 
-echo "==> Running post-deploy validation..."
 DEPLOYED="$HOME/.config"
 
 if [ -d "$_dotfiles" ]; then

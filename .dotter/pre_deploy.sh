@@ -31,7 +31,6 @@ require_var name
 require_var email
 
 # Pre-deploy schema validation
-echo "==> Running pre-deploy schema validation..."
 _repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
 if [ -z "$_repo_root" ]; then

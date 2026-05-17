@@ -180,5 +180,6 @@
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }
-  }
+  },
+  "remoteControlAtStartup": false
 }
