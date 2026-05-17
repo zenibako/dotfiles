@@ -192,7 +192,7 @@ validate_jsonc_schema() {
   fi
 
   if _python3 -c "import jsonschema" 2>/dev/null; then
-    if _python3 "$SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
+    if _python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
       echo "WARNING: JSONC schema validation failed: $_file (schema may be outdated)" >&2
