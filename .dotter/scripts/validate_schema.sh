@@ -43,6 +43,33 @@ ACTIVE_PROFILE=$(get_profile)
 has_taplo() { command -v taplo >/dev/null 2>&1; }
 has_python3() { command -v python3 >/dev/null 2>&1; }
 
+# Ensure a local venv exists at .dotter/scripts/.venv for missing Python packages
+# (self-contained, works with PEP 668 externally-managed environments like Homebrew)
+_ensure_venv() {
+  if [ -s "$_SCRIPTS/.venv/bin/python3" ]; then
+    return 0
+  fi
+  if ! has_python3; then
+    return 1
+  fi
+  echo "  Creating validation venv at $_SCRIPTS/.venv..." >&2
+  python3 -m venv "$_SCRIPTS/.venv" >/dev/null 2>&1
+  [ -s "$_SCRIPTS/.venv/bin/python3" ]
+}
+
+# Install a package into the local venv if missing
+_ensure_pkg() {
+  _pkg="$1"
+  if [ ! -s "$_SCRIPTS/.venv/bin/python3" ]; then
+    _ensure_venv || return 1
+  fi
+  if "$_SCRIPTS/.venv/bin/python3" -c "import $_pkg" 2>/dev/null; then
+    return 0
+  fi
+  echo "  Installing $_pkg into validation venv..." >&2
+  "$_SCRIPTS/.venv/bin/pip" install "$_pkg" >/dev/null 2>&1
+}
+
 # Use venv python if available (for packages like pyyaml that may not be on the host)
 _python3() {
   if [ -s "$_SCRIPTS/.venv/bin/python3" ]; then
@@ -199,7 +226,9 @@ validate_jsonc_schema() {
       # Fall through to basic validation
     fi
   else
-    echo "  Skipping JSONC schema validation (no jsonschema module; install: ${_VENV_PIP:-python3 -m pip} install jsonschema)"
+    _ensure_pkg jsonschema || {
+      echo "  Skipping JSONC schema validation (no jsonschema module; tried to auto-install into $_SCRIPTS/.venv)"
+    }
   fi
   validate_jsonc "$_file"
 }
@@ -413,6 +442,12 @@ if [ "$MODE" = "--pre-deploy" ]; then
   if has_python3; then
     if _python3 -c "import yaml" 2>/dev/null; then
       _has_yaml=1
+    else
+      # Auto-install into local venv (handles PEP 668 externally-managed environments)
+      _ensure_pkg pyyaml >/dev/null 2>&1 || true
+      if _python3 -c "import yaml" 2>/dev/null; then
+        _has_yaml=1
+      fi
     fi
   fi
 
@@ -429,7 +464,7 @@ if [ "$MODE" = "--pre-deploy" ]; then
     fi
 
     if [ -z "$_has_yaml" ]; then
-      echo "  Skipping YAML validation (no yaml module; install: ${_VENV_PIP:-python3 -m pip} install pyyaml)"
+      echo "  Skipping YAML validation (no yaml module; tried auto-install into $_SCRIPTS/.venv but failed)"
       continue
     fi
 
