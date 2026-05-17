@@ -5,6 +5,15 @@
 
 set -eu
 
+# ANSI color codes for warnings and errors
+COLOR_YELLOW='\033[33m'
+COLOR_RED='\033[31m'
+COLOR_GREEN='\033[32m'
+COLOR_RESET='\033[0m'
+_WARN() { printf "${COLOR_YELLOW}WARNING:${COLOR_RESET} %s\n" "$1" >&2; }
+_ERR()  { printf "${COLOR_RED}ERROR:${COLOR_RESET} %s\n" "$1" >&2; }
+_OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
+
 MODE="${1:---pre-deploy}"
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 _SCRIPTS="$REPO_ROOT/.dotter/scripts"
@@ -122,12 +131,12 @@ lint_toml() {
     echo "  TOML OK: $_file"
     rm -f "$_tmp"
   else
-    echo "WARNING: TOML validation failed: $_file (schema may be unreachable; retrying without schema)" >&2
+    _WARN "TOML validation failed: $_file (schema may be unreachable; retrying without schema)"
     if taplo lint --no-schema "$_tmp" >/dev/null 2>&1; then
       echo "  TOML OK: $_file (syntax only)"
       rm -f "$_tmp"
     else
-      echo "ERROR: TOML validation failed: $_file" >&2
+      _ERR "TOML validation failed: $_file"
       taplo lint --no-schema "$_tmp" >&2 || true
       rm -f "$_tmp"
       return 1
@@ -163,7 +172,7 @@ except ImportError:
     echo "  Skipping TOML validation (no toml module)"
     return 0
   elif [ "$rc" -ne 0 ]; then
-    echo "ERROR: TOML validation failed: $_file" >&2
+    		_ERR "TOML validation failed: $_file" >&2
     _python3 -c "
 import sys
 try:
@@ -204,7 +213,7 @@ validate_jsonc() {
   if _python3 "$_SCRIPTS/validate_jsonc.py" "$_file"; then
     echo "  JSONC OK: $_file"
   else
-    echo "ERROR: JSONC validation failed: $_file" >&2
+    		_ERR "JSONC validation failed: $_file" >&2
     return 1
   fi
 }
@@ -222,7 +231,7 @@ validate_jsonc_schema() {
     if _python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
-      echo "WARNING: JSONC schema validation failed: $_file (schema may be outdated)" >&2
+      		_WARN "JSONC schema validation failed: $_file (schema may be outdated)" >&2
       # Fall through to basic validation
     fi
   else
@@ -243,7 +252,7 @@ validate_aerospace() {
   fi
 
   if ! _modes=$(AEROSPACE_CONFIG="$_file" aerospace list-modes 2>/dev/null); then
-    echo "ERROR: AeroSpace config validation failed: $_file" >&2
+    		_ERR "AeroSpace config validation failed: $_file" >&2
     return 1
   fi
   echo "  AeroSpace OK ($_file): detected modes"
@@ -260,7 +269,7 @@ validate_ghostty() {
   fi
 
   if ! ghostty +validate-config --config-file="$_file" 2>&1 >/dev/null; then
-    echo "ERROR: Ghostty config validation failed: $_file" >&2
+    		_ERR "Ghostty config validation failed: $_file" >&2
     return 1
   fi
   echo "  Ghostty OK: $_file"
@@ -279,7 +288,7 @@ validate_handlebars_placeholders() {
   if ! has_python3; then
     # Fallback: naive grep for all placeholders (no local.toml cross-reference)
     if grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >/dev/null 2>/dev/null; then
-      echo "WARNING: Possible unreplaced Handlebars in $_file:" >&2
+      		_WARN "Possible unreplaced Handlebars in $_file:" >&2
       grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >&2
     fi
     return 0
@@ -482,7 +491,7 @@ except ImportError:
       echo "  Skipping YAML validation (no yaml module)"
       continue
     elif [ "$rc" -ne 0 ]; then
-      echo "ERROR: YAML validation failed: $_file" >&2
+      		_ERR "YAML validation failed: $_file" >&2
       _python3 -c "import yaml; yaml.safe_load(open('$_file'))" >&2 || true
       FAILED=1
     else
@@ -532,7 +541,7 @@ elif [ "$MODE" = "--post-deploy" ]; then
     if _python3 "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings"; then
       echo "  Claude Code settings OK"
     else
-      echo "ERROR: Claude Code settings validation failed" >&2
+      		_ERR "Claude Code settings validation failed" >&2
       FAILED=1
     fi
   fi
