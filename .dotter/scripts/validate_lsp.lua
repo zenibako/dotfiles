@@ -333,3 +333,62 @@ if #missing_installs > 0 then
   end
   print("╚══════════════════════════════════════════════════════════════════════╝")
 end
+
+-- ── nvim-lint linter validation ──────────────────────────────────────────────
+-- Run sf code-analyzer synchronously (blocking os.execute is fine in headless)
+-- rather than going through the async nvim-lint job system, which doesn't
+-- complete reliably in a headless session.
+print("\n== Linter Validation Results ==")
+
+local lint_ok, lint = pcall(require, "lint")
+if not lint_ok then
+  print("  ⊘ nvim-lint                 not loaded")
+else
+  local linter_name = "code_analyzer_apex"
+
+  if not lint.linters[linter_name] then
+    print(string.format("  ⊘ %-25s linter not registered", linter_name))
+  elseif vim.fn.executable("sf") == 0 then
+    print(string.format("  ⚠ %-25s sf CLI not found in PATH", linter_name))
+  else
+    -- Reuse the same file content as the apex-language-server test.
+    local apex_test = lsp_tests["apex-language-server"]
+    local lint_dir = test_dir .. "/lint-apex"
+    vim.fn.mkdir(lint_dir, "p")
+    local lint_file = lint_dir .. "/" .. apex_test.filename
+    local lf = io.open(lint_file, "w")
+    if lf then
+      lf:write(apex_test.content)
+      lf:close()
+    end
+
+    local tmpfile = vim.fn.tempname() .. ".json"
+    local lint_start = vim.loop.now()
+
+    os.execute(string.format(
+      "sf code-analyzer run --target %s --workspace %s --output-file %s 2>/dev/null",
+      vim.fn.shellescape(lint_file),
+      vim.fn.shellescape(lint_dir),
+      vim.fn.shellescape(tmpfile)
+    ))
+
+    local elapsed = math.floor((vim.loop.now() - lint_start) / 1000)
+    local violation_count = 0
+    local rf = io.open(tmpfile, "r")
+    if rf then
+      local content = rf:read("*all")
+      rf:close()
+      os.remove(tmpfile)
+      local ok, data = pcall(vim.json.decode, content)
+      if ok and type(data) == "table" then
+        violation_count = #(data.violations or {})
+      end
+    end
+
+    if violation_count > 0 then
+      print(string.format("  ✓ %-25s %d violation(s) in %ds", linter_name, violation_count, elapsed))
+    else
+      print(string.format("  ⚠ %-25s ran but found no violations in %ds", linter_name, elapsed))
+    end
+  end
+end

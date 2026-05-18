@@ -4,28 +4,11 @@ vim.pack.add({
 
 local lint = require("lint")
 
--- Resolve rulesets: prefer project-local apexRuleSets.xml.
--- Falls back to built-in Apex categories when no project file exists.
-local function resolve_rulesets(bufnr)
-	local bufname = vim.api.nvim_buf_get_name(bufnr)
-	if bufname ~= "" then
-		local root = vim.fs.root(bufname, "sfdx-project.json")
-		if root then
-			local project_rulesets = root .. "/apexRuleSets.xml"
-			if vim.fn.filereadable(project_rulesets) == 1 then
-				-- Use only project rulesets; no built-in fallback
-				return project_rulesets
-			end
-		end
-	end
-	-- No fallback: if apexRuleSets.xml doesn't exist, PMD uses its default rules
-	return ""
-end
-
--- Parse PMD JSON output, filter to current-buffer violations only, and map
--- PMD priority → vim diagnostic severity.
--- NOTE: PMD JSON keys are lowercase: beginline, begincolumn, endline, endcolumn
-local function parse_pmd_json(output, bufnr, linter_cwd)
+-- Parse code-analyzer JSON output (sf code-analyzer run --output-format json),
+-- filter to current-buffer violations only, and map severity (1-5) →
+-- vim diagnostic severity.
+-- JSON shape: { runDir, violations: [{ rule, engine, severity, locations: [{ file, startLine, startColumn, endLine, endColumn }], message }] }
+local function parse_ca_json(output, bufnr, linter_cwd)
 	local ok, data = pcall(vim.json.decode, output)
 	if not ok or type(data) ~= "table" then
 		return {}
@@ -33,6 +16,7 @@ local function parse_pmd_json(output, bufnr, linter_cwd)
 
 	local bufname = vim.api.nvim_buf_get_name(bufnr)
 	local bufpath = vim.fn.fnamemodify(bufname, ":p")
+	local run_dir = data.runDir or (linter_cwd or vim.fn.getcwd()) .. "/"
 
 	local function resolve_path(name)
 		if not name or name == "" then
@@ -41,93 +25,105 @@ local function parse_pmd_json(output, bufnr, linter_cwd)
 		if vim.startswith(name, "/") then
 			return vim.fn.fnamemodify(name, ":p")
 		end
-		local base = linter_cwd or vim.fn.getcwd()
-		return vim.fn.fnamemodify(base .. "/" .. name, ":p")
+		return vim.fn.fnamemodify(run_dir .. name, ":p")
 	end
 
 	local diagnostics = {}
-	for _, file in ipairs(data.files or {}) do
-		local filepath = resolve_path(file.filename)
-		if filepath == bufpath then
-			for _, v in ipairs(file.violations or {}) do
-				local severity = vim.diagnostic.severity.HINT
-				local priority = tonumber(v.priority)
-				if priority == 1 then
-					severity = vim.diagnostic.severity.ERROR
-				elseif priority == 2 then
-					severity = vim.diagnostic.severity.WARN
-				elseif priority == 3 then
-					severity = vim.diagnostic.severity.INFO
-				end
-
-				-- Make diagnostics single-line so virtual_lines renders at the
-				-- start line (Neovim places virtual_lines at end_lnum).
-				local lnum = math.max(0, (v.beginline or 1) - 1)
-				table.insert(diagnostics, {
-					lnum = lnum,
-					col = math.max(0, (v.begincolumn or 1) - 1),
-					end_lnum = lnum,
-					end_col = (v.endcolumn or v.begincolumn or 1) - 1,
-					message = v.description or v.rule or "PMD violation",
-					severity = severity,
-					source = "pmd",
-					code = v.rule,
-				})
-			end
+	for _, v in ipairs(data.violations or {}) do
+		local pri_idx = (v.primaryLocationIndex or 0) + 1
+		local loc = (v.locations or {})[pri_idx] or (v.locations or {})[1]
+		if not loc then
+			goto continue
 		end
+
+		local filepath = resolve_path(loc.file)
+		if filepath ~= bufpath then
+			goto continue
+		end
+
+		local severity = vim.diagnostic.severity.HINT
+		local sev = tonumber(v.severity)
+		if sev == 1 or sev == 2 then
+			severity = vim.diagnostic.severity.ERROR
+		elseif sev == 3 then
+			severity = vim.diagnostic.severity.WARN
+		elseif sev == 4 then
+			severity = vim.diagnostic.severity.INFO
+		end
+
+		-- Make diagnostics single-line so virtual_lines renders at the
+		-- start line (Neovim places virtual_lines at end_lnum).
+		local lnum = math.max(0, (loc.startLine or 1) - 1)
+		table.insert(diagnostics, {
+			lnum = lnum,
+			col = math.max(0, (loc.startColumn or 1) - 1),
+			end_lnum = lnum,
+			end_col = math.max(0, (loc.endColumn or loc.startColumn or 1) - 1),
+			message = v.message or v.rule or "code-analyzer violation",
+			severity = severity,
+			source = "code-analyzer",
+			code = v.rule,
+		})
+
+		::continue::
 	end
 	return diagnostics
 end
 
-lint.linters.pmd_apex = {
-	cmd = "pmd",
+lint.linters.code_analyzer_apex = {
+	cmd = "sh",
 	stdin = false,
 	args = {}, -- built dynamically per-buffer in the autocmd
 	stream = "stdout",
 	ignore_exitcode = true,
-	parser = parse_pmd_json,
-	timeout = 30000, -- 30s; PMD can be slow on first run
+	parser = parse_ca_json,
+	timeout = 60000, -- 60s; code-analyzer can be slow on first run
 }
 
 lint.linters_by_ft = {
-	apex = { "pmd_apex" },
+	apex = { "code_analyzer_apex" },
 }
 
--- Warn once per session if PMD is not installed when opening an Apex file.
-local pmd_warned = false
+-- Warn once per session if sf CLI is not installed when opening an Apex file.
+local ca_warned = false
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "apex",
 	callback = function()
-		if not pmd_warned and vim.fn.executable("pmd") == 0 then
-			pmd_warned = true
+		if not ca_warned and vim.fn.executable("sf") == 0 then
+			ca_warned = true
 			vim.notify(
-				"PMD not found in PATH. Apex diagnostics will not work.\n"
-					.. "Install PMD, e.g. `brew install pmd`.",
+				"Salesforce CLI (sf) not found in PATH. Apex diagnostics will not work.\n"
+					.. "Install it from https://developer.salesforce.com/tools/salesforcecli",
 				vim.log.levels.WARN,
-				{ title = "nvim-lint (PMD)" }
+				{ title = "nvim-lint (code-analyzer)" }
 			)
 		end
 	end,
 })
 
 -- Trigger linting on save, read, and filetype detection.
--- Build args dynamically per buffer so --dir points at the file's directory.
+-- Build args dynamically per buffer; sf code-analyzer writes JSON to a temp
+-- file, so we cat it to stdout where nvim-lint reads it.
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "FileType" }, {
 	callback = function(args)
 		local ft = vim.bo[args.buf].filetype
 		if ft == "apex" and lint.linters_by_ft[ft] then
 			local bufname = vim.api.nvim_buf_get_name(args.buf)
 			if bufname ~= "" then
-				local dir = vim.fn.fnamemodify(bufname, ":h")
-				local cache = vim.fn.stdpath("cache") .. "/pmd"
-				vim.fn.mkdir(cache, "p")
+				local root = vim.fs.root(bufname, "sfdx-project.json")
+					or vim.fn.fnamemodify(bufname, ":h")
+				local tmpfile = vim.fn.tempname() .. ".json"
 
-				lint.linters.pmd_apex.args = {
-					"check",
-					"--format", "json",
-					"--rulesets", resolve_rulesets(args.buf),
-					"--dir", dir,
-					"--cache", cache,
+				lint.linters.code_analyzer_apex.args = {
+					"-c",
+					string.format(
+						"sf code-analyzer run --target %s --workspace %s --output-file %s 2>/dev/null && cat %s; rm -f %s",
+						vim.fn.shellescape(bufname),
+						vim.fn.shellescape(root),
+						vim.fn.shellescape(tmpfile),
+						vim.fn.shellescape(tmpfile),
+						vim.fn.shellescape(tmpfile)
+					),
 				}
 			end
 			lint.try_lint()

@@ -155,7 +155,7 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
     echo "Validating LSP attachments..."
     lsp_out=$(mktemp)
     # Neovim headless sends print() output to stderr, capture both
-    timeout 180 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
+    timeout 300 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
     if command -v perl >/dev/null 2>&1; then
       # Suppress:
       # - image.nvim stderr (headless terminal detection)
