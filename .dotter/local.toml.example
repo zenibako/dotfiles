@@ -46,6 +46,7 @@ gpg_key = ""
 
 # For 'personal' profile, uncomment and set these:
 # playdate_sdk_enabled = true
+# bartender_hooks_enabled = true      # Only on macOS machines with Bartender installed
 
 # Home Assistant MCP server (personal profile)
 # Claude Desktop uses OAuth natively. OpenCode uses the long-lived access token below.

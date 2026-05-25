@@ -24,6 +24,7 @@
     }
   },
   "hooks": {
+{{#if (eq bartender_hooks_enabled true)}}
     "Notification": [
       {
         "hooks": [
@@ -68,7 +69,7 @@
       {
         "hooks": [
           {
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "command": "__claudebar_hook() { PORT=\"$HOME/.claude/claudebar-hook-port\"; cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
             "type": "command"
           }
         ],
@@ -87,7 +88,7 @@
       {
         "hooks": [
           {
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "command": "__claudebar_hook() { PORT=\"$HOME/.claude/claudebar-hook-port\"; cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
             "type": "command"
           }
         ],
@@ -106,7 +107,7 @@
       {
         "hooks": [
           {
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "command": "__claudebar_hook() { PORT=\"$HOME/.claude/claudebar-hook-port\"; cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
             "type": "command"
           }
         ],
@@ -125,7 +126,7 @@
       {
         "hooks": [
           {
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "command": "__claudebar_hook() { PORT=\"$HOME/.claude/claudebar-hook-port\"; cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
             "type": "command"
           }
         ],
@@ -136,7 +137,7 @@
       {
         "hooks": [
           {
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "command": "__claudebar_hook() { PORT=\"$HOME/.claude/claudebar-hook-port\"; cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
             "type": "command"
           }
         ],
@@ -147,7 +148,7 @@
       {
         "hooks": [
           {
-            "command": "__claudebar_hook() { PORT=$(cat \"$HOME/.claude/claudebar-hook-port\" 2>/dev/null || echo 19847); cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
+            "command": "__claudebar_hook() { PORT=\"$HOME/.claude/claudebar-hook-port\"; cat | curl -s -X POST \"http://localhost:${PORT}/hook\" -H 'Content-Type: application/json' -d @- > /dev/null 2>&1 & }; __claudebar_hook",
             "type": "command"
           }
         ],
@@ -164,7 +165,8 @@
         ]
       }
     ]
-  },
+  }
+{{/if}},
   "mcpServers": {
     "Backlog": {
       "args": [

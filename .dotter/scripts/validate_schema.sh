@@ -28,6 +28,11 @@ fi
 
 # --- helpers ---
 
+if [ -s "$_SCRIPTS/.venv/bin/python3" ]; then
+  PATH="$_SCRIPTS/.venv/bin:$PATH"
+  export PATH
+fi
+
 get_profile() {
   if [ ! -f "$LOCAL_CONFIG" ]; then return 0; fi
   # Parse packages array from local.toml (handles multi-line arrays)
