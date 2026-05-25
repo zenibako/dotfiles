@@ -52,6 +52,13 @@ home_assistant_webhook_id             = ""
 playdate_sdk_enabled                  = false
 bartender_hooks_enabled               = false
 
+# Claude Desktop & Code
+claude_remote_tools_device_name       = "mac-mini"
+claude_model                          = "opus"
+claude_effort_level                   = "high"
+claude_agent_push_notif_enabled       = true
+claude_bypass_permissions_account_id  = "c5055d6d-b6e9-46de-a26f-0dad4c6255fc"
+
 # Bluesky
 bluesky_handle                        = ""
 bluesky_app_password                  = ""

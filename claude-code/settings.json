@@ -1,30 +1,30 @@
 {
-  "autoUpdatesChannel": "stable",
-  "editorMode": "vim",
+  "model": "{{claude_model}}",
   "enabledPlugins": {
     "chrome-devtools-mcp@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
-    "html-lsp@claude-plugins-official": true,
-    "json-lsp@claude-plugins-official": true,
     "lattice@lattice": true,
     "lua-lsp@claude-plugins-official": true,
-    "python-lsp@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "yaml-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "lattice": {
       "source": {
-        "repo": "techygarg/lattice",
-        "source": "github"
+        "source": "github",
+        "repo": "techygarg/lattice"
       }
     }
   },
-  "hooks": {
+  "effortLevel": "{{claude_effort_level}}",
+  "autoUpdatesChannel": "stable",
+  "editorMode": "vim",
+  "agentPushNotifEnabled": {{#if (eq claude_agent_push_notif_enabled true)}}true{{else}}false{{/if}},
+  "skipAutoPermissionPrompt": true,
 {{#if (eq bartender_hooks_enabled true)}}
+  "hooks": {
     "Notification": [
       {
         "hooks": [
@@ -165,8 +165,8 @@
         ]
       }
     ]
-  }
-{{/if}},
+  },
+{{/if}}
   "mcpServers": {
     "Backlog": {
       "args": [
@@ -217,6 +217,5 @@
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }
-  },
-  "skipAutoPermissionPrompt": true
+  }
 }

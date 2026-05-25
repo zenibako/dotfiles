@@ -58,7 +58,6 @@
     "ccdScheduledTasksEnabled": true,
     "sidebarMode": "epitaxy",
     "coworkWebSearchEnabled": true,
-    "remoteToolsDeviceName": "macbook-air-m2-local",
     "epitaxyPrefs": {
       "starred-local-code-sessions": [],
       "starred-cowork-spaces": [],
@@ -67,10 +66,24 @@
         "pinnedOrder": [],
         "customGroupAssignments": {},
         "customGroupOrder": {}
+      },
+      "cc-landing-worktree-enabled": false,
+      "epitaxy-perm-mode-acks.c5055d6d-b6e9-46de-a26f-0dad4c6255fc": [
+        "/Users/chanderson/projects/home-assistant:auto",
+        "/Users/chanderson/projects/cuejitsu:auto"
+      ],
+      "epitaxy-folder-permission-mode.c5055d6d-b6e9-46de-a26f-0dad4c6255fc": {
+        "/Users/chanderson/projects/home-assistant": "auto",
+        "/Users/chanderson/projects/cuejitsu": "auto"
       }
     },
+    "remoteToolsDeviceName": "{{claude_remote_tools_device_name}}",
     "bypassPermissionsGateByAccount": {
-      "c5055d6d-b6e9-46de-a26f-0dad4c6255fc": false
+      "{{claude_bypass_permissions_account_id}}": true
+    },
+    "ccRemoteControlDefaultEnabled": {{claude_agent_push_notif_enabled}},
+    "bypassPermissionsOptInByAccount": {
+      "{{claude_bypass_permissions_account_id}}": true
     }
   }
 }
