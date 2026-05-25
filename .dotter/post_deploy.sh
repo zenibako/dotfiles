@@ -154,18 +154,44 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
   if [ -f "$_scripts/validate_lsp.lua" ]; then
     echo "Validating LSP attachments..."
     lsp_out=$(mktemp)
+    # Write suppression patterns to a temp file so we only define them once.
+    # These are all known non-fatal stderr noise from headless nvim.
+    lsp_ignore=$(mktemp)
+    cat > "$lsp_ignore" <<'LSP_FILTERS'
+image.nvim
+image.lua
+image/backends
+terminal size
+non-terminal
+Error in command line:
+ignoreSingleFileWarning
+Some capabilities may be reduced
+Cannot read properties of null
+vim.schedule callback
+RPC[Error]
+Request initialize failed
+stack traceback:
+[C]: in function 'assert'
+[C]: in function 'pcall'
+[C]: in function '_with'
+[C]: in function 'nvim_exec2'
+[C]: at 0x
+vim/lsp/client.lua:581: in function
+vim/_core/editor.lua: in function
+filetype.lua:27:
+validate_lsp.lua:
+python3_provider
+g:loaded_python3_provider
+provider: python3: missing
+LSP_FILTERS
     # Neovim headless sends print() output to stderr, capture both
     timeout 300 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
     if command -v perl >/dev/null 2>&1; then
-      # Suppress:
-      # - image.nvim stderr (headless terminal detection)
-      # - terraformls single-file recommendation (not an error)
-      # - Known Salesforce LSP NPE during init (server-side bug, non-fatal)
-      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed\|stack traceback:\|\[C\]: in function '\''assert'\''\|vim/lsp/client\.lua:581: in function\|vim/_core/editor\.lua: in function\|\[C\]: at 0x\|\[C\]: in function '\''pcall'\''\|validate_lsp\.lua:[0-9]\+: in function '\''quiet_wait'\''\|validate_lsp\.lua:[0-9]\+: in main chunk' | grep -v '^\s*$' || true
+      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -Fv -f "$lsp_ignore" | grep -v '^\s*$' || true
     else
-      cat "$lsp_out" | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal\|Error in command line:\|ignoreSingleFileWarning\|Some capabilities may be reduced\|Cannot read properties of null\|vim\.schedule callback\|RPC\[Error\]\|Request initialize failed\|stack traceback:\|\[C\]: in function '\''assert'\''\|vim/lsp/client\.lua:581: in function\|vim/_core/editor\.lua: in function\|\[C\]: at 0x\|\[C\]: in function '\''pcall'\''\|validate_lsp\.lua:[0-9]\+: in function '\''quiet_wait'\''\|validate_lsp\.lua:[0-9]\+: in main chunk' | grep -v '^\s*$' || true
+      cat "$lsp_out" | grep -Fv -f "$lsp_ignore" | grep -v '^\s*$' || true
     fi
-    rm -f "$lsp_out"
+    rm -f "$lsp_out" "$lsp_ignore"
   fi
 fi
 
