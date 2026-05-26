@@ -48,6 +48,17 @@
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
+    },
+    "Obsidian": {
+      "command": "{{shell_bin_path}}/npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://mac-mini.local:27123/mcp"
+      ],
+      "env": {
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
     }
   },
   "preferences": {

@@ -235,6 +235,14 @@
       },
       "enabled": true
     },
+    "Obsidian": {
+      "type": "remote",
+      "url": "http://mac-mini.local:27123/mcp",
+      "headers": {
+        "Authorization": "Bearer 321e24a4d057cf4899e0279f70365bce2ef75291ff5d5690b29b0d8567d80eab"
+      },
+      "enabled": true
+    }
   },
   "lsp": {
 {{#if opencode_profile_work}}
