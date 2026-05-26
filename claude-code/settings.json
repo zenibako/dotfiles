@@ -1,18 +1,25 @@
 {
+{{#if (eq claude_model_at_top true)}}
+  "model": "{{claude_model}}",
+{{/if}}
   "enabledPlugins": {
     "chrome-devtools-mcp@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
+{{#if (eq claude_plugin_extra_lsps true)}}
     "html-lsp@claude-plugins-official": true,
     "json-lsp@claude-plugins-official": true,
+{{/if}}
     "lattice@lattice": true,
     "lua-lsp@claude-plugins-official": true,
+{{#if (eq claude_plugin_extra_lsps true)}}
     "python-lsp@claude-plugins-official": true,
+{{/if}}
     "swift-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "yaml-lsp@claude-plugins-official": true,
-    "clangd-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true{{#if (eq claude_plugin_extra_lsps true)}},
+    "yaml-lsp@claude-plugins-official": true{{/if}}{{#if (eq claude_plugin_clangd_lsp true)}},
+    "clangd-lsp@claude-plugins-official": true{{/if}}
   },
   "extraKnownMarketplaces": {
     "lattice": {
@@ -22,11 +29,11 @@
       }
     }
   },
-  "autoUpdatesChannel": "stable",
-  "editorMode": "vim",
 {{#if (eq claude_effort_level_enabled true)}}
   "effortLevel": "{{claude_effort_level}}",
 {{/if}}
+  "autoUpdatesChannel": "stable",
+  "editorMode": "vim",
 {{#if (eq claude_agent_push_notif_enabled true)}}
   "agentPushNotifEnabled": true,
 {{/if}}
@@ -236,6 +243,6 @@
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }
-  },
-  "model": "{{claude_model}}"
+  }{{#if (eq claude_model_at_top false)}},
+  "model": "{{claude_model}}"{{/if}}
 }
