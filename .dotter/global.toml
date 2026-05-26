@@ -59,6 +59,7 @@ claude_remote_tools_device_name          = "mac-mini"
 claude_model                             = "opus"
 claude_effort_level                      = "high"
 claude_plugin_pyright_lsp                = false
+claude_plugin_extra_lsps                 = true
 mcp_obsidian_enabled                     = false
 mcp_obsidian_url                         = ""
 mcp_obsidian_token                       = ""
@@ -124,7 +125,6 @@ claude_epitaxy_personal_prefs_enabled    = true
 claude_effort_level_enabled              = true
 claude_model_at_top                      = true
 claude_plugin_clangd_lsp                 = false
-claude_plugin_extra_lsps                 = false
 
 [work]
 depends = ["default"]
@@ -165,7 +165,6 @@ claude_epitaxy_personal_prefs_enabled    = false
 claude_effort_level_enabled              = false
 claude_model_at_top                      = true
 claude_plugin_clangd_lsp                 = false
-claude_plugin_extra_lsps                 = true
 
 [oda-mcp]
 
