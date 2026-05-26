@@ -19,7 +19,8 @@
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true{{#if (eq claude_plugin_extra_lsps true)}},
     "yaml-lsp@claude-plugins-official": true{{/if}}{{#if (eq claude_plugin_clangd_lsp true)}},
-    "clangd-lsp@claude-plugins-official": true{{/if}}
+    "clangd-lsp@claude-plugins-official": true{{/if}}{{#if (eq claude_plugin_pyright_lsp true)}},
+    "pyright-lsp@claude-plugins-official": true{{/if}}
   },
   "extraKnownMarketplaces": {
     "lattice": {
@@ -231,18 +232,18 @@
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    },
+    }{{#if (eq mcp_obsidian_enabled true)}},
     "Obsidian": {
       "args": [
         "-y",
         "mcp-remote",
-        "http://mac-mini.local:27123/mcp"
+        "{{mcp_obsidian_url}}"
       ],
       "command": "{{shell_bin_path}}/npx",
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }
+    }{{/if}}
   }{{#if (eq claude_model_at_top false)}},
   "model": "{{claude_model}}"{{/if}}
 }

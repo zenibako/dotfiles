@@ -48,18 +48,18 @@
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    },
+    }{{#if (eq mcp_obsidian_enabled true)}},
     "Obsidian": {
       "command": "{{shell_bin_path}}/npx",
       "args": [
         "-y",
         "mcp-remote",
-        "http://mac-mini.local:27123/mcp"
+        "{{mcp_obsidian_url}}"
       ],
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }
+    }{{/if}}
   },
   "preferences": {
     "chillingSlothLocation": {
