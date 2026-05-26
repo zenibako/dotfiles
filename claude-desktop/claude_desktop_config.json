@@ -54,7 +54,7 @@
     "chillingSlothLocation": {
       "customPath": "/Users/{{username}}/Projects/workspaces"
     },
-    "coworkScheduledTasksEnabled": true,
+    "coworkScheduledTasksEnabled": {{claude_cowork_scheduled_tasks_enabled}},
     "ccdScheduledTasksEnabled": true,
     "sidebarMode": "epitaxy",
     "coworkWebSearchEnabled": true,
@@ -66,24 +66,24 @@
         "pinnedOrder": [],
         "customGroupAssignments": {},
         "customGroupOrder": {}
-      },
+      }{{#if (eq claude_epitaxy_personal_prefs_enabled true)}},
       "cc-landing-worktree-enabled": false,
-      "epitaxy-perm-mode-acks.c5055d6d-b6e9-46de-a26f-0dad4c6255fc": [
-        "/Users/chanderson/projects/home-assistant:auto",
-        "/Users/chanderson/projects/cuejitsu:auto"
+      "epitaxy-perm-mode-acks.{{claude_bypass_permissions_account_id}}": [
+        "/Users/{{username}}/projects/home-assistant:auto",
+        "/Users/{{username}}/projects/cuejitsu:auto"
       ],
-      "epitaxy-folder-permission-mode.c5055d6d-b6e9-46de-a26f-0dad4c6255fc": {
-        "/Users/chanderson/projects/home-assistant": "auto",
-        "/Users/chanderson/projects/cuejitsu": "auto"
-      }
+      "epitaxy-folder-permission-mode.{{claude_bypass_permissions_account_id}}": {
+        "/Users/{{username}}/projects/home-assistant": "auto",
+        "/Users/{{username}}/projects/cuejitsu": "auto"
+      }{{/if}}
     },
     "remoteToolsDeviceName": "{{claude_remote_tools_device_name}}",
     "bypassPermissionsGateByAccount": {
-      "{{claude_bypass_permissions_account_id}}": true
-    },
+      "{{claude_bypass_permissions_account_id}}": {{claude_bypass_permissions_value}}
+    }{{#if (eq claude_bypass_permissions_extras_enabled true)}},
     "ccRemoteControlDefaultEnabled": {{claude_agent_push_notif_enabled}},
     "bypassPermissionsOptInByAccount": {
       "{{claude_bypass_permissions_account_id}}": true
-    }
+    }{{/if}}
   }
 }
