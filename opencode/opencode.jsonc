@@ -188,14 +188,14 @@
       "enabled": false
     },
 {{/if}}
-{{#if home_assistant_token}}
+{{#if mcp_home_assistant_enabled}}
     "Home Assistant": {
       "type": "remote",
       "url": "{{home_assistant_url}}/api/mcp",
       "headers": {
         "Authorization": "Bearer {{home_assistant_token}}"
       },
-      "enabled": {{#if mcp_home_assistant_enabled}}true{{else}}false{{/if}}
+      "enabled": true
     },
 {{/if}}
 {{#if gitea_token}}

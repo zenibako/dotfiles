@@ -90,13 +90,6 @@ if [ -z "$_ZSHENV_LOADED" ]; then
     unset -f _tomlq _load_shared_env
   fi
 
-  # Proton Pass secrets (fetched from vault, cached locally)
-  # Only loads if proton-pass CLI is installed; skips gracefully otherwise.
-  if [ -x "$HOME/.config/opencode/script/proton-pass-env.sh" ]; then
-    # shellcheck source=/dev/null
-    . "$HOME/.config/opencode/script/proton-pass-env.sh"
-  fi
-
   # opencode
   export PATH="$HOME/.opencode/bin:$PATH"
 
