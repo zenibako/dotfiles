@@ -76,62 +76,103 @@ ca_cert_container_path = "/tmp/corp-ca.pem"
 # Example: "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
 java_tool_options = ""
 
+# Proton Pass Secret Management
+# --------------------------------
+# Sensitive credentials (tokens, API keys, passwords) are managed via
+# Proton Pass CLI and loaded at shell startup by
+# ~/.config/opencode/script/proton-pass-env.sh.
+#
+# To migrate a credential to Proton Pass:
+#   1. Store the secret in your Proton Pass vault with the matching vault/item name
+#      (see scripts/proton-pass-env.sh for the mapping)
+#   2. Remove the variable declaration below (leave it empty or delete the line)
+#   3. Run `dotter deploy -f` to pick up changes
+#
+# Non-sensitive values (URLs, handles, flags) can still be declared here.
+
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
-github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
+# DEPRECATED: Use Proton Pass — vault "Development", item "GitHub PAT"
+# github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
 
 # GitLab Personal Access Token (for gitlab.nvim plugin and MCP)
 # Create at: https://gitlab.com/-/user_settings/personal_access_tokens
-gitlab_personal_access_token = ""
-
-# GitLab API URL (for work instances)
-gitlab_api_url = "https://gitlab.com/api/v4"
+# DEPRECATED: Use Proton Pass — vault "Work", item "GitLab PAT"
+# gitlab_personal_access_token = ""
 
 # Home Assistant Long-Lived Access Token (used by OpenCode MCP)
 # Create at: http://homeassistant.local:8123/profile/security
-home_assistant_token = "eyJhbGci..."
-
-# Home Assistant Webhook ID (for OpenCode plugin)
-home_assistant_webhook_id = "your-webhook-id"
-
-# Slack Workflow Webhook URL (for OpenCode plugin)
-opencode_slack_webhook_url = "https://hooks.slack.com/triggers/..."
-
-# Brave Search API key (for OpenClaw web search)
-# Create at: https://brave.com/search/api/ (choose "Data for Search" plan)
-brave_search_api_key = "BSA_YOUR_API_KEY_HERE"
+# DEPRECATED: Use Proton Pass — vault "Home", item "Home Assistant Token"
+# home_assistant_token = "eyJhbGci..."
 
 # Bluesky credentials (personal profile)
 bluesky_handle = "your.handle.bsky.social"
-bluesky_app_password = "xxxx-xxxx-xxxx-xxxx"
+# DEPRECATED: Use Proton Pass — vault "Social", item "Bluesky App Password"
+# bluesky_app_password = "xxxx-xxxx-xxxx-xxxx"
 
 # Plex credentials (personal profile)
-plex_user_token = "YOUR_PLEX_USER_TOKEN"
-plex_server_token = "YOUR_PLEX_SERVER_TOKEN"
+# DEPRECATED: Use Proton Pass — vault "Media", items "Plex User Token", "Plex Server Token"
+# plex_user_token = "YOUR_PLEX_USER_TOKEN"
+# plex_server_token = "YOUR_PLEX_SERVER_TOKEN"
 plex_url = "https://YOUR_PLEX_SERVER:32400"
 
 # TMDB API key (for Plex watchlist)
-tmdb_key = "YOUR_TMDB_API_KEY"
+# DEPRECATED: Use Proton Pass — vault "Media", item "TMDB API Key"
+# tmdb_key = "YOUR_TMDB_API_KEY"
 
 # Google API keys
-youtube_api_key = "YOUR_YOUTUBE_API_KEY"
-google_places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"
+# DEPRECATED: Use Proton Pass — vault "Development", items "YouTube API Key", "Google Places API Key"
+# youtube_api_key = "YOUR_YOUTUBE_API_KEY"
+# google_places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"
 
 # Slack (cookie auth)
-slack_d_cookie = "xoxd-..."
-slack_token = "xoxc-..."
+# DEPRECATED: Use Proton Pass — vault "Work", items "Slack Token", "Slack D-Cookie"
+# slack_d_cookie = "xoxd-..."
+# slack_token = "xoxc-..."
 
 # Reddit credentials (personal profile)
-reddit_session = "eyJhbGci..."
-reddit_token_v2 = "eyJhbGci..."
+# DEPRECATED: Use Proton Pass — vault "Social", items "Reddit Session", "Reddit Token v2"
+# reddit_session = "eyJhbGci..."
+# reddit_token_v2 = "eyJhbGci..."
+
+# Brave Search API (for OpenClaw web search)
+# Create at: https://brave.com/search/api/ (choose "Data for Search" plan)
+# DEPRECATED: Use Proton Pass — vault "Development", item "Brave Search API Key"
+# brave_search_api_key = "BSA_YOUR_API_KEY_HERE"
 
 # Proton Mail Bridge credentials
-proton_user = "your@email.com"
-proton_password = "YOUR_PROTON_BRIDGE_PASSWORD"
+# DEPRECATED: Use Proton Pass — vault "Email", item "Proton Bridge Password"
+# proton_user = "your@email.com"
+# proton_password = "YOUR_PROTON_BRIDGE_PASSWORD"
 
 # Telegram Bot Token
-telegram_bot_token = "1234567890:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+# DEPRECATED: Use Proton Pass — vault "Development", item "Telegram Bot Token"
+# telegram_bot_token = "1234567890:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Grampsweb Credentials
 grampsweb_username = "your@email.com"
-grampsweb_password = "YOUR_GRAMPSWEB_PASSWORD"
+# DEPRECATED: Use Proton Pass — vault "Home", item "Grampsweb Password"
+# grampsweb_password = "YOUR_GRAMPSWEB_PASSWORD"
+
+# TripIt credentials
+# DEPRECATED: Use Proton Pass — vault "Travel", item "TripIt Password"
+# tripit_password = "Jz.i9bWQo7JLktq"
+
+# Last.fm credentials
+# DEPRECATED: Use Proton Pass — vault "Media", item "Last.fm API Key"
+# last_fm_api_key = "YOUR_LAST_FM_API_KEY"
+last_fm_username = "chanderson90"
+
+# Rocksky credentials
+rocksky_handle = "chanderson.tech"
+# DEPRECATED: Use Proton Pass — vault "Media", item "Rocksky Password"
+# rocksky_password = "YOUR_ROCKSKY_PASSWORD"
+
+# Obsidian MCP token
+# DEPRECATED: Use Proton Pass — vault "Development", item "Obsidian MCP Token"
+# mcp_obsidian_token = "YOUR_OBSIDIAN_TOKEN"
+
+# Work credentials (only needed for work profile)
+# DEPRECATED: Use Proton Pass — vault "Work"
+# sonarqube_token = "YOUR_SONAR_TOKEN"
+# postman_api_key = "YOUR_POSTMAN_API_KEY"

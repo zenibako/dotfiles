@@ -338,6 +338,13 @@ optional_vars = {
     'proton_user', 'proton_password',
     'telegram_bot_token', 'youtube_api_key', 'google_places_api_key',
     'slack_d_cookie', 'slack_token',
+    'home_assistant_token', 'bluesky_app_password',
+    'plex_user_token', 'plex_server_token', 'tmdb_key',
+    'reddit_session', 'tripit_password',
+    'last_fm_api_key', 'rocksky_password',
+    'mcp_obsidian_token', 'github_personal_access_token',
+    'gitlab_personal_access_token', 'sonarqube_token',
+    'postman_api_key',
 }
 
 def condition_is_active(condition_name):

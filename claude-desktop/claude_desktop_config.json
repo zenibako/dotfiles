@@ -15,11 +15,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
+      ]
     },
     "Backlog": {
       "command": "{{shell_bin_path}}/backlog",

@@ -141,17 +141,9 @@ _ensure_secret_cache() {
 
 _lookup_secret() {
   local target="$1"
-  while IFS='	' read -r key value _enc; do
+  while IFS=$'\t' read -r key value _enc; do
     [ "$key" = "$target" ] && { printf '%s' "$value"; return 0; }
   done < "$_SECRET_CACHE"
-  return 1
-}
-
-_lookup_proton_secret() {
-  local target="$1"
-  while IFS='	' read -r key value _enc; do
-    [ "$key" = "$target" ] && { printf '%s' "$value"; return 0; }
-  done < "$_PROTON_PASS_CACHE"
   return 1
 }
 
@@ -237,8 +229,8 @@ if _ensure_secret_cache; then
         sed "s/^$_placeholder = \"\"/$_placeholder = \"$_val\"/" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
         echo "  Injected $_placeholder into env.toml"
         _env_modified=1
-      elif grep -q "^$_placeholder = \"\x7b\x7b.*\"" "$_deployed_env" 2>/dev/null; then
-        sed "s|^$_placeholder = \"\x7b\x7b.*\"|$_placeholder = \"$_val\"|" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
+      elif grep -q "^$_placeholder = \"{{.*\"" "$_deployed_env" 2>/dev/null; then
+        sed "s|^$_placeholder = \"{{.*\"|$_placeholder = \"$_val\"|" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
         echo "  Injected $_placeholder into env.toml"
         _env_modified=1
       fi
@@ -253,6 +245,7 @@ else
 fi
 unset -f _ensure_secret_cache _lookup_secret _inject_github_token
 unset _SECRET_CACHE
+
 if [ -d "$_dotfiles" ]; then
   REPO_ROOT="$_dotfiles" "$_scripts/validate_schema.sh" --post-deploy || exit 1
 fi
