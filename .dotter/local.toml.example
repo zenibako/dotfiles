@@ -76,23 +76,37 @@ ca_cert_container_path = "/tmp/corp-ca.pem"
 # Example: "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
 java_tool_options = ""
 
-# Proton Pass Secret Management
+# Secret Management
 # --------------------------------
-# Sensitive credentials (tokens, API keys, passwords) are managed via
-# Proton Pass CLI and loaded at shell startup by
-# ~/.config/opencode/script/proton-pass-env.sh.
+# Sensitive credentials (tokens, API keys, passwords) are NOT stored in this file.
+# Instead they are fetched from a secret backend and injected into deployed configs
+# during `dotter deploy`. No secrets are ever exported as shell env vars.
 #
-# To migrate a credential to Proton Pass:
-#   1. Store the secret in your Proton Pass vault with the matching vault/item name
-#      (see scripts/proton-pass-env.sh for the mapping)
-#   2. Remove the variable declaration below (leave it empty or delete the line)
+# Supported backends (tried in order):
+#   1. Proton Pass CLI  -> ~/.config/opencode/script/proton-pass-env.sh
+#   2. macOS Keychain   -> ~/.config/opencode/script/macos-keychain-env.sh
+#
+# Choose the backend that matches what you have installed on this machine.
+#
+# Proton Pass setup:
+#   Store each secret in your Proton Pass vault with the vault/item name shown
+#   in opencode/script/proton-pass-env.sh.
+#
+# macOS Keychain setup:
+#   security add-generic-password -s KEY_NAME -a dotfiles -w SECRET_VALUE -U login.keychain
+#   (Use the same KEY_NAME as the env var name, e.g. GITLAB_TOKEN)
+#
+# To migrate a credential out of this file:
+#   1. Store the secret in your chosen backend with the correct key name
+#   2. Remove or empty the variable declaration below
 #   3. Run `dotter deploy -f` to pick up changes
 #
 # Non-sensitive values (URLs, handles, flags) can still be declared here.
 
 # GitHub Personal Access Token (for gh CLI, Neovim plugins)
 # Create at: https://github.com/settings/tokens
-# DEPRECATED: Use Proton Pass — vault "Development", item "GitHub PAT"
+# DEPRECATED: Store in your secret backend (Proton Pass vault "Development", item "GitHub PAT"
+#   OR macOS Keychain service "GITHUB_PERSONAL_ACCESS_TOKEN")
 # github_personal_access_token = "ghp_YOUR_TOKEN_HERE"
 
 # GitLab Personal Access Token (for gitlab.nvim plugin and MCP)
