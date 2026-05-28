@@ -78,7 +78,7 @@ $env.STARSHIP_SHELL = "nu"
 
 def create_left_prompt [] {
     # Set window title to current directory name (OSC 2)
-    print -n $"\e]2;($env.PWD | path basename)\a"
+    printf $"\e]2;($env.PWD | path basename)\a"
     starship prompt --cmd-duration $env.CMD_DURATION_MS $'--status=($env.LAST_EXIT_CODE)'
 }
 
@@ -254,7 +254,7 @@ export extern "workmux help" [
 def --env --wrapped nvm [...args] {
     let nvm_sh = ($env.NVM_DIR? | default ($env.HOME | path join ".nvm") | path join "nvm.sh")
     if not ($nvm_sh | path exists) {
-        print -e $"nvm: ($nvm_sh) not found. Install nvm from https://github.com/nvm-sh/nvm"
+        print $"nvm: ($nvm_sh) not found. Install nvm from https://github.com/nvm-sh/nvm"
         return
     }
 
