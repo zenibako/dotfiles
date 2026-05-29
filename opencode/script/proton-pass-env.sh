@@ -47,7 +47,7 @@ _fetch_secret() {
         _log_warn "proton-pass CLI not found. Secret '$vault/$item' unavailable."
         return 1
     fi
-    result=$(pass-cli item get "$vault/$item" 2>/dev/null | jq -r '.password // .value // empty' 2>/dev/null)
+    result=$(pass-cli item get --vault-name "$vault" --item-title "$item" 2>/dev/null | jq -r '.item.content.content.Login.password // .item.content.content.password // .password // .value // empty' 2>/dev/null)
     if [ -z "$result" ] || [ "$result" = "null" ]; then
         _log_warn "Failed to fetch secret: $vault/$item"
         return 1
@@ -84,58 +84,58 @@ _build_cache() {
     local val
 
     # --- GitHub ---
-    val=$(_fetch_secret "Development" "GitHub PAT") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "GitHub") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
 
     # --- Home Assistant ---
-    val=$(_fetch_secret "Home" "Home Assistant Token") && _write "HA_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Home" "Home Assistant Webhook ID") && _write "HA_WEBHOOK_ID" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Home Assistant") && _write "HA_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Home Assistant MariaDB") && _write "HA_MARIADB_PASSWORD" "$val" >> "$_tmp"
 
     # --- Bluesky ---
-    val=$(_fetch_secret "Social" "Bluesky App Password") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Bluesky") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
 
     # --- Plex ---
-    val=$(_fetch_secret "Media" "Plex User Token") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Media" "Plex Server Token") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Plex (DigitalGlue)") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Plex (Personal)") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
 
     # --- TMDB ---
-    val=$(_fetch_secret "Media" "TMDB API Key") && _write "TMDB_KEY" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "TMDB API Key") && _write "TMDB_KEY" "$val" >> "$_tmp"
 
     # --- Google ---
-    val=$(_fetch_secret "Development" "Google Places API Key") && _write "GOOGLE_PLACES_API_KEY" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Development" "YouTube API Key") && _write "YOUTUBE_API_KEY" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Google Places API Key") && _write "GOOGLE_PLACES_API_KEY" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "YouTube API Key") && _write "YOUTUBE_API_KEY" "$val" >> "$_tmp"
 
     # --- Reddit ---
-    val=$(_fetch_secret "Social" "Reddit Session") && _write "REDDIT_SESSION" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Social" "Reddit Token v2") && _write "TOKEN_V2" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "reddit") && _write "REDDIT_SESSION" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Reddit Token v2") && _write "TOKEN_V2" "$val" >> "$_tmp"
 
     # --- Brave Search ---
-    val=$(_fetch_secret "Development" "Brave Search API Key") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Brave Search API Key") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
 
     # --- Proton Mail Bridge ---
-    val=$(_fetch_secret "Email" "Proton Bridge Password") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Proton Bridge Password") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
 
     # --- Telegram ---
-    val=$(_fetch_secret "Development" "Telegram Bot Token") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Telegram Bot Token") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
 
     # --- TripIt ---
-    val=$(_fetch_secret "Travel" "TripIt Password") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "TripIt Password") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
 
     # --- Last.fm ---
-    val=$(_fetch_secret "Media" "Last.fm API Key") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Last.fm API Key") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
 
     # --- Obsidian MCP ---
-    val=$(_fetch_secret "Development" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
 
     # --- Rocksky ---
-    val=$(_fetch_secret "Media" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
 
     # --- Work credentials (only if work profile is active) ---
     if [ "${OPENCODE_PROFILE_WORK:-}" = "true" ] || [ "${OPENCODE_PROFILE_WORK:-}" = "1" ]; then
-        val=$(_fetch_secret "Work" "GitLab PAT") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Work" "SonarQube Token") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Work" "Postman API Key") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Work" "Slack Token") && _write "SLACK_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Work" "Slack D-Cookie") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "GitLab PAT") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "SonarQube Token") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "Postman API Key") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "Slack Token") && _write "SLACK_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "Slack D-Cookie") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
     fi
 
     chmod 600 "$_tmp"
@@ -155,7 +155,7 @@ _ensure_cache() {
 
 _look_up() {
     local target="$1" key value _enc
-    while IFS='\t' read -r key value _enc; do
+    while IFS=$'\t' read -r key value _enc; do
         [ "$key" = "$target" ] && { printf '%s' "$value"; return 0; }
     done < "$PROTON_PASS_CACHE"
     return 1
@@ -182,7 +182,7 @@ case "${1:-}" in
         ;;
     --keys)
         _ensure_cache || exit 1
-        while IFS='\t' read -r key _value _enc; do
+        while IFS=$'\t' read -r key _value _enc; do
             printf '%s\n' "$key"
         done < "$PROTON_PASS_CACHE"
         ;;
@@ -198,7 +198,7 @@ case "${1:-}" in
             fi
             _log_info "Cache: FRESH (built: $mtime, ${CACHE_MAX_AGE_HOURS}h TTL)"
             _log_info "Cached keys:"
-            while IFS='\t' read -r key _value _enc; do
+            while IFS=$'\t' read -r key _value _enc; do
                 printf '  %s=***\n' "$key"
             done < "$PROTON_PASS_CACHE"
         else
