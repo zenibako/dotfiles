@@ -130,6 +130,8 @@ brew "yaml-language-server"
 brew "typescript-language-server"
 # Configuration language (provides `cue lsp`)
 brew "cue"
+# Language server-capable Starlark CLI (`starlark --lsp`)
+brew "starlark-rust"
 # Package manager for the Lua programming language
 brew "luarocks"
 # Utility for directing compilation
@@ -152,6 +154,8 @@ brew "pandoc"
 brew "pipx"
 # CLI for the Pkl programming language
 brew "pkl"
+# Language server for Pkl
+brew "pkl-lsp"
 # Source code analyzer for Java, JavaScript, and more
 brew "pmd"
 # Fast, disk space efficient package manager

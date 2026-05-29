@@ -33,8 +33,10 @@ local install_hints = {
   ["vscode-json-language-server"] = { binary = "vscode-langservers-extracted", manager = "npm", cmd = "npm install -g vscode-langservers-extracted" },
   ["yaml-language-server"] = { binary = "yaml-language-server", manager = "npm", cmd = "npm install -g yaml-language-server" },
   ["taplo"]                = { binary = "taplo", manager = "brew", cmd = "brew install taplo" },
+  ["pkl-lsp"]              = { binary = "pkl-lsp", manager = "brew", cmd = "brew install pkl-lsp" },
   ["typescript-language-server"] = { binary = "typescript-language-server", manager = "npm", cmd = "npm install -g typescript-language-server" },
   ["cue"]                  = { binary = "cue", manager = "brew", cmd = "brew install cue-lang/tap/cue" },
+  ["starlark"]             = { binary = "starlark", manager = "brew", cmd = "brew install starlark-rust" },
   ["sourcekit-lsp"]        = { binary = "sourcekit-lsp", manager = "xcode", cmd = "Install Xcode Command Line Tools: xcode-select --install" },
   ["apex-language-server"] = { binary = "apex-jorje-lsp.jar", manager = "mason", cmd = ":MasonInstall apex-language-server (in Neovim)" },
   ["gitlab-ci-ls"]         = { binary = "gitlab-ci-ls", manager = "cargo", cmd = "cargo install gitlab-ci-ls" },
@@ -85,6 +87,13 @@ local lsp_tests = {
     filename = "test.toml",
     content = "key = \"value\"\n",
   },
+  pkl_lsp = {
+    filetype = "pkl",
+    filename = "test.pkl",
+    content = "bird {\n  name = \"Dodo\"\n}\n",
+    root_markers = { "PklProject" },
+    root_content = "amends \"pkl:Project\"\n",
+  },
   ts_ls = {
     filetype = "typescript",
     filename = "test.ts",
@@ -96,6 +105,11 @@ local lsp_tests = {
     content = "package test\n\n// test comment\n",
     root_markers = { "cue.mod" },
     root_content = "",
+  },
+  starlark_rust = {
+    filetype = "star",
+    filename = "test.star",
+    content = "def hello():\n    return \"world\"\n",
   },
   sourcekit = {
     filetype = "swift",

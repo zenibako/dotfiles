@@ -71,8 +71,10 @@ vim.lsp.enable({
   "html",
   "jsonls",
   "lua_ls",
+  "pkl_lsp",
 {{#if opencode_profile_work}}
   "lwc_ls",
+  "starlark_rust",
   "terraformls",
   "ts_ls",
   "visualforce_ls",
@@ -82,6 +84,7 @@ vim.lsp.enable({
 {{#if opencode_profile_personal}}
   "ts_ls",
   "cue",
+  "starlark_rust",
   "sourcekit",
   "jinja-lsp",
 {{/if}}
