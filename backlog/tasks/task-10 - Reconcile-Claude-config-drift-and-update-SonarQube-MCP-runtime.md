@@ -1,10 +1,11 @@
 ---
 id: TASK-10
 title: Reconcile Claude config drift and update SonarQube MCP runtime
-status: To Do
+status: In Progress
 assignee:
   - OpenCode
 created_date: '2026-06-06 12:28'
+updated_date: '2026-06-06 12:29'
 labels:
   - dotter
   - opencode
@@ -34,6 +35,12 @@ Bring the dotter-managed Claude and opencode configuration back into sync with l
 - [ ] #4 Legacy MCP_DOCKER-related configuration is removed from the managed configuration where it is no longer needed.
 - [ ] #5 A dry-run validation shows the updated managed files reconcile cleanly, or any remaining skips are explained by unmanaged local-only changes outside this task's scope.
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Started investigating dotter drift between repository templates and local Claude target files, plus the current SonarQube MCP runtime configuration in opencode.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
