@@ -66,6 +66,7 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.filetype.add({
   extension = {
     fountain = "fountain",
+    k = "kcl",
     star = "star",
   },
 })
