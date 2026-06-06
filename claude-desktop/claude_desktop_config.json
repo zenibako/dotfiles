@@ -61,6 +61,7 @@
       }
     }{{/if}}
   },
+  "coworkUserFilesPath": "/Users/{{username}}/Claude",
   "preferences": {
     "chillingSlothLocation": {
       "customPath": "/Users/{{username}}/Projects/workspaces"
@@ -91,6 +92,9 @@
     "remoteToolsDeviceName": "{{claude_remote_tools_device_name}}",
     "bypassPermissionsGateByAccount": {
       "{{claude_bypass_permissions_account_id}}": {{claude_bypass_permissions_value}}
+    },
+    "coworkModelAutoFallbackByAccount": {
+      "{{claude_bypass_permissions_account_id}}": true
     }{{#if (eq claude_bypass_permissions_extras_enabled true)}},
     "ccRemoteControlDefaultEnabled": {{claude_agent_push_notif_enabled}},
     "bypassPermissionsOptInByAccount": {

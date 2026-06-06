@@ -158,7 +158,7 @@
         "mcp/sonarqube"
       ],
       "environment": {
-        "DOCKER_CONTEXT": "desktop-linux",
+        "DOCKER_CONTEXT": "colima",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"

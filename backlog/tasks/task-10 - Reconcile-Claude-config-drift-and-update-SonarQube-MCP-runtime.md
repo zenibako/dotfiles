@@ -1,11 +1,11 @@
 ---
 id: TASK-10
 title: Reconcile Claude config drift and update SonarQube MCP runtime
-status: In Progress
+status: Done
 assignee:
   - OpenCode
 created_date: '2026-06-06 12:28'
-updated_date: '2026-06-06 12:32'
+updated_date: '2026-06-06 13:55'
 labels:
   - dotter
   - opencode
@@ -16,7 +16,9 @@ modified_files:
   - claude-code/settings.json
   - claude-desktop/claude_desktop_config.json
   - opencode/opencode.jsonc
-  - .dotter/global.toml
+  - .dotter/local.toml
+  - ~/.claude.json
+  - ~/.config/colima/default/colima.yaml
 priority: high
 ordinal: 1000
 ---
@@ -29,31 +31,27 @@ Bring the dotter-managed Claude and opencode configuration back into sync with l
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Dotter no longer reports drift-related skips for the Claude Desktop config or Claude Code settings caused by repository-managed differences.
-- [ ] #2 The repository templates reflect the intended current local Claude configuration rather than relying on manual target-only edits.
-- [ ] #3 The SonarQube MCP configuration no longer depends on the old Docker-specific setup and is updated for the intended Colima-based local runtime.
-- [ ] #4 Legacy MCP_DOCKER-related configuration is removed from the managed configuration where it is no longer needed.
-- [ ] #5 A dry-run validation shows the updated managed files reconcile cleanly, or any remaining skips are explained by unmanaged local-only changes outside this task's scope.
+- [x] #1 Dotter no longer reports drift-related skips for the Claude Desktop config or Claude Code settings caused by repository-managed differences.
+- [x] #2 The repository templates reflect the intended current local Claude configuration rather than relying on manual target-only edits.
+- [x] #3 The SonarQube MCP configuration no longer depends on the old Docker-specific setup and is updated for the intended Colima-based local runtime.
+- [x] #4 Legacy MCP_DOCKER-related configuration is removed from the managed configuration where it is no longer needed.
+- [x] #5 A dry-run validation shows the updated managed files reconcile cleanly, or any remaining skips are explained by unmanaged local-only changes outside this task's scope.
 <!-- AC:END -->
-
-## Implementation Plan
-
-<!-- SECTION:PLAN:BEGIN -->
-1. Update the managed Claude templates so Dotter owns the current intended settings instead of leaving them as target-only drift. This includes enabling the missing Claude Code clangd plugin through Dotter variables and adding the stable Claude Desktop preferences that currently exist only in the local target file.
-2. Update the managed SonarQube MCP configuration to use the `colima` Docker context instead of `desktop-linux`.
-3. Apply the same SonarQube Colima fix to the live local Claude config in `~/.claude.json` and remove the legacy `MCP_DOCKER` server entry.
-4. Back up the local Claude target files, reconcile the stale Dotter rename/cache state if needed, and run a forced Dotter deploy only if necessary to bring the managed targets back into sync.
-5. Verify with `dotter deploy --dry-run` and targeted readbacks of the generated configs.
-<!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Confirmed the desired SonarQube Docker runtime should be hard-pinned to the `colima` context.
+Forced Dotter deploy succeeded after clearing the stale cache/rename state. Verified the active rendered OpenCode config no longer contains `MCP_DOCKER`, Colima can now pull `mcp/sonarqube:latest`, and the SonarQube MCP container starts successfully against `https://sonarqube.odaseva.net`.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Reconciled the Dotter-managed Claude targets with the intended local settings, enabled the managed Claude Code clangd plugin, updated the managed and local SonarQube MCP runtime to use Docker context `colima`, removed the stray local OpenCode `MCP_DOCKER` config, and fixed Colima guest trust so Docker can pull and start `mcp/sonarqube` successfully behind Netskope. Backed up the local Claude target files before forced Dotter reconciliation and validated with a successful extended `dotter deploy --dry-run`.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 Config is deployed using Dotter. If `--force` is required, back up the previous versions.
-- [ ] #2 Validate results in relevant tool(s). If it's a CLI tool, try in both `zsh` and `nu`.
+- [x] #1 Config is deployed using Dotter. If `--force` is required, back up the previous versions.
+- [x] #2 Validate results in relevant tool(s). If it's a CLI tool, try in both `zsh` and `nu`.
 <!-- DOD:END -->
