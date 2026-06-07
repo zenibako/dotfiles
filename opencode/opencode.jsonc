@@ -408,7 +408,7 @@
         "gemma4:12b-mlx": {
           "contextWindow": 32768,
         "gemma4:12b-it-qat": {
-          "contextWindow": 8192,
+          "contextWindow": 16384,
           "maxTokens": 8192
         },
         "gemma4:12b-it-qat": {
