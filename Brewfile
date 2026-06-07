@@ -88,6 +88,8 @@ brew "gopls"
 brew "netpbm"
 # Graph visualization software from AT&T and Bell Labs
 brew "graphviz"
+# CLI for rendering Mermaid diagrams (provides `mmdc`)
+brew "mermaid-cli"
 # GNU grep, egrep and fgrep
 brew "grep"
 # Command-line utility for Home Assistant
