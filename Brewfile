@@ -149,7 +149,7 @@ brew "nghttp2"
 # Modern shell for the GitHub era
 brew "nushell"
 # Create, run, and share large language models (LLMs)
-brew "ollama", restart_service: :changed
+cask "ollama-app"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Execute binaries from Python packages in isolated environments
