@@ -23,7 +23,7 @@ CACHE_MAX_AGE_HOURS=1
 _log_warn() { printf "[proton-pass] %s\n" "$1" >&2; }
 _log_info() { printf "[proton-pass] %s\n" "$1" >&2; }
 
-_has_proton_pass() { command -v proton-pass >/dev/null 2>&1; }
+_has_proton_pass() { command -v pass-cli >/dev/null 2>&1; }
 
 _cache_is_fresh() {
     if [ ! -f "$PROTON_PASS_CACHE" ]; then return 1; fi
@@ -47,7 +47,7 @@ _fetch_secret() {
         _log_warn "proton-pass CLI not found. Secret '$vault/$item' unavailable."
         return 1
     fi
-    result=$(proton-pass item get "$vault/$item" 2>/dev/null | jq -r '.password // .value // empty' 2>/dev/null)
+    result=$(pass-cli item get "$vault/$item" 2>/dev/null | jq -r '.password // .value // empty' 2>/dev/null)
     if [ -z "$result" ] || [ "$result" = "null" ]; then
         _log_warn "Failed to fetch secret: $vault/$item"
         return 1

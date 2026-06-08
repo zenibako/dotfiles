@@ -409,26 +409,16 @@
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
+      "name": "Ollama (local)",
       "options": {
-        "baseURL": "http://mac-mini.local:11434/v1"
+        "baseURL": "http://localhost:11434/v1",
       },
       "models": {
         "gemma4:12b-mlx": {
-          "name": "Gemma 4 12B MLX",
-          "contextWindow": 16384,
-          "maxTokens": 8192
-        "gemma4:12b-mlx": {
-          "name": "Gemma 4 12B MLX",
           "contextWindow": 16384,
           "maxTokens": 4096
         },
         "gemma4:12b-it-qat": {
-          "name": "Gemma 4 12B IT QAT",
-          "contextWindow": 16384,
-          "maxTokens": 8192
-        "gemma4:12b-it-qat": {
-          "name": "Gemma 4 12B IT QAT",
           "contextWindow": 16384,
           "maxTokens": 4096
         }
