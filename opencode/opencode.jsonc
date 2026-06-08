@@ -113,16 +113,8 @@
 {{/if}}
 {{#if mcp_atlassian_enabled}}
     "Atlassian": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "mcp-remote",
-        "https://mcp.atlassian.com/v1/sse"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      },
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v1/mcp",
       "enabled": true
     },
 {{/if}}

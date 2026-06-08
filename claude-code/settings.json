@@ -232,6 +232,10 @@
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
+    }{{#if mcp_atlassian_enabled}},
+    "Atlassian": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v1/mcp"
     }{{#if (eq mcp_obsidian_enabled true)}},
     "Obsidian": {
       "args": [
@@ -247,7 +251,7 @@
         "MCP_OBSIDIAN_AUTH": "Bearer {{mcp_obsidian_token}}",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }{{/if}}
+    }{{/if}}{{/if}}
   }{{#if (eq claude_model_at_top false)}},
   "model": "{{claude_model}}"{{/if}}
 }
