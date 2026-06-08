@@ -54,9 +54,13 @@
       "args": [
         "-y",
         "mcp-remote",
-        "{{mcp_obsidian_url}}"
+        "{{mcp_obsidian_url}}",
+        "--allow-http",
+        "--header",
+        "Authorization:${MCP_OBSIDIAN_AUTH}"
       ],
       "env": {
+        "MCP_OBSIDIAN_AUTH": "Bearer {{mcp_obsidian_token}}",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }{{/if}}

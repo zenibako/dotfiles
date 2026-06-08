@@ -56,80 +56,43 @@ if [[ -z "$_ZSHENV_LOADED" ]]; then
     _load_shared_env
 fi
 
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# --- Git aliases (extracted from oh-my-zsh git plugin) ---
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gcb='git checkout -b'
+alias gcm='git checkout main 2>/dev/null || git checkout master 2>/dev/null || git checkout $(git symbolic-ref refs/remotes/origin/HEAD | sed s@^refs/remotes/origin/@@)'
+alias gco='git checkout'
+alias gd='git diff'
+alias gf='git fetch'
+alias gl='git pull'
+alias gp='git push'
+alias gst='git status'
+alias gsta='git stash push'
+alias gstp='git stash pop'
+alias gsw='git switch'
+alias gswc='git switch -c'
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
-# ZSH_THEME="agnoster"
-# prompt_context() {}
-
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(extract git git-extras tmux git-commit nmap nvm gitignore encode64 rsync)
-
-source $ZSH/oh-my-zsh.sh
+# Extract archive helper
+extract() {
+  if [[ -f "$1" ]]; then
+    case "$1" in
+      *.tar.bz2) tar xjf "$1" ;;
+      *.tar.gz)  tar xzf "$1" ;;
+      *.tar.xz)  tar xJf "$1" ;;
+      *.tar)     tar xf "$1" ;;
+      *.zip)     unzip "$1" ;;
+      *.rar)     unrar x "$1" ;;
+      *.7z)      7z x "$1" ;;
+      *) echo "'$1' cannot be extracted via extract" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
 
 # User configuration
 
@@ -157,9 +120,14 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# Lazy-load nvm (avoids ~500ms startup penalty)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+nvm() {
+  unset -f nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -218,36 +186,38 @@ rmvenv() {
 
 # Note: SF_USE_GENERIC_UNIX_KEYCHAIN and SF_BETA_TRACK_FILE_MOVES
 # are now loaded from shared/env.toml (via ~/.zshenv)
-# Salesforce CLI autocomplete (macOS only)
-if [[ "$platform" == "darwin"* ]] && [[ -f "$HOME/Library/Caches/sf/autocomplete/zsh_setup" ]]; then
+# Salesforce CLI autocomplete (macOS only, lazy-guarded)
+if (( ${+commands[sf]} )) && [[ "$platform" == "darwin"* ]] && [[ -f "$HOME/Library/Caches/sf/autocomplete/zsh_setup" ]]; then
     source "$HOME/Library/Caches/sf/autocomplete/zsh_setup"
 fi
 
-zstyle :omz:plugins:ssh-agent agent-forwarding on
-
+# ssh-agent socket forwarding
 if [[ -f ~/.ssh/ssh_auth_sock && -S "$SSH_AUTH_SOCK" ]]; then
     ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
 fi
 
 # if type brew &>/dev/null; then
 #     FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-# 
+#
 #     autoload -Uz compinit
 #     compinit
 # fi
 # autoload -U compinit; compinit
 # source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 #
- 
+
 if (( ${+commands[nvim]} ))
 then
   export EDITOR="nvim"
   export MANPAGER="nvim +Man!"
 fi
- 
-if (( ${+commands[brew]} ))
-then
-  export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+
+# Cache brew prefix to avoid ~40ms fork on every shell startup
+if (( ${+commands[brew]} )); then
+  if [[ -z "$_BREW_PREFIX" ]]; then
+    _BREW_PREFIX="$(brew --prefix 2>/dev/null)"
+  fi
+  export DYLD_FALLBACK_LIBRARY_PATH="$_BREW_PREFIX/lib:$DYLD_FALLBACK_LIBRARY_PATH"
 fi
 
 if (( ${+commands[deno]} ))
@@ -260,18 +230,18 @@ fi
 _load_shared_completions() {
     local comp_file="$HOME/.config/shared/completions.toml"
     [[ -f "$comp_file" ]] || return
-    
+
     [[ -d ~/.zsh/completion ]] || mkdir -p ~/.zsh/completion
     [[ -d ~/.zsh/completion-bash ]] || mkdir -p ~/.zsh/completion-bash
-    
+
     local current_tool="" zsh_cmd="" comp_output=""
     local in_tool=0
-    
+
     while IFS= read -r line; do
         # Skip comments and empty lines
         [[ "$line" =~ ^[[:space:]]*# ]] && continue
         [[ -z "${line// }" ]] && continue
-        
+
         # Detect tool section [toolname]
         if [[ "$line" =~ "^\[([a-z_-]+)\]$" ]]; then
             current_tool="${match[1]}"
@@ -279,18 +249,18 @@ _load_shared_completions() {
             zsh_cmd=""
             continue
         fi
-        
+
         # Exit tool section when hitting another section
         if [[ "$line" == "["* ]]; then
             in_tool=0
             current_tool=""
             continue
         fi
-        
+
         # Parse zsh command
         if (( in_tool )) && [[ "$line" =~ '^zsh[[:space:]]*=[[:space:]]*"(.*)"$' ]]; then
             zsh_cmd="${match[1]}"
-            
+
             # Generate completion if tool exists and has a command
             if [[ -n "$zsh_cmd" ]] && (( ${+commands[$current_tool]} )); then
                 comp_output=$(eval "$zsh_cmd" 2>/dev/null)
@@ -308,10 +278,19 @@ _load_shared_completions() {
     done < "$comp_file"
 }
 
-_load_shared_completions
+# Only regenerate completions when completions.toml changes
+local _comp_marker="$HOME/.zsh/.completions_generated"
+if [[ ! -f "$_comp_marker" ]] || [[ "$HOME/.config/shared/completions.toml" -nt "$_comp_marker" ]]; then
+    _load_shared_completions
+    touch "$_comp_marker"
+fi
 fpath=(~/.zsh/completion ~/.zsh/completions $fpath)
-autoload -U compinit
-compinit
+autoload -Uz compinit
+if [[ -n ~/.zcompdump(#qNmh-24) ]]; then
+  compinit -C
+else
+  compinit
+fi
 
 # Source bash-style completions via bashcompinit
 autoload -Uz bashcompinit

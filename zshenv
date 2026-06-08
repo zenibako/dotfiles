@@ -19,63 +19,76 @@ if [ -z "$_ZSHENV_LOADED" ]; then
     esac
   fi
 
-  _tomlq() {
-      if command -v tomlq >/dev/null 2>&1; then
-          command tomlq "$@"
-      elif [ -x /opt/homebrew/bin/tomlq ]; then
-          /opt/homebrew/bin/tomlq "$@"
-      elif [ -x /usr/local/bin/tomlq ]; then
-          /usr/local/bin/tomlq "$@"
-      else
-          return 1
-      fi
-  }
+  # Cache env.toml parsing to avoid running tomlq (Python) on every shell
+  local _env_cache="$HOME/.zshenv.cache.zsh"
+  local _env_file="$HOME/.config/shared/env.toml"
 
-  _load_shared_env() {
-      local env_file="$HOME/.config/shared/env.toml"
-      [ -f "$env_file" ] || return
-      if ! _tomlq --version >/dev/null 2>&1; then
-          if [ -z "$_TOMLQ_MISSING_WARNED" ]; then
-              echo "warning: tomlq not found; shared env (env.toml) will not be loaded. Install with: brew install python-yq" >&2
-              _TOMLQ_MISSING_WARNED=1
-          fi
-          return
-      fi
+  if [ -f "$_env_cache" ] && [ "$_env_cache" -nt "$_env_file" ]; then
+    source "$_env_cache"
+  elif [ -f "$_env_file" ]; then
+    _tomlq() {
+        if command -v tomlq >/dev/null 2>&1; then
+            command tomlq "$@"
+        elif [ -x /opt/homebrew/bin/tomlq ]; then
+            /opt/homebrew/bin/tomlq "$@"
+        elif [ -x /usr/local/bin/tomlq ]; then
+            /usr/local/bin/tomlq "$@"
+        else
+            return 1
+        fi
+    }
 
-      local key value path_entry
-      # [env] section: KEY="value" pairs
-      while IFS=$'\t' read -r key value; do
-          [ -z "$key" ] && continue
-          value="${value//\$HOME/$HOME}"
-          export "$key"="$value"
-      done < <(_tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
+    _load_shared_env() {
+        local env_file="$HOME/.config/shared/env.toml"
+        [ -f "$env_file" ] || return
+        if ! _tomlq --version >/dev/null 2>&1; then
+            if [ -z "$_TOMLQ_MISSING_WARNED" ]; then
+                echo "warning: tomlq not found; shared env (env.toml) will not be loaded. Install with: brew install python-yq" >&2
+                _TOMLQ_MISSING_WARNED=1
+            fi
+            return
+        fi
 
-      # [path] prepend (reverse so first entry has highest priority)
-      while IFS= read -r path_entry; do
-          [ -z "$path_entry" ] && continue
-          path_entry="${path_entry//\$HOME/$HOME}"
-          if [ -d "$path_entry" ]; then
-              case ":$PATH:" in
-                  *:"$path_entry":*) ;;
-                  *) export PATH="$path_entry:$PATH" ;;
-              esac
-          fi
-      done < <(_tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
+        local key value path_entry
+        # [env] section: KEY="value" pairs
+        while IFS=$'\t' read -r key value; do
+            [ -z "$key" ] && continue
+            value="${value//\$HOME/$HOME}"
+            export "$key"="$value"
+            # Write to cache for next time
+            printf 'export %s="%s"\n' "$key" "$value" >>"$_env_cache"
+        done < <(_tomlq -r '.env // {} | to_entries[] | "\(.key)\t\(.value)"' "$env_file")
 
-      # [path] append
-      while IFS= read -r path_entry; do
-          [ -z "$path_entry" ] && continue
-          path_entry="${path_entry//\$HOME/$HOME}"
-          if [ -d "$path_entry" ]; then
-              case ":$PATH:" in
-                  *:"$path_entry":*) ;;
-                  *) export PATH="$path_entry:$PATH" ;;
-              esac
-          fi
-      done < <(_tomlq -r '.path.append // [] | .[]' "$env_file")
-  }
-  _load_shared_env
-  unset -f _tomlq _load_shared_env
+        # [path] prepend (reverse so first entry has highest priority)
+        while IFS= read -r path_entry; do
+            [ -z "$path_entry" ] && continue
+            path_entry="${path_entry//\$HOME/$HOME}"
+            if [ -d "$path_entry" ]; then
+                case ":$PATH:" in
+                    *:"$path_entry":*) ;;
+                    *) export PATH="$path_entry:$PATH" ;;
+                esac
+                printf 'case ":$PATH:" in\n  *:"%s":*) ;;\n  *) export PATH="%s:$PATH" ;;\nesac\n' "$path_entry" "$path_entry" >>"$_env_cache"
+            fi
+        done < <(_tomlq -r '.path.prepend // [] | reverse | .[]' "$env_file")
+
+        # [path] append
+        while IFS= read -r path_entry; do
+            [ -z "$path_entry" ] && continue
+            path_entry="${path_entry//\$HOME/$HOME}"
+            if [ -d "$path_entry" ]; then
+                case ":$PATH:" in
+                    *:"$path_entry":*) ;;
+                  *) export PATH="$PATH:$path_entry" ;;
+                esac
+                printf 'case ":$PATH:" in\n  *:"%s":*) ;;\n  *) export PATH="$PATH:%s" ;;\nesac\n' "$path_entry" "$path_entry" >>"$_env_cache"
+            fi
+        done < <(_tomlq -r '.path.append // [] | .[]' "$env_file")
+    }
+    : > "$_env_cache"  # Clear/create cache
+    _load_shared_env
+    unset -f _tomlq _load_shared_env
+  fi
 
   # opencode
   export PATH="$HOME/.opencode/bin:$PATH"
