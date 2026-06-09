@@ -30,15 +30,15 @@ require_var() {
 require_var name
 require_var email
 
-# Pre-deploy schema validation
+# ── Regenerate configs from KCL ──────────────────────────────────────────
+# KCL is the source of truth; always rebuild before deploying.
 _repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
 if [ -z "$_repo_root" ]; then
   # dotter caches scripts in .dotter/cache/.dotter/, so dirname "$0" is unreliable.
-  # Walk up from this script's directory until we find validate_schema.sh.
   _cdir="$(cd "$(dirname "$0")" && pwd)"
   while [ "$_cdir" != "/" ]; do
-    if [ -f "$_cdir/.dotter/scripts/validate_schema.sh" ]; then
+    if [ -f "$_cdir/.dotter/scripts/generate_from_kcl.py" ]; then
       _repo_root="$_cdir"
       break
     fi
@@ -46,6 +46,21 @@ if [ -z "$_repo_root" ]; then
   done
 fi
 
+if [ -n "$_repo_root" ]; then
+  if command -v kcl >/dev/null 2>&1 && [ -f "$_repo_root/kcl/main.k" ]; then
+    echo "Regenerating configs from KCL..."
+    cd "$_repo_root"
+    kcl run kcl/main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
+    python3 .dotter/scripts/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
+    echo "  Configs regenerated."
+  else
+    echo "WARNING: KCL not available or kcl/main.k missing; skipping regeneration." >&2
+  fi
+else
+  echo "WARNING: could not locate repo root for KCL regeneration" >&2
+fi
+
+# Pre-deploy schema validation
 if [ -n "$_repo_root" ] && [ -f "$_repo_root/.dotter/scripts/validate_schema.sh" ]; then
   "$_repo_root/.dotter/scripts/validate_schema.sh" --pre-deploy || true
 else

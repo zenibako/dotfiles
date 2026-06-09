@@ -12,4 +12,7 @@ node_modules/
 # Deployed config directory (dotter output)
 .config/
 
+# KCL build artifacts
+generated/
+
 **/lazy-lock.json

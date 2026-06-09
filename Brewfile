@@ -12,258 +12,134 @@ tap "sst/tap"
 tap "valkyrie00/bbrew"
 tap "zerotier/tap"
 tap "vladkens/tap"
-# General-purpose data compression with high compression ratio
 brew "xz"
-# Automatic configure script builder
 brew "autoconf"
-# Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
-# Cryptography and SSL/TLS Toolkit
 brew "openssl@3"
-# Library for command-line editing
 brew "readline"
-# Platform built on V8 to build network applications
 brew "node"
-# AWS Cloud Development Kit - framework for defining AWS infra as code
 brew "aws-cdk"
-# Atlassian command-line interface for Jira and Confluence
 brew "acli"
-# Core application library for C
 brew "glib"
-# Parser generator
 brew "bison"
-# Multi-shell multi-command argument completer
 brew "carapace"
-# Cross-platform make
 brew "cmake"
-# GNU File, Shell, and Text utilities
 brew "coreutils"
-# Cryptographic recipes and primitives for Python
 brew "cryptography"
-# Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
-# Pack, ship and run any application as a lightweight container
 brew "docker"
-# Docker CLI plugin for extended build capabilities with BuildKit
 brew "docker-buildx"
-# Platform keystore credential helper for Docker
 brew "docker-credential-helper"
-# Dotfile manager and templater written in rust
 brew "dotter"
-# Spellchecker wrapping library
 brew "enchant"
-# Like neofetch, but much faster because written mostly in C
 brew "fastfetch"
-# Simple, fast and user-friendly alternative to find
 brew "fd"
-# GNU Transport Layer Security (TLS) Library
 brew "gnutls"
-# OpenType text shaping engine
 brew "harfbuzz"
-# Framework for layout and rendering of i18n text
 brew "pango"
-# Play, record, convert, and stream audio and video
 brew "ffmpeg"
-# Monitor a directory for changes and run a shell command
 brew "fswatch"
-# Command-line fuzzy finder written in Go
 brew "fzf"
-# Integer Set Library for the polyhedral model
 brew "isl"
-# GNU compiler collection
 brew "gcc"
-# GitHub command-line tool
 brew "gh"
-# Distributed revision control system
 brew "git"
-# Small git utilities
 brew "git-extras"
-# Open-source GitLab command-line tool
 brew "glab"
-# Open source programming language to build simple/reliable/efficient software
 brew "go"
-# Language server for Go
 brew "gopls"
-# Image manipulation
 brew "netpbm"
-# Graph visualization software from AT&T and Bell Labs
 brew "graphviz"
-# CLI for rendering Mermaid diagrams (provides `mmdc`)
 brew "mermaid-cli"
-# GNU grep, egrep and fgrep
 brew "grep"
-# Command-line utility for Home Assistant
 brew "homeassistant-cli"
-# Improved top (interactive process viewer)
 brew "htop"
-# Spell checker and morphological analyzer
 brew "hunspell"
-# C/C++ and Java libraries for Unicode and globalization
 brew "icu4c@76"
-# Tools and libraries to manipulate images in many formats
 brew "imagemagick"
-# Development kit for the Java programming language
 brew "openjdk"
-# Java language specific implementation of the Language Server Protocol
 brew "jdtls"
-# Git-compatible distributed version control system
 brew "jj"
-# Development kit for the Java programming language
 brew "openjdk@21"
-# Load testing and performance measurement application
 brew "jmeter"
-# Lightweight and flexible command-line JSON processor
 brew "jq"
-# Portable Foreign Function Interface library
 brew "libffi"
-# Implementation of the Double Ratchet cryptographic ratchet
 brew "libolm"
-# YAML Parser
 brew "libyaml"
-# Powerful, lightweight programming language
 brew "lua"
-# Language Server for the Lua language
 brew "lua-language-server"
-# Language servers extracted from VS Code (html, json, css, eslint)
 brew "vscode-langservers-extracted"
-# YAML language server
 brew "yaml-language-server"
-# Language server for TypeScript/JavaScript
 brew "typescript-language-server"
-# Configuration language (provides `cue lsp`)
 brew "cue"
-# Language server-capable Starlark CLI (`starlark --lsp`)
 brew "starlark-rust"
-# Package manager for the Lua programming language
 brew "luarocks"
-# Utility for directing compilation
 brew "make"
-# Java-based project management
 brew "maven"
-# Remote terminal application
 brew "mosh"
-# Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
-# HTTP/2 C Library
 brew "nghttp2"
-# Modern shell for the GitHub era
 brew "nushell"
 # Create, run, and share large language models (LLMs)
 cask "ollama-app"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
-# Execute binaries from Python packages in isolated environments
 brew "pipx"
-# CLI for the Pkl programming language
 brew "pkl"
-# Language server for Pkl
 brew "pkl-lsp"
-# Source code analyzer for Java, JavaScript, and more
 brew "pmd"
-# Fast, disk space efficient package manager
 brew "pnpm"
-# Object-relational database system
 brew "postgresql@14"
-# Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
 brew "prettier"
-# Protocol buffers (Google's data interchange format)
 brew "protobuf"
-# Python version management
 brew "pyenv"
-# Command-line YAML and XML processor that wraps jq
-brew "python-yq", link: false
-# Interpreted, interactive, object-oriented programming language (latest, additional versions managed via pyenv)
+brew "python-yq"
 brew "python@3.13"
-# Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# Powerful, clean, object-oriented scripting language
 brew "ruby"
-# Install Ruby, JRuby, Rubinius, TruffleRuby, or mruby
 brew "ruby-install"
-# Safe, concurrent, practical language
 brew "rust"
-# Smart session manager for the terminal
 brew "sesh"
-# Command-line toolkit for Salesforce development
 brew "sf"
-# Launcher to analyze a project with SonarQube
 brew "sonar-scanner"
-# Cross-shell prompt for astronauts
 brew "starship"
-# Opinionated Lua code formatter
 brew "stylua"
-# Feature rich terminal file transfer and explorer
 brew "termscp"
-# Tool to build, change, and version infrastructure
 brew "terraform"
-# Language server for Terraform
 brew "hashicorp/tap/terraform-ls"
-# Terminal multiplexer
 brew "tmux"
-# Incremental parsing library
 brew "tree-sitter"
-# Extensible IRC client
 brew "weechat"
-# Internet file retriever
 brew "wget"
-# Command-line XML and HTML beautifier and content extractor
-brew "xq", link: false
-# JavaScript package manager
+brew "xq"
 brew "yarn"
-# Feature-rich command-line audio/video downloader
 brew "yt-dlp"
-# General-purpose lossless data-compression library
 brew "zlib"
-# Shell extension to navigate your filesystem faster
 brew "zoxide"
-# UNIX shell (command interpreter)
 brew "zsh"
-# Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-autosuggestions"
-# Additional completion definitions for zsh
 brew "zsh-completions"
-# Native, fast starting Clojure interpreter for scripting.
 brew "borkdude/brew/babashka"
-# The modern, text-based browser
 brew "browsh-org/browsh/browsh"
-# The Clojure Programming Language
 brew "clojure/tools/clojure"
-# Suite of tools for connecting to Palm OS devices
 brew "jichu4n/palm-os/pilot-link"
-# Sudoless performance monitoring CLI tool for Apple Silicon processors
 brew "vladkens/tap/macmon"
-# A TUI built for managing and waking your devices using Wake-on-LAN.
 brew "jonathanruiz/tap/wakey"
-# define simple completions using a spec file
 brew "rsteube/tap/carapace-spec"
-# The AI coding agent built for the terminal.
 brew "sst/tap/opencode"
-# A simple TUI tool to make your homebrew bold.
 brew "valkyrie00/bbrew/bbrew"
-# Command-line tools for building and debugging Android apps
 cask "android-commandlinetools"
-# Android SDK component
 cask "android-platform-tools"
 cask "font-hack-nerd-font"
-# Tool to measure the computer system's performance
 cask "geekbench"
-# Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Tools to protect your emails and files
 cask "gpg-suite"
-# Intercept, modify, replay, save HTTP/S traffic
 cask "mitmproxy"
-# MacBook Notch utility
 cask "quakenotch"
-# CLI tools for Salesforce
 cask "salesforce-cli"
-# JDK from the Eclipse Foundation (Adoptium)
 cask "temurin"
-# Open-source code editor
 cask "visual-studio-code"
-# Free and open source web app scanner
 cask "zap"
-# Mesh VPN client
 cask "zerotier-one"
 vscode "alefragnani.project-manager"
 vscode "amiralizadeh9480.cpp-helper"
@@ -332,7 +208,7 @@ vscode "salesforce.salesforcedx-vscode-visualforce"
 vscode "salesforce.sfdx-code-analyzer-vscode"
 vscode "sumneko.lua"
 vscode "twxs.cmake"
-vscode "vscodevim.vim"
+vscode "vscodevim.vscode-vim"
 vscode "vue.volar"
 vscode "ziyasal.vscode-open-in-github"
 vscode "zxh404.vscode-proto3"

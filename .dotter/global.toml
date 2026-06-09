@@ -1,220 +1,183 @@
-
 [default.files]
-"gitconfig"                                 = { target  = "~/.config/git/dotter-gitconfig",           type = "template" }
-"git/commit-template"                                   = "~/.git-commit-template"
-"git/hooks/prepare-commit-msg"              = { target  = "~/.config/git/hooks/prepare-commit-msg",   type = "template" }
-"shared/env.toml"                           = { target  = "~/.config/shared/env.toml",                type = "template" }
-"shared/completions.toml"                               = "~/.config/shared/completions.toml"
-"atuin/bin"                                             = "~/.atuin/bin"
-"atuin/config.toml"                                     = "~/.config/atuin/config.toml"
-"pnpm/rc"                                               = "~/.config/pnpm/rc"
-"tmux.conf"                                 = { target  = "~/.tmux.conf",                             type = "template" }
-zshenv                                      = { target  = "~/.zshenv",                                type = "template" }
-zshrc                                       = { target  = "~/.zshrc",                                 type = "template" }
-carapace            	                                  = "~/.config/carapace"
-"ghostty/config"                            = { target  = "~/.config/ghostty/config",                 type = "template" }
-iamb                	                                  = "~/.config/iamb"
-nushell                                     = { target  = "~/.config/nushell",                        type = "template" }
-"starship.toml"                                         = "~/.config/starship.toml"
-jj                                          = { target  = "~/.config/jj",                             type = "template" }
-"nvim/default"                              = { target  = "~/.config/nvim",                           type = "template" }
-"opencode/.gitignore"                       = { target  = "~/.config/opencode/.gitignore",            type = "symbolic" }
-"opencode/AGENTS.md"                        = { target  = "~/.config/opencode/AGENTS.md",             type = "symbolic" }
-"opencode/command/review.md"                = { target  = "~/.config/opencode/command/review.md",     type = "symbolic" }
-"opencode/prompt"                           = { target  = "~/.config/opencode/prompt",                type = "symbolic" }
-"opencode/opencode.jsonc"                   = { target  = "~/.config/opencode/opencode.jsonc",        type = "template" }
-"opencode/script"                           = { target  = "~/.config/opencode/script",                type = "symbolic" }
-"claude-desktop"                            = { target  = "~/Library/Application Support/Claude",     type = "template" }
-"claude-code/CLAUDE.md"                     = { target  = "~/.claude/CLAUDE.md",                      type = "template" }
-"claude-code/settings.json"                 = { target  = "~/.claude/settings.json",                  type = "template" }
-"shared/commands/go.md"                     = { target  = "~/.claude/commands/go.md",                 type = "symbolic" }
-"shared/commands/fix-pipeline.md"           = { target  = "~/.claude/commands/fix-pipeline.md",       type = "symbolic" }
-"shared/commands/coderabbit-review.md"      = { target  = "~/.claude/commands/coderabbit-review.md",  type = "symbolic" }
-"claude-code/commands/review.md"            = { target  = "~/.claude/commands/review.md",             type = "symbolic" }
-"claude-code/commands/jj-fix-conflicts.md"  = { target  = "~/.claude/commands/jj-fix-conflicts.md",   type = "symbolic" }
-gitlogue                                                = "~/.config/gitlogue"
-"agents/skills"                             = { target  = "~/.agents/skills",                         type = "symbolic" }
+"gitconfig" = { target = "~/.config/git/dotter-gitconfig", type = "template" }
+"git/commit-template" = "~/.git-commit-template"
+"git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
+"shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
+"shared/completions.toml" = "~/.config/shared/completions.toml"
+"atuin/bin" = "~/.atuin/bin"
+"atuin/config.toml" = "~/.config/atuin/config.toml"
+"pnpm/rc" = "~/.config/pnpm/rc"
+"tmux.conf" = { target = "~/.tmux.conf", type = "template" }
+"zshenv" = { target = "~/.zshenv", type = "template" }
+"zshrc" = { target = "~/.zshrc", type = "template" }
+"carapace" = "~/.config/carapace"
+"ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
+"iamb" = "~/.config/iamb"
+"nushell" = { target = "~/.config/nushell", type = "template" }
+"starship.toml" = "~/.config/starship.toml"
+"jj" = { target = "~/.config/jj", type = "template" }
+"nvim/default" = { target = "~/.config/nvim", type = "template" }
+"opencode/.gitignore" = { target = "~/.config/opencode/.gitignore", type = "symbolic" }
+"opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
+"opencode/command/review.md" = { target = "~/.config/opencode/command/review.md", type = "symbolic" }
+"opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
+"opencode/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
+"opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
+"claude-desktop" = { target = "~/Library/Application Support/Claude", type = "template" }
+"claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
+"claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
+"shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
+"shared/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
+"shared/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
+"claude-code/commands/review.md" = { target = "~/.claude/commands/review.md", type = "symbolic" }
+"claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
+"gitlogue" = "~/.config/gitlogue"
+"agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
 
 [default.variables]
-name                                  = ""
-email                                 = ""
-username                              = "chanderson"
-vim_set_num_relnum                    = "set number relativenumber"
-gpg_key                               = ""
-github_personal_access_token          = ""
-gitea_url                             = ""
-gitea_token                           = ""
-home_assistant_url                    = ""
-home_assistant_token                  = ""
-home_assistant_webhook_id             = ""
-playdate_sdk_enabled                  = false
-bartender_hooks_enabled               = false
-
-# Claude Desktop & Code
-# Machine-wide defaults; per-machine values can be overridden in local.toml.
-# Profile-specific values (work vs personal) live in [work.variables] and
-# [personal.variables] — dotter forbids the same key in both default and a
-# depended-on package.
-claude_remote_tools_device_name          = "mac-mini"
-claude_model                             = "opus"
-claude_effort_level                      = "high"
-claude_plugin_pyright_lsp                = false
-claude_plugin_extra_lsps                 = true
-mcp_obsidian_enabled                     = false
-mcp_obsidian_url                         = ""
-mcp_obsidian_token                       = ""
-
-# Bluesky
-bluesky_handle                        = ""
-bluesky_app_password                  = ""
-
-# Plex
-plex_user_token                       = ""
-plex_server_token                     = ""
-plex_url                              = ""
-
-# TMDB
-tmdb_key                              = ""
-
-# Google APIs
-youtube_api_key                       = ""
-google_places_api_key                 = ""
-
-# Slack
-slack_d_cookie                        = ""
-slack_token                           = ""
-
-# Reddit
-reddit_session                        = ""
-reddit_token_v2                       = ""
-
-# Brave Search API
-brave_search_api_key                  = ""
-
-# Proton Mail Bridge credentials
-proton_user                           = ""
-proton_password                       = ""
-
-# Telegram Bot Token
-telegram_bot_token                    = ""
+name = ""
+email = ""
+username = "chanderson"
+vim_set_num_relnum = "set number relativenumber"
+gpg_key = ""
+github_personal_access_token = ""
+gitea_url = ""
+gitea_token = ""
+home_assistant_url = ""
+home_assistant_token = ""
+home_assistant_webhook_id = ""
+playdate_sdk_enabled = false
+bartender_hooks_enabled = false
+claude_remote_tools_device_name = "mac-mini"
+claude_model = "opus"
+claude_effort_level = "high"
+claude_plugin_pyright_lsp = false
+claude_plugin_extra_lsps = true
+mcp_obsidian_enabled = false
+mcp_obsidian_url = ""
+mcp_obsidian_token = ""
+bluesky_handle = ""
+bluesky_app_password = ""
+plex_user_token = ""
+plex_server_token = ""
+plex_url = ""
+tmdb_key = ""
+youtube_api_key = ""
+google_places_api_key = ""
+slack_d_cookie = ""
+slack_token = ""
+reddit_session = ""
+reddit_token_v2 = ""
+brave_search_api_key = ""
+proton_user = ""
+proton_password = ""
+telegram_bot_token = ""
 
 [personal]
 depends = ["default"]
 
 [personal.files]
-"nvim/personal"                       = { target  = "~/.config/nvim",                              type = "template" }
-# "opencode/plugin/home-assistant.ts"   = { target  = "~/.config/opencode/plugin/home-assistant.ts", type = "template" }
+"nvim/personal" = { target = "~/.config/nvim", type = "template" }
 
 [personal.variables]
-opencode_profile_personal             = true
-mcp_coderabbit                        = false
-mcp_home_assistant_enabled             = false
-mcp_netlify                           = true
-opencode_build_agent_model            = "ollama-cloud/kimi-k2.6:cloud"
-opencode_plan_agent_model             = "ollama-cloud/gemma4:31b"
-opencode_test_agent_model             = "ollama-cloud/glm-5.1"
-opencode_review_agent_model           = "ollama-cloud/glm-5.1"
-
-# Claude Desktop & Code — personal profile
-claude_agent_push_notif_enabled          = true
-claude_bypass_permissions_account_id     = "c5055d6d-b6e9-46de-a26f-0dad4c6255fc"
-claude_bypass_permissions_value          = true
+opencode_profile_personal = true
+mcp_coderabbit = false
+mcp_home_assistant_enabled = false
+mcp_netlify = true
+opencode_build_agent_model = "ollama-cloud/kimi-k2.6:cloud"
+opencode_plan_agent_model = "ollama-cloud/gemma4:31b"
+opencode_test_agent_model = "ollama-cloud/glm-5.1"
+opencode_review_agent_model = "ollama-cloud/glm-5.1"
+claude_agent_push_notif_enabled = true
+claude_bypass_permissions_account_id = "c5055d6d-b6e9-46de-a26f-0dad4c6255fc"
+claude_bypass_permissions_value = true
 claude_bypass_permissions_extras_enabled = true
-claude_cowork_scheduled_tasks_enabled    = true
-claude_epitaxy_personal_prefs_enabled    = true
-claude_effort_level_enabled              = true
-claude_model_at_top                      = true
-claude_plugin_clangd_lsp                 = false
+claude_cowork_scheduled_tasks_enabled = true
+claude_epitaxy_personal_prefs_enabled = true
+claude_effort_level_enabled = true
+claude_model_at_top = true
+claude_plugin_clangd_lsp = false
 
 [work]
 depends = ["default"]
 
 [work.files]
-"nvim/work"                           = { target  = "~/.config/nvim",                              type = "template" }
-"opencode/plugin/slack-workflow.ts"   = { target  = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
-"opencode/script/lwc-lsp-wrapper.sh"  = { target  = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
+"nvim/work" = { target = "~/.config/nvim", type = "template" }
+"opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
+"opencode/script/lwc-lsp-wrapper.sh" = { target = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
 
 [work.variables]
-opencode_profile_work                 = true
-mcp_salesforce_dx_enabled             = false
-mcp_atlassian_enabled                 = false
-mcp_odaseva_enabled                   = false
-mcp_postman_enabled                   = true
-mcp_sonarqube_enabled                 = true
-postman_api_key                       = ""
-sonarqube_url                         = ""
-sonarqube_token                       = ""
-gitlab_personal_access_token          = ""
-gitlab_api_url                        = "https://gitlab.com/api/v4"
-gitlab_url                            = ""
-opencode_slack_webhook_url            = ""
-opencode_build_agent_model            = "openai/gpt-5.4"
-opencode_plan_agent_model             = "openai/gpt-5.4"
-opencode_test_agent_model             = "openai/gpt-5.4"
-opencode_review_agent_model           = "openai/gpt-5.4"
-node_extra_ca_certs                   = ""
-p10k_root_dir                         = ""
-
-# Claude Desktop & Code — work profile (different account, leaner config)
-claude_agent_push_notif_enabled          = false
-claude_bypass_permissions_account_id     = "cc63eabd-b672-4570-871a-fd0d4607e75d"
-claude_bypass_permissions_value          = false
+opencode_profile_work = true
+mcp_salesforce_dx_enabled = false
+mcp_atlassian_enabled = false
+mcp_odaseva_enabled = false
+mcp_postman_enabled = true
+mcp_sonarqube_enabled = true
+postman_api_key = ""
+sonarqube_url = ""
+sonarqube_token = ""
+gitlab_personal_access_token = ""
+gitlab_api_url = "https://gitlab.com/api/v4"
+gitlab_url = ""
+opencode_slack_webhook_url = ""
+opencode_build_agent_model = "openai/gpt-5.4"
+opencode_plan_agent_model = "openai/gpt-5.4"
+opencode_test_agent_model = "openai/gpt-5.4"
+opencode_review_agent_model = "openai/gpt-5.4"
+node_extra_ca_certs = ""
+p10k_root_dir = ""
+claude_agent_push_notif_enabled = false
+claude_bypass_permissions_account_id = "cc63eabd-b672-4570-871a-fd0d4607e75d"
+claude_bypass_permissions_value = false
 claude_bypass_permissions_extras_enabled = false
-claude_cowork_scheduled_tasks_enabled    = false
-claude_epitaxy_personal_prefs_enabled    = false
-claude_effort_level_enabled              = false
-claude_model_at_top                      = true
-claude_plugin_clangd_lsp                 = false
-
-[oda-mcp]
-
-[oda-mcp.variables]
+claude_cowork_scheduled_tasks_enabled = false
+claude_epitaxy_personal_prefs_enabled = false
+claude_effort_level_enabled = false
+claude_model_at_top = true
+claude_plugin_clangd_lsp = false
 
 [linux.files]
-hypr                	                = "~/.config/hypr"
-# "waybar"                            = "~/.config/waybar"
+"hypr" = "~/.config/hypr"
 
 [linux.variables]
 shell_bin_path = "/usr/bin"
 
 [mac.files]
-"aerospace.toml"             	        = "~/.aerospace.toml"
+"aerospace.toml" = "~/.aerospace.toml"
 
 [mac.variables]
 shell_bin_path = "/opt/homebrew/bin"
 
 [monokai.variables]
-ghostty_theme                         = "Monokai Pro"
-ghostty_unfocused_split_fill          = "#221f22"
-ghostty_split_divider_color           = "#727072"
-nvim_colorscheme_plugin               = "sainnhe/sonokai"
-nvim_colorscheme_config               = """      vim.g.sonokai_enable_italic = true
+ghostty_theme = "Monokai Pro"
+ghostty_unfocused_split_fill = "#221f22"
+ghostty_split_divider_color = "#727072"
+nvim_colorscheme_plugin = "sainnhe/sonokai"
+nvim_colorscheme_config = """      vim.g.sonokai_enable_italic = true
       vim.g.sonokai_transparent_background = 1
       vim.cmd.colorscheme('sonokai')"""
-nvim_lualine_theme                    = "sonokai"
-tmux_theme_plugin                     = "zenibako/tmux-monokai-pro"
-tmux_theme_config                     = """
+nvim_lualine_theme = "sonokai"
+tmux_theme_plugin = "zenibako/tmux-monokai-pro"
+tmux_theme_config = """
 # Monokai theme configuration
-# available plugins: battery, cpu-usage, git, gpu-usage, ram-usage, tmux-ram-usage, network, network-bandwidth, network-ping, ssh-session, attached-clients, network-vpn, weather, time, mpc, spotify-tui, playerctl, kubernetes-context, synchronize-panes
 set -g @monokai-plugins 'time battery cpu-usage ram-usage'
 set -g @monokai-show-powerline true
 set -g @monokai-show-left-sep ''
 set -g @monokai-show-right-sep ''
 """
-# Nushell prompt colors
-nu_prompt_insert_color                = "green_bold"
-nu_prompt_normal_color                = "yellow_bold"
+nu_prompt_insert_color = "green_bold"
+nu_prompt_normal_color = "yellow_bold"
 
 [nightowl.variables]
-ghostty_theme                         = "Night Owl"
-ghostty_unfocused_split_fill          = "#011627"
-ghostty_split_divider_color           = "#5f7e97"
-nvim_colorscheme_plugin               = "oxfist/night-owl.nvim"
-nvim_colorscheme_config               = """      require('night-owl').setup()
+ghostty_theme = "Night Owl"
+ghostty_unfocused_split_fill = "#011627"
+ghostty_split_divider_color = "#5f7e97"
+nvim_colorscheme_plugin = "oxfist/night-owl.nvim"
+nvim_colorscheme_config = """      require('night-owl').setup()
       vim.cmd.colorscheme('night-owl')"""
-nvim_lualine_theme                    = "night-owl"
-tmux_theme_plugin                     = "kylepeeler/tmux-nightowl"
-tmux_theme_config                     = """
+nvim_lualine_theme = "night-owl"
+tmux_theme_plugin = "kylepeeler/tmux-nightowl"
+tmux_theme_config = """
 # Nightowl theme configuration
 set -g @nightowl-show-powerline true
 set -g @nightowl-show-left-icon session
@@ -226,16 +189,15 @@ set -g @nightowl-ram-usage true
 set -g @nightowl-show-timezone true
 set -g @nightowl-border-contrast true
 """
-# Nushell prompt colors
-nu_prompt_insert_color                = "light_blue_bold"
-nu_prompt_normal_color                = "light_purple_bold"
+nu_prompt_insert_color = "light_blue_bold"
+nu_prompt_normal_color = "light_purple_bold"
 
 [tokyonight.variables]
-ghostty_theme                         = "TokyoNight Night"
-ghostty_unfocused_split_fill          = "#1a1b26"
-ghostty_split_divider_color           = "#283457"
-nvim_colorscheme_plugin               = "folke/tokyonight.nvim"
-nvim_colorscheme_config               = """      require('tokyonight').setup({
+ghostty_theme = "TokyoNight Night"
+ghostty_unfocused_split_fill = "#1a1b26"
+ghostty_split_divider_color = "#283457"
+nvim_colorscheme_plugin = "folke/tokyonight.nvim"
+nvim_colorscheme_config = """      require('tokyonight').setup({
         style = 'night',
         transparent = true,
         terminal_colors = true,
@@ -247,50 +209,27 @@ nvim_colorscheme_config               = """      require('tokyonight').setup({
         },
       })
       vim.cmd.colorscheme('tokyonight')"""
-nvim_lualine_theme                    = "tokyonight"
-tmux_theme_plugin                     = "janoamaral/tokyo-night-tmux"
-tmux_theme_config                     = """
+nvim_lualine_theme = "tokyonight"
+tmux_theme_plugin = "janoamaral/tokyo-night-tmux"
+tmux_theme_config = """
 # Tokyo Night theme configuration
-# Theme style: storm, day, or night (default)
 set -g @tokyo-night-tmux_theme night
 set -g @tokyo-night-tmux_transparent 0
-
-# Window and pane numbering styles
-# Options: hide, none, digital, roman, fsquare, hsquare, dsquare, super, sub
-# Note: 'digital' requires Unicode 13+ support, use 'fsquare' or 'roman' if icons don't show
 set -g @tokyo-night-tmux_window_id_style fsquare
 set -g @tokyo-night-tmux_pane_id_style hsquare
 set -g @tokyo-night-tmux_zoom_id_style dsquare
-
-# Date and time widget
 set -g @tokyo-night-tmux_show_datetime 1
 set -g @tokyo-night-tmux_date_format MYD
 set -g @tokyo-night-tmux_time_format 12H
-
-# Path widget
 set -g @tokyo-night-tmux_show_path 1
 set -g @tokyo-night-tmux_path_format relative
-
-# Battery widget (set to 0 if not needed)
 set -g @tokyo-night-tmux_show_battery_widget 0
-# set -g @tokyo-night-tmux_battery_name "BAT1"
-# set -g @tokyo-night-tmux_battery_low_threshold 21
-
-# Netspeed widget
 set -g @tokyo-night-tmux_show_netspeed 0
-# set -g @tokyo-night-tmux_netspeed_iface "wlan0"
-# set -g @tokyo-night-tmux_netspeed_showip 1
-# set -g @tokyo-night-tmux_netspeed_refresh 1
-
-# Now playing widget
 set -g @tokyo-night-tmux_show_music 0
-
-# Hostname widget
 set -g @tokyo-night-tmux_show_hostname 0
 """
-# Nushell prompt colors
-nu_prompt_insert_color                = "cyan_bold"
-nu_prompt_normal_color                = "blue_bold"
+nu_prompt_insert_color = "cyan_bold"
+nu_prompt_normal_color = "blue_bold"
 
 [settings]
-default_target_type                   = "automatic"
+default_target_type = "automatic"

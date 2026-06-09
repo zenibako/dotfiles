@@ -252,6 +252,27 @@ else
     echo "opencode already installed. Skipping."
 fi
 
+# KCL (for config generation)
+if ! command -v kcl >/dev/null 2>&1; then
+    echo "Installing KCL..."
+    if [ "$platform" = "Darwin" ]; then
+        brew install kcl-lang/tap/kcl || echo "WARNING: failed to install KCL via Homebrew"
+    else
+        echo "WARNING: KCL auto-install not supported on this platform. Install manually: https://kcl-lang.io/docs/user_docs/getting-started/install"
+    fi
+else
+    echo "KCL already installed. Skipping."
+fi
+
+# Regenerate dotter configs from KCL source of truth
+echo "Regenerating configs from KCL..."
+if command -v kcl >/dev/null 2>&1; then
+    kcl run kcl/main.k > /dev/null || { echo "WARNING: KCL run failed" >&2; }
+    python3 .dotter/scripts/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
+else
+    echo "WARNING: KCL not found; skipping config regeneration." >&2
+fi
+
 # Deploy dotfiles
 echo "Deploying dotfiles..."
 dotter deploy -f
