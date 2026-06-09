@@ -12,12 +12,19 @@ import json
 import sys
 from pathlib import Path
 
-import tomli_w
+try:
+    import tomli_w
+except ImportError:
+    print("ERROR: 'tomli_w' module not found. Install it with:", file=sys.stderr)
+    print("  pip3 install tomli_w", file=sys.stderr)
+    print("  uv pip install tomli_w", file=sys.stderr)
+    print("  python3 -m pip install --user tomli_w", file=sys.stderr)
+    sys.exit(1)
 
 def _load_json():
     p = Path("generated/config.json")
     if not p.exists():
-        print("ERROR: generated/config.json not found. Run `kcl run kcl/main.k` first.", file=sys.stderr)
+        print("ERROR: generated/config.json not found. Run `kcl run main.k` first.", file=sys.stderr)
         sys.exit(1)
     with open(p) as f:
         return json.load(f)

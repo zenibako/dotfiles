@@ -56,7 +56,10 @@ if [ -n "$_repo_root" ]; then
     python3 .dotter/scripts/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
     echo "  Configs regenerated."
   else
-    echo "WARNING: KCL not available or kcl/main.k missing; skipping regeneration." >&2
+    echo "ERROR: KCL is required for this repository but was not found." >&2
+    echo "       Install it with: brew install kcl-lang/tap/kcl" >&2
+    echo "       Or visit: https://kcl-lang.io/docs/user_docs/getting-started/install" >&2
+    exit 1
   fi
 else
   echo "WARNING: could not locate repo root for KCL regeneration" >&2
