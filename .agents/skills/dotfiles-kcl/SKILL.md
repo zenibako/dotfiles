@@ -1,5 +1,5 @@
 ---
-name: kcl-dotfiles
+name: dotfiles-kcl
 description: >
   Maintain KCL configuration files for this dotfiles repository. KCL is the typed
   single source of truth that generates dotter config, static TOML files, and
@@ -11,7 +11,7 @@ metadata:
   version: "1.0"
 ---
 
-# KCL Dotfiles Configuration
+# Dotfiles KCL Configuration
 
 ## When to use
 
@@ -31,7 +31,7 @@ KCL is the **single source of truth**. The pipeline is:
 main.k ──→ kcl run main.k ──→ generated/config.json
                                           │
                                           ▼
-                              .dotter/scripts/generate_from_kcl.py
+                               .dotter/scripts/generate_from_kcl.py
                                           │
                                           ▼
      ┌─────────────┬──────────────┬───────┴───────┬──────────────┐
