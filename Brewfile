@@ -80,9 +80,7 @@ brew "mosh"
 brew "neovim"
 brew "nghttp2"
 brew "nushell"
-# Create, run, and share large language models (LLMs)
-cask "ollama-app"
-# Swiss-army knife of markup format conversion
+brew "ollama"
 brew "pandoc"
 brew "pipx"
 brew "pkl"

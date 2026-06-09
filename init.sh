@@ -267,6 +267,7 @@ fi
 # Regenerate dotter configs from KCL source of truth
 echo "Regenerating configs from KCL..."
 if command -v kcl >/dev/null 2>&1; then
+    mkdir -p generated
     kcl run kcl/main.k > /dev/null || { echo "WARNING: KCL run failed" >&2; }
     python3 .dotter/scripts/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
 else
