@@ -26,15 +26,8 @@ unfocused-split-opacity = 0.7
 unfocused-split-fill = {{ ghostty_unfocused_split_fill }}
 split-divider-color = {{ ghostty_split_divider_color }}
 
-# Trying to fly without tmux temporarily
-# command = zsh -l -c "tmux attach || tmux"
-
 # Default shell: Nushell (via sh to set XDG_CONFIG_HOME before exec)
 command = /bin/sh -c 'XDG_CONFIG_HOME=$HOME/.config exec {{ shell_bin_path }}/nu -l'
-
-# Direct launch (may fail with permission errors through /usr/bin/login)
-# command = {{ shell_bin_path }}/nu -l
-# env = XDG_CONFIG_HOME=/Users/{{ username }}/.config
 
 # Allow tmux to set window title
 window-title-font-family = "MesloLGMDZ Nerd Font Mono"

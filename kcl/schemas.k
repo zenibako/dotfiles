@@ -104,6 +104,7 @@ schema StarshipConfig:
 schema TemplateConfig:
     jj?: {str: any}
     tmux?: {str: any}
+    ghostty?: str
 
 schema AerospaceConfig:
     config_version?: int = 2
@@ -134,4 +135,3 @@ schema ConfigMap:
     starship?: StarshipConfig
     templates?: TemplateConfig
     aerospace?: AerospaceConfig
-    raw?: RawConfigs
