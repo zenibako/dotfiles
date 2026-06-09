@@ -340,7 +340,7 @@ print(string.format("\n%d OK, %d warnings, %d skipped", ok_count, warn_count, sk
 -- Print install hints for missing binaries
 if #missing_installs > 0 then
   print("\n╔══════════════════════════════════════════════════════════════════════╗")
-  print("║  MISSING LSP BINARIES — Install with:                              ║")
+  print("║  MISSING LSP BINARIES - Install with:                              ║")
   print("╠══════════════════════════════════════════════════════════════════════╣")
   for _, m in ipairs(missing_installs) do
     print(string.format("║  %-20s → %-44s ║", m.lsp, string.sub(m.cmd, 1, 44)))
