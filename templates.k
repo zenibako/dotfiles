@@ -1,0 +1,66 @@
+# ── Template configs ───────────────────────────────────────────────────
+# These files contain Handlebars placeholders that dotter resolves at deploy time.
+# TEMPLATE_MARKER keys signal the Python converter to emit `{{value}}` instead of the literal.
+templates = {
+    jj = {
+        user = {
+            name = { TEMPLATE_MARKER = "name" }
+            email = { TEMPLATE_MARKER = "email" }
+        }
+        ui = {
+            default_command = ["log", "--limit", "5"]
+            diff_editor = ":builtin"
+            show_cryptographic_signatures = True
+        }
+        signing = {
+            sign_all = True
+            backend = "gpg"
+            key = { TEMPLATE_MARKER = "gpg_key" }
+        }
+        merge_tools = {
+            diffconflicts = {
+                program = "nvim"
+                merge_args = ["-c", "let g:jj_diffconflicts_marker_length=$marker_length", "-c", "JJDiffConflicts!", "$output", "$base", "$left", "$right"]
+                merge_tool_edits_conflict_markers = True
+            }
+        }
+    }
+    tmux = {
+        theme_plugin = { TEMPLATE_MARKER = "tmux_theme_plugin" }
+        theme_config = { TEMPLATE_MARKER = "tmux_theme_config" }
+    }
+    ghostty = """font-family = "MesloLGMDZ Nerd Font Mono"
+
+theme = "{{ ghostty_theme }}"
+
+background-opacity  = 0.85
+background-blur     = true
+background          = "#000000"
+
+macos-titlebar-style = "transparent"
+
+mouse-hide-while-typing = true
+scrollback-limit = 1000000
+copy-on-select = true
+window-save-state = always
+
+keybind = super+r=reload_config
+
+# Split navigation with vim-style hjkl
+keybind = super+h=goto_split:left
+keybind = super+j=goto_split:bottom
+keybind = super+k=goto_split:top
+keybind = super+l=goto_split:right
+
+# Split pane visual distinction
+unfocused-split-opacity = 0.7
+unfocused-split-fill = {{ ghostty_unfocused_split_fill }}
+split-divider-color = {{ ghostty_split_divider_color }}
+
+# Default shell: Nushell (via sh to set XDG_CONFIG_HOME before exec)
+command = /bin/sh -c 'XDG_CONFIG_HOME=$HOME/.config exec {{ shell_bin_path }}/nu -l'
+
+# Allow tmux to set window title
+window-title-font-family = "MesloLGMDZ Nerd Font Mono"
+"""
+}
