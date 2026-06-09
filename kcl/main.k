@@ -387,6 +387,239 @@ completions = schemas.CompletionsConfig {
     }
 }
 
+# ── Atuin config ────────────────────────────────────────────────────────
+atuin = schemas.AtuinConfig {
+    enter_accept = True
+    keymap_mode = "vim-normal"
+    search_mode = "daemon-fuzzy"
+    stats = {
+        common_prefix = ["sudo", "pnpm", "npm", "yarn"]
+    }
+    sync = {
+        records = True
+    }
+    daemon = {
+        enabled = True
+        autostart = True
+    }
+    dotfiles = {
+        enabled = True
+    }
+    ai = {
+        enabled = True
+    }
+}
+
+# ── Starship format strings (built outside schema body to avoid $-interpolation) ──
+_dollar = "$"
+_brace_open = "{"
+_brace_close = "}"
+_nl = "\n"
+
+_starship_format = _dollar + "username" + _nl + _dollar + "hostname" + _nl + _dollar + "localip" + _nl + _dollar + "shlvl" + _nl + _dollar + "singularity" + _nl + _dollar + "kubernetes" + _nl + _dollar + "directory" + _nl + _dollar + "vcsh" + _nl + _dollar + "fossil_branch" + _nl + _dollar + "fossil_metrics" + _nl + _dollar + "git_branch" + _nl + _dollar + "git_commit" + _nl + _dollar + "git_state" + _nl + _dollar + "git_metrics" + _nl + _dollar + "git_status" + _nl + _dollar + _brace_open + "custom.jj_change" + _brace_close + _nl + _dollar + _brace_open + "custom.jj_empty" + _brace_close + _nl + _dollar + _brace_open + "custom.jj_desc" + _brace_close + _nl + _dollar + "all"
+
+_starship_right = _dollar + "shell"
+
+# ── Starship config ──────────────────────────────────────────────────
+starship = schemas.StarshipConfig {
+    add_newline = True
+    format = _starship_format
+    right_format = _starship_right
+    command_timeout = 750
+    package = {
+        disabled = True
+    }
+    git_commit = {
+        disabled = True
+    }
+    custom = {
+        sf = {
+            description = "The target org used by default for Salesforce CLI commands"
+            command = "sf config get target-org --json | from json | get result.value.0"
+            when = "sf config get target-org --json | from json | get result.value"
+            format = "via [$symbol ($output)]($style) "
+            style = "bold 039"
+            symbol = ""
+        }
+        jj_change = {
+            description = "The working copy of the repo in your current directory"
+            command = "jj log --no-graph -r=@ -T='separate(\" \", working_copies, change_id.shortest(), bookmarks,)'"
+            when = "jj root"
+            format = "on [$symbol ($output)]($style) "
+            symbol = ""
+            style = "bold purple"
+            ignore_timeout = True
+        }
+        jj_empty = {
+            description = "Shows (empty) in green if the working copy has no changes"
+            command = "echo \"(empty)\""
+            when = "jj log --no-graph -r=@ -T='if(empty, \"y\", \"\")' | grep -q '^y$'"
+            format = "[$output]($style) "
+            style = "bold green"
+            ignore_timeout = True
+        }
+        jj_desc = {
+            description = "The description of your working copy, if set"
+            command = "jj log --no-graph -r=@ -T='if(description, description.first_line(), \"(no description)\")'"
+            when = "jj root"
+            format = "$symbol [($output)]($style) "
+            symbol = "|"
+            ignore_timeout = True
+        }
+    }
+    shell = {
+        disabled = False
+        format = "[$indicator]($style) "
+    }
+}
+
+# ── Template configs ───────────────────────────────────────────────────
+# These files contain Handlebars placeholders that dotter resolves at deploy time.
+# TEMPLATE_MARKER keys signal the Python converter to emit `{{value}}` instead of the literal.
+templates = {
+    jj = {
+        user = {
+            name = { TEMPLATE_MARKER = "name" }
+            email = { TEMPLATE_MARKER = "email" }
+        }
+        ui = {
+            default_command = ["log", "--limit", "5"]
+            diff_editor = ":builtin"
+            show_cryptographic_signatures = True
+        }
+        signing = {
+            sign_all = True
+            backend = "gpg"
+            key = { TEMPLATE_MARKER = "gpg_key" }
+        }
+        merge_tools = {
+            diffconflicts = {
+                program = "nvim"
+                merge_args = ["-c", "let g:jj_diffconflicts_marker_length=$marker_length", "-c", "JJDiffConflicts!", "$output", "$base", "$left", "$right"]
+                merge_tool_edits_conflict_markers = True
+            }
+        }
+    }
+    tmux = {
+        theme_plugin = { TEMPLATE_MARKER = "tmux_theme_plugin" }
+        theme_config = { TEMPLATE_MARKER = "tmux_theme_config" }
+    }
+}
+
+# ── Aerospace config (macOS specific) ──────────────────────────────────
+aerospace = schemas.AerospaceConfig {
+    config_version = 2
+    after_startup_command = []
+    start_at_login = True
+    enable_normalization_flatten_containers = True
+    enable_normalization_opposite_orientation_for_nested_containers = True
+    accordion_padding = 30
+    default_root_container_layout = "tiles"
+    default_root_container_orientation = "auto"
+    on_focused_monitor_changed = ["move-mouse monitor-lazy-center"]
+    automatically_unhide_macos_hidden_apps = True
+    persistent_workspaces = ["1", "2", "3", "4", "5", "6"]
+    on_mode_changed = []
+    key_mapping = {
+        preset = "qwerty"
+    }
+    gaps = {
+        "inner.horizontal" = 10
+        "inner.vertical" = 10
+        "outer.left" = 10
+        "outer.bottom" = 10
+        "outer.top" = 0
+        "outer.right" = 10
+    }
+    on_window_detected = [
+        { "if.app-id" = "com.google.Chrome", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }
+        { "if.app-id" = "app.zen-browser.zen", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }
+        { "if.app-id" = "com.mitchellh.ghostty", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }
+        { "if.app-id" = "com.tinyspeck.slackmacgap", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 2" }
+        { "if.app-id" = "com.hnc.Discord", run = "move-node-to-workspace 2" }
+        { "if.app-id" = "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm", run = "move-node-to-workspace 2" }
+        { "if.app-id" = "com.automattic.beeper.desktop", run = "move-node-to-workspace 2" }
+        { "if.app-id" = "com.apple.iCal", run = "move-node-to-workspace 3" }
+        { "if.app-id" = "com.apple.finder", run = "move-node-to-workspace 3" }
+        { "if.app-id" = "io.robbie.HomeAssistant", run = "move-node-to-workspace 3" }
+        { "if.app-id" = "com.apple.Photos", run = "move-node-to-workspace 3" }
+        { "if.app-id" = "net.kovidgoyal.calibre", run = "move-node-to-workspace 3" }
+        { "if.app-id" = "com.valvesoftware.steam", run = "move-node-to-workspace 4" }
+        { "if.app-id" = "com.valvesoftware.steam.helper", run = "move-node-to-workspace 4" }
+        { "if.app-id" = "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan", run = "move-node-to-workspace 4" }
+        { "if.app-id" = "org.videolan.vlc", run = "move-node-to-workspace 4" }
+    ]
+    mode_main_binding = {
+        "alt-slash" = "layout tiles horizontal vertical"
+        "alt-comma" = "layout accordion horizontal vertical"
+        "cmd-shift-h" = "focus left"
+        "cmd-shift-j" = "focus down"
+        "cmd-shift-k" = "focus up"
+        "cmd-shift-l" = "focus right"
+        "alt-h" = "move left"
+        "alt-j" = "move down"
+        "alt-k" = "move up"
+        "alt-l" = "move right"
+        "alt-minus" = "resize smart -50"
+        "alt-equal" = "resize smart +50"
+        "alt-1" = "workspace 1"
+        "alt-2" = "workspace 2"
+        "alt-3" = "workspace 3"
+        "alt-4" = "workspace 4"
+        "alt-5" = "workspace 5"
+        "alt-6" = "workspace 6"
+        "alt-7" = "workspace 7"
+        "alt-8" = "workspace 8"
+        "alt-9" = "workspace 9"
+        "alt-q" = "workspace 1"
+        "alt-w" = "workspace 2"
+        "alt-e" = "workspace 3"
+        "alt-r" = "workspace 4"
+        "alt-t" = "workspace 5"
+        "alt-y" = "workspace 6"
+        "alt-shift-1" = "move-node-to-workspace 1"
+        "alt-shift-2" = "move-node-to-workspace 2"
+        "alt-shift-3" = "move-node-to-workspace 3"
+        "alt-shift-4" = "move-node-to-workspace 4"
+        "alt-shift-5" = "move-node-to-workspace 5"
+        "alt-shift-6" = "move-node-to-workspace 6"
+        "alt-shift-7" = "move-node-to-workspace 7"
+        "alt-shift-8" = "move-node-to-workspace 8"
+        "alt-shift-9" = "move-node-to-workspace 9"
+        "alt-shift-q" = "move-node-to-workspace 1"
+        "alt-shift-w" = "move-node-to-workspace 2"
+        "alt-shift-e" = "move-node-to-workspace 3"
+        "alt-shift-r" = "move-node-to-workspace 4"
+        "alt-shift-t" = "move-node-to-workspace 5"
+        "alt-shift-y" = "move-node-to-workspace 6"
+        "alt-tab" = "workspace-back-and-forth"
+        "alt-shift-tab" = "move-workspace-to-monitor --wrap-around next"
+        "alt-shift-semicolon" = "mode service"
+        "alt-shift-p" = "mode passthrough"
+    }
+    mode_service_binding = {
+        esc = ["reload-config", "mode main"]
+        r = ["flatten-workspace-tree", "mode main"]
+        f = ["layout floating tiling", "mode main"]
+        backspace = ["close-all-windows-but-current", "mode main"]
+        "alt-shift-h" = ["join-with left", "mode main"]
+        "alt-shift-j" = ["join-with down", "mode main"]
+        "alt-shift-k" = ["join-with up", "mode main"]
+        "alt-shift-l" = ["join-with right", "mode main"]
+    }
+    mode_passthrough_binding = {
+        "alt-shift-p" = "mode main"
+    }
+    workspace_to_monitor_force_assignment = {
+        "1" = "main"
+        "2" = "main"
+        "3" = "main"
+        "4" = "main"
+        "5" = "main"
+        "6" = "secondary"
+    }
+}
+
 # ── Assemble and export ───────────────────────────────────────────────
 config = schemas.ConfigMap {
     dotter = schemas.DotterConfig {
@@ -402,6 +635,10 @@ config = schemas.ConfigMap {
     }
     env = env
     completions = completions
+    atuin = atuin
+    starship = starship
+    templates = templates
+    aerospace = aerospace
 }
 
 # Write JSON for the Python converter
