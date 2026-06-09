@@ -1,9 +1,10 @@
 ---
 id: TASK-14
 title: Migrate ghostty config to KCL generation
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-06-09 12:43'
+updated_date: '2026-06-09 12:43'
 labels:
   - refactor
   - kcl
@@ -25,6 +26,16 @@ Migrate ghostty/config to KCL generation. The ghostty config is a simple key-val
 - [ ] #3 dotter deploy succeeds with generated ghostty config
 - [ ] #4 Ghostty terminal still works after migration
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Add ghostty config data to KCL templates section as raw text
+2. Update Python converter to write raw text files
+3. Remove ghostty/config from dotter global.toml files list
+4. Test dotter deploy -d
+5. Deploy and verify Ghostty works
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
