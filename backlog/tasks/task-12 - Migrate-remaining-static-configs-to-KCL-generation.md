@@ -1,9 +1,10 @@
 ---
 id: TASK-12
 title: Migrate remaining static configs to KCL generation
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-06-09 02:05'
+updated_date: '2026-06-09 02:06'
 labels:
   - refactor
   - kcl
@@ -27,6 +28,24 @@ Migrate atuin/config.toml, aerospace.toml, and starship.toml from manually-maint
 - [ ] #5 pre_deploy.sh regenerates all three files automatically
 - [ ] #6 dotter deploy dry-run succeeds after migration
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Read atuin/config.toml, aerospace.toml, starship.toml to extract active settings
+2. Add KCL schemas for: AtuinConfig, AerospaceConfig, StarshipConfig
+3. Add config data to kcl/main.k for all three tools
+4. Update Python converter to generate the three TOML files
+5. Mark original files as generated (or move them)
+6. Run dotter deploy -d to verify
+7. Commit changes
+<!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Starting migration of atuin, aerospace, and starship configs to KCL generation.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
