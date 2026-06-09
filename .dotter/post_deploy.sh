@@ -58,82 +58,54 @@ fi
 
 DEPLOYED="$HOME/.config"
 
-# --- Secret injection (Proton Pass or macOS Keychain) ---
+# --- Secret injection (Proton Pass) ---
 # Instead of exporting secrets as shell env vars, we read them from a local
 # credential cache and inject them directly into the config files that need
 # them. This limits secret exposure to specific processes/config files only.
 #
-# Backends (tried in order):
-#   1. Proton Pass CLI  -> ~/.cache/proton-pass-secrets.env
-#   2. macOS Keychain   -> ~/.cache/macos-keychain-secrets.env
+# Requirement: Proton Pass CLI (`pass-cli`) installed and vault unlocked.
+#   Install: brew install proton-pass-cli  (or equivalent for your platform)
+#
+# Naming convention: Proton Pass item names must match the lookup keys below
+# exactly. Example: vault "Personal", item "GitHub" → key GITHUB_PERSONAL_ACCESS_TOKEN
 _SECRET_CACHE=""
 
 _ensure_secret_cache() {
   local _proton_cache="$HOME/.cache/proton-pass-secrets.env"
-  local _keychain_cache="$HOME/.cache/macos-keychain-secrets.env"
 
-  # --- Try Proton Pass first ---
-  if [ -x "$HOME/.config/opencode/script/proton-pass-env.sh" ]; then
-    local _needs_build=0
-    if [ ! -f "$_proton_cache" ]; then
-      _needs_build=1
+  if [ ! -x "$HOME/.config/opencode/script/proton-pass-env.sh" ]; then
+    echo "WARNING: Proton Pass secret fetcher not found at ~/.config/opencode/script/proton-pass-env.sh" >&2
+    return 1
+  fi
+
+  local _needs_build=0
+  if [ ! -f "$_proton_cache" ]; then
+    _needs_build=1
+  else
+    local _mtime_epoch
+    if [ "$(uname -s)" = "Darwin" ]; then
+      _mtime_epoch=$(stat -f %m "$_proton_cache" 2>/dev/null)
     else
-      local _mtime_epoch
-      if [ "$(uname -s)" = "Darwin" ]; then
-        _mtime_epoch=$(stat -f %m "$_proton_cache" 2>/dev/null)
-      else
-        _mtime_epoch=$(stat -c %Y "$_proton_cache" 2>/dev/null)
-      fi
-      if [ -n "$_mtime_epoch" ]; then
-        local _now_epoch _age_sec
-        _now_epoch=$(date +%s)
-        _age_sec=$(( _now_epoch - _mtime_epoch ))
-        [ "$_age_sec" -ge 3600 ] && _needs_build=1
-      else
-        _needs_build=1
-      fi
+      _mtime_epoch=$(stat -c %Y "$_proton_cache" 2>/dev/null)
     fi
-    if [ "$_needs_build" -eq 1 ]; then
-      "$HOME/.config/opencode/script/proton-pass-env.sh" --build && {
-        _SECRET_CACHE="$_proton_cache"
-        return 0
-      }
+    if [ -n "$_mtime_epoch" ]; then
+      local _now_epoch _age_sec
+      _now_epoch=$(date +%s)
+      _age_sec=$(( _now_epoch - _mtime_epoch ))
+      [ "$_age_sec" -ge 3600 ] && _needs_build=1
     else
-      _SECRET_CACHE="$_proton_cache"
-      return 0
+      _needs_build=1
     fi
   fi
 
-  # --- Fall back to macOS Keychain ---
-  if [ -x "$HOME/.config/opencode/script/macos-keychain-env.sh" ]; then
-    local _needs_build=0
-    if [ ! -f "$_keychain_cache" ]; then
-      _needs_build=1
-    else
-      local _mtime_epoch
-      if [ "$(uname -s)" = "Darwin" ]; then
-        _mtime_epoch=$(stat -f %m "$_keychain_cache" 2>/dev/null)
-      else
-        _mtime_epoch=$(stat -c %Y "$_keychain_cache" 2>/dev/null)
-      fi
-      if [ -n "$_mtime_epoch" ]; then
-        local _now_epoch _age_sec
-        _now_epoch=$(date +%s)
-        _age_sec=$(( _now_epoch - _mtime_epoch ))
-        [ "$_age_sec" -ge 3600 ] && _needs_build=1
-      else
-        _needs_build=1
-      fi
-    fi
-    if [ "$_needs_build" -eq 1 ]; then
-      "$HOME/.config/opencode/script/macos-keychain-env.sh" --build && {
-        _SECRET_CACHE="$_keychain_cache"
-        return 0
-      }
-    else
-      _SECRET_CACHE="$_keychain_cache"
+  if [ "$_needs_build" -eq 1 ]; then
+    "$HOME/.config/opencode/script/proton-pass-env.sh" --build && {
+      _SECRET_CACHE="$_proton_cache"
       return 0
-    fi
+    }
+  else
+    _SECRET_CACHE="$_proton_cache"
+    return 0
   fi
 
   return 1
@@ -241,7 +213,7 @@ if _ensure_secret_cache; then
   unset _deployed_env _env_modified
 
 else
-  echo "WARNING: No secret backend available (Proton Pass or macOS Keychain); secrets will not be injected."
+  echo "WARNING: Proton Pass not configured or vault locked; secrets will not be injected." >&2
 fi
 unset -f _ensure_secret_cache _lookup_secret _inject_github_token
 unset _SECRET_CACHE

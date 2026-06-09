@@ -89,6 +89,7 @@ _build_cache() {
     # --- Home Assistant ---
     val=$(_fetch_secret "Personal" "Home Assistant") && _write "HA_TOKEN" "$val" >> "$_tmp"
     val=$(_fetch_secret "Personal" "Home Assistant MariaDB") && _write "HA_MARIADB_PASSWORD" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Home Assistant Webhook") && _write "HA_WEBHOOK_ID" "$val" >> "$_tmp"
 
     # --- Bluesky ---
     val=$(_fetch_secret "Personal" "Bluesky") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
