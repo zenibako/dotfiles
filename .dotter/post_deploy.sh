@@ -229,8 +229,8 @@ if _ensure_secret_cache; then
         sed "s/^$_placeholder = \"\"/$_placeholder = \"$_val\"/" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
         echo "  Injected $_placeholder into env.toml"
         _env_modified=1
-      elif grep -q "^$_placeholder = \"{{.*\"" "$_deployed_env" 2>/dev/null; then
-        sed "s|^$_placeholder = \"{{.*\"|$_placeholder = \"$_val\"|" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
+      elif grep -q "^$_placeholder = \"\x7b\x7b.*\"" "$_deployed_env" 2>/dev/null; then
+        sed "s|^$_placeholder = \"\x7b\x7b.*\"|$_placeholder = \"$_val\"|" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
         echo "  Injected $_placeholder into env.toml"
         _env_modified=1
       fi

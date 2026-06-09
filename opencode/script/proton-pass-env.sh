@@ -138,6 +138,14 @@ _build_cache() {
         val=$(_fetch_secret "Personal" "Slack D-Cookie") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
     fi
 
+    # Only create the cache if we actually wrote secrets.
+    # If no secrets were fetched, report failure so the caller can fall back.
+    if [ ! -f "$_tmp" ] || [ ! -s "$_tmp" ]; then
+        rm -f "$_tmp"
+        _log_warn "No secrets were fetched from Proton Pass. Is the vault unlocked and items named correctly?"
+        return 1
+    fi
+
     chmod 600 "$_tmp"
     mv "$_tmp" "$PROTON_PASS_CACHE"
     _log_info "Cache built at ${PROTON_PASS_CACHE} ($(wc -l < "$PROTON_PASS_CACHE" | tr -d ' ') entries)"

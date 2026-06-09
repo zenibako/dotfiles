@@ -145,6 +145,12 @@ _build_cache() {
         val=$(_fetch_secret "SLACK_D_COOKIE") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
     fi
 
+    if [ ! -f "$_tmp" ] || [ ! -s "$_tmp" ]; then
+        rm -f "$_tmp"
+        _log_warn "No secrets were fetched from macOS Keychain. Have the items been created with the correct service names?"
+        return 1
+    fi
+
     chmod 600 "$_tmp"
     mv "$_tmp" "$KEYCHAIN_CACHE"
     _log_info "Cache built at ${KEYCHAIN_CACHE} ($(wc -l < "$KEYCHAIN_CACHE" | tr -d ' ') entries)"
@@ -162,7 +168,7 @@ _ensure_cache() {
 
 _look_up() {
     local target="$1" key value _enc
-    while IFS='\t' read -r key value _enc; do
+    while IFS=$'\t' read -r key value _enc; do
         [ "$key" = "$target" ] && { printf '%s' "$value"; return 0; }
     done < "$KEYCHAIN_CACHE"
     return 1
