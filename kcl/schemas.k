@@ -134,3 +134,4 @@ schema ConfigMap:
     starship?: StarshipConfig
     templates?: TemplateConfig
     aerospace?: AerospaceConfig
+    raw?: RawConfigs
