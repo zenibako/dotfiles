@@ -1,6 +1,10 @@
 #!/bin/bash
 # macOS Keychain Secret Fetcher
 # Fetches secrets from macOS Keychain and caches them locally.
+#
+# Naming convention: service name (-s flag) matches the output key name exactly.
+# Example: security add-generic-password -s HA_TOKEN ... produces key HA_TOKEN
+#
 # Uses the same CLI interface as proton-pass-env.sh so the two backends
 # are interchangeable.
 #
