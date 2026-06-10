@@ -12,9 +12,9 @@ import jj
 import tmux
 import ghostty_config as ghostty
 import aerospace
-import iamb_config
-import gitlogue_config
-import pnpm_config
+import iamb
+import gitlogue
+import pnpm
 
 # ── Assemble and export ───────────────────────────────────────────────
 config = _shared.ConfigMap {
@@ -39,9 +39,9 @@ config = _shared.ConfigMap {
         ghostty = ghostty.ghostty
     }
     aerospace = aerospace.aerospace
-    iamb = iamb_config.iamb
-    gitlogue = gitlogue_config.gitlogue
-    pnpm = pnpm_config.pnpm
+    iamb = iamb.iamb
+    gitlogue = gitlogue.gitlogue
+    pnpm = pnpm.pnpm
 }
 
 # Write JSON for the Python converter
