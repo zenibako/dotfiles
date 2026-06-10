@@ -140,13 +140,6 @@ _ensure_secret_cache() {
 
   return 1
 }
-  else
-    _SECRET_CACHE="$_proton_cache"
-    return 0
-  fi
-
-  return 1
-}
 
 _lookup_secret() {
   local target="$1"
