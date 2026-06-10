@@ -66,7 +66,9 @@ main.k ──→ kcl run main.k ──→ generated/config.json
 ├── starship.k          # Starship prompt config (⚠️ $-interpolation sensitive)
 ├── jj.k                # jj config (TOML template with Handlebars)
 ├── tmux.k              # tmux theme plugin/config markers
-├── ghostty_config.k    # ghostty raw text template (renamed to avoid ghostty/ collision)
+├── ghostty/
+│   ├── main.k            # ghostty raw text template with {{}} placeholders
+│   └── shaders/          # GLSL cursor effect assets (not KCL, deployed separately)
 ├── aerospace.k         # macOS window manager config
 ├── atuin/
 │   └── main.k          # Atuin shell history config (directory module)
@@ -86,11 +88,10 @@ main.k ──→ kcl run main.k ──→ generated/config.json
 | Pattern | When to use | Example |
 |---|---|---|
 | **Bare `.k` at root** | No directory name collision; single file output | `aerospace.k` → `out/aerospace.toml` |
-| **`foo/main.k` directory** | Config naturally deploys to a directory; directory doesn't conflict | `atuin/main.k` → `out/atuin/config.toml` |
-| **`foo_config.k` at root** | Directory `foo/` exists but is for other assets (not KCL) | `ghostty_config.k` → `out/ghostty/config` |
+| **`foo/main.k` directory** | Config domain deploys to a directory (even if dir has non-KCL assets) | `ghostty/main.k` → `out/ghostty/config` |
 | **`_shared/*.k`** | Shared schemas, helpers, utilities | `_shared/schemas.k`, `_shared/templates.k` |
 
-**Rule:** Prefer `foo/main.k` when the config domain maps to a directory. Only use `_config` suffix when the directory exists for non-KCL assets (e.g., `ghostty/` contains GLSL shaders).
+**Rule:** Always prefer `foo/main.k` when the config domain has any directory structure. Only use bare `.k` at root for single-file configs with no natural directory.
 
 **Important:** KCL resolves `import foo` to `foo/` directory over `foo.k` file. If both exist, the directory wins.
 
@@ -176,8 +177,8 @@ dotter = _shared.DotterConfig {
 ## Adding a New Tool Config
 
 1. **Choose module naming:**
-   - If config deploys to a directory and the directory name is free → `mkdir mytool && mytool/main.k`
-   - If it's a single file or directory exists for other assets → `mytool.k` or `mytool_config.k` at root
+   - If config deploys to a directory → `mkdir mytool && mytool/main.k`
+   - If it's a single file with no directory → `mytool.k` at root
 
 2. **Add a schema** to `_shared/schemas.k` (or reuse `{str: any}` for simple configs)
 
@@ -251,7 +252,7 @@ Each template domain lives in its own `.k` file:
 |---|---|---|
 | `jj.k` | `out/jj/config.toml` | TOML with `tpl.hb()` markers |
 | `tmux.k` | `out/tmux.conf` | Custom tmux script with markers |
-| `ghostty_config.k` | `out/ghostty/config` | Raw text with `{{}}` placeholders |
+| `ghostty/main.k` | `out/ghostty/config` | Raw text with `{{}}` placeholders |
 
 Register in `main.k` under `TemplateConfig`:
 
@@ -259,7 +260,7 @@ Register in `main.k` under `TemplateConfig`:
 templates = _shared.TemplateConfig {
     jj = jj.jj
     tmux = tmux.tmux
-    ghostty = ghostty_config.ghostty
+    ghostty = ghostty.ghostty
 }
 ```
 
@@ -288,8 +289,7 @@ starship = _shared.StarshipConfig {
 If a `.k` file has the same name as an existing directory (e.g., `ghostty.k` vs `ghostty/`), KCL resolves `import ghostty` to the **directory** and ignores the `.k` file.
 
 **Solutions:**
-- Put KCL inside `ghostty/main.k` if `ghostty/` is for KCL config
-- Use `ghostty_config.k` at root if `ghostty/` is for non-KCL assets (e.g., GLSL shaders)
+- Put KCL inside `ghostty/main.k` — the directory wins, and non-KCL assets (shaders, etc.) coexist peacefully
 
 ### No `kcl.mod` Needed
 
