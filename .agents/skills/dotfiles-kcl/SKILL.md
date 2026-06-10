@@ -69,10 +69,11 @@ src/main.k ──→ kcl run src/main.k ──→ generated/config.json
 │   ├── tmux.k              # tmux theme plugin/config markers
 │   ├── aerospace.k         # macOS window manager config
 │   ├── atuin/
-│   │   └── main.k          # Atuin shell history config
+│   │   ├── main.k          # Atuin shell history config
+│   │   └── bin/              # Shell integration scripts (deployed from src/)
 │   ├── ghostty/
-│   │   ├── main.k          # ghostty raw text template
-│   │   └── shaders/        # GLSL cursor effects (static assets, not KCL)
+│   │   ├── main.k            # ghostty raw text template
+│   │   └── shaders/          # GLSL cursor effects (deployed from src/)
 │   ├── iamb/
 │   │   └── main.k          # Matrix client config
 │   ├── gitlogue/
@@ -82,20 +83,16 @@ src/main.k ──→ kcl run src/main.k ──→ generated/config.json
 │   └── _shared/
 │       ├── schemas.k       # All KCL type schemas
 │       └── templates.k     # Shared template helpers (hb, etc.)
-├── atuin/                  # Static shell integration scripts (deployed separately)
-│   └── bin/
-├── ghostty/                # Static assets
-│   └── shaders/
 ├── out/                    # Generated configs (gitignored)
 ├── generated/              # KCL intermediate JSON (gitignored)
 └── .dotter/
     └── global.toml         # dotter entry point
 ```
 
-- **`src/`** — All KCL source code lives here. Nothing in `src/` is deployed directly.
+- **`src/`** — All KCL source code and static assets for config domains live here. Nothing in `src/` is deployed directly.
 - **`src/main.k`** — Orchestration. Imports all modules, assembles `ConfigMap`, writes `generated/config.json`.
 - **`src/_shared/`** — Shared schemas and helpers (imported as `import _shared`).
-- **Directory modules** (`src/foo/main.k`) — KCL resolves `import foo` to `src/foo/main.k`. Coexist with static assets at root (`atuin/bin/`, `ghostty/shaders/`).
+- **Directory modules** (`src/foo/main.k`) — KCL resolves `import foo` to `src/foo/main.k`. Static assets for the same domain live inside `src/foo/` (e.g., `src/atuin/bin/`, `src/ghostty/shaders/`).
 - **Bare `.k` files** (`src/aerospace.k`, `src/jj.k`) — Single-file configs with no directory structure.
 
 ## Quick Commands
@@ -291,7 +288,7 @@ starship = _shared.StarshipConfig {
 
 KCL resolves `import foo` to `src/foo/` directory over `src/foo.k` file. If both exist, the directory wins.
 
-**Solution:** Put KCL inside `src/foo/main.k`. Static assets go at root (`foo/shaders/`, `foo/bin/`), not inside `src/foo/`.
+**Solution:** Put KCL inside `src/foo/main.k`. Static assets for the same domain go inside `src/foo/` (e.g., `src/atuin/bin/`, `src/ghostty/shaders/`) so the entire config domain is self-contained.
 
 ### No `kcl.mod` Needed
 
