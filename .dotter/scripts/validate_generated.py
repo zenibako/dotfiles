@@ -22,11 +22,12 @@ def check_file_exists(path, desc):
     if not Path(path).exists():
         print(f"  FAIL: Missing {desc}: {path}")
         return False
-    print(f"  OK: {desc}")
     return True
 
 
 def check_toml_parses(path, desc):
+    if not check_file_exists(path, desc):
+        return False
     try:
         import tomllib
         with open(path, "rb") as f:
@@ -42,23 +43,27 @@ def check_toml_parses(path, desc):
     except Exception as e:
         print(f"  FAIL: {desc} is invalid TOML: {e}")
         return False
-    print(f"  OK: {desc} parses as TOML")
+    print(f"  OK: {desc}")
     return True
 
 
 def check_json_parses(path, desc):
+    if not check_file_exists(path, desc):
+        return False
     try:
         with open(path) as f:
             json.load(f)
     except Exception as e:
         print(f"  FAIL: {desc} is invalid JSON: {e}")
         return False
-    print(f"  OK: {desc} parses as JSON")
+    print(f"  OK: {desc}")
     return True
 
 
 def check_template_file(path, desc):
     """Check template file for balanced Handlebars blocks."""
+    if not check_file_exists(path, desc):
+        return False
     try:
         with open(path) as f:
             content = f.read()
@@ -76,13 +81,13 @@ def check_template_file(path, desc):
 
     # Check for other common block tags
     for tag in ['each', 'with', 'unless']:
-        open_tags = len(re.findall(rf'\{{{{#{tag}\b', content))
-        close_tags = len(re.findall(rf'\{{{{/{tag}\}}\}}', content))
+        open_tags = len(re.findall(r'\{\{#' + tag + r'\b', content))
+        close_tags = len(re.findall(r'\{\{/' + tag + r'\}\}', content))
         if open_tags != close_tags:
             print(f"  FAIL: {desc} has unbalanced {{#{tag}}} blocks")
             return False
 
-    print(f"  OK: {desc} template structure valid")
+    print(f"  OK: {desc}")
     return True
 
 
@@ -90,36 +95,24 @@ def main():
     print("== Validating KCL-generated configs ==")
     all_ok = True
 
-    # Expected files
-    expected = [
-        ("generated/config.json", "KCL JSON output", "json"),
-        (".dotter/global.toml", "dotter config", "toml"),
-        ("shared/env.toml", "env config", "template"),
-        ("shared/completions.toml", "completions config", "toml"),
-        ("packages-fedora.txt", "Fedora packages", "txt"),
-        ("Brewfile", "Homebrew bundle", "txt"),
-        ("atuin/config.toml", "atuin config", "toml"),
-        ("starship.toml", "starship config", "toml"),
-        ("aerospace.toml", "aerospace config", "toml"),
-        ("jj/config.toml", "jj config", "template"),
-        ("tmux.conf", "tmux config", "template"),
-        ("ghostty/config", "ghostty config", "template"),
+    checks = [
+        ("generated/config.json", "KCL JSON output", check_json_parses),
+        (".dotter/global.toml", "dotter config", check_toml_parses),
+        ("shared/env.toml", "env config", check_template_file),
+        ("shared/completions.toml", "completions config", check_toml_parses),
+        ("packages-fedora.txt", "Fedora packages", check_file_exists),
+        ("Brewfile", "Homebrew bundle", check_file_exists),
+        ("atuin/config.toml", "atuin config", check_toml_parses),
+        ("starship.toml", "starship config", check_toml_parses),
+        ("aerospace.toml", "aerospace config", check_toml_parses),
+        ("jj/config.toml", "jj config", check_template_file),
+        ("tmux.conf", "tmux config", check_template_file),
+        ("ghostty/config", "ghostty config", check_template_file),
     ]
 
-    for path, desc, kind in expected:
-        if not check_file_exists(path, desc):
+    for path, desc, checker in checks:
+        if not checker(path, desc):
             all_ok = False
-            continue
-
-        if kind == "toml":
-            if not check_toml_parses(path, desc):
-                all_ok = False
-        elif kind == "json":
-            if not check_json_parses(path, desc):
-                all_ok = False
-        elif kind == "template":
-            if not check_template_file(path, desc):
-                all_ok = False
 
     if all_ok:
         print("\nAll generated configs valid.")
