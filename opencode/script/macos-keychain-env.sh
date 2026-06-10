@@ -183,6 +183,9 @@ _look_up() {
 # ------------------------------------------------------------------
 
 case "${1:-}" in
+    --configured)
+        _has_security && exit 0 || exit 1
+        ;;
     --build)
         _build_cache
         ;;
@@ -232,7 +235,7 @@ case "${1:-}" in
         ;;
     --help|-h)
         cat <<'EOF'
-Usage: macos-keychain-env.sh [--build|--get KEY|--keys|--status|--clear|--help]
+Usage: macos-keychain-env.sh [--build|--get KEY|--keys|--status|--clear|--configured|--help]
 
 Build and query a local credential cache from the macOS Keychain.
 Secrets are stored in a private cache file (~/.cache/macos-keychain-secrets.env)
@@ -248,12 +251,13 @@ Setup: store each secret with the macOS security command:
   -a (account)  -> "dotfiles" (used to namespace)
   -U             -> update existing if present
 
-  --build    Fetch secrets from Keychain and rebuild the cache
-  --get KEY  Print the raw value of KEY to stdout
-  --keys     List all cached key names
-  --status   Show cache freshness and list cached key names
-  --clear    Remove the local credential cache
-  --help     Show this message
+  --build       Fetch secrets from Keychain and rebuild the cache
+  --get KEY     Print the raw value of KEY to stdout
+  --keys        List all cached key names
+  --status      Show cache freshness and list cached key names
+  --clear       Remove the local credential cache
+  --configured  Exit 0 if security CLI is available, 1 otherwise (probe only)
+  --help        Show this message
 
 The cache is refreshed automatically when it is older than 1 hour.
 EOF

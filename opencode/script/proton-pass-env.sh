@@ -175,6 +175,9 @@ _look_up() {
 # ------------------------------------------------------------------
 
 case "${1:-}" in
+    --configured)
+        _has_proton_pass && exit 0 || exit 1
+        ;;
     --build)
         _build_cache
         ;;
@@ -224,19 +227,20 @@ case "${1:-}" in
         ;;
     --help|-h)
         cat <<'EOF'
-Usage: proton-pass-env.sh [--build|--get KEY|--keys|--status|--clear|--help]
+Usage: proton-pass-env.sh [--build|--get KEY|--keys|--status|--clear|--configured|--help]
 
 Build and query a local credential cache from Proton Pass CLI vaults.
 Secrets are stored in a private cache file (~/.cache/proton-pass-secrets.env)
 in a tab-separated format (KEY<TAB>VALUE<TAB>raw) that avoids shell-quoting
 issues and is safe for any character including newlines (via b64 encoding flag).
 
-  --build    Fetch secrets from Proton Pass and rebuild the cache
-  --get KEY  Print the raw value of KEY to stdout
-  --keys     List all cached key names
-  --status   Show cache freshness and list cached key names
-  --clear    Remove the local credential cache
-  --help     Show this message
+  --build       Fetch secrets from Proton Pass and rebuild the cache
+  --get KEY     Print the raw value of KEY to stdout
+  --keys        List all cached key names
+  --status      Show cache freshness and list cached key names
+  --clear       Remove the local credential cache
+  --configured  Exit 0 if pass-cli is installed, 1 otherwise (probe only)
+  --help        Show this message
 
 The cache is refreshed automatically when it is older than 1 hour.
 EOF

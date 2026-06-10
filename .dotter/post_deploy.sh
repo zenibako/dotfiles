@@ -73,9 +73,22 @@ _SECRET_CACHE=""
 _ensure_secret_cache() {
   local _proton_cache="$HOME/.cache/proton-pass-secrets.env"
   local _keychain_cache="$HOME/.cache/macos-keychain-secrets.env"
+  local _backend=""
 
-  # --- Try Proton Pass first ---
-  if [ -x "$HOME/.config/opencode/script/proton-pass-env.sh" ]; then
+  # --- Detect which backend is installed ---
+  if [ -x "$HOME/.config/opencode/script/proton-pass-env.sh" ] \
+      && "$HOME/.config/opencode/script/proton-pass-env.sh" --configured >/dev/null 2>&1; then
+    _backend="proton"
+  elif [ -x "$HOME/.config/opencode/script/macos-keychain-env.sh" ] \
+      && "$HOME/.config/opencode/script/macos-keychain-env.sh" --configured >/dev/null 2>&1; then
+    _backend="keychain"
+  else
+    echo "WARNING: No secret backend installed (Proton Pass or macOS Keychain); secrets will not be injected." >&2
+    return 1
+  fi
+
+  # --- Use the detected backend only ---
+  if [ "$_backend" = "proton" ]; then
     local _needs_build=0
     if [ ! -f "$_proton_cache" ]; then
       _needs_build=1
@@ -96,7 +109,7 @@ _ensure_secret_cache() {
       fi
     fi
     if [ "$_needs_build" -eq 1 ]; then
-      "$HOME/.config/opencode/script/proton-pass-env.sh" --build && {
+      "$HOME/.config/opencode/script/proton-pass-env.sh" --build >/dev/null 2>&1 && {
         _SECRET_CACHE="$_proton_cache"
         return 0
       }
@@ -104,10 +117,7 @@ _ensure_secret_cache() {
       _SECRET_CACHE="$_proton_cache"
       return 0
     fi
-  fi
-
-  # --- Fall back to macOS Keychain ---
-  if [ -x "$HOME/.config/opencode/script/macos-keychain-env.sh" ]; then
+  elif [ "$_backend" = "keychain" ]; then
     local _needs_build=0
     if [ ! -f "$_keychain_cache" ]; then
       _needs_build=1
@@ -128,7 +138,7 @@ _ensure_secret_cache() {
       fi
     fi
     if [ "$_needs_build" -eq 1 ]; then
-      "$HOME/.config/opencode/script/macos-keychain-env.sh" --build && {
+      "$HOME/.config/opencode/script/macos-keychain-env.sh" --build >/dev/null 2>&1 && {
         _SECRET_CACHE="$_keychain_cache"
         return 0
       }
@@ -243,7 +253,7 @@ if _ensure_secret_cache; then
   unset _deployed_env _env_modified
 
 else
-  echo "WARNING: No secret backend available (Proton Pass or macOS Keychain); secrets will not be injected." >&2
+    echo "WARNING: No secret backend installed (Proton Pass or macOS Keychain); secrets will not be injected." >&2
 fi
 unset -f _ensure_secret_cache _lookup_secret _inject_github_token
 unset _SECRET_CACHE
