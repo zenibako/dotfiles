@@ -127,3 +127,6 @@ schema ConfigMap:
     starship?: StarshipConfig
     templates?: TemplateConfig
     aerospace?: AerospaceConfig
+    iamb?: {str: any}
+    gitlogue?: {str: any}
+    pnpm?: {str: any}

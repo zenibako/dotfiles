@@ -10,13 +10,13 @@ default = _shared.Profile {
         "out/shared/completions.toml" = "~/.config/shared/completions.toml"
         "atuin/bin" = "~/.atuin/bin"
         "out/atuin/config.toml" = "~/.config/atuin/config.toml"
-        "pnpm/rc" = "~/.config/pnpm/rc"
+        "out/iamb/config.toml" = "~/.config/iamb/config.toml"
+        "out/pnpm/rc" = "~/.config/pnpm/rc"
         "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
         zshenv = { target = "~/.zshenv", type = "template" }
         zshrc = { target = "~/.zshrc", type = "template" }
         carapace = "~/.config/carapace"
         "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
-        iamb = "~/.config/iamb"
         nushell = { target = "~/.config/nushell", type = "template" }
         "out/starship.toml" = "~/.config/starship.toml"
         "out/jj/config.toml" = { target = "~/.config/jj/config.toml", type = "template" }
@@ -35,7 +35,7 @@ default = _shared.Profile {
         "shared/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
         "claude-code/commands/review.md" = { target = "~/.claude/commands/review.md", type = "symbolic" }
         "claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
-        gitlogue = "~/.config/gitlogue"
+        "out/gitlogue/config.toml" = "~/.config/gitlogue/config.toml"
         "agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
     }
     variables = {

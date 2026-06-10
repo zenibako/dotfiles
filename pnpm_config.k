@@ -1,4 +1,6 @@
-# pnpm configuration
+# ── pnpm config (npmrc-style) ──────────────────────────────────────────
+# Using raw text because pnpm uses INI, not TOML
+_pnpm_rc = """# pnpm configuration
 # See: https://pnpm.io/npmrc
 
 # Store location for pnpm packages
@@ -23,3 +25,8 @@ registry=https://registry.npmjs.org/
 
 # JSR registry for @jsr scope
 @jsr:registry=https://npm.jsr.io/
+"""
+
+pnpm = {
+    rc = _pnpm_rc
+}

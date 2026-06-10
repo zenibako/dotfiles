@@ -10,8 +10,11 @@ import atuin
 import starship
 import jj
 import tmux
-import ghostty_config
+import ghostty_config as ghostty
 import aerospace
+import iamb_config
+import gitlogue_config
+import pnpm_config
 
 # ── Assemble and export ───────────────────────────────────────────────
 config = _shared.ConfigMap {
@@ -33,9 +36,12 @@ config = _shared.ConfigMap {
     templates = _shared.TemplateConfig {
         jj = jj.jj
         tmux = tmux.tmux
-        ghostty = ghostty_config.ghostty
+        ghostty = ghostty.ghostty
     }
     aerospace = aerospace.aerospace
+    iamb = iamb_config.iamb
+    gitlogue = gitlogue_config.gitlogue
+    pnpm = pnpm_config.pnpm
 }
 
 # Write JSON for the Python converter

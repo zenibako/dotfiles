@@ -128,6 +128,9 @@ def main():
         ("jj/config.toml", "jj config", check_template_file),
         ("tmux.conf", "tmux config", check_template_file),
         ("ghostty/config", "ghostty config", check_template_file),
+        ("iamb/config.toml", "iamb config", check_toml_parses),
+        ("gitlogue/config.toml", "gitlogue config", check_toml_parses),
+        ("pnpm/rc", "pnpm config", check_file_exists),
     ]
 
     for path, desc, checker in checks:
