@@ -130,3 +130,4 @@ schema ConfigMap:
     iamb?: {str: any}
     gitlogue?: {str: any}
     pnpm?: {str: any}
+    gitconfig?: str

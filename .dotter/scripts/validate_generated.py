@@ -110,7 +110,13 @@ def check_template_file(path, desc):
     # Check that jj config still has template markers for identity fields
     if path == "jj/config.toml":
         if '{{name}}' not in content or '{{email}}' not in content:
-            print(f"  FAIL: {desc} missing required Handlebars placeholders ({{{{name}}}}, {{{{email}}}})")
+            print(f"  FAIL: {desc} missing required Handlebars placeholders ({{name}}, {{email}})")
+            return False
+
+    # Check that gitconfig has template markers for identity fields
+    if path == "gitconfig":
+        if '{{name}}' not in content or '{{email}}' not in content:
+            print(f"  FAIL: {desc} missing required Handlebars placeholders ({{name}}, {{email}})")
             return False
 
     print(f"  OK: {desc}")
@@ -137,6 +143,7 @@ def main():
         ("iamb/config.toml", "iamb config", check_toml_parses),
         ("gitlogue/config.toml", "gitlogue config", check_toml_parses),
         ("pnpm/rc", "pnpm config", check_file_exists),
+        ("gitconfig", "gitconfig", check_template_file),
     ]
 
     for path, desc, checker in checks:

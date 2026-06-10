@@ -3,7 +3,7 @@ import _shared
 # ── Default profile ────────────────────────────────────────────────────
 default = _shared.Profile {
     files = {
-        gitconfig = { target = "~/.config/git/dotter-gitconfig", type = "template" }
+        "out/gitconfig" = { target = "~/.config/git/dotter-gitconfig", type = "template" }
         "git/commit-template" = "~/.git-commit-template"
         "git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
         "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }

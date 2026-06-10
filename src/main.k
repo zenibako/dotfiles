@@ -15,6 +15,7 @@ import aerospace
 import iamb
 import gitlogue
 import pnpm
+import gitconfig
 
 # ── Assemble and export ───────────────────────────────────────────────
 config = _shared.ConfigMap {
@@ -42,6 +43,7 @@ config = _shared.ConfigMap {
     iamb = iamb.iamb
     gitlogue = gitlogue.gitlogue
     pnpm = pnpm.pnpm
+    gitconfig = gitconfig.gitconfig
 }
 
 # Write JSON for the Python converter
