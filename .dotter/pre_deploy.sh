@@ -46,12 +46,12 @@ if [ -z "$_repo_root" ]; then
   done
 fi
 
-if [ -n "$_repo_root" ]; then
-  if command -v kcl >/dev/null 2>&1 && [ -f "$_repo_root/main.k" ]; then
+  if [ -n "$_repo_root" ]; then
+  if command -v kcl >/dev/null 2>&1 && [ -f "$_repo_root/src/main.k" ]; then
     echo "Regenerating configs from KCL..."
     cd "$_repo_root"
     mkdir -p generated
-    kcl run main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
+    kcl run src/main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
     python3 .dotter/scripts/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
     python3 .dotter/scripts/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
     echo "  Configs regenerated."
@@ -67,6 +67,7 @@ fi
 
 # Pre-deploy schema validation
 if [ -n "$_repo_root" ] && [ -f "$_repo_root/.dotter/scripts/validate_schema.sh" ]; then
+  cd "$_repo_root"
   "$_repo_root/.dotter/scripts/validate_schema.sh" --pre-deploy || true
 else
   echo "WARNING: could not locate validate_schema.sh for pre-deploy validation" >&2

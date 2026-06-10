@@ -268,7 +268,7 @@ fi
 echo "Regenerating configs from KCL..."
 if command -v kcl >/dev/null 2>&1; then
     mkdir -p generated
-    kcl run main.k > /dev/null || { echo "WARNING: KCL run failed" >&2; }
+    kcl run src/main.k > /dev/null || { echo "WARNING: KCL run failed" >&2; }
     python3 .dotter/scripts/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
 else
     echo "WARNING: KCL not found; skipping config regeneration." >&2
