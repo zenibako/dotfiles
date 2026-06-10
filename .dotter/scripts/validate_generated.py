@@ -77,7 +77,7 @@ def check_json_parses(path, desc):
 
 
 def check_template_file(path, desc):
-    """Check template file for balanced Handlebars blocks."""
+    """Check template file for balanced Handlebars blocks and expected markers."""
     if not check_file_exists(path, desc):
         return False
     if path in ("generated/config.json", ".dotter/global.toml"):
@@ -105,6 +105,12 @@ def check_template_file(path, desc):
         close_tags = len(re.findall(r'\{\{/' + tag + r'\}\}', content))
         if open_tags != close_tags:
             print(f"  FAIL: {desc} has unbalanced {{{{#{tag}}}}} blocks")
+            return False
+
+    # Check that jj config still has template markers for identity fields
+    if path == "jj/config.toml":
+        if '{{name}}' not in content or '{{email}}' not in content:
+            print(f"  FAIL: {desc} missing required Handlebars placeholders ({{{{name}}}}, {{{{email}}}})")
             return False
 
     print(f"  OK: {desc}")
