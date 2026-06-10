@@ -72,10 +72,6 @@ schema CompletionEntry:
 schema CompletionsConfig:
     tools?: {str: CompletionEntry}
 
-schema TemplateField:
-    """Marks a field as a dotter template variable."""
-    _template: str
-
 schema AtuinConfig:
     enter_accept?: bool = True
     keymap_mode?: str = "vim-normal"
@@ -85,10 +81,6 @@ schema AtuinConfig:
     daemon?: {str: any}
     dotfiles?: {str: any}
     ai?: {str: any}
-
-schema StarshipSection:
-    """A generic TOML section for starship (format, style, symbol, etc)."""
-    _ = """dummy"""
 
 schema StarshipConfig:
     add_newline?: bool = True
