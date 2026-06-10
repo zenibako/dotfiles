@@ -8,7 +8,9 @@ import env
 import completions
 import atuin
 import starship
-import templates
+import jj
+import tmux
+import ghostty_config
 import aerospace
 
 # ── Assemble and export ───────────────────────────────────────────────
@@ -28,7 +30,11 @@ config = _shared.ConfigMap {
     completions = completions.completions
     atuin = atuin.atuin
     starship = starship.starship
-    templates = templates.templates
+    templates = _shared.TemplateConfig {
+        jj = jj.jj
+        tmux = tmux.tmux
+        ghostty = ghostty_config.ghostty
+    }
     aerospace = aerospace.aerospace
 }
 

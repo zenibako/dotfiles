@@ -19,7 +19,7 @@ default = _shared.Profile {
         iamb = "~/.config/iamb"
         nushell = { target = "~/.config/nushell", type = "template" }
         "out/starship.toml" = "~/.config/starship.toml"
-        jj = { target = "~/.config/jj", type = "template" }
+        "out/jj/config.toml" = { target = "~/.config/jj/config.toml", type = "template" }
         "nvim/default" = { target = "~/.config/nvim", type = "template" }
         "opencode/.gitignore" = { target = "~/.config/opencode/.gitignore", type = "symbolic" }
         "opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
