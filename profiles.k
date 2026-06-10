@@ -6,19 +6,19 @@ default = _shared.Profile {
         gitconfig = { target = "~/.config/git/dotter-gitconfig", type = "template" }
         "git/commit-template" = "~/.git-commit-template"
         "git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
-        "shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
-        "shared/completions.toml" = "~/.config/shared/completions.toml"
+        "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
+        "out/shared/completions.toml" = "~/.config/shared/completions.toml"
         "atuin/bin" = "~/.atuin/bin"
-        "atuin/config.toml" = "~/.config/atuin/config.toml"
+        "out/atuin/config.toml" = "~/.config/atuin/config.toml"
         "pnpm/rc" = "~/.config/pnpm/rc"
-        "tmux.conf" = { target = "~/.tmux.conf", type = "template" }
+        "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
         zshenv = { target = "~/.zshenv", type = "template" }
         zshrc = { target = "~/.zshrc", type = "template" }
         carapace = "~/.config/carapace"
-        "ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
+        "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
         iamb = "~/.config/iamb"
         nushell = { target = "~/.config/nushell", type = "template" }
-        "starship.toml" = "~/.config/starship.toml"
+        "out/starship.toml" = "~/.config/starship.toml"
         jj = { target = "~/.config/jj", type = "template" }
         "nvim/default" = { target = "~/.config/nvim", type = "template" }
         "opencode/.gitignore" = { target = "~/.config/opencode/.gitignore", type = "symbolic" }
@@ -156,7 +156,7 @@ linux = _shared.Profile {
 
 mac = _shared.Profile {
     files = {
-        "aerospace.toml" = "~/.aerospace.toml"
+        "out/aerospace.toml" = "~/.aerospace.toml"
     }
     variables = {
         shell_bin_path = "/opt/homebrew/bin"

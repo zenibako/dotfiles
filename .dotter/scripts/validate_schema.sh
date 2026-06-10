@@ -432,20 +432,20 @@ if [ "$MODE" = "--pre-deploy" ]; then
 
   # TOML files (source; skip schema because templates use Handlebars)
   for _file in \
-    "$REPO_ROOT/atuin/config.toml" \
+    "$REPO_ROOT/out/atuin/config.toml" \
     "$REPO_ROOT/iamb/config.toml" \
     "$REPO_ROOT/gitlogue/config.toml" \
-    "$REPO_ROOT/aerospace.toml" \
-    "$REPO_ROOT/starship.toml" \
-    "$REPO_ROOT/shared/completions.toml"
+    "$REPO_ROOT/out/aerospace.toml" \
+    "$REPO_ROOT/out/starship.toml" \
+    "$REPO_ROOT/out/shared/completions.toml"
   do
     validate_toml_file "$_file" "skip-schema" || FAILED=1
   done
 
   # Template files — skip taplo/python syntax validation, just warn about placeholders
   for _file in \
-    "$REPO_ROOT/jj/config.toml" \
-    "$REPO_ROOT/shared/env.toml"
+    "$REPO_ROOT/out/jj/config.toml" \
+    "$REPO_ROOT/out/shared/env.toml"
   do
     if [ -f "$_file" ]; then
       echo "  Skipping TOML syntax validation (template file): $_file"

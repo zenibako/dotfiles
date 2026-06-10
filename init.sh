@@ -76,7 +76,7 @@ else
     if [[ -f "/etc/os-release" ]]; then
         source /etc/os-release
         case "$ID" in
-            fedora|rhel|centos|rocky|almalinux) pkg_file="packages-fedora.txt" ;;
+            fedora|rhel|centos|rocky|almalinux) pkg_file="out/packages-fedora.txt" ;;
             arch|manjaro) pkg_file="packages-arch.txt" ;;
             debian|ubuntu|linuxmint|pop) pkg_file="packages-debian.txt" ;;
             alpine) pkg_file="packages-alpine.txt" ;;

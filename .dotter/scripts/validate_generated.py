@@ -3,7 +3,7 @@
 
 Runs after KCL + Python converter to catch broken configs before dotter deploy.
 Checks:
-  - All expected files exist
+  - All expected files exist in out/
   - TOML files parse correctly
   - Template files have valid structure (no orphaned {{}} blocks)
   - Generated JSON is valid
@@ -17,10 +17,18 @@ import json
 import sys
 from pathlib import Path
 
+OUT = Path("out")
+ROOT = Path(".")
+
 
 def check_file_exists(path, desc):
-    if not Path(path).exists():
-        print(f"  FAIL: Missing {desc}: {path}")
+    # Some files stay at root (dotter entry point, KCL intermediate output)
+    if path in ("generated/config.json", ".dotter/global.toml"):
+        full = ROOT / path
+    else:
+        full = OUT / path
+    if not full.exists():
+        print(f"  FAIL: Missing {desc}: {full}")
         return False
     return True
 
@@ -28,14 +36,18 @@ def check_file_exists(path, desc):
 def check_toml_parses(path, desc):
     if not check_file_exists(path, desc):
         return False
+    if path in ("generated/config.json", ".dotter/global.toml"):
+        full = ROOT / path
+    else:
+        full = OUT / path
     try:
         import tomllib
-        with open(path, "rb") as f:
+        with open(full, "rb") as f:
             tomllib.load(f)
     except ImportError:
         try:
             import tomli
-            with open(path, "rb") as f:
+            with open(full, "rb") as f:
                 tomli.load(f)
         except ImportError:
             print(f"  SKIP: No TOML parser available for {desc}")
@@ -50,8 +62,12 @@ def check_toml_parses(path, desc):
 def check_json_parses(path, desc):
     if not check_file_exists(path, desc):
         return False
+    if path in ("generated/config.json", ".dotter/global.toml"):
+        full = ROOT / path
+    else:
+        full = OUT / path
     try:
-        with open(path) as f:
+        with open(full) as f:
             json.load(f)
     except Exception as e:
         print(f"  FAIL: {desc} is invalid JSON: {e}")
@@ -64,8 +80,12 @@ def check_template_file(path, desc):
     """Check template file for balanced Handlebars blocks."""
     if not check_file_exists(path, desc):
         return False
+    if path in ("generated/config.json", ".dotter/global.toml"):
+        full = ROOT / path
+    else:
+        full = OUT / path
     try:
-        with open(path) as f:
+        with open(full) as f:
             content = f.read()
     except Exception as e:
         print(f"  FAIL: {desc} unreadable: {e}")
@@ -76,7 +96,7 @@ def check_template_file(path, desc):
     open_if = len(re.findall(r'\{\{#if\b', content))
     close_if = len(re.findall(r'\{\{/if\}\}', content))
     if open_if != close_if:
-        print(f"  FAIL: {desc} has unbalanced {{#if}} blocks ({open_if} open, {close_if} close)")
+        print(f"  FAIL: {desc} has unbalanced {{{{#if}}}} blocks ({open_if} open, {close_if} close)")
         return False
 
     # Check for other common block tags
@@ -84,7 +104,7 @@ def check_template_file(path, desc):
         open_tags = len(re.findall(r'\{\{#' + tag + r'\b', content))
         close_tags = len(re.findall(r'\{\{/' + tag + r'\}\}', content))
         if open_tags != close_tags:
-            print(f"  FAIL: {desc} has unbalanced {{#{tag}}} blocks")
+            print(f"  FAIL: {desc} has unbalanced {{{{#{tag}}}}} blocks")
             return False
 
     print(f"  OK: {desc}")
