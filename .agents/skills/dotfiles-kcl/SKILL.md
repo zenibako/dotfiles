@@ -8,7 +8,7 @@ description: >
 compatibility: Requires KCL CLI v0.12.3+. Python 3 with tomli_w for the converter.
 metadata:
   author: chanderson
-  version: "1.0"
+  version: "2.0"
 ---
 
 # Dotfiles KCL Configuration
@@ -18,9 +18,9 @@ metadata:
 - When adding or modifying dotter profiles (default, personal, work, linux, mac)
 - When adding or modifying themes (monokai, nightowl, tokyonight)
 - When changing package lists (Fedora, Homebrew, VS Code extensions)
-- When modifying tool configs: atuin, starship, aerospace
+- When modifying tool configs: atuin, starship, aerospace, iamb, gitlogue, pnpm
 - When modifying template configs: jj, tmux, ghostty
-- When adding new KCL schemas for new config domains
+- When adding new KCL schemas or modules for new config domains
 - When the KCL → JSON → Python → TOML/text pipeline needs debugging
 
 ## Architecture Overview
@@ -36,17 +36,22 @@ main.k ──→ kcl run main.k ──→ generated/config.json
                                           ▼
      ┌─────────────┬──────────────┬───────┴───────┬──────────────┐
      ▼             ▼              ▼               ▼              ▼
- .dotter/      shared/      packages-      atuin/        jj/
- global.toml   env.toml      fedora.txt     config.toml   config.toml
-               completions   Brewfile       starship      tmux.conf
-               .toml                         .toml         ghostty/
-                                              aerospace     config
-                                              .toml
+ .dotter/      out/shared/    out/packages-    out/atuin/      out/jj/
+ global.toml   env.toml        fedora.txt       config.toml     config.toml
+               completions     out/Brewfile     out/starship    out/tmux.conf
+               .toml                          .toml             out/ghostty/
+                                               out/aerospace     config
+                                               .toml             out/iamb/
+                                                                 config.toml
+                                                                 out/gitlogue/
+                                                                 config.toml
+                                                                 out/pnpm/
+                                                                 rc
 ```
 
 1. **KCL** (`main.k` + domain modules) produces `generated/config.json`
-2. **Python converter** (`.dotter/scripts/generate_from_kcl.py`) reads JSON and writes TOML/text files
-3. **dotter** deploys the generated files
+2. **Python converter** (`.dotter/scripts/generate_from_kcl.py`) reads JSON and writes TOML/text files to `out/`
+3. **dotter** deploys the generated files from `out/` to `~/.config/`
 
 ## File Layout
 
@@ -59,17 +64,35 @@ main.k ──→ kcl run main.k ──→ generated/config.json
 ├── env.k               # Environment variables (PATH, XDG_CONFIG_HOME, etc.)
 ├── completions.k       # Shell completion commands per tool
 ├── starship.k          # Starship prompt config (⚠️ $-interpolation sensitive)
-├── templates.k         # Handlebars templates: jj, tmux, ghostty
+├── jj.k                # jj config (TOML template with Handlebars)
+├── tmux.k              # tmux theme plugin/config markers
+├── ghostty_config.k    # ghostty raw text template (renamed to avoid ghostty/ collision)
 ├── aerospace.k         # macOS window manager config
 ├── atuin/
 │   └── main.k          # Atuin shell history config (directory module)
+├── iamb/
+│   └── main.k          # Matrix client config (directory module)
+├── gitlogue/
+│   └── main.k          # Git log TUI config (directory module)
+├── pnpm/
+│   └── main.k          # pnpm rc config (directory module)
 └── _shared/
-    └── schemas.k       # All KCL type schemas
+    ├── schemas.k       # All KCL type schemas
+    └── templates.k     # Shared template helpers (hb, etc.)
 ```
 
-- **Root `.k` files** live at repo root (no matching directory)
-- **Directory modules** (like `atuin/`) contain `main.k` when a config directory already exists
-- **`_shared/`** prefix marks functional folders (not config domains)
+### Module Naming Convention
+
+| Pattern | When to use | Example |
+|---|---|---|
+| **Bare `.k` at root** | No directory name collision; single file output | `aerospace.k` → `out/aerospace.toml` |
+| **`foo/main.k` directory** | Config naturally deploys to a directory; directory doesn't conflict | `atuin/main.k` → `out/atuin/config.toml` |
+| **`foo_config.k` at root** | Directory `foo/` exists but is for other assets (not KCL) | `ghostty_config.k` → `out/ghostty/config` |
+| **`_shared/*.k`** | Shared schemas, helpers, utilities | `_shared/schemas.k`, `_shared/templates.k` |
+
+**Rule:** Prefer `foo/main.k` when the config domain maps to a directory. Only use `_config` suffix when the directory exists for non-KCL assets (e.g., `ghostty/` contains GLSL shaders).
+
+**Important:** KCL resolves `import foo` to `foo/` directory over `foo.k` file. If both exist, the directory wins.
 
 ## Quick Commands
 
@@ -152,10 +175,16 @@ dotter = _shared.DotterConfig {
 
 ## Adding a New Tool Config
 
-1. **Add a schema** to `_shared/schemas.k` (or reuse `{str: any}` for simple configs)
-2. **Create a domain file** (e.g., `mytool.k` at root):
+1. **Choose module naming:**
+   - If config deploys to a directory and the directory name is free → `mkdir mytool && mytool/main.k`
+   - If it's a single file or directory exists for other assets → `mytool.k` or `mytool_config.k` at root
+
+2. **Add a schema** to `_shared/schemas.k` (or reuse `{str: any}` for simple configs)
+
+3. **Create the domain file:**
 
 ```kcl
+# For directory module: mytool/main.k
 import _shared
 
 mytool = _shared.MyToolConfig {
@@ -163,7 +192,7 @@ mytool = _shared.MyToolConfig {
 }
 ```
 
-3. **Register in `main.k`**:
+4. **Register in `main.k`:**
 
 ```kcl
 import mytool
@@ -174,23 +203,39 @@ config = _shared.ConfigMap {
 }
 ```
 
-4. **Update the Python converter** (`.dotter/scripts/generate_from_kcl.py`) to handle the new config type if needed
-5. **Add validation** to `.dotter/scripts/validate_generated.py` if needed
-
-## Adding a Template Config
-
-Template configs contain Handlebars `{{}}` placeholders resolved by dotter at deploy time. Edit `templates.k`:
+5. **Update `profiles.k`** to reference the generated file:
 
 ```kcl
-mytemplate = {
-    api_key = { TEMPLATE_MARKER = "my_api_key" }
+files = {
+    "out/mytool/config.toml" = "~/.config/mytool/config.toml"
+}
+```
+
+6. **Update the Python converter** (`.dotter/scripts/generate_from_kcl.py`) to handle the new config type
+7. **Add validation** to `.dotter/scripts/validate_generated.py` if needed
+
+## Template Configs
+
+Template configs contain Handlebars `{{}}` placeholders resolved by dotter at deploy time.
+
+### Using the Shared Template Helper
+
+Use `_shared/templates.k` instead of raw `{TEMPLATE_MARKER = "field"}` dicts:
+
+```kcl
+import _shared.templates as tpl
+
+myconfig = {
+    api_key = tpl.hb("my_api_key")
     endpoint = "https://api.example.com"
 }
 ```
 
-The Python converter detects `TEMPLATE_MARKER` dicts and emits `{{field_name}}` instead of the literal.
+`tpl.hb("field")` returns `{TEMPLATE_MARKER = "field"}` which the Python converter turns into `{{field}}`.
 
-For **raw text** templates (like ghostty), use a triple-quoted string with `{{}}` directly:
+### Raw Text Templates
+
+For non-TOML formats, use triple-quoted strings with `{{}}` directly:
 
 ```kcl
 myapp = """setting = "{{ myapp_setting }}"
@@ -198,14 +243,23 @@ other = true
 """
 ```
 
-Register in `templates.k`:
+### Template Domains
+
+Each template domain lives in its own `.k` file:
+
+| File | Output | Format |
+|---|---|---|
+| `jj.k` | `out/jj/config.toml` | TOML with `tpl.hb()` markers |
+| `tmux.k` | `out/tmux.conf` | Custom tmux script with markers |
+| `ghostty_config.k` | `out/ghostty/config` | Raw text with `{{}}` placeholders |
+
+Register in `main.k` under `TemplateConfig`:
 
 ```kcl
-templates = {
-    jj = ...
-    tmux = ...
-    ghostty = ...
-    myapp = myapp
+templates = _shared.TemplateConfig {
+    jj = jj.jj
+    tmux = tmux.tmux
+    ghostty = ghostty_config.ghostty
 }
 ```
 
@@ -229,13 +283,13 @@ starship = _shared.StarshipConfig {
 }
 ```
 
-### TEMPLATE_MARKER
-
-The Python converter only recognizes the exact dict shape `{TEMPLATE_MARKER: "field_name"}`. Do not add extra keys or change the casing.
-
 ### Directory Shadowing
 
-If a `.k` file has the same name as an existing directory (e.g., `atuin.k` vs `atuin/`), KCL resolves `import atuin` to the **directory** and ignores the `.k` file. Put the config inside `atuin/main.k` instead.
+If a `.k` file has the same name as an existing directory (e.g., `ghostty.k` vs `ghostty/`), KCL resolves `import ghostty` to the **directory** and ignores the `.k` file.
+
+**Solutions:**
+- Put KCL inside `ghostty/main.k` if `ghostty/` is for KCL config
+- Use `ghostty_config.k` at root if `ghostty/` is for non-KCL assets (e.g., GLSL shaders)
 
 ### No `kcl.mod` Needed
 
@@ -245,18 +299,32 @@ KCL resolves sibling `.k` files in the same directory automatically. Only `impor
 
 Functional folders (schemas, shared utilities) use `_` prefix to distinguish them from config domains. Import as `import _shared`.
 
+### Generated Files Go to `out/`
+
+All generated configs live in `out/` (gitignored). Only `.dotter/global.toml` stays at root (dotter entry point).
+
+When adding a new generated file, update `profiles.k` to use the `out/` prefix:
+
+```kcl
+# Before (stale, at root)
+"mytool/config.toml" = "~/.config/mytool/config.toml"
+
+# After (correct, in out/)
+"out/mytool/config.toml" = "~/.config/mytool/config.toml"
+```
+
 ## Validation
 
 The validation script (`.dotter/scripts/validate_generated.py`) runs after generation and checks:
 
 - `generated/config.json` exists and parses as JSON
 - `.dotter/global.toml` parses as TOML
-- `shared/env.toml` template structure (balanced `{{#if}}`/`{{/if}}`)
-- `shared/completions.toml` parses as TOML
-- `packages-fedora.txt` and `Brewfile` non-empty
+- `out/shared/env.toml` template structure (balanced `{{#if}}`/`{{/if}}`)
+- `out/shared/completions.toml` parses as TOML
+- `out/packages-fedora.txt` and `out/Brewfile` non-empty
 - All tool configs parse as TOML
 - All template configs have valid template markers
-- `ghostty/config` is non-empty
+- `out/ghostty/config` is non-empty
 
 Run manually:
 
@@ -279,9 +347,9 @@ All schemas live in `_shared/schemas.k`:
 | `CompletionsConfig` | Shell completion commands |
 | `AtuinConfig` | Atuin shell history settings |
 | `StarshipConfig` | Starship prompt settings |
-| `TemplateConfig` | Template output definitions |
+| `TemplateConfig` | Template output definitions (jj, tmux, ghostty) |
 | `AerospaceConfig` | macOS window manager settings |
-| `ConfigMap` | Top-level output structure |
+| `ConfigMap` | Top-level output structure (includes all domains) |
 
 ## Committing KCL Changes
 
