@@ -4,7 +4,7 @@
 "git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
 "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
 "out/shared/completions.toml" = "~/.config/shared/completions.toml"
-"atuin/bin" = "~/.atuin/bin"
+"src/atuin/bin" = "~/.atuin/bin"
 "out/atuin/config.toml" = "~/.config/atuin/config.toml"
 "out/iamb/config.toml" = "~/.config/iamb/config.toml"
 "out/pnpm/rc" = "~/.config/pnpm/rc"
@@ -12,6 +12,7 @@
 "zshenv" = { target = "~/.zshenv", type = "template" }
 "zshrc" = { target = "~/.zshrc", type = "template" }
 "carapace" = "~/.config/carapace"
+"src/ghostty/shaders" = { target = "~/.config/ghostty/shaders", type = "symbolic" }
 "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
 "nushell" = { target = "~/.config/nushell", type = "template" }
 "out/starship.toml" = "~/.config/starship.toml"
