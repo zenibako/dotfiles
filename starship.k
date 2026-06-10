@@ -6,7 +6,7 @@ _brace_open = "{"
 _brace_close = "}"
 # Note: original starship.toml had format as a single line with escaped newlines.
 # We concatenate without separators to match the original behavior.
-_starship_format = _dollar + "username" + _dollar + "hostname" + _dollar + "localip" + _dollar + "shlvl" + _dollar + "singularity" + _dollar + "kubernetes" + _dollar + "directory" + _dollar + "vcsh" + _dollar + "fossil_branch" + _dollar + "fossil_metrics" + _dollar + "git_branch" + _dollar + "git_commit" + _dollar + "git_state" + _dollar + "git_metrics" + _dollar + "git_status" + _dollar + _brace_open + "custom.jj_change" + _brace_close + _dollar + _brace_open + "custom.jj_empty" + _brace_close + _dollar + _brace_open + "custom.jj_desc" + _brace_close + _dollar + "all"
+_starship_format = _dollar + "username" + _dollar + "hostname" + _dollar + "localip" + _dollar + "shlvl" + _dollar + "singularity" + _dollar + "kubernetes" + _dollar + "directory" + _dollar + "vcsh" + _dollar + "fossil_branch" + _dollar + "fossil_metrics" + _dollar + "git_branch" + _dollar + "git_commit" + _dollar + "git_state" + _dollar + "git_metrics" + _dollar + "git_status" + "🐦" + _dollar + _brace_open + "custom.jj_change" + _brace_close + _dollar + _brace_open + "custom.jj_empty" + _brace_close + _dollar + _brace_open + "custom.jj_desc" + _brace_close + _dollar + "all"
 
 _starship_right = _dollar + "shell"
 
