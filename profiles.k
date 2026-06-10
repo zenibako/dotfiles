@@ -57,6 +57,8 @@ default = _shared.Profile {
         claude_effort_level = "high"
         claude_plugin_pyright_lsp = False
         claude_plugin_extra_lsps = True
+        claude_model_at_top = True
+        claude_plugin_clangd_lsp = False
         mcp_obsidian_enabled = False
         mcp_obsidian_url = ""
         mcp_obsidian_token = ""
@@ -101,8 +103,6 @@ personal = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = True
         claude_epitaxy_personal_prefs_enabled = True
         claude_effort_level_enabled = True
-        claude_model_at_top = True
-        claude_plugin_clangd_lsp = False
     }
 }
 
@@ -141,8 +141,6 @@ work = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = False
         claude_epitaxy_personal_prefs_enabled = False
         claude_effort_level_enabled = False
-        claude_model_at_top = True
-        claude_plugin_clangd_lsp = False
     }
 }
 

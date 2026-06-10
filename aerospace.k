@@ -1,6 +1,8 @@
 import _shared
 
 # ── Aerospace config (macOS specific) ──────────────────────────────────
+_gap = 10
+
 aerospace = _shared.AerospaceConfig {
     config_version = 2
     after_startup_command = []
@@ -18,12 +20,12 @@ aerospace = _shared.AerospaceConfig {
         preset = "qwerty"
     }
     gaps = {
-        "inner.horizontal" = 10
-        "inner.vertical" = 10
-        "outer.left" = 10
-        "outer.bottom" = 10
+        "inner.horizontal" = _gap
+        "inner.vertical" = _gap
+        "outer.left" = _gap
+        "outer.bottom" = _gap
         "outer.top" = 0
-        "outer.right" = 10
+        "outer.right" = _gap
     }
     on_window_detected = [
         { "if.app-id" = "com.google.Chrome", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }

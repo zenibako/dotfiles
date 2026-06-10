@@ -53,6 +53,8 @@ claude_model = "opus"
 claude_effort_level = "high"
 claude_plugin_pyright_lsp = false
 claude_plugin_extra_lsps = true
+claude_model_at_top = true
+claude_plugin_clangd_lsp = false
 mcp_obsidian_enabled = false
 mcp_obsidian_url = ""
 mcp_obsidian_token = ""
@@ -95,8 +97,6 @@ claude_bypass_permissions_extras_enabled = true
 claude_cowork_scheduled_tasks_enabled = true
 claude_epitaxy_personal_prefs_enabled = true
 claude_effort_level_enabled = true
-claude_model_at_top = true
-claude_plugin_clangd_lsp = false
 
 [work]
 depends = ["default"]
@@ -133,8 +133,6 @@ claude_bypass_permissions_extras_enabled = false
 claude_cowork_scheduled_tasks_enabled = false
 claude_epitaxy_personal_prefs_enabled = false
 claude_effort_level_enabled = false
-claude_model_at_top = true
-claude_plugin_clangd_lsp = false
 
 [linux.files]
 "hypr" = "~/.config/hypr"
