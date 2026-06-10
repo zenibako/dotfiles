@@ -10,7 +10,7 @@ import atuin
 import starship
 import jj
 import tmux
-import ghostty_config as ghostty
+import ghostty
 import aerospace
 import iamb
 import gitlogue
