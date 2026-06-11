@@ -194,12 +194,12 @@ if _ensure_secret_cache; then
   _opencode_config="$HOME/.config/opencode/opencode.jsonc"
   if [ -f "$_opencode_config" ] && command -v python3 >/dev/null 2>&1; then
     _patch_args=""
-    _tok=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") && _patch_args="$_patch_args --github-token '$_tok'"
-    _tok=$(_lookup_secret "GITLAB_TOKEN") && _patch_args="$_patch_args --gitlab-token '$_tok'"
-    _tok=$(_lookup_secret "POSTMAN_API_KEY") && _patch_args="$_patch_args --postman-token '$_tok'"
-    _tok=$(_lookup_secret "SONAR_TOKEN") && _patch_args="$_patch_args --sonar-token '$_tok'"
-    _tok=$(_lookup_secret "HA_TOKEN") && _patch_args="$_patch_args --ha-token '$_tok'"
-    _tok=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") && _patch_args="$_patch_args --obsidian-token '$_tok'"
+    _tok=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") && _patch_args="$_patch_args --github-token $_tok"
+    _tok=$(_lookup_secret "GITLAB_TOKEN") && _patch_args="$_patch_args --gitlab-token $_tok"
+    _tok=$(_lookup_secret "POSTMAN_API_KEY") && _patch_args="$_patch_args --postman-token $_tok"
+    _tok=$(_lookup_secret "SONAR_TOKEN") && _patch_args="$_patch_args --sonar-token $_tok"
+    _tok=$(_lookup_secret "HA_TOKEN") && _patch_args="$_patch_args --ha-token $_tok"
+    _tok=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") && _patch_args="$_patch_args --obsidian-token $_tok"
     if [ -n "$_patch_args" ]; then
       echo "  Patching OpenCode MCP config..."
       python3 "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || echo "  WARNING: Failed to patch OpenCode config"
