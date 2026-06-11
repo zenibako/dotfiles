@@ -35,6 +35,11 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
                                               ├──→ file.write() ──→ out/pnpm/rc
                                               ├──→ file.write() ──→ out/tmux.conf
                                               │
+                                              ├──→ file.write() ──→ out/ghostty/config
+                                              ├──→ file.write() ──→ out/gitconfig
+                                              ├──→ file.write() ──→ out/pnpm/rc
+                                              ├──→ file.write() ──→ out/tmux.conf
+                                              │
                                               ▼
                                    .dotter/scripts/generate_from_kcl.py
                                               │
