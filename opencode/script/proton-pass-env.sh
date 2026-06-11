@@ -107,7 +107,7 @@ _build_cache() {
 
     # --- Reddit ---
     val=$(_fetch_secret "Personal" "reddit") && _write "REDDIT_SESSION" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "Reddit Token v2") && _write "TOKEN_V2" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Reddit Token v2") && _write "REDDIT_TOKEN_V2" "$val" >> "$_tmp"
 
     # --- Brave Search ---
     val=$(_fetch_secret "Personal" "Brave Search API Key") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
