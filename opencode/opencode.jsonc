@@ -68,19 +68,12 @@
       "enabled": true
     },
 {{#if opencode_profile_work}}
+    // Disabled until the GitLab instance exposes /api/v4/mcp for authenticated requests.
+    // Current blocker on {{gitlab_url}}: OAuth/bootstrap reaches the server, but the MCP endpoint returns 404.
     "GitLab": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "@modelcontextprotocol/server-gitlab"
-      ],
-      "environment": {
-        "GITLAB_PERSONAL_ACCESS_TOKEN": "{{gitlab_personal_access_token}}",
-        "GITLAB_API_URL": "{{gitlab_api_url}}",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      },
-      "enabled": true
+      "type": "remote",
+      "url": "{{gitlab_url}}/api/v4/mcp",
+      "enabled": false
     },
 {{#if mcp_salesforce_dx_enabled}}
     "Salesforce DX": {
@@ -98,15 +91,6 @@
       "environment": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       },
-      "enabled": true
-    },
-{{/if}}
-{{#if mcp_odaseva_enabled}}
-    "Odaseva": {
-      "type": "local",
-      "command": [
-        "oda-mcp"
-      ],
       "enabled": true
     },
 {{/if}}
