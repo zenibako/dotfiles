@@ -23,7 +23,7 @@ ROOT = Path(".")
 
 def check_file_exists(path, desc):
     # Some files stay at root (dotter entry point, KCL intermediate output)
-    if path in ("generated/config.json", ".dotter/global.toml"):
+    if path in ("out/config.json", ".dotter/global.toml"):
         full = ROOT / path
     else:
         full = OUT / path
@@ -36,7 +36,7 @@ def check_file_exists(path, desc):
 def check_toml_parses(path, desc):
     if not check_file_exists(path, desc):
         return False
-    if path in ("generated/config.json", ".dotter/global.toml"):
+    if path in ("out/config.json", ".dotter/global.toml"):
         full = ROOT / path
     else:
         full = OUT / path
@@ -62,7 +62,7 @@ def check_toml_parses(path, desc):
 def check_json_parses(path, desc):
     if not check_file_exists(path, desc):
         return False
-    if path in ("generated/config.json", ".dotter/global.toml"):
+    if path in ("out/config.json", ".dotter/global.toml"):
         full = ROOT / path
     else:
         full = OUT / path
@@ -80,7 +80,7 @@ def check_template_file(path, desc):
     """Check template file for balanced Handlebars blocks and expected markers."""
     if not check_file_exists(path, desc):
         return False
-    if path in ("generated/config.json", ".dotter/global.toml"):
+    if path in ("out/config.json", ".dotter/global.toml"):
         full = ROOT / path
     else:
         full = OUT / path
@@ -128,7 +128,7 @@ def main():
     all_ok = True
 
     checks = [
-        ("generated/config.json", "KCL JSON output", check_json_parses),
+        ("out/config.json", "KCL JSON output", check_json_parses),
         (".dotter/global.toml", "dotter config", check_toml_parses),
         ("shared/env.toml", "env config", check_template_file),
         ("shared/completions.toml", "completions config", check_toml_parses),

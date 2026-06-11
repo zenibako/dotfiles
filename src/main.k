@@ -47,4 +47,4 @@ config = _shared.ConfigMap {
 }
 
 # Write JSON for the Python converter
-file.write("generated/config.json", json.encode(config, indent=2))
+file.write("out/config.json", json.encode(config, indent=2))

@@ -29,9 +29,9 @@ except ImportError:
 
 
 def _load_json():
-    p = Path("generated/config.json")
+    p = Path("out/config.json")
     if not p.exists():
-        print("ERROR: generated/config.json not found. Run `kcl run main.k` first.", file=sys.stderr)
+        print("ERROR: out/config.json not found. Run `kcl run src/main.k` first.", file=sys.stderr)
         sys.exit(1)
     with open(p) as f:
         return json.load(f)

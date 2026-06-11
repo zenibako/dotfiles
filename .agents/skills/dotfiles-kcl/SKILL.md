@@ -28,7 +28,7 @@ metadata:
 KCL is the **single source of truth**. The pipeline is:
 
 ```
-src/main.k ──→ kcl run src/main.k ──→ generated/config.json
+src/main.k ──→ kcl run src/main.k ──→ out/config.json
                                               │
                                               ▼
                                    .dotter/scripts/generate_from_kcl.py
@@ -49,7 +49,7 @@ src/main.k ──→ kcl run src/main.k ──→ generated/config.json
                                                                      rc
 ```
 
-1. **KCL** (`src/main.k` + domain modules) produces `generated/config.json`
+1. **KCL** (`src/main.k` + domain modules) produces `out/config.json`
 2. **Python converter** (`.dotter/scripts/generate_from_kcl.py`) reads JSON and writes TOML/text files to `out/`
 3. **dotter** deploys the generated files from `out/` to `~/.config/`
 
@@ -84,13 +84,12 @@ src/main.k ──→ kcl run src/main.k ──→ generated/config.json
 │       ├── schemas.k       # All KCL type schemas
 │       └── templates.k     # Shared template helpers (hb, etc.)
 ├── out/                    # Generated configs (gitignored)
-├── generated/              # KCL intermediate JSON (gitignored)
 └── .dotter/
     └── global.toml         # dotter entry point
 ```
 
 - **`src/`** — All KCL source code and static assets for config domains live here. Nothing in `src/` is deployed directly.
-- **`src/main.k`** — Orchestration. Imports all modules, assembles `ConfigMap`, writes `generated/config.json`.
+- **`src/main.k`** — Orchestration. Imports all modules, assembles `ConfigMap`, writes `out/config.json`.
 - **`src/_shared/`** — Shared schemas and helpers (imported as `import _shared`).
 - **Directory modules** (`src/foo/main.k`) — KCL resolves `import foo` to `src/foo/main.k`. Static assets for the same domain live inside `src/foo/` (e.g., `src/atuin/bin/`, `src/ghostty/shaders/`).
 - **Bare `.k` files** (`src/aerospace.k`, `src/jj.k`) — Single-file configs with no directory structure.
@@ -106,7 +105,7 @@ python3 .dotter/scripts/generate_from_kcl.py
 python3 .dotter/scripts/validate_generated.py
 
 # Verify output is byte-identical before/after changes
-# 1. Save current generated/config.json
+# 1. Save current out/config.json
 # 2. Make edits
 # 3. Regenerate
 # 4. diff old.json new.json
@@ -309,7 +308,7 @@ When adding a new generated file, update `src/profiles.k` to use the `out/` pref
 
 The validation script (`.dotter/scripts/validate_generated.py`) runs after generation and checks:
 
-- `generated/config.json` exists and parses as JSON
+- `out/config.json` exists and parses as JSON
 - `.dotter/global.toml` parses as TOML
 - `out/shared/env.toml` template structure (balanced `{{#if}}`/`{{/if}}`)
 - `out/shared/completions.toml` parses as TOML
