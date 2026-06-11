@@ -58,6 +58,8 @@ if [ -n "$_repo_root" ]; then
     echo "Regenerating configs from KCL..."
     cd "$_repo_root"
     mkdir -p generated
+    # Ensure out/ directories exist before KCL runs (fresh clones won't have them)
+    mkdir -p out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm
     kcl run src/main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
     "$PYTHON" .dotter/scripts/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
     "$PYTHON" .dotter/scripts/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
