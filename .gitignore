@@ -24,3 +24,7 @@ out/
 .packages_meta.json
 
 **/lazy-lock.json
+
+# Local Claude test directory
+.claude/
+

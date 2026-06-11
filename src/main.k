@@ -16,6 +16,7 @@ import iamb
 import gitlogue
 import pnpm
 import opencode
+import claude
 import gitconfig
 
 # ── Assemble config data ──────────────────────────────────────────────

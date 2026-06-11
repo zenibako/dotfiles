@@ -28,7 +28,9 @@ default = _shared.Profile {
         "opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
         "out/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
         "opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
-        "claude-desktop" = { target = "~/Library/Application Support/Claude", type = "template" }
+        "out/claude_desktop_config.json" = { target = "~/Library/Application Support/Claude/claude_desktop_config.json", type = "template" }
+        "claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
+        "claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
         "claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
         "claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
         "shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }

@@ -186,6 +186,7 @@ else:
 
 if _ensure_secret_cache; then
   echo "Applying secrets to deployed configs..."
+  _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
   _inject_github_token "$HOME/.claude/settings.json"
 
