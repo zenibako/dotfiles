@@ -42,14 +42,22 @@ _cache_is_fresh() {
 }
 
 _fetch_secret() {
-    local vault="$1" item="$2" result
+    local vault="$1" item="$2" field="${3:-}" result
     if ! _has_proton_pass; then
         _log_warn "proton-pass CLI not found. Secret '$vault/$item' unavailable."
         return 1
     fi
-    result=$(pass-cli item get --vault-name "$vault" --item-title "$item" 2>/dev/null | jq -r '.item.content.content.Login.password // .item.content.content.password // .password // .value // empty' 2>/dev/null)
+    
+    if [ -n "$field" ]; then
+        # Fetch specific field from extra_fields (Hidden or Text)
+        result=$(pass-cli item view --vault-name "$vault" --item-title "$item" --output json 2>/dev/null | jq -r --arg field "$field" '.item.content.extra_fields[]? | select(.name == $field) | .content.Hidden // .content.Text // empty' 2>/dev/null)
+    else
+        # Fetch main password field (default)
+        result=$(pass-cli item view --vault-name "$vault" --item-title "$item" --output json 2>/dev/null | jq -r '.item.content.content.Login.password // .item.content.content.password // .password // .value // empty' 2>/dev/null)
+    fi
+    
     if [ -z "$result" ] || [ "$result" = "null" ]; then
-        _log_warn "Failed to fetch secret: $vault/$item"
+        _log_warn "Failed to fetch secret: $vault/$item${field:+ (field: $field)}"
         return 1
     fi
     printf '%s' "$result"
@@ -83,20 +91,18 @@ _build_cache() {
 
     local val
 
-    # --- GitHub ---
-    val=$(_fetch_secret "Personal" "GitHub") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
+    # --- GitHub (PAT is in hidden field) ---
+    val=$(_fetch_secret "Personal" "GitHub" "Personal Access Token") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
 
     # --- Home Assistant ---
-    val=$(_fetch_secret "Personal" "Home Assistant") && _write "HA_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "Home Assistant MariaDB") && _write "HA_MARIADB_PASSWORD" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "Home Assistant Webhook") && _write "HA_WEBHOOK_ID" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Home Assistant" "CLI Long-Lived Token") && _write "HA_TOKEN" "$val" >> "$_tmp"
 
-    # --- Bluesky ---
-    val=$(_fetch_secret "Personal" "Bluesky") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
+    # --- Bluesky (app password is in hidden field) ---
+    val=$(_fetch_secret "Personal" "Bluesky" "App Password") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Plex ---
-    val=$(_fetch_secret "Personal" "Plex (DigitalGlue)") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "Plex (Personal)") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
+    # --- Plex (tokens are in hidden fields) ---
+    val=$(_fetch_secret "Personal" "Plex (DigitalGlue)" "User Token") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Plex (Personal)" "Server Token") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
 
     # --- TMDB ---
     val=$(_fetch_secret "Personal" "TMDB API Key") && _write "TMDB_KEY" "$val" >> "$_tmp"
@@ -132,7 +138,7 @@ _build_cache() {
 
     # --- Work credentials (only if work profile is active) ---
     if [ "${OPENCODE_PROFILE_WORK:-}" = "true" ] || [ "${OPENCODE_PROFILE_WORK:-}" = "1" ]; then
-        val=$(_fetch_secret "Personal" "GitLab PAT") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "GitLab" "Personal Access Token") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "SonarQube Token") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "Postman API Key") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "Slack Token") && _write "SLACK_TOKEN" "$val" >> "$_tmp"
