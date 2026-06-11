@@ -19,12 +19,50 @@ import sys
 
 
 def strip_jsonc_comments(text: str) -> str:
-    """Remove C-style and line comments from JSONC text."""
-    # Remove single-line comments
-    text = re.sub(r'//.*$', '', text, flags=re.MULTILINE)
-    # Remove multi-line comments
-    text = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
-    return text
+    """Remove C-style and line comments from JSONC text without breaking URLs.
+
+    A simple regex like r'//.*$' would corrupt URLs like https://...
+    This implementation tracks whether we're inside a JSON string to avoid
+    stripping // that appears inside quoted values.
+    """
+    result = []
+    i = 0
+    length = len(text)
+
+    while i < length:
+        char = text[i]
+
+        # Multi-line comment /* ... */
+        if i + 1 < length and char == '/' and text[i + 1] == '*':
+            i += 2
+            while i + 1 < length and not (text[i] == '*' and text[i + 1] == '/'):
+                i += 1
+            i += 2  # skip past */
+            continue
+
+        # JSON string: copy verbatim (including any // inside it)
+        if char == '"':
+            result.append(char)
+            i += 1
+            while i < length:
+                ch = text[i]
+                result.append(ch)
+                if ch == '"' and text[i - 1] != '\\':
+                    i += 1
+                    break
+                i += 1
+            continue
+
+        # Line comment // (only when outside a JSON string)
+        if i + 1 < length and char == '/' and text[i + 1] == '/':
+            while i < length and text[i] != '\n':
+                i += 1
+            continue
+
+        result.append(char)
+        i += 1
+
+    return ''.join(result)
 
 
 def main() -> int:
