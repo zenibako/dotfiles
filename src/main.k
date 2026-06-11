@@ -54,8 +54,12 @@ file.write("out/ghostty/config", ghostty.ghostty)
 file.write("out/gitconfig", gitconfig.gitconfig)
 file.write("out/pnpm/rc", pnpm.pnpm.rc or "")
 file.write("out/tmux.conf", tmux.tmux._full_text)
+file.write("out/packages-fedora.txt", packages.packages_txt)
+file.write("out/Brewfile", packages.brewfile)
+file.write("out/shared/completions.toml", completions.completions_toml)
 
-# ── Write env sections metadata for Python ─────────────────────────────
+# ── Write env metadata for Python ────────────────────────────────────
+# env.toml has complex Handlebars conditionals; metadata drives Python
 env_meta = {
     "path": "shared/env.toml"
     "core_vars": env.env
@@ -64,23 +68,3 @@ env_meta = {
     "path_append": env.env.path_append or []
 }
 file.write("out/.env_meta.json", json.encode(env_meta, indent=2))
-
-# ── Write completions metadata for Python ──────────────────────────────
-completions_meta = {
-    "path": "shared/completions.toml"
-    "data": completions.completions
-}
-file.write("out/.completions_meta.json", json.encode(completions_meta, indent=2))
-
-# ── Write package metadata for Python ──────────────────────────────────
-packages_meta = {
-    "fedora_txt": {
-        "path": "packages-fedora.txt"
-        "lines": packages.packages.fedora or []
-    }
-    "brewfile": {
-        "path": "Brewfile"
-        "data": packages.packages
-    }
-}
-file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))

@@ -80,3 +80,13 @@ packages = _shared.PackageList {
         "zxh404.vscode-proto3",
     ]
 }
+
+# ── String builders ───────────────────────────────────────────────────
+packages_txt = "\n".join(packages.fedora)
+
+_brew_lines = ['tap "' + tap + '"' for tap in packages.brew_taps]
+_brew_lines += ['brew "' + formula + '"' for formula in packages.brew_formulae]
+_brew_lines += ['cask "' + cask + '"' for cask in packages.brew_casks]
+_brew_lines += ['vscode "' + ext + '"' for ext in packages.vscode_extensions]
+
+brewfile = "\n".join(_brew_lines)

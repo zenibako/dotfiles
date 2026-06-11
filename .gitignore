@@ -17,7 +17,6 @@ out/
 
 # Temporary metadata JSON files (used by Python converter)
 .env_meta.json
-.completions_meta.json
 .packages_meta.json
 
 **/lazy-lock.json
