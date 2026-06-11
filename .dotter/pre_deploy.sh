@@ -46,14 +46,21 @@ if [ -z "$_repo_root" ]; then
   done
 fi
 
-  if [ -n "$_repo_root" ]; then
+if [ -n "$_repo_root" ]; then
+  # Detect project virtualenv (uv or standard venv)
+  PYTHON="python3"
+  if [ -f "$_repo_root/.venv/bin/python3" ]; then
+    PYTHON="$_repo_root/.venv/bin/python3"
+  elif [ -f "$_repo_root/venv/bin/python3" ]; then
+    PYTHON="$_repo_root/venv/bin/python3"
+  fi
   if command -v kcl >/dev/null 2>&1 && [ -f "$_repo_root/src/main.k" ]; then
     echo "Regenerating configs from KCL..."
     cd "$_repo_root"
     mkdir -p generated
     kcl run src/main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
-    python3 .dotter/scripts/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
-    python3 .dotter/scripts/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
+    "$PYTHON" .dotter/scripts/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
+    "$PYTHON" .dotter/scripts/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
     echo "  Configs regenerated."
   else
     echo "ERROR: KCL is required for this repository but was not found." >&2

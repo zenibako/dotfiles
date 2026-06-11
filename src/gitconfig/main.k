@@ -20,293 +20,293 @@ _gitconfig = r"""[user]
 
 [alias]
 	build = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"build${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"build${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	chore = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"chore${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"chore${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	ci = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"ci${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"ci${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	docs = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"docs${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"docs${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	feat = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"feat${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"feat${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	fix = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"fix${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"fix${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	perf = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"perf${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"perf${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	refactor = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"refactor${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"refactor${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	rev = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"revert${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"revert${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	style = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"style${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"style${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	test = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"test${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"test${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 	wip = "!a() {
-local _scope _attention _message
-while [ $# -ne 0 ]; do
-case $1 in
-  -s | --scope )
-    if [ -z \"$2\" ]; then
-      echo \"Missing scope!\"
-      return 1
-    fi
-    _scope=\"$2\"
-    shift 2
-    ;;
-  -a | --attention )
-    _attention=\"!\"
-    shift 1
-    ;;
-  * )
-    _message=\"${_message} $1\"
-    shift 1
-    ;;
-esac
-done
-git commit -m \"wip${_scope:+(${_scope})}${_attention}:${_message}\"
-}; a"
+	local _scope _attention _message
+	while [ $# -ne 0 ]; do
+	case $1 in
+	  -s | --scope )
+	    if [ -z \"$2\" ]; then
+	      echo \"Missing scope!\"
+	      return 1
+	    fi
+	    _scope=\"$2\"
+	    shift 2
+	    ;;
+	  -a | --attention )
+	    _attention=\"!\"
+	    shift 1
+	    ;;
+	  * )
+	    _message=\"${_message} $1\"
+	    shift 1
+	    ;;
+	esac
+	done
+	git commit -m \"wip${_scope:+(${_scope})}${_attention}:${_message}\"
+	}; a"
 """
 
 gitconfig = _gitconfig
