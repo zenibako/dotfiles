@@ -107,25 +107,25 @@ schema TemplateConfig:
     ghostty?: str
 
 schema AerospaceConfig:
-    config_version?: int = 2
-    after_startup_command?: [str]
-    start_at_login?: bool = True
-    enable_normalization_flatten_containers?: bool = True
-    enable_normalization_opposite_orientation_for_nested_containers?: bool = True
-    accordion_padding?: int = 30
-    default_root_container_layout?: str = "tiles"
-    default_root_container_orientation?: str = "auto"
-    on_focused_monitor_changed?: [str]
-    automatically_unhide_macos_hidden_apps?: bool = True
-    persistent_workspaces?: [str]
-    on_mode_changed?: [str]
-    key_mapping?: {str: any}
-    gaps?: {str: any}
-    on_window_detected?: [any]
-    mode_main_binding?: {str: any}
-    mode_service_binding?: {str: any}
-    mode_passthrough_binding?: {str: any}
-    workspace_to_monitor_force_assignment?: {str: any}
+    "config-version"?: int = 2
+    "after-startup-command"?: [str]
+    "start-at-login"?: bool = True
+    "enable-normalization-flatten-containers"?: bool = True
+    "enable-normalization-opposite-orientation-for-nested-containers"?: bool = True
+    "accordion-padding"?: int = 30
+    "default-root-container-layout"?: str = "tiles"
+    "default-root-container-orientation"?: str = "auto"
+    "on-focused-monitor-changed"?: [str]
+    "automatically-unhide-macos-hidden-apps"?: bool = True
+    "persistent-workspaces"?: [str]
+    "on-mode-changed"?: [str]
+    "key-mapping"?: {str: any}
+    "gaps"?: {str: any}
+    "on-window-detected"?: [any]
+    "mode-main-binding"?: {str: any}
+    "mode-service-binding"?: {str: any}
+    "mode-passthrough-binding"?: {str: any}
+    "workspace-to-monitor-force-assignment"?: {str: any}
 
 schema OutputTextFile:
     path: str

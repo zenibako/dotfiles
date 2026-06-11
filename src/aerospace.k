@@ -4,19 +4,19 @@ import _shared
 _gap = 10
 
 aerospace = _shared.AerospaceConfig {
-    config_version = 2
-    after_startup_command = []
-    start_at_login = True
-    enable_normalization_flatten_containers = True
-    enable_normalization_opposite_orientation_for_nested_containers = True
-    accordion_padding = 30
-    default_root_container_layout = "tiles"
-    default_root_container_orientation = "auto"
-    on_focused_monitor_changed = ["move-mouse monitor-lazy-center"]
-    automatically_unhide_macos_hidden_apps = True
-    persistent_workspaces = ["1", "2", "3", "4", "5", "6"]
-    on_mode_changed = []
-    key_mapping = {
+    "config-version" = 2
+    "after-startup-command" = []
+    "start-at-login" = True
+    "enable-normalization-flatten-containers" = True
+    "enable-normalization-opposite-orientation-for-nested-containers" = True
+    "accordion-padding" = 30
+    "default-root-container-layout" = "tiles"
+    "default-root-container-orientation" = "auto"
+    "on-focused-monitor-changed" = ["move-mouse monitor-lazy-center"]
+    "automatically-unhide-macos-hidden-apps" = True
+    "persistent-workspaces" = ["1", "2", "3", "4", "5", "6"]
+    "on-mode-changed" = []
+    "key-mapping" = {
         preset = "qwerty"
     }
     gaps = {
@@ -27,7 +27,7 @@ aerospace = _shared.AerospaceConfig {
         "outer.top" = 0
         "outer.right" = _gap
     }
-    on_window_detected = [
+    "on-window-detected" = [
         { "if.app-id" = "com.google.Chrome", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }
         { "if.app-id" = "app.zen-browser.zen", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }
         { "if.app-id" = "com.mitchellh.ghostty", "if.during-aerospace-startup" = True, run = "move-node-to-workspace 1" }
@@ -45,7 +45,7 @@ aerospace = _shared.AerospaceConfig {
         { "if.app-id" = "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan", run = "move-node-to-workspace 4" }
         { "if.app-id" = "org.videolan.vlc", run = "move-node-to-workspace 4" }
     ]
-    mode_main_binding = {
+    "mode-main-binding" = {
         "alt-slash" = "layout tiles horizontal vertical"
         "alt-comma" = "layout accordion horizontal vertical"
         "cmd-shift-h" = "focus left"
@@ -93,7 +93,7 @@ aerospace = _shared.AerospaceConfig {
         "alt-shift-semicolon" = "mode service"
         "alt-shift-p" = "mode passthrough"
     }
-    mode_service_binding = {
+    "mode-service-binding" = {
         esc = ["reload-config", "mode main"]
         r = ["flatten-workspace-tree", "mode main"]
         f = ["layout floating tiling", "mode main"]
@@ -103,10 +103,10 @@ aerospace = _shared.AerospaceConfig {
         "alt-shift-k" = ["join-with up", "mode main"]
         "alt-shift-l" = ["join-with right", "mode main"]
     }
-    mode_passthrough_binding = {
+    "mode-passthrough-binding" = {
         "alt-shift-p" = "mode main"
     }
-    workspace_to_monitor_force_assignment = {
+    "workspace-to-monitor-force-assignment" = {
         "1" = "main"
         "2" = "main"
         "3" = "main"
