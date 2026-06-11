@@ -26,7 +26,7 @@ default = _shared.Profile {
         "opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
         "opencode/command/review.md" = { target = "~/.config/opencode/command/review.md", type = "symbolic" }
         "opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
-        "opencode/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
+        "out/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
         "opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
         "claude-desktop" = { target = "~/Library/Application Support/Claude", type = "template" }
         "claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
@@ -79,6 +79,9 @@ default = _shared.Profile {
         proton_user = ""
         proton_password = ""
         telegram_bot_token = ""
+        sonarqube_url = ""
+        sonarqube_token = ""
+        gitlab_url = ""
     }
 }
 

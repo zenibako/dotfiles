@@ -15,6 +15,7 @@ import aerospace
 import iamb
 import gitlogue
 import pnpm
+import opencode
 import gitconfig
 
 # ── Assemble config data ──────────────────────────────────────────────
