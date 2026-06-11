@@ -73,6 +73,7 @@ def main() -> int:
     parser.add_argument("--gitlab-token", default="", help="GitLab PAT to inject into GitLab MCP env")
     parser.add_argument("--postman-token", default="", help="Postman API key to inject into Postman MCP headers")
     parser.add_argument("--sonar-token", default="", help="SonarQube token to inject into SonarQube MCP env")
+    parser.add_argument("--obsidian-token", default="", help="Obsidian MCP token to inject into Obsidian MCP headers")
     args = parser.parse_args()
 
     path = args.config_path

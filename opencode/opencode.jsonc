@@ -386,11 +386,11 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama (local)",
       "options": {
-        "baseURL": "http://localhost:11434/v1",
+        "baseURL": "http://localhost:11434/v1"
       },
       "models": {
         "gemma4:12b-mlx": {
-          "contextWindow": 32768,
+          "contextWindow": 32768
         },
         "gemma4:12b-it-qat": {
           "contextWindow": 16384,
