@@ -37,6 +37,13 @@ schema DotterConfig:
     packages?: PackageList
     settings?: {str: any}
 
+schema EnvSection:
+    name: str
+    condition?: str
+    vars?: {str: str}
+    path_prepend?: [str]
+    path_append?: [str]
+
 schema EnvConfig:
     editor?: str
     xdg_config_home?: str
@@ -62,6 +69,7 @@ schema EnvConfig:
     tripit_username?: str
     path_prepend?: [str]
     path_append?: [str]
+    sections?: [EnvSection]
     profile_work?: bool = False
     profile_personal?: bool = False
 
@@ -119,6 +127,55 @@ schema AerospaceConfig:
     mode_passthrough_binding?: {str: any}
     workspace_to_monitor_force_assignment?: {str: any}
 
+schema OutputTextFile:
+    path: str
+    content: str
+
+schema OutputTomlFile:
+    path: str
+    data: {str: any}
+    header?: str
+
+schema OutputTemplateFile:
+    path: str
+    data: {str: any}
+    header?: str
+
+schema OutputEnvSection:
+    type: "table" | "conditional" | "conditional_single"
+    name?: str
+    vars?: {str: str}
+    path_prepend?: [str]
+    path_append?: [str]
+
+schema OutputEnvConfig:
+    path: str
+    sections: [OutputEnvSection]
+
+schema OutputCompletionsConfig:
+    path: str
+    data: {str: any}
+
+schema OutputPackagesConfig:
+    fedora_txt: OutputPackageList
+    brewfile: OutputBrewfile
+
+schema OutputPackageList:
+    path: str
+    lines: [str]
+
+schema OutputBrewfile:
+    path: str
+    data: PackageList
+
+schema OutputConfig:
+    text_files?: [OutputTextFile]
+    toml_files?: [OutputTomlFile]
+    template_files?: [OutputTemplateFile]
+    env?: OutputEnvConfig
+    completions?: OutputCompletionsConfig
+    packages?: OutputPackagesConfig
+
 schema ConfigMap:
     dotter?: DotterConfig
     env?: EnvConfig
@@ -131,3 +188,4 @@ schema ConfigMap:
     gitlogue?: {str: any}
     pnpm?: {str: any}
     gitconfig?: str
+    __output__?: OutputConfig

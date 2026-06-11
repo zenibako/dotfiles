@@ -17,7 +17,7 @@ import gitlogue
 import pnpm
 import gitconfig
 
-# ── Assemble and export ───────────────────────────────────────────────
+# ── Assemble config data ──────────────────────────────────────────────
 config = _shared.ConfigMap {
     dotter = _shared.DotterConfig {
         default = profiles.default
@@ -46,5 +46,41 @@ config = _shared.ConfigMap {
     gitconfig = gitconfig.gitconfig
 }
 
-# Write JSON for the Python converter
+# ── Write JSON for Python TOML converter ──────────────────────────────
 file.write("out/config.json", json.encode(config, indent=2))
+
+# ── Write text files directly (no Python needed) ──────────────────────
+file.write("out/ghostty/config", ghostty.ghostty)
+file.write("out/gitconfig", gitconfig.gitconfig)
+file.write("out/pnpm/rc", pnpm.pnpm.rc or "")
+file.write("out/tmux.conf", tmux.tmux._full_text)
+
+# ── Write env sections metadata for Python ─────────────────────────────
+env_meta = {
+    "path": "shared/env.toml"
+    "core_vars": env.env
+    "sections": env.env.sections or []
+    "path_prepend": env.env.path_prepend or []
+    "path_append": env.env.path_append or []
+}
+file.write("out/.env_meta.json", json.encode(env_meta, indent=2))
+
+# ── Write completions metadata for Python ──────────────────────────────
+completions_meta = {
+    "path": "shared/completions.toml"
+    "data": completions.completions
+}
+file.write("out/.completions_meta.json", json.encode(completions_meta, indent=2))
+
+# ── Write package metadata for Python ──────────────────────────────────
+packages_meta = {
+    "fedora_txt": {
+        "path": "packages-fedora.txt"
+        "lines": packages.packages.fedora or []
+    }
+    "brewfile": {
+        "path": "Brewfile"
+        "data": packages.packages
+    }
+}
+file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))

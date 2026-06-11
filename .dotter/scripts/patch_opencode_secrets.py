@@ -39,7 +39,7 @@ def main() -> int:
 
     path = args.config_path
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             raw = f.read()
     except FileNotFoundError:
         print(f"ERROR: Config not found: {path}", file=sys.stderr)

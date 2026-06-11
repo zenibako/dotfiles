@@ -15,4 +15,9 @@ node_modules/
 # Generated config files (rebuilt by KCL + Python on every deploy)
 out/
 
+# Temporary metadata JSON files (used by Python converter)
+.env_meta.json
+.completions_meta.json
+.packages_meta.json
+
 **/lazy-lock.json

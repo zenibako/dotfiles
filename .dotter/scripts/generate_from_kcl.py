@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 """KCL-to-dotfiles converter.
-Reads generated/config.json (from KCL) and generates:
-  - out/.dotter/global.toml
-  - out/shared/env.toml
-  - out/shared/completions.toml
-  - out/packages-fedora.txt
-  - out/Brewfile
+
+Reads out/config.json (from KCL) and generates TOML/text config files.
+Text files (ghostty, gitconfig, pnpm/rc, tmux.conf) are now written
+    directly by KCL via file.write(). This script only handles:
+- dotter global.toml (custom format)
+- TOML files (via tomli_w)
+- Template TOML files (with Handlebars marker resolution)
+- env.toml (custom format with Handlebars conditionals)
+- completions.toml (custom format)
+- packages (txt and Brewfile)
 """
 
+import io
 import json
 import sys
 from pathlib import Path
 
 OUT_DIR = Path("out")
-
-def _out(path):
-    """Return an output path inside the out/ directory."""
-    return str(OUT_DIR / path)
+META_DIR = OUT_DIR  # Metadata files are alongside output
 
 try:
     import tomli_w
@@ -24,194 +26,128 @@ except ImportError:
     print("ERROR: 'tomli_w' module not found. Install it with:", file=sys.stderr)
     print("  pip3 install tomli_w", file=sys.stderr)
     print("  uv pip install tomli_w", file=sys.stderr)
-    print("  python3 -m pip install --user tomli_w", file=sys.stderr)
     sys.exit(1)
 
 
-def _load_json():
-    p = Path("out/config.json")
+def _load_json(path):
+    p = Path(path)
     if not p.exists():
-        print("ERROR: out/config.json not found. Run `kcl run src/main.k` first.", file=sys.stderr)
+        print(f"ERROR: {path} not found. Run `kcl run src/main.k` first.", file=sys.stderr)
         sys.exit(1)
     with open(p) as f:
         return json.load(f)
 
 
-def _toml_escape_value(v):
-    if isinstance(v, bool):
-        return "true" if v else "false"
-    if isinstance(v, (int, float)):
-        return str(v)
-    if isinstance(v, str):
-        # Multiline strings: use triple-quotes
-        if "\n" in v:
-            return '"""' + v + '"""'
-        # Escape quotes and backslashes
-        if '"' in v or "\\" in v:
-            v = v.replace("\\", "\\\\").replace('"', '\\"')
-        return '"' + v + '"'
-    if isinstance(v, list):
-        items = [_toml_escape_value(i) for i in v]
-        return "[" + ", ".join(items) + "]"
-    return str(v)
+def _is_template_marker(value):
+    """Check if a value is a template marker dict like {TEMPLATE_MARKER: 'field'}."""
+    return isinstance(value, dict) and "TEMPLATE_MARKER" in value and len(value) == 1
 
 
-def _write_dotter_toml(cfg, out_path):
-    lines = []
-    dotter = cfg["dotter"]
+def _resolve_template_value(value):
+    """Replace template marker dicts with Handlebars placeholders."""
+    if _is_template_marker(value):
+        return f"{{{{{value['TEMPLATE_MARKER']}}}}}"
+    elif isinstance(value, dict):
+        return {k: _resolve_template_value(v) for k, v in value.items()}
+    elif isinstance(value, list):
+        return [_resolve_template_value(item) for item in value]
+    return value
 
-    def write_profile(name, profile):
-        files = profile.get("files", {})
-        variables = profile.get("variables", {})
-        depends = profile.get("depends")
 
-        if depends is not None:
-            lines.append(f"[{name}]")
-            lines.append(f'depends = {json.dumps(depends)}')
-            lines.append("")
+def _write_raw_text(content, out_path, *, strip_trailing_newline=False):
+    """Write raw text content verbatim."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if strip_trailing_newline:
+        content = content.rstrip("\n")
+    with open(out_path, "w") as f:
+        f.write(content)
+    print(f"  Wrote {out_path}")
 
-        if files:
-            if depends is None:
-                lines.append(f"[{name}.files]")
-            else:
-                lines.append(f"[{name}.files]")
-            for k, v in files.items():
-                key = json.dumps(k)  # handles special chars, spaces
-                if isinstance(v, str):
-                    lines.append(f'{key} = {json.dumps(v)}')
-                elif isinstance(v, dict):
-                    target = v.get("target", "")
-                    t = v.get("type", "automatic")
-                    if target:
-                        lines.append(f'{key} = {{ target = {json.dumps(target)}, type = {json.dumps(t)} }}')
-                    else:
-                        lines.append(f'{key} = {{ type = {json.dumps(t)} }}')
-            lines.append("")
 
-        if variables:
-            lines.append(f"[{name}.variables]")
-            for k, v in variables.items():
-                lines.append(f"{k} = {_toml_escape_value(v)}")
-            lines.append("")
+def _write_toml(data, out_path, *, header=None, template=False):
+    """Write a dict as TOML using tomli_w."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    write_profile("default", dotter["default"])
-    write_profile("personal", dotter["personal"])
-    write_profile("work", dotter["work"])
-    write_profile("oda-mcp", dotter.get("oda_mcp", {}))
+    if template:
+        data = _resolve_template_value(data)
 
-    # linux/mac profiles
-    linux = dotter.get("linux", {})
-    if linux.get("files") or linux.get("variables"):
-        write_profile("linux", linux)
+    if not isinstance(data, dict):
+        raise TypeError(f"TOML writer expects dict, got {type(data).__name__}")
 
-    mac = dotter.get("mac", {})
-    if mac.get("files") or mac.get("variables"):
-        write_profile("mac", mac)
+    buf = io.BytesIO()
+    tomli_w.dump(data, buf)
+    raw = buf.getvalue().decode("utf-8")
 
-    # themes
-    for theme_name, theme_vars in dotter.get("themes", {}).items():
-        lines.append(f"[{theme_name}.variables]")
-        for k, v in theme_vars.items():
-            lines.append(f"{k} = {_toml_escape_value(v)}")
+    lines = ["# Generated by KCL — do not edit manually", ""]
+    if header:
+        lines.append(header)
         lines.append("")
-
-    # settings
-    settings = dotter.get("settings", {})
-    if settings:
-        lines.append("[settings]")
-        for k, v in settings.items():
-            lines.append(f"{k} = {_toml_escape_value(v)}")
-        lines.append("")
+    lines.append(raw)
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines))
     print(f"  Wrote {out_path}")
 
 
-def _hb(field):
-    """Return a Handlebars placeholder: {{field}}"""
-    return "{{" + field + "}}"
+def _write_env_toml(env_meta):
+    """Write the env.toml file with Handlebars conditionals."""
+    out_path = OUT_DIR / env_meta["path"]
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    core_env = env_meta.get("core_vars", {})
+    sections = env_meta.get("sections", [])
+    path_prepend = env_meta.get("path_prepend", [])
+    path_append = env_meta.get("path_append", [])
 
-# Profile-gated env.toml sections (hardcoded in Python; env.toml uses dotter Handlebars)
-_WORK_ENV_VARS = [
-    ("GITLAB_URL", "gitlab_url"),
-    ("GITLAB_TOKEN", ""),
-    ("SONAR_TOKEN", ""),
-    ("SLACK_TOKEN", ""),
-    ("SLACK_D_COOKIE", ""),
-    ("NODE_EXTRA_CA_CERTS", "node_extra_ca_certs"),
-    ("REQUESTS_CA_BUNDLE", "node_extra_ca_certs"),
-    ("P10K_ROOT_DIR", "p10k_root_dir"),
-]
-
-_PERSONAL_ENV_VARS = [
-    ("HA_URL", "home_assistant_url"),
-    ("BSKY_HANDLE", "bluesky_handle"),
-    ("PLEX_URL", "plex_url"),
-    ("PROTON_USER", "proton_user"),
-]
-
-
-def _write_env_toml(env, out_path):
     lines = ["# Generated by KCL — do not edit manually", ""]
     lines.append("[env]")
 
-    # Core env vars — iterate generically, uppercasing the key
-    for key, val in sorted(env.items()):
-        # Skip schema metadata keys and profile booleans
-        if key.startswith("_") or key in ("profile_work", "profile_personal"):
-            continue
-        # Skip path sections (handled below)
-        if key in ("path_prepend", "path_append"):
+    # Core env vars — filter metadata and path sections
+    skip = ("_", "profile_work", "profile_personal", "path_prepend", "path_append", "sections", "editor")
+    for key, val in sorted(core_env.items()):
+        if key.startswith("_") or key in skip:
             continue
         if val:
             lines.append(f'{key.upper()} = "{val}"')
 
     # Profile-gated sections
-    lines.append("")
-    lines.append("{{#if opencode_profile_work}}")
-    lines.append("# GitLab configuration (work profile)")
-    for var_name, template_field in _WORK_ENV_VARS:
-        if template_field:
-            lines.append(f'{var_name} = "' + _hb(template_field) + '"')
-        else:
-            lines.append(f'{var_name} = ""')
-    lines.append("{{/if}}")
+    for section in sections:
+        condition = section.get("condition", "")
+        vars_dict = section.get("vars", {})
 
-    lines.append("")
-    lines.append("{{#if opencode_profile_personal}}")
-    lines.append("# Home Assistant")
-    for var_name, template_field in _PERSONAL_ENV_VARS:
-        if template_field:
-            if template_field == "bluesky_handle":
-                lines.append("{{#if bluesky_handle}}" + f'{var_name} = "' + _hb(template_field) + '"')
-                lines.append("{{/if}}")
-            elif template_field == "proton_user":
-                lines.append("# Proton Mail Bridge username")
-                lines.append("{{#if proton_user}}" + f'{var_name} = "' + _hb(template_field) + '"')
-                lines.append("{{/if}}")
+        if condition:
+            lines.append("")
+            lines.append(condition)
+
+        for var_name, template_field in vars_dict.items():
+            if template_field:
+                if template_field in ("bluesky_handle", "proton_user"):
+                    lines.append(f"{{{{#if {template_field}}}}}" + f'{var_name} = "{{{{{template_field}}}}}"')
+                    lines.append("{{/if}}")
+                else:
+                    lines.append(f'{var_name} = "{{{{{template_field}}}}}"')
             else:
-                lines.append(f'{var_name} = "' + _hb(template_field) + '"')
-    lines.append("{{/if}}")
+                lines.append(f'{var_name} = ""')
 
+        if condition:
+            lines.append("{{/if}}")
+
+    # TripIt conditional
     lines.append("")
     lines.append('{{#if tripit_username}}TRIPIT_USERNAME = "{{tripit_username}}"')
     lines.append("{{/if}}")
 
+    # Path sections
     lines.append("")
     lines.append("[path]")
-    prepend = env.get("path_prepend", [])
-    if prepend:
+    if path_prepend:
         lines.append("prepend = [")
-        for p in prepend:
+        for p in path_prepend:
             lines.append(f'    {json.dumps(p)},')
         lines.append("]")
-
-    append = env.get("path_append", [])
-    if append:
+    if path_append:
         lines.append("append = [")
-        for p in append:
+        for p in path_append:
             lines.append(f'    {json.dumps(p)},')
         lines.append("]")
 
@@ -220,29 +156,33 @@ def _write_env_toml(env, out_path):
     print(f"  Wrote {out_path}")
 
 
-def _write_completions_toml(completions, out_path):
-    lines = [
-        "# Generated by KCL — do not edit manually",
-        "# Shared completion definitions for zsh and nushell",
-        "#",
-        "# Usage:",
-        "#   - zsh: parsed with a helper function, outputs to ~/.zsh/completion/_<tool>",
-        "#   - nushell: parsed natively, outputs to ~/.cache/completions/<tool>.nu",
-        "#",
-        "# Each tool has:",
-        "#   - zsh: command to generate zsh completions (piped to a file or sourced)",
-        "#   - nu: command to generate nushell completions (piped to a cache file)",
-        "#",
-        "# Empty string means:",
-        "#   - Handled by carapace bridge (nushell)",
-        "#   - Handled by oh-my-zsh plugin (zsh)",
-        "#   - Manual completions already exist",
-        "#   - Tool doesn't support that shell",
-        "#",
-        "# Tools are automatically skipped if not found in PATH.",
-        "",
-    ]
-    for tool_name, commands in completions.get("tools", {}).items():
+def _write_completions_toml(completions_meta):
+    """Write completions.toml."""
+    out_path = OUT_DIR / completions_meta["path"]
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    data = completions_meta["data"]
+    header = (
+        "# Generated by KCL — do not edit manual\n"
+        "# Shared completion definitions for zsh and nushell\n"
+        "#\n"
+        "# Usage:\n"
+        "#   - zsh: parsed with a helper function, outputs to ~/.zsh/completion/_<tool>\n"
+        "#   - nushell: parsed natively, outputs to ~/.cache/completions/<tool>.nu\n"
+        "#\n"
+        "# Each tool has:\n"
+        "#   - zsh: command to generate zsh completions (piped to a file or sourced)\n"
+        "#   - nu: command to generate nushell completions (piped to a cache file)\n"
+        "#\n"
+        "# Empty string means:\n"
+        "#   - Handled by carapace bridge (nushell)\n"
+        "#   - Handled by oh-my-zsh plugin (zsh)\n"
+        "#   - Manual completions already exist\n"
+        "#   - Tool doesn't support that shell\n"
+        "#\n"
+        "# Tools are automatically skipped if not found in PATH.\n"
+    )
+    lines = [header]
+    for tool_name, commands in data.get("tools", {}).items():
         lines.append(f"[{tool_name}]")
         if commands.get("zsh"):
             lines.append(f'zsh = {json.dumps(commands["zsh"])}')
@@ -255,6 +195,85 @@ def _write_completions_toml(completions, out_path):
     print(f"  Wrote {out_path}")
 
 
+def _write_dotter_toml(cfg, out_path):
+    """Write dotter global.toml."""
+    lines = []
+    dotter = cfg["dotter"]
+
+    def _escape_toml_value(v):
+        if isinstance(v, bool):
+            return "true" if v else "false"
+        if isinstance(v, (int, float)):
+            return str(v)
+        if isinstance(v, str):
+            if "\n" in v:
+                return '"""' + v + '"""'
+            escaped = v.replace("\\", "\\\\").replace('"', '\\"')
+            return f'"{escaped}"'
+        return json.dumps(v)
+
+    def write_profile(name, profile):
+        files = profile.get("files", {})
+        variables = profile.get("variables", {})
+        depends = profile.get("depends")
+
+        if depends is not None:
+            lines.append(f"[{name}]")
+            lines.append(f"depends = {json.dumps(depends)}")
+            lines.append("")
+
+        if files:
+            lines.append(f"[{name}.files]")
+            for k, v in files.items():
+                key = json.dumps(k)
+                if isinstance(v, str):
+                    lines.append(f"{key} = {json.dumps(v)}")
+                elif isinstance(v, dict):
+                    target = v.get("target", "")
+                    t = v.get("type", "automatic")
+                    if target:
+                        lines.append(f"{key} = {{ target = {json.dumps(target)}, type = {json.dumps(t)} }}")
+                    else:
+                        lines.append(f"{key} = {{ type = {json.dumps(t)} }}")
+            lines.append("")
+
+        if variables:
+            lines.append(f"[{name}.variables]")
+            for k, v in variables.items():
+                lines.append(f"{k} = {_escape_toml_value(v)}")
+            lines.append("")
+
+    write_profile("default", dotter["default"])
+    write_profile("personal", dotter["personal"])
+    write_profile("work", dotter["work"])
+    write_profile("oda-mcp", dotter.get("oda_mcp", {}))
+
+    linux = dotter.get("linux", {})
+    if linux.get("files") or linux.get("variables"):
+        write_profile("linux", linux)
+
+    mac = dotter.get("mac", {})
+    if mac.get("files") or mac.get("variables"):
+        write_profile("mac", mac)
+
+    for theme_name, theme_vars in dotter.get("themes", {}).items():
+        lines.append(f"[{theme_name}.variables]")
+        for k, v in theme_vars.items():
+            lines.append(f"{k} = {_escape_toml_value(v)}")
+        lines.append("")
+
+    settings = dotter.get("settings", {})
+    if settings:
+        lines.append("[settings]")
+        for k, v in settings.items():
+            lines.append(f"{k} = {_escape_toml_value(v)}")
+        lines.append("")
+
+    with open(out_path, "w") as f:
+        f.write("\n".join(lines))
+    print(f"  Wrote {out_path}")
+
+
 def _write_packages_txt(packages, out_path):
     with open(out_path, "w") as f:
         for pkg in packages:
@@ -262,15 +281,15 @@ def _write_packages_txt(packages, out_path):
     print(f"  Wrote {out_path}")
 
 
-def _write_brewfile(packages, out_path):
+def _write_brewfile(data, out_path):
     lines = []
-    for tap in packages.get("brew_taps", []):
+    for tap in data.get("brew_taps", []):
         lines.append(f'tap "{tap}"')
-    for formula in packages.get("brew_formulae", []):
+    for formula in data.get("brew_formulae", []):
         lines.append(f'brew "{formula}"')
-    for cask in packages.get("brew_casks", []):
+    for cask in data.get("brew_casks", []):
         lines.append(f'cask "{cask}"')
-    for ext in packages.get("vscode_extensions", []):
+    for ext in data.get("vscode_extensions", []):
         lines.append(f'vscode "{ext}"')
 
     with open(out_path, "w") as f:
@@ -278,225 +297,50 @@ def _write_brewfile(packages, out_path):
     print(f"  Wrote {out_path}")
 
 
-def _write_generic_toml(data, out_path, *, header=None):
-    """Write a nested dict as TOML using tomli_w.
-    
-    tomli_w naturally handles:
-      - Dotted keys inside dicts (e.g. {"gaps": {"inner.horizontal": 10}})
-      - Arrays of dicts (e.g. [[on-window-detected]])
-      - Lists of strings
-    
-    We just add our header comment on top.
-    """
-    import io
-
-    # Ensure data is a dict for tomli_w (type guard for linter)
-    if not isinstance(data, dict):
-        raise TypeError(f"_write_generic_toml expects dict, got {type(data).__name__}")
-
-    buf = io.BytesIO()
-    tomli_w.dump(data, buf)  # type: ignore[arg-type]
-    raw = buf.getvalue().decode("utf-8")
-
-    lines = ["# Generated by KCL — do not edit manually", ""]
-    if header:
-        lines.append(header)
-        lines.append("")
-    lines.append(raw)
-
-    with open(out_path, "w") as f:
-        f.write("\n".join(lines))
-    print(f"  Wrote {out_path}")
-
-
-def _is_template_marker(value):
-    """Check if a value is a template marker dict like {TEMPLATE_MARKER: 'field'}."""
-    return isinstance(value, dict) and "TEMPLATE_MARKER" in value and len(value) == 1
-
-
-def _resolve_template_value(value, template_fields):
-    """Replace template marker dicts with Handlebars placeholders."""
-    if _is_template_marker(value):
-        field_name = value["TEMPLATE_MARKER"]
-        return f"{{{{{field_name}}}}}"
-    elif isinstance(value, dict):
-        return {k: _resolve_template_value(v, template_fields) for k, v in value.items()}
-    elif isinstance(value, list):
-        return [_resolve_template_value(item, template_fields) for item in value]
-    return value
-
-
-def _write_template_toml(data, out_path, *, header=None):
-    """Write a template config as TOML, replacing {TEMPLATE_MARKER: 'x'} with {{x}}."""
-    resolved = _resolve_template_value(data, {})
-    
-    # Template root must be a dict (tomli_w requirement)
-    if not isinstance(resolved, dict):
-        raise ValueError(f"Template config must be a dict, got {type(resolved).__name__}")
-    
-    import io
-    buf = io.BytesIO()
-    tomli_w.dump(resolved, buf)  # type: ignore[arg-type]
-    raw = buf.getvalue().decode("utf-8")
-
-    lines = ["# Generated by KCL — do not edit manually", ""]
-    if header:
-        lines.append(header)
-        lines.append("")
-    lines.append(raw)
-
-    with open(out_path, "w") as f:
-        f.write("\n".join(lines))
-    print(f"  Wrote {out_path}")
-
-
-def _write_raw_text(content, out_path, strip_trailing_newline=False):
-    """Write raw text content verbatim (for ghostty, gitconfig, etc)."""
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    if strip_trailing_newline:
-        content = content.rstrip("\n")
-    with open(out_path, "w") as f:
-        f.write(content)
-    print(f"  Wrote {out_path}")
-
-
-def _write_tmux_template(tmux_data, out_path):
-    """Write tmux.conf with Handlebars placeholders for theme variables."""
-    lines = ["# Generated by KCL — do not edit manually", ""]
-    
-    # Static part of tmux config
-    lines.append("# List of plugins. REMEMBER TO INSTALL USING `prefix + I` ON NEW MACHINES!")
-    lines.append("set -g @plugin 'tmux-plugins/tpm'")
-    lines.append("set -g @plugin 'tmux-plugins/tmux-sensible'")
-    lines.append("# set -g @plugin 'erikw/tmux-powerline'")
-    
-    # Template variable for theme plugin
-    plugin = tmux_data.get("theme_plugin", {})
-    if _is_template_marker(plugin):
-        lines.append(f"set -g @plugin '{{{plugin['TEMPLATE_MARKER']}}}'")
-    else:
-        lines.append(f"set -g @plugin '{plugin}'")
-    
-    lines.append("# set -g @plugin 'x4121/tmux-slack-counter'")
-    lines.append("set -g @plugin 'tmux-plugins/tmux-resurrect'")
-    lines.append("set -g @plugin 'tmux-plugins/tmux-continuum'")
-    lines.append("set -g @plugin 'christoomey/vim-tmux-navigator'")
-    lines.append("")
-    
-    # Template variable for theme config
-    config_val = tmux_data.get("theme_config", {})
-    if _is_template_marker(config_val):
-        lines.append(f"{{{{{config_val['TEMPLATE_MARKER']}}}}}")
-    else:
-        lines.append(config_val)
-    
-    lines.append("")
-    lines.append("# Other examples:")
-    lines.append("# set -g @plugin 'github_username/plugin_name'")
-    lines.append("# set -g @plugin 'github_username/plugin_name#branch'")
-    lines.append("# set -g @plugin 'github_username/plugin_name#branch'")
-    lines.append("# set -g @plugin 'git@github.com:user/plugin'")
-    lines.append("# set -g @plugin 'git@bitbucket.com:user/plugin'")
-    lines.append("")
-    lines.append("set -g mouse on")
-    lines.append("")
-    lines.append("# set-option -g status-interval 5")
-    lines.append("# set-option -g automatic-rename on")
-    lines.append("# set-option -g automatic-rename-format '#{b:pane_current_path}'")
-    lines.append("")
-    lines.append("# Start windows and panes at 1, not 0")
-    lines.append("set -g base-index 1")
-    lines.append("setw -g pane-base-index 1")
-    lines.append("set -g renumber-windows on")
-    lines.append("set -g detach-on-destroy off")
-    lines.append("")
-    lines.append("setw -g mode-keys vi")
-    lines.append("set -g set-clipboard on")
-    lines.append("")
-    lines.append("set -gq allow-passthrough on")
-    lines.append("set -g visual-activity off")
-    lines.append("")
-    lines.append("set -g @continuum-restore 'on'")
-    lines.append("")
-    lines.append("# Open splits using current working path")
-    lines.append('bind \'"\' split-window -c "#{pane_current_path}"')
-    lines.append("bind '%' split-window -h -c '#{pane_current_path}'")
-    lines.append("")
-    lines.append("# Open new window using current working path")
-    lines.append("bind c new-window -c '#{pane_current_path}'")
-    lines.append("")
-    lines.append('# Default to the user\'s login shell (zsh) so plugins/scripts that assume POSIX')
-    lines.append('# work. Set TMUX_DEFAULT_CMD=nu (or any other shell) in your env to override.')
-    lines.append('set -g default-command "${TMUX_DEFAULT_CMD:-${SHELL}}"')
-    lines.append("")
-    lines.append("set -g status-position top")
-    lines.append("")
-    lines.append("# Set terminal title to show tmux session name")
-    lines.append('set -g set-titles on')
-    lines.append('set -g set-titles-string "#S:#I #W"')
-    lines.append("")
-    lines.append("# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)")
-    lines.append("run '~/.tmux/plugins/tpm/tpm'")
-    
-    with open(out_path, "w") as f:
-        f.write("\n".join(lines) + "\n")
-    print(f"  Wrote {out_path}")
-
-
 def main():
-    cfg = _load_json()
-    dotter = cfg["dotter"]
-    env = cfg["env"]
-    completions = cfg["completions"]
-    packages = dotter["packages"]
-    atuin = cfg.get("atuin", {})
-    starship = cfg.get("starship", {})
-    aerospace = cfg.get("aerospace", {})
-    templates = cfg.get("templates", {})
-    iamb = cfg.get("iamb", {})
-    gitlogue = cfg.get("gitlogue", {})
-    pnpm = cfg.get("pnpm", {})
-    gitconfig = cfg.get("gitconfig", "")
-
-    # Ensure output dirs exist under out/
-    OUT_DIR.mkdir(exist_ok=True)
-    (OUT_DIR / ".dotter").mkdir(exist_ok=True)
-    (OUT_DIR / "shared").mkdir(exist_ok=True)
-    (OUT_DIR / "atuin").mkdir(exist_ok=True)
-    (OUT_DIR / "jj").mkdir(exist_ok=True)
-    (OUT_DIR / "ghostty").mkdir(exist_ok=True)
-    (OUT_DIR / "iamb").mkdir(exist_ok=True)
-    (OUT_DIR / "gitlogue").mkdir(exist_ok=True)
-    (OUT_DIR / "pnpm").mkdir(exist_ok=True)
+    cfg = _load_json("out/config.json")
 
     print("Generating dotfiles from KCL config...")
-    # global.toml stays at .dotter/ (dotter entry point; must exist before dotter runs)
-    _write_dotter_toml(cfg, ".dotter/global.toml")
-    # Everything else goes to out/
-    _write_env_toml(env, _out("shared/env.toml"))
-    _write_completions_toml(completions, _out("shared/completions.toml"))
-    _write_packages_txt(packages.get("fedora", []), _out("packages-fedora.txt"))
-    _write_brewfile(packages, _out("Brewfile"))
-    if atuin:
-        _write_generic_toml(atuin, _out("atuin/config.toml"), header="# Atuin config — generated by KCL")
-    if starship:
-        _write_generic_toml(starship, _out("starship.toml"), header="# Starship config — generated by KCL")
-    if aerospace:
-        _write_generic_toml(aerospace, _out("aerospace.toml"), header="# Aerospace config — generated by KCL")
+
+    # 1. dotter global.toml
+    _write_dotter_toml(cfg, Path(".dotter/global.toml"))
+
+    # 2. TOML files (direct serialization from KCL data)
+    toml_map = {
+        "atuin/config.toml": (cfg.get("atuin", {}), "# Atuin config — generated by KCL"),
+        "starship.toml": (cfg.get("starship", {}), "# Starship config — generated by KCL"),
+        "aerospace.toml": (cfg.get("aerospace", {}), "# Aerospace config — generated by KCL"),
+        "iamb/config.toml": (cfg.get("iamb", {}), "# iamb config — generated by KCL"),
+        "gitlogue/config.toml": (cfg.get("gitlogue", {}), "# gitlogue config — generated by KCL"),
+    }
+    for path, (data, header) in toml_map.items():
+        if data:
+            _write_toml(data, OUT_DIR / path, header=header)
+
+    # 3. Template TOML files (with Handlebars marker resolution)
+    templates = cfg.get("templates", {})
     if templates.get("jj"):
-        _write_template_toml(templates["jj"], _out("jj/config.toml"), header="# jj config — generated by KCL")
-    if templates.get("tmux"):
-        _write_tmux_template(templates["tmux"], _out("tmux.conf"))
-    if templates.get("ghostty"):
-        _write_raw_text(templates["ghostty"], _out("ghostty/config"))
-    if iamb:
-        _write_generic_toml(iamb, _out("iamb/config.toml"), header="# iamb config — generated by KCL")
-    if gitlogue:
-        _write_generic_toml(gitlogue, _out("gitlogue/config.toml"), header="# gitlogue config — generated by KCL")
-    if pnpm:
-        _write_raw_text(pnpm.get("rc", ""), _out("pnpm/rc"))
-    if gitconfig:
-        _write_raw_text(gitconfig, _out("gitconfig"), strip_trailing_newline=True)
+        _write_toml(templates["jj"], OUT_DIR / "jj/config.toml",
+                    header="# jj config — generated by KCL", template=True)
+
+    # 4. Special: env.toml (from metadata)
+    env_meta = _load_json("out/.env_meta.json")
+    _write_env_toml(env_meta)
+
+    # 5. Special: completions.toml (from metadata)
+    completions_meta = _load_json("out/.completions_meta.json")
+    _write_completions_toml(completions_meta)
+
+    # 6. Special: packages (from metadata)
+    packages_meta = _load_json("out/.packages_meta.json")
+    fedora = packages_meta.get("fedora_txt", {})
+    if fedora.get("lines"):
+        _write_packages_txt(fedora["lines"], OUT_DIR / fedora["path"])
+
+    brew = packages_meta.get("brewfile", {})
+    if brew.get("data"):
+        _write_brewfile(brew["data"], OUT_DIR / brew["path"])
+
     print("Done.")
 
 

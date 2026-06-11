@@ -30,6 +30,11 @@ KCL is the **single source of truth**. The pipeline is:
 ```
 src/main.k ──→ kcl run src/main.k ──→ out/config.json
                                               │
+                                              ├──→ file.write() ──→ out/ghostty/config
+                                              ├──→ file.write() ──→ out/gitconfig
+                                              ├──→ file.write() ──→ out/pnpm/rc
+                                              ├──→ file.write() ──→ out/tmux.conf
+                                              │
                                               ▼
                                    .dotter/scripts/generate_from_kcl.py
                                               │
@@ -39,18 +44,18 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
      .dotter/      out/shared/    out/packages-    out/atuin/      out/jj/
      global.toml   env.toml        fedora.txt       config.toml     config.toml
                    completions     out/Brewfile     out/starship    out/tmux.conf
-                   .toml                          .toml             out/ghostty/
-                                                   out/aerospace     config
-                                                   .toml             out/iamb/
-                                                                     config.toml
-                                                                     out/gitlogue/
-                                                                     config.toml
-                                                                     out/pnpm/
-                                                                     rc
+                   .toml                           .toml             out/ghostty/
+                                                   out/aerospace      config
+                                                   .toml              out/iamb/
+                                                                       config.toml
+                                                                       out/gitlogue/
+                                                                       config.toml
+                                                                       out/pnpm/
+                                                                       rc
 ```
 
-1. **KCL** (`src/main.k` + domain modules) produces `out/config.json`
-2. **Python converter** (`.dotter/scripts/generate_from_kcl.py`) reads JSON and writes TOML/text files to `out/`
+1. **KCL** (`src/main.k` + domain modules) writes text files directly via `file.write()` and produces `out/config.json` for structured data
+2. **Python converter** (`.dotter/scripts/generate_from_kcl.py`) reads JSON and writes TOML/structured text files to `out/`
 3. **dotter** deploys the generated files from `out/` to `~/.config/`
 
 ## File Layout
