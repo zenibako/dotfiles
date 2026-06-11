@@ -42,20 +42,37 @@ _cache_is_fresh() {
 }
 
 _fetch_secret() {
-    local vault="$1" item="$2" field="${3:-}" result
+    local vault="$1" item="$2" field="${3:-}" result _raw
     if ! _has_proton_pass; then
         _log_warn "proton-pass CLI not found. Secret '$vault/$item' unavailable."
         return 1
     fi
-    
-    if [ -n "$field" ]; then
-        # Fetch specific field from extra_fields (Hidden or Text)
-        result=$(pass-cli item view --vault-name "$vault" --item-title "$item" --output json 2>/dev/null | jq -r --arg field "$field" '.item.content.extra_fields[]? | select(.name == $field) | .content.Hidden // .content.Text // empty' 2>/dev/null)
-    else
-        # Fetch main password field (default)
-        result=$(pass-cli item view --vault-name "$vault" --item-title "$item" --output json 2>/dev/null | jq -r '.item.content.content.Login.password // .item.content.content.password // .password // .value // empty' 2>/dev/null)
+
+    # Fetch raw JSON once to avoid multiple CLI calls
+    _raw=$(pass-cli item view --vault-name "$vault" --item-title "$item" --output json 2>/dev/null) || { _log_warn "pass-cli view failed for $vault/$item"; return 1; }
+
+    # Detect if the returned item is an Alias (has Alias key in content).
+    # Aliases shadow real items when multiple items share the same title.
+    local _is_alias
+    _is_alias=$(printf '%s' "$_raw" | jq -r 'if .item.content.content | has("Alias") then "yes" else "no" end' 2>/dev/null)
+    if [ "$_is_alias" = "yes" ]; then
+        _log_warn "Item '$item' is an Alias; searching for real item..."
+        # Find the first non-trashed, non-alias item with the same title
+        local _real_id
+        _real_id=$(pass-cli item list "$vault" --output json 2>/dev/null | jq -r --arg title "$item" '[.items[] | select(.title == $title and .state != "Trashed") | .id] | first // empty')
+        if [ -n "$_real_id" ]; then
+            _raw=$(pass-cli item view --vault-name "$vault" --item-id "$_real_id" --output json 2>/dev/null) || { _log_warn "pass-cli view failed for $vault/$item (id=$_real_id)"; return 1; }
+        fi
     fi
-    
+
+    if [ -n "$field" ]; then
+        # Specific field: try extra_fields first, then Custom sections
+        result=$(printf '%s' "$_raw" | jq -r --arg field "$field" '(.item.content.extra_fields[]? | select(.name == $field) | .content.Hidden // .content.Text // empty) // (.item.content.content.Custom.sections[]?.section_fields[]? | select(.name == $field) | .content.Hidden // .content.Text // empty)' 2>/dev/null)
+    else
+        # No field: try Login password, then first hidden/text in Custom, then fallbacks
+        result=$(printf '%s' "$_raw" | jq -r '.item.content.content.Login.password // .item.content.content.password // ([.item.content.content.Custom.sections[]?.section_fields[]? | select(.content.Hidden or .content.Text) | .content.Hidden // .content.Text] | first // empty) // .password // .value // empty' 2>/dev/null)
+    fi
+
     if [ -z "$result" ] || [ "$result" = "null" ]; then
         _log_warn "Failed to fetch secret: $vault/$item${field:+ (field: $field)}"
         return 1
@@ -104,37 +121,30 @@ _build_cache() {
     val=$(_fetch_secret "Personal" "Plex (DigitalGlue)" "User Token") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
     val=$(_fetch_secret "Personal" "Plex (Personal)" "Server Token") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
 
-    # --- TMDB ---
-    val=$(_fetch_secret "Personal" "TMDB API Key") && _write "TMDB_KEY" "$val" >> "$_tmp"
-
-    # --- Google ---
-    val=$(_fetch_secret "Personal" "Google Places API Key") && _write "GOOGLE_PLACES_API_KEY" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "YouTube API Key") && _write "YOUTUBE_API_KEY" "$val" >> "$_tmp"
-
-    # --- Reddit ---
-    val=$(_fetch_secret "Personal" "reddit") && _write "REDDIT_SESSION" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "Reddit Token v2") && _write "REDDIT_TOKEN_V2" "$val" >> "$_tmp"
-
     # --- Brave Search ---
-    val=$(_fetch_secret "Personal" "Brave Search API Key") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Brave Search API") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
 
     # --- Proton Mail Bridge ---
-    val=$(_fetch_secret "Personal" "Proton Bridge Password") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
+    # Using "Proton" login item; the bridge password is not in a hidden field,
+    # so we use the main password. Note: this is the account password.
+    val=$(_fetch_secret "Personal" "Proton") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
 
     # --- Telegram ---
     val=$(_fetch_secret "Personal" "Telegram Bot Token") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
 
     # --- TripIt ---
-    val=$(_fetch_secret "Personal" "TripIt Password") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
+    # Using existing "TripIt" login item (password field)
+    val=$(_fetch_secret "Personal" "TripIt") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
 
     # --- Last.fm ---
-    val=$(_fetch_secret "Personal" "Last.fm API Key") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
+    # Using existing "last.fm" login item (password field)
+    val=$(_fetch_secret "Personal" "last.fm") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
 
-    # --- Obsidian MCP ---
-    val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
+    # --- Obsidian MCP (not yet in Proton Pass; disabled until created) ---
+    # val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
 
-    # --- Rocksky ---
-    val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+    # --- Rocksky (not yet in Proton Pass; disabled until created) ---
+    # val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
 
     # --- Work credentials (only if work profile is active) ---
     if [ "${OPENCODE_PROFILE_WORK:-}" = "true" ] || [ "${OPENCODE_PROFILE_WORK:-}" = "1" ]; then
@@ -142,7 +152,7 @@ _build_cache() {
         val=$(_fetch_secret "Personal" "SonarQube Token") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "Postman API Key") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "Slack Token") && _write "SLACK_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Personal" "Slack D-Cookie") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "Slack D Cookie") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
     fi
 
     # Only create the cache if we actually wrote secrets.
