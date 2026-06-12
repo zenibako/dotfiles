@@ -61,7 +61,8 @@ settings = {
 # Emit as JSON with Handlebars conditionals
 # We build the JSON string manually to include Handlebars markers
 _json_parts = [
-    """{{#if (eq claude_model_at_top true)}}
+    """{
+{{#if (eq claude_model_at_top true)}}
   "model": "{{claude_model}}",
 {{/if}}"""
     """  "enabledPlugins": {
@@ -315,7 +316,7 @@ _json_parts = [
 }"""
 ]
 
-# Join all parts
-_full_json = "{\n" + "\n".join(_json_parts) + "\n}"
+# Join all parts — no outer wrapping, each part is self-contained
+_full_json = "\n".join(_json_parts)
 
 file.write("out/claude-code/settings.json", _full_json)
