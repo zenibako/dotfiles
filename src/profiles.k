@@ -4,8 +4,8 @@ import _shared
 default = _shared.Profile {
     files = {
         "out/gitconfig" = { target = "~/.config/git/dotter-gitconfig", type = "template" }
-        "git/commit-template" = "~/.git-commit-template"
-        "git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
+        "src/git/commit-template" = "~/.git-commit-template"
+        "src/git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
         "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
         "out/shared/completions.toml" = "~/.config/shared/completions.toml"
         "src/atuin/bin" = "~/.atuin/bin"
@@ -14,32 +14,32 @@ default = _shared.Profile {
         "out/pnpm/rc" = "~/.config/pnpm/rc"
         "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
         "out/zshenv" = { target = "~/.zshenv", type = "template" }
-        zshrc = { target = "~/.zshrc", type = "template" }
-        carapace = "~/.config/carapace"
+        "src/zshrc" = { target = "~/.zshrc", type = "template" }
+        "src/carapace" = "~/.config/carapace"
         "src/ghostty/shaders" = { target = "~/.config/ghostty/shaders", type = "symbolic" }
         "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
-        nushell = { target = "~/.config/nushell", type = "template" }
+        "src/nushell" = { target = "~/.config/nushell", type = "template" }
         "out/starship.toml" = "~/.config/starship.toml"
         "out/jj/config.toml" = { target = "~/.config/jj/config.toml", type = "template" }
-        "nvim/default" = { target = "~/.config/nvim", type = "template" }
-        "opencode/.gitignore" = { target = "~/.config/opencode/.gitignore", type = "symbolic" }
-        "opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
-        "opencode/command/review.md" = { target = "~/.config/opencode/command/review.md", type = "symbolic" }
-        "opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
+        "src/nvim/default" = { target = "~/.config/nvim", type = "template" }
+        "src/opencode/.gitignore" = { target = "~/.config/opencode/.gitignore", type = "symbolic" }
+        "src/opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
+        "src/opencode/command/review.md" = { target = "~/.config/opencode/command/review.md", type = "symbolic" }
+        "src/opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
         "out/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
-        "opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
+        "src/opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
         "out/claude_desktop_config.json" = { target = "~/Library/Application Support/Claude/claude_desktop_config.json", type = "template" }
-        "claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
-        "claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
-        "claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
+        "src/claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
+        "src/claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
+        "src/claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
         "out/claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
-        "shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
-        "shared/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
-        "shared/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
-        "claude-code/commands/review.md" = { target = "~/.claude/commands/review.md", type = "symbolic" }
-        "claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
+        "src/shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
+        "src/shared/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
+        "src/shared/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
+        "src/claude-code/commands/review.md" = { target = "~/.claude/commands/review.md", type = "symbolic" }
+        "src/claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
         "out/gitlogue/config.toml" = "~/.config/gitlogue/config.toml"
-        "agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
+        "src/agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
     }
     variables = {
         name = ""
@@ -91,7 +91,7 @@ default = _shared.Profile {
 personal = _shared.Profile {
     depends = ["default"]
     files = {
-        "nvim/personal" = { target = "~/.config/nvim", type = "template" }
+        "src/nvim/personal" = { target = "~/.config/nvim", type = "template" }
     }
     variables = {
         opencode_profile_personal = True
@@ -116,9 +116,9 @@ personal = _shared.Profile {
 work = _shared.Profile {
     depends = ["default"]
     files = {
-        "nvim/work" = { target = "~/.config/nvim", type = "template" }
-        "opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
-        "opencode/script/lwc-lsp-wrapper.sh" = { target = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
+        "src/nvim/work" = { target = "~/.config/nvim", type = "template" }
+        "src/opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
+        "src/opencode/script/lwc-lsp-wrapper.sh" = { target = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
     }
     variables = {
         opencode_profile_work = True
@@ -153,7 +153,7 @@ work = _shared.Profile {
 # ── Platform profiles ─────────────────────────────────────────────────
 linux = _shared.Profile {
     files = {
-        hypr = "~/.config/hypr"
+        "src/hypr" = "~/.config/hypr"
     }
     variables = {
         shell_bin_path = "/usr/bin"

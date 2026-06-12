@@ -43,14 +43,14 @@ except Exception:
       _manifest="$_skills_base/manifest.json"
       mkdir -p "$_skills_dir"
       echo "Deploying Claude Desktop skills..."
-      for _sd in "$_dotfiles/claude-desktop/skills"/*/; do
+      for _sd in "$_dotfiles/src/claude-desktop/skills"/*/; do
         [ -d "$_sd" ] || continue
         _sname=$(basename "$_sd")
         mkdir -p "$_skills_dir/$_sname"
         cp "$_sd/SKILL.md" "$_skills_dir/$_sname/SKILL.md"
         echo "  Copied skill: $_sname"
       done
-      python3 "$_scripts/deploy_skills.py" "$_manifest" "$_dotfiles/claude-desktop/skills"
+      python3 "$_scripts/deploy_skills.py" "$_manifest" "$_dotfiles/src/claude-desktop/skills"
     fi
   fi
   unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname

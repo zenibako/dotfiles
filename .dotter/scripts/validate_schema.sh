@@ -483,9 +483,9 @@ if [ "$MODE" = "--pre-deploy" ]; then
   fi
 
   for _file in \
-    "$REPO_ROOT/carapace/bridges.yaml" \
-    "$REPO_ROOT/carapace/specs/gog.yaml" \
-    "$REPO_ROOT/carapace/specs/sf.yaml" \
+    "$REPO_ROOT/src/carapace/bridges.yaml" \
+    "$REPO_ROOT/src/carapace/specs/gog.yaml" \
+    "$REPO_ROOT/src/carapace/specs/sf.yaml" \
     "$REPO_ROOT/workmux/config.yaml"
   do
     if [ ! -f "$_file" ]; then continue; fi
