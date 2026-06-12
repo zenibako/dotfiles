@@ -17,6 +17,8 @@ import gitlogue
 import pnpm
 import opencode
 import claude
+import claude_code
+import zshenv
 import gitconfig
 
 # ── Assemble config data ──────────────────────────────────────────────

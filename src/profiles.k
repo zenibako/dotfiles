@@ -13,7 +13,7 @@ default = _shared.Profile {
         "out/iamb/config.toml" = "~/.config/iamb/config.toml"
         "out/pnpm/rc" = "~/.config/pnpm/rc"
         "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
-        zshenv = { target = "~/.zshenv", type = "template" }
+        "out/zshenv" = { target = "~/.zshenv", type = "template" }
         zshrc = { target = "~/.zshrc", type = "template" }
         carapace = "~/.config/carapace"
         "src/ghostty/shaders" = { target = "~/.config/ghostty/shaders", type = "symbolic" }
@@ -32,7 +32,7 @@ default = _shared.Profile {
         "claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
         "claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
         "claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
-        "claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
+        "out/claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
         "shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
         "shared/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
         "shared/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
