@@ -132,7 +132,6 @@ work = _shared.Profile {
         sonarqube_token = ""
         gitlab_personal_access_token = ""
         gitlab_api_url = "https://gitlab.com/api/v4"
-        gitlab_url = ""
         opencode_slack_webhook_url = ""
         opencode_build_agent_model = "openai/gpt-5.4"
         opencode_plan_agent_model = "openai/gpt-5.4"
