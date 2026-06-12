@@ -5,7 +5,7 @@ default = _shared.Profile {
     files = {
         "out/gitconfig" = { target = "~/.config/git/dotter-gitconfig", type = "template" }
         "src/git/commit-template" = "~/.git-commit-template"
-        "src/git/hooks/prepare-commit-msg" = { target = "~/.config/git/hooks/prepare-commit-msg", type = "template" }
+        "src/git/hooks/prepare-commit-msg" = "~/.config/git/hooks/prepare-commit-msg"
         "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
         "out/shared/completions.toml" = "~/.config/shared/completions.toml"
         "src/atuin/bin" = "~/.atuin/bin"
@@ -14,7 +14,7 @@ default = _shared.Profile {
         "out/pnpm/rc" = "~/.config/pnpm/rc"
         "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
         "out/zshenv" = { target = "~/.zshenv", type = "template" }
-        "src/zshrc" = { target = "~/.zshrc", type = "template" }
+        "src/zshrc" = "~/.zshrc"
         "src/carapace" = "~/.config/carapace"
         "src/ghostty/shaders" = { target = "~/.config/ghostty/shaders", type = "symbolic" }
         "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
@@ -31,7 +31,7 @@ default = _shared.Profile {
         "out/claude_desktop_config.json" = { target = "~/Library/Application Support/Claude/claude_desktop_config.json", type = "template" }
         "src/claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
         "src/claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
-        "src/claude-code/CLAUDE.md" = { target = "~/.claude/CLAUDE.md", type = "template" }
+        "src/claude-code/CLAUDE.md" = "~/.claude/CLAUDE.md"
         "out/claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
         "src/shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
         "src/shared/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
@@ -91,7 +91,7 @@ default = _shared.Profile {
 personal = _shared.Profile {
     depends = ["default"]
     files = {
-        "src/nvim/personal" = { target = "~/.config/nvim", type = "template" }
+        "src/nvim/personal" = { target = "~/.config/nvim", type = "symbolic" }
     }
     variables = {
         opencode_profile_personal = True
@@ -116,7 +116,7 @@ personal = _shared.Profile {
 work = _shared.Profile {
     depends = ["default"]
     files = {
-        "src/nvim/work" = { target = "~/.config/nvim", type = "template" }
+        "src/nvim/work" = { target = "~/.config/nvim", type = "symbolic" }
         "src/opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
         "src/opencode/script/lwc-lsp-wrapper.sh" = { target = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
     }
@@ -154,6 +154,7 @@ work = _shared.Profile {
 linux = _shared.Profile {
     files = {
         "src/hypr" = "~/.config/hypr"
+        "src/waybar" = "~/.config/waybar"
     }
     variables = {
         shell_bin_path = "/usr/bin"
