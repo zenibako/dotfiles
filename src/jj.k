@@ -12,7 +12,7 @@ jj = {
         email = tpl.hb("email")
     }
     ui = {
-        default_command = ["log", "--limit", "5"]
+        "default-command" = ["log", "--limit", "5"]
         diff_editor = _builtin_editor
         show_cryptographic_signatures = True
     }
