@@ -139,7 +139,7 @@ claude_effort_level_enabled = false
 
 [linux.files]
 "src/hypr" = "~/.config/hypr"
-"src/waybar" = "~/.config/waybar"
+"waybar" = "~/.config/waybar"
 
 [linux.variables]
 shell_bin_path = "/usr/bin"
