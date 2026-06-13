@@ -188,4 +188,8 @@ schema ConfigMap:
     gitlogue?: {str: any}
     pnpm?: {str: any}
     gitconfig?: str
+    opencode?: str
+    claude_desktop?: str
+    claude_code?: str
+    zshenv?: str
     __output__?: OutputConfig

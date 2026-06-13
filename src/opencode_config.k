@@ -1,5 +1,4 @@
 import json
-import file
 import _shared.mcp as mcp_shared
 
 # ── OpenCode (opencode.jsonc) ────────────────────────────────────────
@@ -158,5 +157,5 @@ _jsonc_header = """/**
  */
 """
 
-# Emit the JSONC file
-file.write("out/opencode.jsonc", _jsonc_header + json.encode(opencode, indent=2))
+# Build the JSONC output for the Python converter to write
+output_jsonc = _jsonc_header + json.encode(opencode, indent=2)

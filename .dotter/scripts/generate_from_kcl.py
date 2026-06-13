@@ -346,6 +346,10 @@ def main():
     if brew.get("data"):
         _write_brewfile(brew["data"], OUT_DIR / brew["path"])
 
+    # 7. JSONC files (text with JSON + header comment)
+    if cfg.get("opencode"):
+        _write_raw_text(cfg["opencode"], OUT_DIR / "opencode.jsonc")
+
     print("Done.")
 
 

@@ -15,7 +15,7 @@ import aerospace
 import iamb
 import gitlogue
 import pnpm
-import opencode
+import opencode_config
 import claude
 import claude_code
 import zshenv
@@ -48,6 +48,7 @@ config = _shared.ConfigMap {
     gitlogue = gitlogue.gitlogue
     pnpm = pnpm.pnpm
     gitconfig = gitconfig.gitconfig
+    opencode = opencode_config.output_jsonc
 }
 
 # ── Write JSON for Python TOML converter ──────────────────────────────
