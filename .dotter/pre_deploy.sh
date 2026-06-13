@@ -81,4 +81,12 @@ if [ -n "$_repo_root" ] && [ -f "$_repo_root/.dotter/scripts/validate_schema.sh"
 else
   echo "WARNING: could not locate validate_schema.sh for pre-deploy validation" >&2
 fi
+
+# Remind about deploy wrapper (dotter pre_deploy runs too late on fresh clones)
+if [ -n "$_repo_root" ] && [ -f "$_repo_root/deploy.sh" ]; then
+  echo ""
+  echo "TIP: Use ./deploy.sh instead of 'dotter deploy' to ensure KCL generation"
+  echo "     runs before dotter reads the file list (required on fresh clones)."
+fi
+
 unset _cdir
