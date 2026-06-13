@@ -1,10 +1,10 @@
 ---
 id: TASK-13
 title: Migrate remaining configs and simple shell scripts to KCL
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-06-09 11:34'
-updated_date: '2026-06-13 20:12'
+updated_date: '2026-06-13 20:13'
 labels:
   - refactor
   - kcl
@@ -40,6 +40,12 @@ gitconfig, ghostty/config, and pnpm/rc are already KCL-generated.
 
 git/commit-template, lwc-lsp-wrapper.sh, prepare-commit-msg, and waybar/reload.sh are static files that don't require template variables; they remain in src/ and are deployed correctly.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Completed migration of remaining configs. gitconfig, ghostty/config, and pnpm/rc were already KCL-generated. Fixed waybar path in profiles.k (changed 'src/waybar' to 'waybar' since the directory is at root level). Static files (git/commit-template, lwc-lsp-wrapper.sh, prepare-commit-msg, waybar/reload.sh) remain in src/ as they don't require template variables. dotter deploy dry-run passes for all configs (only expected secret-injection diffs from post_deploy.sh).
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
