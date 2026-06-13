@@ -268,6 +268,11 @@ def _write_dotter_toml(cfg, out_path):
         for k, v in settings.items():
             lines.append(f"{k} = {_escape_toml_value(v)}")
         lines.append("")
+    else:
+        lines.append("[settings]")
+    # Add pre_deploy hook to ensure KCL generation runs before dotter reads files
+    lines.append('pre_deploy = ".dotter/pre_deploy.sh"')
+    lines.append("")
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines))

@@ -235,3 +235,5 @@ nu_prompt_normal_color = "blue_bold"
 
 [settings]
 default_target_type = "automatic"
+
+pre_deploy = ".dotter/pre_deploy.sh"
