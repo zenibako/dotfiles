@@ -151,7 +151,7 @@ work = _shared.Profile {
 linux = _shared.Profile {
     files = {
         "src/hypr" = "~/.config/hypr"
-        "waybar" = "~/.config/waybar"
+        "src/waybar" = "~/.config/waybar"
     }
     variables = {
         shell_bin_path = "/usr/bin"
