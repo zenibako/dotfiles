@@ -1,10 +1,10 @@
 ---
 id: TASK-12
 title: Migrate remaining static configs to KCL generation
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-06-09 02:05'
-updated_date: '2026-06-09 11:27'
+updated_date: '2026-06-13 20:13'
 labels:
   - refactor
   - kcl
