@@ -269,8 +269,17 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
   mcp_out=$(mktemp)
   mcp_err=$(mktemp)
 
-  if ! opencode mcp list > "$mcp_out" 2> "$mcp_err"; then
-    echo "WARNING: opencode mcp list command failed" >&2
+  # opencode mcp list can hang if the server is starting; add a 30s timeout
+  if command -v timeout >/dev/null 2>&1; then
+    _mcp_list_cmd="timeout 30 opencode mcp list"
+  elif command -v gtimeout >/dev/null 2>&1; then
+    _mcp_list_cmd="gtimeout 30 opencode mcp list"
+  else
+    _mcp_list_cmd="opencode mcp list"
+  fi
+
+  if ! eval "$_mcp_list_cmd" > "$mcp_out" 2> "$mcp_err"; then
+    echo "WARNING: opencode mcp list command failed or timed out" >&2
     if [ -s "$mcp_err" ]; then
       cat "$mcp_err" >&2
     fi
@@ -305,6 +314,7 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
 
     rm -f "$mcp_out" "$mcp_err"
   fi
+  unset _mcp_list_cmd
 fi
 
 # --- Lua validation ---
