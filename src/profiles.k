@@ -161,6 +161,7 @@ linux = _shared.Profile {
 mac = _shared.Profile {
     files = {
         "out/aerospace.toml" = "~/.aerospace.toml"
+        "src/gnupg/gpg-agent.conf" = "~/.gnupg/gpg-agent.conf"
     }
     variables = {
         shell_bin_path = "/opt/homebrew/bin"

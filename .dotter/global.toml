@@ -146,6 +146,7 @@ shell_bin_path = "/usr/bin"
 
 [mac.files]
 "out/aerospace.toml" = "~/.aerospace.toml"
+"src/gnupg/gpg-agent.conf" = "~/.gnupg/gpg-agent.conf"
 
 [mac.variables]
 shell_bin_path = "/opt/homebrew/bin"
