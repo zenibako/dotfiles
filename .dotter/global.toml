@@ -29,9 +29,9 @@
 "src/claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
 "src/claude-code/CLAUDE.md" = "~/.claude/CLAUDE.md"
 "out/claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
-"src/shared/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
-"src/shared/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
-"src/shared/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
+"src/agents/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
+"src/agents/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
+"src/agents/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }
 "src/claude-code/commands/review.md" = { target = "~/.claude/commands/review.md", type = "symbolic" }
 "src/claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
 "out/gitlogue/config.toml" = "~/.config/gitlogue/config.toml"
