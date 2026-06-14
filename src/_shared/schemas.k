@@ -122,9 +122,7 @@ schema AerospaceConfig:
     "key-mapping"?: {str: any}
     "gaps"?: {str: any}
     "on-window-detected"?: [any]
-    "mode-main-binding"?: {str: any}
-    "mode-service-binding"?: {str: any}
-    "mode-passthrough-binding"?: {str: any}
+    "mode"?: {str: any}
     "workspace-to-monitor-force-assignment"?: {str: any}
 
 schema OutputTextFile:
