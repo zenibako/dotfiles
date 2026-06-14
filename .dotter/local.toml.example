@@ -26,10 +26,10 @@ name = "Your Name"
 # Use your work email for work profile, personal email for personal profile
 email = "your@email.com"
 
-# GPG signing key for Jujutsu commits
-# Set to your GPG key ID (e.g., "ABCD1234EFGH5678" or "your.email@example.com")
-# Leave as empty string to disable GPG signing
-gpg_key = ""
+# GPG signing key for git + Jujutsu commits.
+# Defaults to the key baked into the `default` profile (src/profiles.k).
+# Uncomment to override on this machine, or set to "" to disable signing.
+# gpg_key = "ABCD1234EFGH5678"
 
 # Username for system paths (override based on your actual username)
 # username = "your-username"
