@@ -161,10 +161,11 @@ linux = _shared.Profile {
 mac = _shared.Profile {
     files = {
         "out/aerospace.toml" = "~/.aerospace.toml"
-        "src/gnupg/gpg-agent.conf" = "~/.gnupg/gpg-agent.conf"
+        "src/gnupg/gpg-agent.conf" = { target = "~/.gnupg/gpg-agent.conf", type = "template" }
     }
     variables = {
         shell_bin_path = "/opt/homebrew/bin"
+        gpg_pinentry_program = "/opt/homebrew/bin/pinentry-mac"
     }
 }
 

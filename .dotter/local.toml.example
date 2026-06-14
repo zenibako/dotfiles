@@ -31,6 +31,10 @@ email = "your@email.com"
 # Uncomment to override on this machine, or set to "" to disable signing.
 # gpg_key = "ABCD1234EFGH5678"
 
+# GPG pinentry program (macOS). Defaults to pinentry-mac (GUI dialog).
+# On a headless / SSH-only Mac, use the terminal pinentry instead:
+# gpg_pinentry_program = "/opt/homebrew/bin/pinentry-curses"
+
 # Username for system paths (override based on your actual username)
 # username = "your-username"
 
