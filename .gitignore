@@ -3,7 +3,7 @@
 node_modules/
 
 .dotter/local.toml
-.dotter/local.toml.bak
+.dotter/local.toml.bak*
 .dotter/.local.toml.real.bak
 .dotter/cache.toml
 .dotter/cache
