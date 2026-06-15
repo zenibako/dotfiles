@@ -26,12 +26,19 @@ _mcp_servers = [
         opencode = {
             "type" = "local"
             "command" = ["{{shell_bin_path}}/npx", "-y", "@modelcontextprotocol/server-github"]
-            "environment" = {"PATH" = _SHELL_PATH}
+            "environment" = {
+                "PATH" = _SHELL_PATH
+                "GITHUB_PERSONAL_ACCESS_TOKEN" = "{{github_personal_access_token}}"
+            }
             "enabled" = True
         }
         claude = {
             "command" = "{{shell_bin_path}}/npx"
             "args" = ["-y", "@modelcontextprotocol/server-github"]
+            "env" = {
+                "GITHUB_PERSONAL_ACCESS_TOKEN" = "{{github_personal_access_token}}"
+                "PATH" = _SHELL_PATH
+            }
         }
     }
     {

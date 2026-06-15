@@ -270,7 +270,11 @@ _json_parts = [
         "-y",
         "@modelcontextprotocol/server-github"
       ],
-      "command": "{{shell_bin_path}}/npx"
+      "command": "{{shell_bin_path}}/npx",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_personal_access_token}}",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
     },
     "Jujutsu": {
       "args": [
