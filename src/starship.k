@@ -10,6 +10,11 @@ _starship_format = _dollar + "username" + _dollar + "hostname" + _dollar + "loca
 
 _starship_right = _dollar + "shell"
 
+# Salesforce default target-org, read straight from the config JSON (fast —
+# invoking the `sf` CLI has slow Node startup and times out the prompt). Walks
+# up to the project's .sf/config.json, then falls back to global ~/.sf/config.json.
+_sf_read = "d=$PWD; while [ \"$d\" != / ] && [ ! -f \"$d/.sf/config.json\" ]; do d=$(dirname \"$d\"); done; { jq -r '.\"target-org\" // empty' \"$d/.sf/config.json\"; jq -r '.\"target-org\" // empty' ~/.sf/config.json; } 2>/dev/null"
+
 # ── Starship config ──────────────────────────────────────────────────
 starship = _shared.StarshipConfig {
     add_newline = True
@@ -25,8 +30,8 @@ starship = _shared.StarshipConfig {
     custom = {
         sf = {
             description = "The target org used by default for Salesforce CLI commands"
-            command = "sf config get target-org --json | from json | get result.value.0"
-            when = "sf config get target-org --json | from json | get result.value"
+            command = _sf_read + " | grep -m1 ."
+            when = _sf_read + " | grep -qm1 ."
             format = "via [$symbol ($output)]($style) "
             style = "bold 039"
             symbol = "󰢎"
