@@ -10,10 +10,12 @@ _starship_format = _dollar + "username" + _dollar + "hostname" + _dollar + "loca
 
 _starship_right = _dollar + "shell"
 
-# Salesforce default target-org, read straight from the config JSON (fast —
+# Salesforce default target-org, read straight from config JSON (fast —
 # invoking the `sf` CLI has slow Node startup and times out the prompt). Walks
-# up to the project's .sf/config.json, then falls back to global ~/.sf/config.json.
-_sf_read = "d=$PWD; while [ \"$d\" != / ] && [ ! -f \"$d/.sf/config.json\" ]; do d=$(dirname \"$d\"); done; { jq -r '.\"target-org\" // empty' \"$d/.sf/config.json\"; jq -r '.\"target-org\" // empty' ~/.sf/config.json; } 2>/dev/null"
+# up to the project root (sfdx-project.json), then reads the modern
+# .sf/config.json (target-org) and the legacy .sfdx/sfdx-config.json
+# (target-org / defaultusername) — project first, then the global equivalents.
+_sf_read = "d=$PWD; while [ \"$d\" != / ] && [ ! -f \"$d/sfdx-project.json\" ]; do d=$(dirname \"$d\"); done; { jq -r '.\"target-org\" // empty' \"$d/.sf/config.json\"; jq -r '.\"target-org\" // .defaultusername // empty' \"$d/.sfdx/sfdx-config.json\"; jq -r '.\"target-org\" // empty' ~/.sf/config.json; jq -r '.\"target-org\" // .defaultusername // empty' ~/.sfdx/sfdx-config.json; } 2>/dev/null"
 
 # ── Starship config ──────────────────────────────────────────────────
 starship = _shared.StarshipConfig {
