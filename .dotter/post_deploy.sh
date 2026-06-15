@@ -13,6 +13,16 @@ fi
 
 _scripts="$_dotfiles/.dotter/scripts"
 
+# Prefer a project virtualenv python over the bare `python3` (matches pre_deploy.sh).
+# On some machines `python3` resolves to a broken pyenv shim that aborts at startup;
+# the repo venv has a working interpreter with the deps these scripts need.
+PYTHON="python3"
+if [ -f "$_dotfiles/.venv/bin/python3" ]; then
+  PYTHON="$_dotfiles/.venv/bin/python3"
+elif [ -f "$_dotfiles/venv/bin/python3" ]; then
+  PYTHON="$_dotfiles/venv/bin/python3"
+fi
+
 # Symlink shared commands into OpenCode (dotter can't map one source to two targets,
 # so we point opencode at the already-deployed ~/.claude/commands/ symlinks)
 _oc_cmd="$HOME/.config/opencode/command"
@@ -26,8 +36,8 @@ unset _oc_cmd _cmd
 if [ -n "$_dotfiles" ]; then
   _claude_app="$HOME/Library/Application Support/Claude"
   _ops_file="$_claude_app/cowork-enabled-cli-ops.json"
-  if [ -f "$_ops_file" ] && command -v python3 >/dev/null 2>&1; then
-    _account_id=$(python3 -c "
+  if [ -f "$_ops_file" ] && command -v "$PYTHON" >/dev/null 2>&1; then
+    _account_id=$("$PYTHON" -c "
 import json, sys
 try:
     print(json.load(open('$_ops_file'))['ownerAccountId'])
@@ -50,7 +60,7 @@ except Exception:
         cp "$_sd/SKILL.md" "$_skills_dir/$_sname/SKILL.md"
         echo "  Copied skill: $_sname"
       done
-      python3 "$_scripts/deploy_skills.py" "$_manifest" "$_dotfiles/src/claude-desktop/skills"
+      "$PYTHON" "$_scripts/deploy_skills.py" "$_manifest" "$_dotfiles/src/claude-desktop/skills"
     fi
   fi
   unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
@@ -165,7 +175,7 @@ _inject_github_token() {
   local token
   token=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") || return
   echo "  Injecting GitHub token into $(basename "$config_file")..."
-  python3 -c "
+  "$PYTHON" -c "
 import json, sys
 cfg_path = '$config_file'
 with open(cfg_path, 'r') as f:
@@ -192,7 +202,7 @@ if _ensure_secret_cache; then
 
   # --- OpenCode MCP config (JSONC with comments) ---
   _opencode_config="$HOME/.config/opencode/opencode.jsonc"
-  if [ -f "$_opencode_config" ] && command -v python3 >/dev/null 2>&1; then
+  if [ -f "$_opencode_config" ] && command -v "$PYTHON" >/dev/null 2>&1; then
     _patch_args=""
     _tok=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") && _patch_args="$_patch_args --github-token $_tok"
     _tok=$(_lookup_secret "GITLAB_TOKEN") && _patch_args="$_patch_args --gitlab-token $_tok"
@@ -202,7 +212,7 @@ if _ensure_secret_cache; then
     _tok=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") && _patch_args="$_patch_args --obsidian-token $_tok"
     if [ -n "$_patch_args" ]; then
       echo "  Patching OpenCode MCP config..."
-      python3 "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || echo "  WARNING: Failed to patch OpenCode config"
+      "$PYTHON" "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || echo "  WARNING: Failed to patch OpenCode config"
     fi
     unset _patch_args _tok
   fi
