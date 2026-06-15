@@ -83,14 +83,15 @@ _mcp_servers = [
     }
     {
         name = "Obsidian"
-        # Conditional: only when mcp_obsidian_enabled
+        # Local REST API plugin's built-in MCP endpoint (streamable HTTP).
+        # url + token come from local.toml (mac-mini's vault host + API key).
         opencode = {
             "type" = "remote"
             "url" = "{{mcp_obsidian_url}}"
             "headers" = {
                 "Authorization" = "Bearer {{mcp_obsidian_token}}"
             }
-            "enabled" = False
+            "enabled" = True
         }
         claude = {
             "command" = "{{shell_bin_path}}/npx"
