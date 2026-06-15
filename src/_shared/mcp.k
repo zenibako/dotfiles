@@ -23,22 +23,18 @@ _mcp_servers = [
     }
     {
         name = "GitHub"
+        # Remote GitHub MCP server with OAuth — no token stored in config.
+        # Claude (first-party) authenticates automatically; opencode may need
+        # `opencode mcp auth GitHub` (GitHub doesn't support Dynamic Client
+        # Registration, so opencode's auto-OAuth can 422 — see README notes).
         opencode = {
-            "type" = "local"
-            "command" = ["{{shell_bin_path}}/npx", "-y", "@modelcontextprotocol/server-github"]
-            "environment" = {
-                "PATH" = _SHELL_PATH
-                "GITHUB_PERSONAL_ACCESS_TOKEN" = "{{github_personal_access_token}}"
-            }
+            "type" = "remote"
+            "url" = "https://api.githubcopilot.com/mcp/"
             "enabled" = True
         }
         claude = {
-            "command" = "{{shell_bin_path}}/npx"
-            "args" = ["-y", "@modelcontextprotocol/server-github"]
-            "env" = {
-                "GITHUB_PERSONAL_ACCESS_TOKEN" = "{{github_personal_access_token}}"
-                "PATH" = _SHELL_PATH
-            }
+            "type" = "http"
+            "url" = "https://api.githubcopilot.com/mcp/"
         }
     }
     {
