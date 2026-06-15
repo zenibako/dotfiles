@@ -23,13 +23,17 @@ _mcp_servers = [
     }
     {
         name = "GitHub"
-        # Remote GitHub MCP server with OAuth — no token stored in config.
-        # Claude (first-party) authenticates automatically; opencode may need
-        # `opencode mcp auth GitHub` (GitHub doesn't support Dynamic Client
-        # Registration, so opencode's auto-OAuth can 422 — see README notes).
+        # Remote GitHub MCP server. Claude Code/Desktop are first-party OAuth
+        # clients, so they authenticate automatically with no token in config.
+        # opencode can't OAuth here (GitHub doesn't support Dynamic Client
+        # Registration), so it uses a PAT bearer header sourced from local.toml
+        # (Proton Pass), like the Home Assistant server.
         opencode = {
             "type" = "remote"
             "url" = "https://api.githubcopilot.com/mcp/"
+            "headers" = {
+                "Authorization" = "Bearer {{github_personal_access_token}}"
+            }
             "enabled" = True
         }
         claude = {
