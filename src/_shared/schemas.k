@@ -46,6 +46,8 @@ schema EnvSection:
 
 schema EnvConfig:
     editor?: str
+    visual?: str
+    manpager?: str
     xdg_config_home?: str
     venv_home?: str
     nvm_dir?: str

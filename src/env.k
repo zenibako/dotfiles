@@ -44,6 +44,8 @@ _personal_section = _shared.EnvSection {
 
 env = _shared.EnvConfig {
     editor = "nvim"
+    visual = "nvim"
+    manpager = "nvim +Man!"
     xdg_config_home = "$HOME/.config"
     venv_home = "$HOME/.virtualenvs"
     nvm_dir = "$HOME/.nvm"

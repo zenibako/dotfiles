@@ -103,7 +103,7 @@ def _write_env_toml(env_meta):
     lines.append("[env]")
 
     # Core env vars — filter metadata and path sections
-    skip = ("_", "profile_work", "profile_personal", "path_prepend", "path_append", "sections", "editor")
+    skip = ("_", "profile_work", "profile_personal", "path_prepend", "path_append", "sections")
     for key, val in sorted(core_env.items()):
         if key.startswith("_") or key in skip:
             continue
