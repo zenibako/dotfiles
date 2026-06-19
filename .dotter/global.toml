@@ -36,6 +36,8 @@
 "src/claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
 "out/gitlogue/config.toml" = "~/.config/gitlogue/config.toml"
 "src/agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
+"out/kiro/mcp.json" = { target = "~/.kiro/settings/mcp.json", type = "template" }
+"src/kiro/steering" = { target = "~/.kiro/steering", type = "symbolic" }
 
 [default.variables]
 name = ""

@@ -120,8 +120,10 @@ _mcp_servers = [
             "url" = "https://mcp.atlassian.com/v1/mcp"
             "enabled" = False
         }
-        # Not available in Claude Desktop
-        claude = None
+        claude = {
+            "type" = "http"
+            "url" = "https://mcp.atlassian.com/v1/mcp"
+        }
     }
     {
         name = "Postman"
@@ -206,8 +208,10 @@ _mcp_servers = [
             "url" = "{{gitlab_url}}/api/v4/mcp"
             "enabled" = False
         }
-        # Not available in Claude Desktop
-        claude = None
+        claude = {
+            "type" = "http"
+            "url" = "{{gitlab_url}}/api/v4/mcp"
+        }
     }
 ]
 

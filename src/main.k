@@ -18,8 +18,12 @@ import pnpm
 import opencode_config
 import claude
 import claude_code
+import kiro_config as kiro_mod
 import zshenv
 import gitconfig
+
+# Force side-effect evaluation of modules with file.write
+_kiro_eval = kiro_mod.kiro_config
 
 # ── Assemble config data ──────────────────────────────────────────────
 config = _shared.ConfigMap {
