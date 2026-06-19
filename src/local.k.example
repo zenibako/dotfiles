@@ -1,0 +1,30 @@
+# Local machine-specific overrides — NOT committed (gitignored).
+# Copy to local.k and fill in your values:
+#   cp src/local.k.example src/local.k
+
+packages = ["personal", "mac", "tokyonight"]
+
+variables = {
+    name = ""
+    email = ""
+    username = "chanderson"
+    shell_bin_path = "/opt/homebrew/bin"
+    apex_lsp_jar_path = ""
+    gitlab_personal_access_token = ""
+    gitlab_api_url = ""
+    gitlab_url = ""
+    mcp_atlassian_enabled = False
+    opencode_build_agent_model = ""
+    opencode_plan_agent_model = ""
+    node_extra_ca_certs = ""
+    sonarqube_token = ""
+    sonarqube_url = ""
+    gpg_key = ""
+    claude_remote_tools_device_name = ""
+    claude_model = "opus"
+    claude_effort_level = "high"
+    claude_effort_level_enabled = False
+    claude_plugin_clangd_lsp = False
+    claude_plugin_pyright_lsp = False
+    kiro_enabled = False
+}

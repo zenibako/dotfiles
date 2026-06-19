@@ -2,6 +2,7 @@
 
 node_modules/
 
+src/local.k
 .dotter/local.toml
 .dotter/local.toml.bak*
 .dotter/.local.toml.real.bak

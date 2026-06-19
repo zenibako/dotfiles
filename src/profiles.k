@@ -40,6 +40,8 @@ default = _shared.Profile {
         "src/claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
         "out/gitlogue/config.toml" = "~/.config/gitlogue/config.toml"
         "src/agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
+        "out/kiro/mcp.json" = { target = "~/.kiro/settings/mcp.json", type = "template" }
+        "src/kiro/steering" = { target = "~/.kiro/steering", type = "symbolic" }
     }
     variables = {
         name = ""
@@ -62,6 +64,7 @@ default = _shared.Profile {
         claude_plugin_extra_lsps = True
         claude_model_at_top = True
         claude_plugin_clangd_lsp = False
+        kiro_enabled = False
         mcp_obsidian_enabled = False
         mcp_obsidian_url = ""
         mcp_obsidian_token = ""
