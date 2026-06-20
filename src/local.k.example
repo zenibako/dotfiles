@@ -10,6 +10,7 @@ variables = {
     username = "chanderson"
     shell_bin_path = "/opt/homebrew/bin"
     apex_lsp_jar_path = ""
+    github_personal_access_token = ""
     gitlab_personal_access_token = ""
     gitlab_api_url = ""
     gitlab_url = ""

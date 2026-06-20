@@ -26,14 +26,13 @@ _mcp_servers = [
         # Remote GitHub MCP server. Claude Code/Desktop are first-party OAuth
         # clients, so they authenticate automatically with no token in config.
         # opencode can't OAuth here (GitHub doesn't support Dynamic Client
-        # Registration), so it uses a PAT bearer header sourced from local.toml
-        # (Proton Pass), like the Home Assistant server.
+        # Registration), so it uses a PAT bearer header injected by
+        # patch_opencode_secrets.py at post-deploy time.
+        # NOTE: Do NOT set a blank Authorization header here — opencode sends
+        # it as-is, resulting in "Authorization header is badly formatted".
         opencode = {
             "type" = "remote"
             "url" = "https://api.githubcopilot.com/mcp/"
-            "headers" = {
-                "Authorization" = "Bearer {{github_personal_access_token}}"
-            }
             "enabled" = True
         }
         claude = {
@@ -84,13 +83,10 @@ _mcp_servers = [
     {
         name = "Obsidian"
         # Local REST API plugin's built-in MCP endpoint (streamable HTTP).
-        # url + token come from local.toml (mac-mini's vault host + API key).
+        # url + token injected by patch_opencode_secrets.py at post-deploy.
         opencode = {
             "type" = "remote"
             "url" = "{{mcp_obsidian_url}}"
-            "headers" = {
-                "Authorization" = "Bearer {{mcp_obsidian_token}}"
-            }
             "enabled" = True
         }
         claude = {
@@ -179,12 +175,10 @@ _mcp_servers = [
     }
     {
         name = "Home Assistant"
+        # Token injected by patch_opencode_secrets.py at post-deploy.
         opencode = {
             "type" = "remote"
             "url" = "{{home_assistant_url}}/api/mcp"
-            "headers" = {
-                "Authorization" = "Bearer {{home_assistant_token}}"
-            }
             "enabled" = False
         }
         # Not available in Claude Desktop

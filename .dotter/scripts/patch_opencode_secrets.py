@@ -93,14 +93,13 @@ def main() -> int:
 
     modified = False
 
-    # --- GitHub MCP: inject env token ---
+    # --- GitHub MCP: inject header token ---
     if args.github_token:
         mcp = cfg.get("mcp", {})
         gh = mcp.get("GitHub")
         if gh and isinstance(gh, dict):
-            env = gh.setdefault("environment", {})
-            env["GITHUB_PERSONAL_ACCESS_TOKEN"] = args.github_token
-            env.setdefault("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")
+            headers = gh.setdefault("headers", {})
+            headers["Authorization"] = f"Bearer {args.github_token}"
             modified = True
             print("  Patched GitHub MCP token")
 
