@@ -13,9 +13,6 @@ src/local.k
 # Deployed config directory (dotter output)
 .config/
 
-# KCL build artifacts
-generated/
-
 # Generated config files (rebuilt by KCL + Python on every deploy)
 out/
 

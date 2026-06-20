@@ -1,0 +1,973 @@
+{
+  "dotter": {
+    "default": {
+      "files": {
+        "out/gitconfig": {
+          "target": "~/.config/git/dotter-gitconfig",
+          "type": "template"
+        },
+        "git/commit-template": "~/.git-commit-template",
+        "git/hooks/prepare-commit-msg": {
+          "target": "~/.config/git/hooks/prepare-commit-msg",
+          "type": "template"
+        },
+        "out/shared/env.toml": {
+          "target": "~/.config/shared/env.toml",
+          "type": "template"
+        },
+        "out/shared/completions.toml": "~/.config/shared/completions.toml",
+        "src/atuin/bin": "~/.atuin/bin",
+        "out/atuin/config.toml": "~/.config/atuin/config.toml",
+        "out/iamb/config.toml": "~/.config/iamb/config.toml",
+        "out/pnpm/rc": "~/.config/pnpm/rc",
+        "out/tmux.conf": {
+          "target": "~/.tmux.conf",
+          "type": "template"
+        },
+        "zshenv": {
+          "target": "~/.zshenv",
+          "type": "template"
+        },
+        "zshrc": {
+          "target": "~/.zshrc",
+          "type": "template"
+        },
+        "carapace": "~/.config/carapace",
+        "src/ghostty/shaders": {
+          "target": "~/.config/ghostty/shaders",
+          "type": "symbolic"
+        },
+        "out/ghostty/config": {
+          "target": "~/.config/ghostty/config",
+          "type": "template"
+        },
+        "nushell": {
+          "target": "~/.config/nushell",
+          "type": "template"
+        },
+        "out/starship.toml": "~/.config/starship.toml",
+        "out/jj/config.toml": {
+          "target": "~/.config/jj/config.toml",
+          "type": "template"
+        },
+        "nvim/default": {
+          "target": "~/.config/nvim",
+          "type": "template"
+        },
+        "opencode/.gitignore": {
+          "target": "~/.config/opencode/.gitignore",
+          "type": "symbolic"
+        },
+        "opencode/AGENTS.md": {
+          "target": "~/.config/opencode/AGENTS.md",
+          "type": "symbolic"
+        },
+        "opencode/command/review.md": {
+          "target": "~/.config/opencode/command/review.md",
+          "type": "symbolic"
+        },
+        "opencode/prompt": {
+          "target": "~/.config/opencode/prompt",
+          "type": "symbolic"
+        },
+        "opencode/opencode.jsonc": {
+          "target": "~/.config/opencode/opencode.jsonc",
+          "type": "template"
+        },
+        "opencode/script": {
+          "target": "~/.config/opencode/script",
+          "type": "symbolic"
+        },
+        "claude-desktop": {
+          "target": "~/Library/Application Support/Claude",
+          "type": "template"
+        },
+        "claude-code/CLAUDE.md": {
+          "target": "~/.claude/CLAUDE.md",
+          "type": "template"
+        },
+        "claude-code/settings.json": {
+          "target": "~/.claude/settings.json",
+          "type": "template"
+        },
+        "shared/commands/go.md": {
+          "target": "~/.claude/commands/go.md",
+          "type": "symbolic"
+        },
+        "shared/commands/fix-pipeline.md": {
+          "target": "~/.claude/commands/fix-pipeline.md",
+          "type": "symbolic"
+        },
+        "shared/commands/coderabbit-review.md": {
+          "target": "~/.claude/commands/coderabbit-review.md",
+          "type": "symbolic"
+        },
+        "claude-code/commands/review.md": {
+          "target": "~/.claude/commands/review.md",
+          "type": "symbolic"
+        },
+        "claude-code/commands/jj-fix-conflicts.md": {
+          "target": "~/.claude/commands/jj-fix-conflicts.md",
+          "type": "symbolic"
+        },
+        "out/gitlogue/config.toml": "~/.config/gitlogue/config.toml",
+        "agents/skills": {
+          "target": "~/.agents/skills",
+          "type": "symbolic"
+        }
+      },
+      "variables": {
+        "name": "",
+        "email": "",
+        "username": "chanderson",
+        "vim_set_num_relnum": "set number relativenumber",
+        "gpg_key": "",
+        "github_personal_access_token": "",
+        "gitea_url": "",
+        "gitea_token": "",
+        "home_assistant_url": "",
+        "home_assistant_token": "",
+        "home_assistant_webhook_id": "",
+        "playdate_sdk_enabled": false,
+        "bartender_hooks_enabled": false,
+        "claude_remote_tools_device_name": "mac-mini",
+        "claude_model": "opus",
+        "claude_effort_level": "high",
+        "claude_plugin_pyright_lsp": false,
+        "claude_plugin_extra_lsps": true,
+        "claude_model_at_top": true,
+        "claude_plugin_clangd_lsp": false,
+        "mcp_obsidian_enabled": false,
+        "mcp_obsidian_url": "",
+        "mcp_obsidian_token": "",
+        "bluesky_handle": "",
+        "bluesky_app_password": "",
+        "plex_user_token": "",
+        "plex_server_token": "",
+        "plex_url": "",
+        "tmdb_key": "",
+        "youtube_api_key": "",
+        "google_places_api_key": "",
+        "slack_d_cookie": "",
+        "slack_token": "",
+        "reddit_session": "",
+        "reddit_token_v2": "",
+        "brave_search_api_key": "",
+        "proton_user": "",
+        "proton_password": "",
+        "telegram_bot_token": ""
+      }
+    },
+    "personal": {
+      "depends": [
+        "default"
+      ],
+      "files": {
+        "nvim/personal": {
+          "target": "~/.config/nvim",
+          "type": "template"
+        }
+      },
+      "variables": {
+        "opencode_profile_personal": true,
+        "mcp_coderabbit": false,
+        "mcp_home_assistant_enabled": false,
+        "mcp_netlify": true,
+        "opencode_build_agent_model": "ollama-cloud/kimi-k2.6:cloud",
+        "opencode_plan_agent_model": "ollama-cloud/gemma4:31b",
+        "opencode_test_agent_model": "ollama-cloud/glm-5.1",
+        "opencode_review_agent_model": "ollama-cloud/glm-5.1",
+        "claude_agent_push_notif_enabled": true,
+        "claude_bypass_permissions_account_id": "c5055d6d-b6e9-46de-a26f-0dad4c6255fc",
+        "claude_bypass_permissions_value": true,
+        "claude_bypass_permissions_extras_enabled": true,
+        "claude_cowork_scheduled_tasks_enabled": true,
+        "claude_epitaxy_personal_prefs_enabled": true,
+        "claude_effort_level_enabled": true
+      }
+    },
+    "work": {
+      "depends": [
+        "default"
+      ],
+      "files": {
+        "nvim/work": {
+          "target": "~/.config/nvim",
+          "type": "template"
+        },
+        "opencode/plugin/slack-workflow.ts": {
+          "target": "~/.config/opencode/plugin/slack-workflow.ts",
+          "type": "template"
+        },
+        "opencode/script/lwc-lsp-wrapper.sh": {
+          "target": "~/.config/opencode/script/lwc-lsp-wrapper.sh",
+          "type": "symbolic"
+        }
+      },
+      "variables": {
+        "opencode_profile_work": true,
+        "mcp_salesforce_dx_enabled": false,
+        "mcp_atlassian_enabled": false,
+        "mcp_odaseva_enabled": false,
+        "mcp_postman_enabled": true,
+        "mcp_sonarqube_enabled": true,
+        "postman_api_key": "",
+        "sonarqube_url": "",
+        "sonarqube_token": "",
+        "gitlab_personal_access_token": "",
+        "gitlab_api_url": "https://gitlab.com/api/v4",
+        "gitlab_url": "",
+        "opencode_slack_webhook_url": "",
+        "opencode_build_agent_model": "openai/gpt-5.4",
+        "opencode_plan_agent_model": "openai/gpt-5.4",
+        "opencode_test_agent_model": "openai/gpt-5.4",
+        "opencode_review_agent_model": "openai/gpt-5.4",
+        "node_extra_ca_certs": "",
+        "p10k_root_dir": "",
+        "claude_agent_push_notif_enabled": false,
+        "claude_bypass_permissions_account_id": "cc63eabd-b672-4570-871a-fd0d4607e75d",
+        "claude_bypass_permissions_value": false,
+        "claude_bypass_permissions_extras_enabled": false,
+        "claude_cowork_scheduled_tasks_enabled": false,
+        "claude_epitaxy_personal_prefs_enabled": false,
+        "claude_effort_level_enabled": false
+      }
+    },
+    "linux": {
+      "files": {
+        "hypr": "~/.config/hypr"
+      },
+      "variables": {
+        "shell_bin_path": "/usr/bin"
+      }
+    },
+    "mac": {
+      "files": {
+        "out/aerospace.toml": "~/.aerospace.toml"
+      },
+      "variables": {
+        "shell_bin_path": "/opt/homebrew/bin"
+      }
+    },
+    "oda_mcp": {},
+    "themes": {
+      "monokai": {
+        "ghostty_theme": "Monokai Pro",
+        "ghostty_unfocused_split_fill": "#221f22",
+        "ghostty_split_divider_color": "#727072",
+        "nvim_colorscheme_plugin": "sainnhe/sonokai",
+        "nvim_colorscheme_config": "      vim.g.sonokai_enable_italic = true\n      vim.g.sonokai_transparent_background = 1\n      vim.cmd.colorscheme('sonokai')",
+        "nvim_lualine_theme": "sonokai",
+        "tmux_theme_plugin": "zenibako/tmux-monokai-pro",
+        "tmux_theme_config": "\n# Monokai theme configuration\nset -g @monokai-plugins 'time battery cpu-usage ram-usage'\nset -g @monokai-show-powerline true\nset -g @monokai-show-left-sep ''\nset -g @monokai-show-right-sep ''\n",
+        "nu_prompt_insert_color": "green_bold",
+        "nu_prompt_normal_color": "yellow_bold"
+      },
+      "nightowl": {
+        "ghostty_theme": "Night Owl",
+        "ghostty_unfocused_split_fill": "#011627",
+        "ghostty_split_divider_color": "#5f7e97",
+        "nvim_colorscheme_plugin": "oxfist/night-owl.nvim",
+        "nvim_colorscheme_config": "      require('night-owl').setup()\n      vim.cmd.colorscheme('night-owl')",
+        "nvim_lualine_theme": "night-owl",
+        "tmux_theme_plugin": "kylepeeler/tmux-nightowl",
+        "tmux_theme_config": "\n# Nightowl theme configuration\nset -g @nightowl-show-powerline true\nset -g @nightowl-show-left-icon session\nset -g @nightowl-show-left-sep ''\nset -g @nightowl-show-right-sep ''\nset -g @nightowl-military-time false\nset -g @nightowl-cpu-usage true\nset -g @nightowl-ram-usage true\nset -g @nightowl-show-timezone true\nset -g @nightowl-border-contrast true\n",
+        "nu_prompt_insert_color": "light_blue_bold",
+        "nu_prompt_normal_color": "light_purple_bold"
+      },
+      "tokyonight": {
+        "ghostty_theme": "TokyoNight Night",
+        "ghostty_unfocused_split_fill": "#1a1b26",
+        "ghostty_split_divider_color": "#283457",
+        "nvim_colorscheme_plugin": "folke/tokyonight.nvim",
+        "nvim_colorscheme_config": "      require('tokyonight').setup({\n        style = 'night',\n        transparent = true,\n        terminal_colors = true,\n        styles = {\n          comments = { italic = true },\n          keywords = { italic = true },\n          sidebars = 'transparent',\n          floats = 'transparent',\n        },\n      })\n      vim.cmd.colorscheme('tokyonight')",
+        "nvim_lualine_theme": "tokyonight",
+        "tmux_theme_plugin": "janoamaral/tokyo-night-tmux",
+        "tmux_theme_config": "\n# Tokyo Night theme configuration\nset -g @tokyo-night-tmux_theme night\nset -g @tokyo-night-tmux_transparent 0\nset -g @tokyo-night-tmux_window_id_style fsquare\nset -g @tokyo-night-tmux_pane_id_style hsquare\nset -g @tokyo-night-tmux_zoom_id_style dsquare\nset -g @tokyo-night-tmux_show_datetime 1\nset -g @tokyo-night-tmux_date_format MYD\nset -g @tokyo-night-tmux_time_format 12H\nset -g @tokyo-night-tmux_show_path 1\nset -g @tokyo-night-tmux_path_format relative\nset -g @tokyo-night-tmux_show_battery_widget 0\nset -g @tokyo-night-tmux_show_netspeed 0\nset -g @tokyo-night-tmux_show_music 0\nset -g @tokyo-night-tmux_show_hostname 0\n",
+        "nu_prompt_insert_color": "cyan_bold",
+        "nu_prompt_normal_color": "blue_bold"
+      }
+    },
+    "packages": {
+      "fedora": [
+        "fzf",
+        "fd-find",
+        "ripgrep",
+        "zsh",
+        "tmux",
+        "git",
+        "gh",
+        "jq",
+        "curl",
+        "wget",
+        "snapd",
+        "golang",
+        "cargo"
+      ],
+      "brew_taps": [
+        "atlassian/acli",
+        "borkdude/brew",
+        "hashicorp/tap",
+        "browsh-org/browsh",
+        "clojure/tools",
+        "gcenx/wine",
+        "jichu4n/palm-os",
+        "jonathanruiz/tap",
+        "koekeishiya/formulae",
+        "rsteube/tap",
+        "sst/tap",
+        "valkyrie00/bbrew",
+        "zerotier/tap",
+        "vladkens/tap"
+      ],
+      "brew_formulae": [
+        "xz",
+        "autoconf",
+        "automake",
+        "openssl@3",
+        "readline",
+        "node",
+        "aws-cdk",
+        "acli",
+        "glib",
+        "bison",
+        "carapace",
+        "cmake",
+        "coreutils",
+        "cryptography",
+        "curl",
+        "docker",
+        "docker-buildx",
+        "docker-credential-helper",
+        "dotter",
+        "enchant",
+        "fastfetch",
+        "fd",
+        "gnutls",
+        "harfbuzz",
+        "pango",
+        "ffmpeg",
+        "fswatch",
+        "fzf",
+        "isl",
+        "gcc",
+        "gh",
+        "git",
+        "git-extras",
+        "glab",
+        "go",
+        "gopls",
+        "netpbm",
+        "graphviz",
+        "mermaid-cli",
+        "grep",
+        "homeassistant-cli",
+        "htop",
+        "hunspell",
+        "icu4c@76",
+        "imagemagick",
+        "openjdk",
+        "jdtls",
+        "jj",
+        "openjdk@21",
+        "jmeter",
+        "jq",
+        "libffi",
+        "libolm",
+        "libyaml",
+        "lua",
+        "lua-language-server",
+        "vscode-langservers-extracted",
+        "yaml-language-server",
+        "typescript-language-server",
+        "cue",
+        "starlark-rust",
+        "luarocks",
+        "make",
+        "maven",
+        "mosh",
+        "neovim",
+        "nghttp2",
+        "nushell",
+        "ollama",
+        "pandoc",
+        "pipx",
+        "pkl",
+        "pkl-lsp",
+        "pmd",
+        "pnpm",
+        "postgresql@14",
+        "prettier",
+        "protobuf",
+        "pyenv",
+        "python-yq",
+        "python@3.13",
+        "ripgrep",
+        "ruby",
+        "ruby-install",
+        "rust",
+        "sesh",
+        "sf",
+        "sonar-scanner",
+        "starship",
+        "stylua",
+        "termscp",
+        "terraform",
+        "hashicorp/tap/terraform-ls",
+        "tmux",
+        "tree-sitter",
+        "weechat",
+        "wget",
+        "xq",
+        "yarn",
+        "yt-dlp",
+        "zlib",
+        "zoxide",
+        "zsh",
+        "zsh-autosuggestions",
+        "zsh-completions",
+        "borkdude/brew/babashka",
+        "browsh-org/browsh/browsh",
+        "clojure/tools/clojure",
+        "jichu4n/palm-os/pilot-link",
+        "vladkens/tap/macmon",
+        "jonathanruiz/tap/wakey",
+        "rsteube/tap/carapace-spec",
+        "sst/tap/opencode",
+        "valkyrie00/bbrew/bbrew"
+      ],
+      "brew_casks": [
+        "android-commandlinetools",
+        "android-platform-tools",
+        "font-hack-nerd-font",
+        "geekbench",
+        "ghostty",
+        "gpg-suite",
+        "mitmproxy",
+        "quakenotch",
+        "salesforce-cli",
+        "temurin",
+        "visual-studio-code",
+        "zap",
+        "zerotier-one"
+      ],
+      "vscode_extensions": [
+        "alefragnani.project-manager",
+        "amiralizadeh9480.cpp-helper",
+        "astro-build.astro-vscode",
+        "augustocdias.tasks-shell-input",
+        "christian-kohler.npm-intellisense",
+        "chrmarti.network-proxy-test",
+        "chuckjonas.apex-pmd",
+        "codezombiech.gitignore",
+        "compulim.vscode-mocha",
+        "cpylua.language-postcss",
+        "cspotcode.vscode-mocha-latte",
+        "dbaeumer.vscode-eslint",
+        "docker.docker",
+        "donjayamanne.githistory",
+        "esbenp.prettier-vscode",
+        "financialforce.lana",
+        "github.copilot",
+        "github.copilot-chat",
+        "juanblanco.solidity",
+        "kendoui.kendotemplatewizard",
+        "linhmtran168.mac-ca-vscode",
+        "marus25.cortex-debug",
+        "mcu-debug.debug-tracker-vscode",
+        "mcu-debug.memory-view",
+        "mcu-debug.peripheral-viewer",
+        "mcu-debug.rtos-views",
+        "midouest.playdate-debug",
+        "ms-azuretools.vscode-containers",
+        "ms-azuretools.vscode-docker",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "ms-python.black-formatter",
+        "ms-python.debugpy",
+        "ms-python.isort",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+        "ms-toolsai.vscode-jupyter-cell-tags",
+        "ms-toolsai.vscode-jupyter-slideshow",
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cpptools-themes",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.remote-explorer",
+        "ms-vscode.remote-server",
+        "nomicfoundation.hardhat-solidity",
+        "orta.vscode-jest",
+        "piersdeseilligny.betterfountain",
+        "redhat.vscode-xml",
+        "salesforce.salesforce-vscode-slds",
+        "salesforce.salesforcedx-einstein-gpt",
+        "salesforce.salesforcedx-vscode",
+        "salesforce.salesforcedx-vscode-apex",
+        "salesforce.salesforcedx-vscode-apex-debugger",
+        "salesforce.salesforcedx-vscode-apex-replay-debugger",
+        "salesforce.salesforcedx-vscode-core",
+        "salesforce.salesforcedx-vscode-expanded",
+        "salesforce.salesforcedx-vscode-lightning",
+        "salesforce.salesforcedx-vscode-lwc",
+        "salesforce.salesforcedx-vscode-soql",
+        "salesforce.salesforcedx-vscode-visualforce",
+        "salesforce.sfdx-code-analyzer-vscode",
+        "sumneko.lua",
+        "twxs.cmake",
+        "vscodevim.vscode-vim",
+        "vue.volar",
+        "ziyasal.vscode-open-in-github",
+        "zxh404.vscode-proto3"
+      ]
+    },
+    "settings": {
+      "default_target_type": "automatic"
+    }
+  },
+  "env": {
+    "editor": "nvim",
+    "xdg_config_home": "$HOME/.config",
+    "venv_home": "$HOME/.virtualenvs",
+    "nvm_dir": "$HOME/.nvm",
+    "pnpm_home": "$HOME/Library/pnpm",
+    "sf_use_generic_unix_keychain": "true",
+    "sf_beta_track_file_moves": "true",
+    "lua_path": "/opt/homebrew/Cellar/luarocks/3.13.0_1/share/lua/5.5/?.lua;/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.5/?.lua;/opt/homebrew/share/lua/5.5/?.lua;/opt/homebrew/share/lua/5.5/?/init.lua;/opt/homebrew/lib/lua/5.5/?.lua;/opt/homebrew/lib/lua/5.5/?/init.lua;./?.lua;./?/init.lua;$HOME/.luarocks/share/lua/5.5/?.lua;$HOME/.luarocks/share/lua/5.5/?/init.lua",
+    "lua_cpath": "/opt/homebrew/lib/lua/5.5/?.so;/opt/homebrew/lib/lua/5.5/loadall.so;./?.so;$HOME/.luarocks/lib/lua/5.5/?.so",
+    "path_prepend": [
+      "{{shell_bin_path}}",
+      "$HOME/.luarocks/bin",
+      "$HOME/.cargo/bin",
+      "$HOME/Library/pnpm/bin",
+      "/opt/python27/bin",
+      "$HOME/.local/bin"
+    ],
+    "path_append": [
+      "$HOME/go/bin",
+      "$HOME/bin",
+      "$HOME/.atuin/bin",
+      "/usr/local/bin",
+      "/Applications/Obsidian.app/Contents/MacOS"
+    ],
+    "profile_work": false,
+    "profile_personal": false
+  },
+  "completions": {
+    "tools": {
+      "acli": {
+        "zsh": "acli completion zsh",
+        "nu": "open ~/.config/nushell/completions/acli.nu --raw"
+      },
+      "atuin": {
+        "zsh": "",
+        "nu": "atuin gen-completions --shell nushell"
+      },
+      "backlog": {
+        "zsh": "",
+        "nu": "open ~/.config/nushell/completions/backlog.nu --raw"
+      },
+      "carapace": {
+        "zsh": "",
+        "nu": "carapace _carapace nushell"
+      },
+      "clawdbot": {
+        "zsh": "",
+        "nu": ""
+      },
+      "dotter": {
+        "zsh": "dotter gen-completions --shell zsh",
+        "nu": "open ~/.config/nushell/completions/dotter.nu --raw"
+      },
+      "pixlet": {
+        "zsh": "pixlet completion zsh",
+        "nu": "open ~/.config/nushell/completions/pixlet.nu --raw"
+      },
+      "jj": {
+        "zsh": "jj util completion zsh",
+        "nu": "jj util completion nushell"
+      },
+      "netlify": {
+        "zsh": "cat ~/.config/tabtab/zsh/netlify.zsh",
+        "nu": ""
+      },
+      "opencode": {
+        "zsh": "opencode completion zsh",
+        "nu": "open ~/.config/nushell/completions/opencode.nu --raw"
+      },
+      "openclaw": {
+        "zsh": "cat ~/.openclaw/completions/openclaw.zsh",
+        "nu": ""
+      },
+      "pnpm": {
+        "zsh": "pnpm completion zsh",
+        "nu": ""
+      },
+      "sf": {
+        "zsh": "",
+        "nu": ""
+      },
+      "starship": {
+        "zsh": "starship completions zsh",
+        "nu": ""
+      },
+      "workmux": {
+        "zsh": "workmux completions zsh",
+        "nu": ""
+      },
+      "zoxide": {
+        "zsh": "",
+        "nu": ""
+      }
+    }
+  },
+  "atuin": {
+    "enter_accept": true,
+    "keymap_mode": "vim-normal",
+    "search_mode": "daemon-fuzzy",
+    "stats": {
+      "common_prefix": [
+        "sudo",
+        "pnpm",
+        "npm",
+        "yarn"
+      ]
+    },
+    "sync": {
+      "records": true
+    },
+    "daemon": {
+      "enabled": true,
+      "autostart": true
+    },
+    "dotfiles": {
+      "enabled": true
+    },
+    "ai": {
+      "enabled": true
+    }
+  },
+  "starship": {
+    "add_newline": true,
+    "format": "$username$hostname$localip$shlvl$singularity$kubernetes$directory$vcsh$fossil_branch$fossil_metrics$git_branch$git_commit$git_state$git_metrics$git_status${custom.jj_change}${custom.jj_empty}${custom.jj_desc}$all",
+    "right_format": "$shell",
+    "command_timeout": 750,
+    "package": {
+      "disabled": true
+    },
+    "git_commit": {
+      "disabled": true
+    },
+    "custom": {
+      "sf": {
+        "description": "The target org used by default for Salesforce CLI commands",
+        "command": "sf config get target-org --json | from json | get result.value.0",
+        "when": "sf config get target-org --json | from json | get result.value",
+        "format": "via [$symbol ($output)]($style) ",
+        "style": "bold 039",
+        "symbol": "󰢎"
+      },
+      "jj_change": {
+        "description": "The working copy of the repo in your current directory",
+        "command": "jj log --no-graph -r=@ -T='separate(\" \", working_copies, change_id.shortest(), bookmarks,)'",
+        "when": "jj root",
+        "format": "on [$symbol ($output)]($style) ",
+        "symbol": "🐦",
+        "style": "bold purple",
+        "ignore_timeout": true
+      },
+      "jj_empty": {
+        "description": "Shows (empty) in green if the working copy has no changes",
+        "command": "echo \"(empty)\"",
+        "when": "jj log --no-graph -r=@ -T='if(empty, \"y\", \"\")' | grep -q '^y$'",
+        "format": "[$output]($style) ",
+        "style": "bold green",
+        "ignore_timeout": true
+      },
+      "jj_desc": {
+        "description": "The description of your working copy, if set",
+        "command": "jj log --no-graph -r=@ -T='if(description, description.first_line(), \"(no description)\")'",
+        "when": "jj root",
+        "format": "$symbol [($output)]($style) ",
+        "symbol": "|",
+        "ignore_timeout": true
+      }
+    },
+    "shell": {
+      "disabled": false,
+      "format": "[$indicator]($style) "
+    }
+  },
+  "templates": {
+    "jj": {
+      "user": {
+        "name": {
+          "TEMPLATE_MARKER": "name"
+        },
+        "email": {
+          "TEMPLATE_MARKER": "email"
+        }
+      },
+      "ui": {
+        "default_command": [
+          "log",
+          "--limit",
+          "5"
+        ],
+        "diff_editor": ":builtin",
+        "show_cryptographic_signatures": true
+      },
+      "signing": {
+        "sign_all": true,
+        "backend": "gpg",
+        "key": {
+          "TEMPLATE_MARKER": "gpg_key"
+        }
+      },
+      "merge_tools": {
+        "diffconflicts": {
+          "program": "nvim",
+          "merge_args": [
+            "-c",
+            "let g:jj_diffconflicts_marker_length=$marker_length",
+            "-c",
+            "JJDiffConflicts!",
+            "$output",
+            "$base",
+            "$left",
+            "$right"
+          ],
+          "merge_tool_edits_conflict_markers": true
+        }
+      }
+    },
+    "tmux": {
+      "theme_plugin": {
+        "TEMPLATE_MARKER": "tmux_theme_plugin"
+      },
+      "theme_config": {
+        "TEMPLATE_MARKER": "tmux_theme_config"
+      }
+    },
+    "ghostty": "font-family = \"MesloLGMDZ Nerd Font Mono\"\n\ntheme = \"{{ ghostty_theme }}\"\n\nbackground-opacity  = 0.85\nbackground-blur     = true\nbackground          = \"#000000\"\n\nmacos-titlebar-style = \"transparent\"\n\nmouse-hide-while-typing = true\nscrollback-limit = 1000000\ncopy-on-select = true\nwindow-save-state = always\n\nkeybind = super+r=reload_config\n\n# Split navigation with vim-style hjkl\nkeybind = super+h=goto_split:left\nkeybind = super+j=goto_split:bottom\nkeybind = super+k=goto_split:top\nkeybind = super+l=goto_split:right\n\n# Split pane visual distinction\nunfocused-split-opacity = 0.7\nunfocused-split-fill = {{ ghostty_unfocused_split_fill }}\nsplit-divider-color = {{ ghostty_split_divider_color }}\n\n# Default shell: Nushell (via sh to set XDG_CONFIG_HOME before exec)\ncommand = /bin/sh -c 'XDG_CONFIG_HOME=$HOME/.config exec {{ shell_bin_path }}/nu -l'\n\n# Allow tmux to set window title\nwindow-title-font-family = \"MesloLGMDZ Nerd Font Mono\"\n"
+  },
+  "aerospace": {
+    "config_version": 2,
+    "after_startup_command": [],
+    "start_at_login": true,
+    "enable_normalization_flatten_containers": true,
+    "enable_normalization_opposite_orientation_for_nested_containers": true,
+    "accordion_padding": 30,
+    "default_root_container_layout": "tiles",
+    "default_root_container_orientation": "auto",
+    "on_focused_monitor_changed": [
+      "move-mouse monitor-lazy-center"
+    ],
+    "automatically_unhide_macos_hidden_apps": true,
+    "persistent_workspaces": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "on_mode_changed": [],
+    "key_mapping": {
+      "preset": "qwerty"
+    },
+    "gaps": {
+      "inner.horizontal": 10,
+      "inner.vertical": 10,
+      "outer.left": 10,
+      "outer.bottom": 10,
+      "outer.top": 0,
+      "outer.right": 10
+    },
+    "on_window_detected": [
+      {
+        "if.app-id": "com.google.Chrome",
+        "if.during-aerospace-startup": true,
+        "run": "move-node-to-workspace 1"
+      },
+      {
+        "if.app-id": "app.zen-browser.zen",
+        "if.during-aerospace-startup": true,
+        "run": "move-node-to-workspace 1"
+      },
+      {
+        "if.app-id": "com.mitchellh.ghostty",
+        "if.during-aerospace-startup": true,
+        "run": "move-node-to-workspace 1"
+      },
+      {
+        "if.app-id": "com.tinyspeck.slackmacgap",
+        "if.during-aerospace-startup": true,
+        "run": "move-node-to-workspace 2"
+      },
+      {
+        "if.app-id": "com.hnc.Discord",
+        "run": "move-node-to-workspace 2"
+      },
+      {
+        "if.app-id": "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm",
+        "run": "move-node-to-workspace 2"
+      },
+      {
+        "if.app-id": "com.automattic.beeper.desktop",
+        "run": "move-node-to-workspace 2"
+      },
+      {
+        "if.app-id": "com.apple.iCal",
+        "run": "move-node-to-workspace 3"
+      },
+      {
+        "if.app-id": "com.apple.finder",
+        "run": "move-node-to-workspace 3"
+      },
+      {
+        "if.app-id": "io.robbie.HomeAssistant",
+        "run": "move-node-to-workspace 3"
+      },
+      {
+        "if.app-id": "com.apple.Photos",
+        "run": "move-node-to-workspace 3"
+      },
+      {
+        "if.app-id": "net.kovidgoyal.calibre",
+        "run": "move-node-to-workspace 3"
+      },
+      {
+        "if.app-id": "com.valvesoftware.steam",
+        "run": "move-node-to-workspace 4"
+      },
+      {
+        "if.app-id": "com.valvesoftware.steam.helper",
+        "run": "move-node-to-workspace 4"
+      },
+      {
+        "if.app-id": "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan",
+        "run": "move-node-to-workspace 4"
+      },
+      {
+        "if.app-id": "org.videolan.vlc",
+        "run": "move-node-to-workspace 4"
+      }
+    ],
+    "mode_main_binding": {
+      "alt-slash": "layout tiles horizontal vertical",
+      "alt-comma": "layout accordion horizontal vertical",
+      "cmd-shift-h": "focus left",
+      "cmd-shift-j": "focus down",
+      "cmd-shift-k": "focus up",
+      "cmd-shift-l": "focus right",
+      "alt-h": "move left",
+      "alt-j": "move down",
+      "alt-k": "move up",
+      "alt-l": "move right",
+      "alt-minus": "resize smart -50",
+      "alt-equal": "resize smart +50",
+      "alt-1": "workspace 1",
+      "alt-2": "workspace 2",
+      "alt-3": "workspace 3",
+      "alt-4": "workspace 4",
+      "alt-5": "workspace 5",
+      "alt-6": "workspace 6",
+      "alt-7": "workspace 7",
+      "alt-8": "workspace 8",
+      "alt-9": "workspace 9",
+      "alt-q": "workspace 1",
+      "alt-w": "workspace 2",
+      "alt-e": "workspace 3",
+      "alt-r": "workspace 4",
+      "alt-t": "workspace 5",
+      "alt-y": "workspace 6",
+      "alt-shift-1": "move-node-to-workspace 1",
+      "alt-shift-2": "move-node-to-workspace 2",
+      "alt-shift-3": "move-node-to-workspace 3",
+      "alt-shift-4": "move-node-to-workspace 4",
+      "alt-shift-5": "move-node-to-workspace 5",
+      "alt-shift-6": "move-node-to-workspace 6",
+      "alt-shift-7": "move-node-to-workspace 7",
+      "alt-shift-8": "move-node-to-workspace 8",
+      "alt-shift-9": "move-node-to-workspace 9",
+      "alt-shift-q": "move-node-to-workspace 1",
+      "alt-shift-w": "move-node-to-workspace 2",
+      "alt-shift-e": "move-node-to-workspace 3",
+      "alt-shift-r": "move-node-to-workspace 4",
+      "alt-shift-t": "move-node-to-workspace 5",
+      "alt-shift-y": "move-node-to-workspace 6",
+      "alt-tab": "workspace-back-and-forth",
+      "alt-shift-tab": "move-workspace-to-monitor --wrap-around next",
+      "alt-shift-semicolon": "mode service",
+      "alt-shift-p": "mode passthrough"
+    },
+    "mode_service_binding": {
+      "esc": [
+        "reload-config",
+        "mode main"
+      ],
+      "r": [
+        "flatten-workspace-tree",
+        "mode main"
+      ],
+      "f": [
+        "layout floating tiling",
+        "mode main"
+      ],
+      "backspace": [
+        "close-all-windows-but-current",
+        "mode main"
+      ],
+      "alt-shift-h": [
+        "join-with left",
+        "mode main"
+      ],
+      "alt-shift-j": [
+        "join-with down",
+        "mode main"
+      ],
+      "alt-shift-k": [
+        "join-with up",
+        "mode main"
+      ],
+      "alt-shift-l": [
+        "join-with right",
+        "mode main"
+      ]
+    },
+    "mode_passthrough_binding": {
+      "alt-shift-p": "mode main"
+    },
+    "workspace_to_monitor_force_assignment": {
+      "1": "main",
+      "2": "main",
+      "3": "main",
+      "4": "main",
+      "5": "main",
+      "6": "secondary"
+    }
+  },
+  "iamb": {
+    "profiles": {
+      "user": {
+        "user_id": "@zenibako:beeper.com"
+      }
+    }
+  },
+  "gitlogue": {
+    "speed": 5,
+    "loop": true,
+    "ignore_patterns": [
+      "**/datasetComponents*.js"
+    ]
+  },
+  "pnpm": {
+    "rc": "# pnpm configuration\n# See: https://pnpm.io/npmrc\n\n# Store location for pnpm packages\n# Using default location: ~/Library/pnpm/store\n# Commented out to use pnpm's default store location\n# store-dir=~/.pnpm-store\n\n# Auto-install peers\nauto-install-peers=true\n\n# Hoist all dependencies to node_modules/.pnpm\nhoist=true\n\n# Use strict peer dependencies\nstrict-peer-dependencies=false\n\n# Lockfile settings\nlockfile=true\n\n# Registry\nregistry=https://registry.npmjs.org/\n\n# JSR registry for @jsr scope\n@jsr:registry=https://npm.jsr.io/\n"
+  },
+  "gitconfig": "[user]\n    name = {{name}}\n    email = {{email}}\n{{#if gpg_key}}\n    signingkey = {{gpg_key}}\n{{/if}}\n[init]\n    defaultBranch = main\n[commit]\n    gpgSign = {{#if gpg_key}}true{{else}}false{{/if}}\n    template = ~/.git-commit-template\n[core]\n    hooksPath = ~/.config/git/hooks\n[oh-my-zsh]\n    git-commit-alias = 061f773dd356df52a8bccd5e73377c012f97ef14\n\n[alias]\n    build = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"build${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    chore = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"chore${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    ci = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"ci${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    docs = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"docs${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    feat = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"feat${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    fix = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"fix${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    perf = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"perf${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    refactor = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"refactor${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    rev = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"revert${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    style = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"style${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    test = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"test${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n    wip = \"!a() { local _s _a _m; while [ $# -ne 0 ]; do case $1 in -s|--scope) if [ -z \\\"$2\\\" ]; then echo \\\"Missing scope!\\\"; return 1; fi; _s=\\\"$2\\\"; shift 2;; -a|--attention) _a=\\\"!\\\"; shift 1;; *) _m=\\\"${_m} $1\\\"; shift 1;; esac; done; git commit -m \\\"wip${_s:+(${_s})}${_a}:${_m}\\\"; }; a\"\n"
+}
