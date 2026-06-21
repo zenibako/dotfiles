@@ -6,7 +6,7 @@ allowed-tools: Read Glob Grep Write Edit
 
 # Wiki Lint
 
-You are health-checking an LLM Wiki in this Obsidian vault. Read `AGENTS.md` at the vault root for the full schema.
+You are health-checking an LLM Wiki in this Obsidian vault. Read `AGENTS.md` at the vault root for the full schema. The wiki follows the **Open Knowledge Format (OKF) v0.1** specification.
 
 ## Your task
 
@@ -14,16 +14,45 @@ Perform a comprehensive health check of the wiki and report findings.
 
 ## Workflow
 
+The lint process has **three phases**. Run them in this order.
+
+### Phase A: OKF Structural Conformance
+
+Run the OKF conformance validator first. This catches structural issues that could break consumption by other agents or tools.
+
+```bash
+python3 scripts/okf-lint.py
+```
+
+This validates:
+- **§9.1** — Every non-reserved `.md` file has parseable YAML frontmatter with a non-empty `type` field
+- **§6** — Sub-directory `index.md` files have NO frontmatter (progressive disclosure listing only)
+- **§11** — Root `index.md` declares `okf_version: '0.1'` in its frontmatter
+- **§7** — Every `log.md` has ISO 8601 date headings (`## YYYY-MM-DD` or `## [YYYY-MM-DD]`)
+- **§5.3** — Broken cross-links are reported as WARN (not ERROR; consumers MUST tolerate them)
+
+**If `okf-lint.py` reports errors, fix them before proceeding to Phase B.**
+
+### Phase B: Wiki Semantic Health
+
+Run the wiki-specific health checker. This catches content-quality issues that OKF does not prescribe.
+
+```bash
+python3 scripts/wiki-lint.py
+```
+
+Steps performed by `wiki-lint.py`:
+
 1. **Scan `wiki/` with Glob and read frontmatter to build a catalog.** Also read `wiki/log.md` to understand recent activity. The `wiki/index.base` file is an Obsidian Dataview config — agents should not rely on it for discovery.
 
 2. **Read every wiki page** in `wiki/`. For each page, note:
    - Outbound `[[wikilinks]]` — do the targets exist?
    - Inbound links — is this page linked from other pages?
-   - Frontmatter completeness (title, type, tags, sources, dates)
+   - Frontmatter completeness (`title`, `type`, `tags`, `sources`, `dates`)
    - Content freshness — does the `updated` date seem stale relative to source activity?
 
 3. **Build a link graph.** Identify:
-   - **Orphan pages** — pages with no inbound links (excluding index.md and log.md)
+   - **Orphan pages** — pages with no inbound links (excluding `index.md` and `log.md`)
    - **Broken links** — `[[wikilinks]]` pointing to non-existent pages
    - **Dead ends** — pages with no outbound links to other wiki pages
 
@@ -42,35 +71,62 @@ Perform a comprehensive health check of the wiki and report findings.
    - Are there source documents in `raw/` that haven't been ingested (no corresponding `src-*.md` page)?
    - Are there daily journal entries with substantial content that could be ingested?
 
-7. **Present a report** organized as:
+### Phase C: Regeneration
 
-   ```
-   ## Wiki Health Report — YYYY-MM-DD
+After all fixes, regenerate derived artifacts:
 
-   ### Stats
-   - Total pages: X
-   - By type: entities (X), concepts (X), source summaries (X), syntheses (X), analyses (X)
-   - Total sources in raw/: X
-   - Sources not yet ingested: X
+```bash
+python3 scripts/wiki-index-generator.py
+python3 scripts/graphify-wiki.py   # if graph assets are stale
+python3 scripts/okf-lint.py        # final structural validation
+```
 
-   ### Issues Found
-   #### Critical (contradictions, broken links)
-   #### Moderate (orphans, missing pages, stale content)
-   #### Minor (thin pages, missing cross-references)
+## Report Format
 
-   ### Suggestions
-   - New pages to create
-   - New sources to look for
-   - Questions worth investigating
-   ```
+Present findings organized as:
 
-8. **Ask the user** which issues to fix, then fix them.
+```
+## Wiki Health Report — YYYY-MM-DD
 
-9. **Update `description:` on any fixed pages** so the auto-generated index stays current.
+### Phase A: OKF Structural Conformance
+- Errors: X
+- Warnings: X
+- Status: PASS / FAIL
 
-10. **Append to `wiki/log.md`**:
-    ```
-    ## [YYYY-MM-DD] lint | Wiki health check
+### Phase B: Semantic Health
+#### Stats
+- Total pages: X
+- By type: entities (X), concepts (X), source summaries (X), syntheses (X), analyses (X)
+- Total sources in raw/: X
+- Sources not yet ingested: X
 
-    <Summary of findings and fixes applied.>
-    ```
+#### Issues Found
+##### Critical (contradictions, broken links, missing type fields)
+##### Moderate (orphans, missing pages, stale content)
+##### Minor (thin pages, missing cross-references)
+
+#### Suggestions
+- New pages to create
+- New sources to look for
+- Questions worth investigating
+
+### Phase C: Regeneration
+- index.md regenerated: Yes / No
+- graph assets updated: Yes / No
+```
+
+## Fixing Issues
+
+1. **Ask the user** which issues to fix, then fix them.
+2. **Update `description:` on any fixed pages** so the auto-generated index stays current.
+3. **Ensure any new pages have `type:` frontmatter** per OKF §4.1.
+4. **Re-run `okf-lint.py`** before finishing.
+
+## Logging
+
+**Append to `wiki/log.md`**:
+```
+## [YYYY-MM-DD] lint | Wiki health check
+
+<Summary of Phase A (OKF), Phase B (semantic), and Phase C (regeneration) results.>
+```
