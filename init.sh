@@ -276,9 +276,8 @@ fi
 
 # Deploy dotfiles
 echo "Deploying dotfiles..."
-mkdir -p .dotter
-ln -sf ../scripts/pre_deploy.sh .dotter/pre_deploy.sh
-ln -sf ../scripts/post_deploy.sh .dotter/post_deploy.sh
+. scripts/dotter/lib.sh
+ensure_dotter_dir "$DOTFILES_DIR"
 dotter deploy -f
 
 # Setup dotter-managed gitconfig via include (avoids conflicts with gh auth setup-git)

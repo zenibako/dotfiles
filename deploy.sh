@@ -7,10 +7,10 @@ set -eu
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Ensure .dotter/ output directory and symlinks exist
-mkdir -p .dotter
-ln -sf ../scripts/pre_deploy.sh .dotter/pre_deploy.sh
-ln -sf ../scripts/post_deploy.sh .dotter/post_deploy.sh
+# shellcheck source=scripts/dotter/lib.sh
+. scripts/dotter/lib.sh
+
+ensure_dotter_dir "$SCRIPT_DIR"
 
 # Run pre-deploy (KCL generation + validation)
 echo "==> Running pre-deploy (KCL generation)..."
