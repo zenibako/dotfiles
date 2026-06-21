@@ -21,3 +21,4 @@ out/
 # Local Claude test directory
 .claude/
 
+**/.venv/
