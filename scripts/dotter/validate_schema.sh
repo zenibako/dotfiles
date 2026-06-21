@@ -16,12 +16,12 @@ _OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
 
 MODE="${1:---pre-deploy}"
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
-_SCRIPTS="$REPO_ROOT/.dotter/scripts"
+_SCRIPTS="$REPO_ROOT/scripts/dotter"
 DEPLOYED="$HOME/.config"
 LOCAL_CONFIG="${DOTTER_LOCAL_CONFIG:-$REPO_ROOT/.dotter/local.toml}"
 
 if [ ! -d "$_SCRIPTS" ]; then
-  echo "Could not locate .dotter/scripts at $_SCRIPTS" >&2
+  echo "Could not locate scripts/dotter at $_SCRIPTS" >&2
   echo "Usage: REPO_ROOT=/path/to/repo validate_schema.sh [--pre-deploy|--post-deploy]" >&2
   exit 1
 fi
@@ -57,7 +57,7 @@ ACTIVE_PROFILE=$(get_profile)
 has_taplo() { command -v taplo >/dev/null 2>&1; }
 has_python3() { command -v python3 >/dev/null 2>&1; }
 
-# Ensure a local venv exists at .dotter/scripts/.venv for missing Python packages
+# Ensure a local venv exists at scripts/dotter/.venv for missing Python packages
 # (self-contained, works with PEP 668 externally-managed environments like Homebrew)
 _ensure_venv() {
   if [ -s "$_SCRIPTS/.venv/bin/python3" ]; then

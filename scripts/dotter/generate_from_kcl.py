@@ -271,7 +271,7 @@ def _write_dotter_toml(cfg, out_path):
     else:
         lines.append("[settings]")
     # Add pre_deploy hook to ensure KCL generation runs before dotter reads files
-    lines.append('pre_deploy = ".dotter/pre_deploy.sh"')
+    lines.append('pre_deploy = "scripts/pre_deploy.sh"')
     lines.append("")
 
     with open(out_path, "w") as f:

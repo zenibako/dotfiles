@@ -269,13 +269,16 @@ echo "Regenerating configs from KCL..."
 if command -v kcl >/dev/null 2>&1; then
     mkdir -p generated
     kcl run src/main.k > /dev/null || { echo "WARNING: KCL run failed" >&2; }
-    python3 .dotter/scripts/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
+    python3 scripts/dotter/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
 else
     echo "WARNING: KCL not found; skipping config regeneration." >&2
 fi
 
 # Deploy dotfiles
 echo "Deploying dotfiles..."
+mkdir -p .dotter
+ln -sf ../scripts/pre_deploy.sh .dotter/pre_deploy.sh
+ln -sf ../scripts/post_deploy.sh .dotter/post_deploy.sh
 dotter deploy -f
 
 # Setup dotter-managed gitconfig via include (avoids conflicts with gh auth setup-git)

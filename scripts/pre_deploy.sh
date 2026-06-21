@@ -38,7 +38,7 @@ if [ -z "$_repo_root" ]; then
   # dotter caches scripts in .dotter/cache/.dotter/, so dirname "$0" is unreliable.
   _cdir="$(cd "$(dirname "$0")" && pwd)"
   while [ "$_cdir" != "/" ]; do
-    if [ -f "$_cdir/.dotter/scripts/generate_from_kcl.py" ]; then
+    if [ -f "$_cdir/scripts/dotter/generate_from_kcl.py" ]; then
       _repo_root="$_cdir"
       break
     fi
@@ -61,8 +61,8 @@ if [ -n "$_repo_root" ]; then
     # Ensure out/ directories exist before KCL runs (fresh clones won't have them)
     mkdir -p out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
     kcl run src/main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
-    "$PYTHON" .dotter/scripts/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
-    "$PYTHON" .dotter/scripts/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
+    "$PYTHON" scripts/dotter/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
+    "$PYTHON" scripts/dotter/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
     echo "  Configs regenerated."
   else
     echo "ERROR: KCL is required for this repository but was not found." >&2
@@ -75,9 +75,9 @@ else
 fi
 
 # Pre-deploy schema validation
-if [ -n "$_repo_root" ] && [ -f "$_repo_root/.dotter/scripts/validate_schema.sh" ]; then
+if [ -n "$_repo_root" ] && [ -f "$_repo_root/scripts/dotter/validate_schema.sh" ]; then
   cd "$_repo_root"
-  "$_repo_root/.dotter/scripts/validate_schema.sh" --pre-deploy || true
+  "$_repo_root/scripts/dotter/validate_schema.sh" --pre-deploy || true
 else
   echo "WARNING: could not locate validate_schema.sh for pre-deploy validation" >&2
 fi

@@ -11,7 +11,7 @@ if [ -z "$_dotfiles" ]; then
   _dotfiles=$(pwd)
 fi
 
-_scripts="$_dotfiles/.dotter/scripts"
+_scripts="$_dotfiles/scripts/dotter"
 
 # Prefer a project virtualenv python over the bare `python3` (matches pre_deploy.sh).
 # On some machines `python3` resolves to a broken pyenv shim that aborts at startup;

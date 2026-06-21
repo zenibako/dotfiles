@@ -7,14 +7,14 @@ set -eu
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Ensure .dotter/ output directory and symlinks exist
+mkdir -p .dotter
+ln -sf ../scripts/pre_deploy.sh .dotter/pre_deploy.sh
+ln -sf ../scripts/post_deploy.sh .dotter/post_deploy.sh
+
 # Run pre-deploy (KCL generation + validation)
-if [ -f ".dotter/pre_deploy.sh" ]; then
-    echo "==> Running pre-deploy (KCL generation)..."
-    bash .dotter/pre_deploy.sh
-else
-    echo "ERROR: .dotter/pre_deploy.sh not found" >&2
-    exit 1
-fi
+echo "==> Running pre-deploy (KCL generation)..."
+bash scripts/pre_deploy.sh
 
 # Run dotter with any passed arguments
 echo "==> Running dotter deploy..."

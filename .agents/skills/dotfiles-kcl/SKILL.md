@@ -41,7 +41,7 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
                                               ├──→ file.write() ──→ out/tmux.conf
                                               │
                                               ▼
-                                   .dotter/scripts/generate_from_kcl.py
+                                   scripts/dotter/generate_from_kcl.py
                                               │
                                               ▼
          ┌─────────────┬──────────────┬───────┴───────┬──────────────┐
@@ -60,7 +60,7 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
 ```
 
 1. **KCL** (`src/main.k` + domain modules) writes text files directly via `file.write()` and produces `out/config.json` for structured data
-2. **Python converter** (`.dotter/scripts/generate_from_kcl.py`) reads JSON and writes TOML/structured text files to `out/`
+2. **Python converter** (`scripts/dotter/generate_from_kcl.py`) reads JSON and writes TOML/structured text files to `out/`
 3. **dotter** deploys the generated files from `out/` to `~/.config/`
 
 ## File Layout
@@ -114,8 +114,8 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
 kcl run src/main.k >/dev/null
 
 # Run the full pipeline (generation + validation)
-python3 .dotter/scripts/generate_from_kcl.py
-python3 .dotter/scripts/validate_generated.py
+python3 scripts/dotter/generate_from_kcl.py
+python3 scripts/dotter/validate_generated.py
 
 # Verify output is byte-identical before/after changes
 # 1. Save current out/config.json
@@ -224,8 +224,8 @@ files = {
 }
 ```
 
-6. **Update the Python converter** (`.dotter/scripts/generate_from_kcl.py`) to handle the new config type if needed
-7. **Add validation** to `.dotter/scripts/validate_generated.py` if needed
+6. **Update the Python converter** (`scripts/dotter/generate_from_kcl.py`) to handle the new config type if needed
+7. **Add validation** to `scripts/dotter/validate_generated.py` if needed
 
 ## Template Configs
 
@@ -319,7 +319,7 @@ When adding a new generated file, update `src/profiles.k` to use the `out/` pref
 
 ## Validation
 
-The validation script (`.dotter/scripts/validate_generated.py`) runs after generation and checks:
+The validation script (`scripts/dotter/validate_generated.py`) runs after generation and checks:
 
 - `out/config.json` exists and parses as JSON
 - `.dotter/global.toml` parses as TOML
@@ -333,7 +333,7 @@ The validation script (`.dotter/scripts/validate_generated.py`) runs after gener
 Run manually:
 
 ```bash
-python3 .dotter/scripts/validate_generated.py
+python3 scripts/dotter/validate_generated.py
 ```
 
 ## Schema Reference
@@ -361,8 +361,8 @@ Always run the full pipeline before committing:
 
 ```bash
 kcl run src/main.k >/dev/null
-python3 .dotter/scripts/generate_from_kcl.py
-python3 .dotter/scripts/validate_generated.py
+python3 scripts/dotter/generate_from_kcl.py
+python3 scripts/dotter/validate_generated.py
 ```
 
 Then deploy to verify dotter handles the generated files correctly:

@@ -3,12 +3,7 @@
 node_modules/
 
 src/local.k
-.dotter/local.toml
-.dotter/local.toml.bak*
-.dotter/.local.toml.real.bak
-.dotter/cache.toml
-.dotter/cache
-.dotter/scripts/.venv
+.dotter/
 
 # Deployed config directory (dotter output)
 .config/

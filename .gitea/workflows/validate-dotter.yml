@@ -37,7 +37,7 @@ jobs:
 
       - name: Pre-deploy validation
         run: |
-          REPO_ROOT=$(pwd) ./.dotter/scripts/validate_schema.sh --pre-deploy
+          REPO_ROOT=$(pwd) ./scripts/dotter/validate_schema.sh --pre-deploy
 
       - name: Create deployment directory
         run: |
@@ -45,7 +45,11 @@ jobs:
           echo "DEPLOY_DIR=$DEPLOY_DIR" >> $GITHUB_ENV
 
       - name: Deploy config with dotter
-        run: scripts/dotter-ci/create-local-toml.sh --force --ci "${{ matrix.profile }}" monokai .dotter/local.toml
+        run: |
+          mkdir -p .dotter
+          ln -sf ../scripts/pre_deploy.sh .dotter/pre_deploy.sh
+          ln -sf ../scripts/post_deploy.sh .dotter/post_deploy.sh
+          scripts/dotter-ci/create-local-toml.sh --force --ci "${{ matrix.profile }}" monokai .dotter/local.toml
 
       - name: Run dotter deploy
         run: |
@@ -117,6 +121,9 @@ jobs:
       - name: Test global.toml for duplicate variables
         run: |
           echo "Testing each profile without variable overrides to catch conflicts in global.toml"
+          mkdir -p .dotter
+          ln -sf ../scripts/pre_deploy.sh .dotter/pre_deploy.sh
+          ln -sf ../scripts/post_deploy.sh .dotter/post_deploy.sh
 
           for profile in default personal work; do
             echo "Testing $profile profile..."
@@ -137,10 +144,10 @@ jobs:
 
       - name: Validate OpenCode config against schema
         run: |
-          python3 .dotter/scripts/validate_jsonc_schema.py "$HOME/.config/opencode/opencode.jsonc" || {
+          python3 scripts/dotter/validate_jsonc_schema.py "$HOME/.config/opencode/opencode.jsonc" || {
             echo "WARNING: Schema validation failed or schema unreachable"
             # Don't fail CI if network/schema is unreachable
-            python3 .dotter/scripts/validate_jsonc.py "$HOME/.config/opencode/opencode.jsonc"
+            python3 scripts/dotter/validate_jsonc.py "$HOME/.config/opencode/opencode.jsonc"
           }
 
       - name: Validate Lua files
