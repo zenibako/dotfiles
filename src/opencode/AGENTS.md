@@ -43,6 +43,11 @@ If you need to clean or reset the repository on the HA host, **only do so after 
 - **Commit style**: Conventional commits (e.g., `fix:`, `feat:`, `chore:`)
 - **Prefer MCPs over CLIs**: When available, use the Jujutsu, GitHub, and GitLab MCP tools instead of their command-line interfaces for better integration and error handling
 - **Always commit changes**: Before moving on to another topic or task, commit all changes with an appropriate conventional commit message
+- **GPG signing**: Before your first commit in a session, warm the GPG cache:
+  ```bash
+  gpg-preset-from-keychain
+  ```
+  This pre-seeds gpg-agent from macOS Keychain so signing works non-interactively. If it fails, ask the user to unlock GPG manually.
 
 ## Commit Attribution (Co-authored-by)
 

@@ -22,6 +22,7 @@ When automating browsers or running end-to-end tests, use the `e2e-testing` skil
 - **Merge tool**: `jj-diffconflicts` via nvim (`merge-tools.diffconflicts`)
 - **GPG Signing**: ALL commits must be GPG signed. Never bypass signing.
 - **Agent Commits**: Agents may commit directly when signing works non-interactively. If signing would block on a GPG/pinentry prompt, stop and prompt the user to make the commit manually with `jj commit -m "message"` so the GPG agent cache is warmed first.
+- **GPG cache warming**: Run `gpg-preset-from-keychain` to pre-seed the passphrase from macOS Keychain. Kiro and Claude Code do this automatically via SessionStart hooks; OpenCode agents should run it before their first commit.
 
 ## Repository Structure
 - Profiles: `nvim/{default,work,personal}` deployed via dotter (don't edit `~/.config/nvim` directly!)

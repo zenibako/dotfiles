@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Warm GPG passphrase cache from Keychain",
+      "trigger": "SessionStart",
+      "description": "Pre-seeds gpg-agent with the passphrase from macOS Keychain at session start so commit signing works non-interactively.",
+      "action": {
+        "type": "command",
+        "command": "gpg-preset-from-keychain 2>/dev/null || true",
+        "timeout": 10
+      }
+    }
+  ]
+}
