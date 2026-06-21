@@ -1,147 +1,117 @@
 # dotfiles
 
-Personal configuration files for various development tools and shell environments.
+Personal configuration files managed with [KCL](https://kcl-lang.io/) and [dotter](https://github.com/SuperCuber/dotter).
 
 ## What's Included
 
-- **Shell**: Zsh with Oh My Zsh, Fish, Nushell
+- **Shell**: Zsh (Oh My Zsh), Nushell, Fish
 - **Terminal**: Ghostty
-- **Multiplexer**: Tmux with custom theme support
-- **Editor**: Neovim with LSP, plugins, and profile variants (default, work, personal)
-- **CLI Tools**: Starship prompt, Atuin (shell history), Carapace (completions), Jujutsu (VCS), iamb (Matrix client)
-- **Package Managers**: pnpm, npm, yarn support with shared configuration
-- **OpenCode**: Custom commands and plugins for OpenCode AI assistant
-- **Claude**: MCP server configurations
+- **Multiplexer**: Tmux with theme support
+- **Editor**: Neovim with LSP, plugins, and profile variants (default/work/personal)
+- **CLI Tools**: Starship, Atuin, Carapace, Zoxide, Jujutsu, iamb
+- **AI Assistants**: OpenCode, Claude Code, Kiro (MCP server configs, commands, skills)
 - **Window Management**: AeroSpace (macOS), Hyprland (Linux)
+- **Package Managers**: Homebrew (macOS), pnpm, npm
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Clone and configure
 
 ```bash
 git clone https://github.com/zenibako/dotfiles.git
 cd dotfiles
+cp local.toml.example .dotter/local.toml
 ```
 
-### 2. Create Local Configuration
+Edit `.dotter/local.toml` to set your name, email, profile, platform, and theme.
 
-Copy the example local config and customize it:
-
-```bash
-cp .dotter/local.toml.example .dotter/local.toml
-```
-
-Edit `.dotter/local.toml` to set your:
-- Name and email
-- Profile selection (default, work, or personal)
-- Color scheme (monokai, nightowl, or tokyonight)
-- Platform (mac or linux)
-- MCP server settings
-- API tokens and credentials
-
-### 3. Run the Initialization Script
+### 2. Run init
 
 ```bash
 sh init.sh
 ```
 
-This script will:
-- Install Homebrew (macOS) or packages via your Linux package manager
-- Install Oh My Zsh
-- Install Tmux Plugin Manager (tpm)
-- Deploy configurations using dotter
+This installs dependencies, generates configs from KCL, and deploys via dotter.
 
-## Configuration Management
+## Usage
 
-This repository uses [dotter](https://github.com/SuperCuber/dotter) for templating and deployment.
+### Deploy changes
+
+```bash
+./deploy.sh        # KCL generation + dotter deploy
+./deploy.sh -f     # Force overwrite changed targets
+```
+
+Always use `./deploy.sh` rather than bare `dotter deploy` — KCL must regenerate `global.toml` before dotter reads it.
 
 ### Profiles
 
-Three Neovim profiles are available:
-- **default**: Basic setup with common LSPs and plugins
-- **work**: Includes Salesforce-specific tooling and enterprise configs
-- **personal**: Personal projects setup
+Select ONE profile, ONE platform, ONE theme in `.dotter/local.toml`:
 
-Select your profile in `.dotter/local.toml`:
 ```toml
-packages = ["personal", "mac", "monokai"]
+packages = ["work", "mac", "monokai"]
 ```
 
-`name` and `email` are required. `dotter deploy` is blocked until you set both in `.dotter/local.toml`.
+- **work** / **personal** — both inherit from **default** via `depends`
+- Themes: monokai, nightowl, tokyonight
 
-### Deploy Configuration Changes
+### Secrets
 
-After editing source files, deploy them:
+Secrets are fetched from macOS Keychain (or Proton Pass) and injected into deployed configs during `post_deploy.sh`. Never commit secrets to `local.toml`.
 
 ```bash
-dotter deploy -f
+security add-generic-password -s KEY_NAME -a dotfiles -w SECRET_VALUE -U login.keychain
 ```
 
-**Note**: Always edit files in the repository root (e.g., `nvim/default/`), not in `~/.config/`. The `~/.config/` directory contains deployed configs that will be overwritten on the next `dotter deploy`.
+## Architecture
 
-To remove deployed files (e.g. after pruning entries from `.dotter/global.toml`), run `dotter undeploy -f` before re-deploying so stale symlinks/copies don't linger. The `-f` flag is non-interactive, matching `dotter deploy -f`.
+```
+src/                    # Source of truth
+├── main.k              # KCL entrypoint
+├── profiles.k          # Profile/package definitions
+├── *.k                 # KCL modules (env, packages, themes, etc.)
+├── local.k.example     # Template for src/local.k (generates .dotter/local.toml)
+├── zshrc               # Zsh interactive config (template)
+├── nvim/               # Neovim configs (default/work/personal)
+├── opencode/           # OpenCode commands, prompts, skills
+├── claude-code/        # Claude Code CLAUDE.md + settings
+├── kiro/               # Kiro steering + MCP config
+├── gnupg/              # GPG agent config (template)
+└── ...                 # Other tool configs
+
+scripts/                # Deploy pipeline scripts
+├── pre_deploy.sh       # KCL generation + validation (dotter hook)
+├── post_deploy.sh      # Secret injection + post-deploy checks (dotter hook)
+└── dotter/             # Shared helpers and validators
+    ├── lib.sh          # Common functions (resolve_python, run_with_timeout, etc.)
+    ├── generate_from_kcl.py  # Converts KCL JSON output to dotter global.toml + configs
+    ├── validate_*.py   # Config validation scripts
+    └── validate_schema.sh
+
+.dotter/                # Generated output (gitignored)
+├── global.toml         # Generated by KCL pipeline
+├── local.toml          # Per-machine config (user creates)
+├── pre_deploy.sh       # Symlink → ../scripts/pre_deploy.sh
+└── post_deploy.sh      # Symlink → ../scripts/post_deploy.sh
+
+out/                    # Generated config files (gitignored, written by KCL)
+deploy.sh               # Deploy wrapper (creates .dotter/, runs pipeline)
+init.sh                 # First-time machine setup
+local.toml.example      # Template for .dotter/local.toml
+```
+
+## Pipeline
+
+1. **KCL** (`src/main.k`) evaluates profiles, variables, and templates into JSON
+2. **Python** (`scripts/dotter/generate_from_kcl.py`) converts JSON into `.dotter/global.toml` + `out/` configs
+3. **Dotter** reads `global.toml` + `local.toml`, deploys files to `~/.config/` etc.
+4. **Post-deploy** injects secrets from Keychain, validates Lua/LSP/schemas
 
 ## Platform Support
 
-- **macOS**: Full support via Homebrew
-- **Linux**: Supports Arch (pacman), Debian/Ubuntu (apt), Fedora (dnf), CentOS/RHEL (yum), openSUSE (zypper), and Alpine (apk)
-
-## Package Managers
-
-### pnpm
-
-pnpm is configured as the recommended Node.js package manager with:
-- Global store location: `~/Library/pnpm/store` (default)
-- Global binaries: `~/Library/pnpm/bin`
-- Configuration: `~/.config/pnpm/rc`
-- Shell completions for zsh and nushell
-- Integrated with Atuin history search
-
-### npm & yarn
-
-npm and yarn are also supported with completion integration.
-
-## Customization
-
-### Color Schemes
-
-Three themes are available with matching terminal, Neovim, and tmux colors:
-- Monokai Pro
-- Night Owl
-- Tokyo Night
-
-Enable by including the corresponding section in `.dotter/local.toml`.
-
-### MCP Servers
-
-Enable optional MCP servers for Claude Desktop:
-- Atlassian (Jira/Confluence)
-- GitLab
-- Odaseva
-- Postman
-- Salesforce
-- SonarQube
-
-Set to `true` in `.dotter/local.toml` and provide required API tokens.
-
-## Structure
-
-```
-.
-├── .dotter/           # Dotter configuration and templates
-├── nvim/              # Neovim configs (default/work/personal)
-├── opencode/          # OpenCode commands and plugins
-├── atuin/             # Shell history sync config
-├── fish/              # Fish shell config
-├── ghostty/           # Ghostty terminal config
-├── hypr/              # Hyprland (Linux) config
-├── tmux-sessionizer/ # Tmux session management
-├── waybar/            # Waybar (Linux) status bar with Go scripts
-├── init.sh            # Initial setup script
-├── Brewfile           # macOS package definitions
-└── README.md          # This file
-```
+- **macOS**: Full support (Homebrew, AeroSpace, Ghostty)
+- **Linux**: Fedora (dnf), Arch (pacman), Debian/Ubuntu (apt), openSUSE (zypper), Alpine (apk)
 
 ## License
 
-Personal configurations - use at your own discretion.
+Personal configurations — use at your own discretion.
