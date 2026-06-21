@@ -286,7 +286,7 @@ stack traceback:
 [C]: in function '_with'
 [C]: in function 'nvim_exec2'
 [C]: at 0x
-vim/lsp/client.lua:581: in function
+vim/lsp/client.lua:
 vim/_core/editor.lua: in function
 filetype.lua:27:
 validate_lsp.lua:
