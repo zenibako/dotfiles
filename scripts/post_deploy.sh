@@ -1,8 +1,15 @@
 #!/bin/sh
 set -eu
 
+# Resolve lib.sh whether run directly from scripts/ or from dotter's hook cache
+# (dotter copies hooks into .dotter/cache/.dotter/ before executing them).
 # shellcheck source=dotter/lib.sh
-. "$(cd "$(dirname "$0")" && pwd)/dotter/lib.sh"
+_self="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+if [ -f "$_self/dotter/lib.sh" ]; then
+  . "$_self/dotter/lib.sh"
+else
+  . "$(git rev-parse --show-toplevel 2>/dev/null || pwd)/scripts/dotter/lib.sh"
+fi
 
 resolve_repo_root
 resolve_python
@@ -99,9 +106,12 @@ _lookup_secret() {
 
 _inject_github_token() {
   local config_file="$1"
-  [ -f "$config_file" ] || return
+  # Missing file or absent token means "nothing to inject here" — not an error.
+  # A bare `return` would propagate the failing test's status (1) and, because
+  # this function is called as a bare statement under `set -e`, abort the hook.
+  [ -f "$config_file" ] || return 0
   local token
-  token=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") || return
+  token=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") || return 0
   echo "  Injecting GitHub token into $(basename "$config_file")..."
   "$PYTHON" -c "
 import json, sys

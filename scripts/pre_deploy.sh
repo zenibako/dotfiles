@@ -1,8 +1,15 @@
 #!/bin/sh
 set -eu
 
+# Resolve lib.sh whether run directly from scripts/ or from dotter's hook cache
+# (dotter copies hooks into .dotter/cache/.dotter/ before executing them).
 # shellcheck source=dotter/lib.sh
-. "$(cd "$(dirname "$0")" && pwd)/dotter/lib.sh"
+_self="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+if [ -f "$_self/dotter/lib.sh" ]; then
+  . "$_self/dotter/lib.sh"
+else
+  . "$(git rev-parse --show-toplevel 2>/dev/null || pwd)/scripts/dotter/lib.sh"
+fi
 
 LOCAL_CONFIG="${DOTTER_LOCAL_CONFIG:-.dotter/local.toml}"
 

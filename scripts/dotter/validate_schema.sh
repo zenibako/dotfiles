@@ -256,11 +256,22 @@ validate_aerospace() {
     return 0
   fi
 
-  if ! _modes=$(AEROSPACE_CONFIG="$_file" aerospace list-modes 2>/dev/null); then
-    		_ERR "AeroSpace config validation failed: $_file" >&2
-    return 1
+  # `aerospace list-modes` queries the running AeroSpace.app server (not the
+  # file), so it cannot validate a config offline. Treat a "server not running"
+  # failure as a skip; only a genuine config rejection is an error.
+  if _modes=$(AEROSPACE_CONFIG="$_file" aerospace list-modes 2>&1); then
+    echo "  AeroSpace OK ($_file): detected modes"
+    return 0
   fi
-  echo "  AeroSpace OK ($_file): detected modes"
+  case "$_modes" in
+    *"connect to AeroSpace"*|*"not running"*)
+      echo "  Skipping AeroSpace validation (AeroSpace.app not running)"
+      return 0 ;;
+    *)
+      _ERR "AeroSpace config validation failed: $_file" >&2
+      printf '%s\n' "$_modes" | sed 's/^/    /' >&2
+      return 1 ;;
+  esac
 }
 
 # Ghostty TOML validation — needs deployed config
