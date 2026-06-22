@@ -28,7 +28,12 @@ default = _shared.Profile {
         "src/opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
         "out/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
         "src/opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
-        "out/claude_desktop_config.json" = { target = "~/Library/Application Support/Claude/claude_desktop_config.json", type = "template" }
+        # Rendered to a private staging file dotter owns exclusively;
+        # post_deploy.sh merges it into the live config. Claude Desktop rewrites
+        # the live file at runtime, so dotter must not own it directly (it would
+        # skip with "target contents were changed"). See
+        # scripts/dotter/merge_claude_desktop_config.py.
+        "out/claude_desktop_config.json" = { target = "~/.cache/dotfiles/claude_desktop_config.rendered.json", type = "template" }
         "src/claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
         "src/claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
         "src/claude-code/CLAUDE.md" = "~/.claude/CLAUDE.md"

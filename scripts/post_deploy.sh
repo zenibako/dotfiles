@@ -59,6 +59,19 @@ except Exception:
   unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
 fi
 
+# ── Merge Claude Desktop config ──────────────────────────────────────────
+# dotter renders the templated config to a private staging file (it can't own
+# the live file: Claude Desktop rewrites it at runtime). Merge the
+# dotfiles-managed keys into the live file, preserving Claude's own state.
+_cd_rendered="$HOME/.cache/dotfiles/claude_desktop_config.rendered.json"
+_cd_live="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+if [ -f "$_cd_rendered" ] && command -v "$PYTHON" >/dev/null 2>&1; then
+  echo "Merging Claude Desktop config..."
+  "$PYTHON" "$_scripts/merge_claude_desktop_config.py" "$_cd_rendered" "$_cd_live" \
+    || echo "  WARNING: Failed to merge Claude Desktop config"
+fi
+unset _cd_rendered _cd_live
+
 # ── Secret injection ─────────────────────────────────────────────────────
 _SECRET_CACHE=""
 
