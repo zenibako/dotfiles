@@ -26,18 +26,23 @@ default = _shared.Profile {
         "src/opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
         "src/opencode/command/review.md" = { target = "~/.config/opencode/command/review.md", type = "symbolic" }
         "src/opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
-        "out/opencode.jsonc" = { target = "~/.config/opencode/opencode.jsonc", type = "template" }
+        # Rendered to a private staging file; post_deploy.sh merges it into the
+        # live config (post-deploy secret injection rewrites the live file, so
+        # dotter must not own it directly). See merge_json_config.py.
+        "out/opencode.jsonc" = { target = "~/.cache/dotfiles/opencode.rendered.jsonc", type = "template" }
         "src/opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
         # Rendered to a private staging file dotter owns exclusively;
         # post_deploy.sh merges it into the live config. Claude Desktop rewrites
         # the live file at runtime, so dotter must not own it directly (it would
-        # skip with "target contents were changed"). See
-        # scripts/dotter/merge_claude_desktop_config.py.
+        # skip with "target contents were changed"). See merge_json_config.py.
         "out/claude_desktop_config.json" = { target = "~/.cache/dotfiles/claude_desktop_config.rendered.json", type = "template" }
         "src/claude-desktop/skills" = { target = "~/Library/Application Support/Claude/skills", type = "symbolic" }
         "src/claude-desktop/Claude Extensions Settings" = { target = "~/Library/Application Support/Claude/Claude Extensions Settings", type = "symbolic" }
         "src/claude-code/CLAUDE.md" = "~/.claude/CLAUDE.md"
-        "out/claude-code/settings.json" = { target = "~/.claude/settings.json", type = "template" }
+        # Rendered to a private staging file; post_deploy.sh merges it into the
+        # live config (Claude Code rewrites the live file at runtime and
+        # post_deploy injects a token, so dotter must not own it directly).
+        "out/claude-code/settings.json" = { target = "~/.cache/dotfiles/claude_code_settings.rendered.json", type = "template" }
         "src/agents/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
         "src/agents/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
         "src/agents/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }

@@ -59,18 +59,34 @@ except Exception:
   unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
 fi
 
-# ── Merge Claude Desktop config ──────────────────────────────────────────
-# dotter renders the templated config to a private staging file (it can't own
-# the live file: Claude Desktop rewrites it at runtime). Merge the
-# dotfiles-managed keys into the live file, preserving Claude's own state.
-_cd_rendered="$HOME/.cache/dotfiles/claude_desktop_config.rendered.json"
-_cd_live="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-if [ -f "$_cd_rendered" ] && command -v "$PYTHON" >/dev/null 2>&1; then
-  echo "Merging Claude Desktop config..."
-  "$PYTHON" "$_scripts/merge_claude_desktop_config.py" "$_cd_rendered" "$_cd_live" \
-    || echo "  WARNING: Failed to merge Claude Desktop config"
-fi
-unset _cd_rendered _cd_live
+# ── Merge dotfiles-managed configs into app-owned live files ─────────────
+# dotter renders these to private staging files because it can't own the live
+# files: the apps rewrite them at runtime and/or post_deploy injects secrets,
+# so dotter always sees them as externally modified and skips. Merge the
+# dotfiles content in, preserving runtime state and post-deploy-injected
+# secrets (those live only in keys absent from the rendered template).
+# Only Claude Desktop's mcpServers is fully replaced (--replace) so removed
+# servers disappear; it carries no post-deploy secret (its only token is
+# rendered from a Handlebars variable). The others must NOT use --replace or a
+# deploy without secret access would blank their injected tokens.
+_merge_config() {
+  _rendered="$1"
+  _live="$2"
+  shift 2
+  [ -f "$_rendered" ] && command -v "$PYTHON" >/dev/null 2>&1 || return 0
+  "$PYTHON" "$_scripts/merge_json_config.py" "$_rendered" "$_live" "$@" \
+    || echo "  WARNING: Failed to merge $(basename "$_live")"
+}
+echo "Merging dotfiles-managed app configs..."
+_merge_config "$HOME/.cache/dotfiles/claude_desktop_config.rendered.json" \
+  "$HOME/Library/Application Support/Claude/claude_desktop_config.json" \
+  --replace mcpServers
+_merge_config "$HOME/.cache/dotfiles/claude_code_settings.rendered.json" \
+  "$HOME/.claude/settings.json"
+_merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
+  "$HOME/.config/opencode/opencode.jsonc"
+unset -f _merge_config
+unset _rendered _live
 
 # ── Secret injection ─────────────────────────────────────────────────────
 _SECRET_CACHE=""

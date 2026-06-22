@@ -22,3 +22,7 @@ out/
 .claude/
 
 **/.venv/
+
+# Python bytecode caches
+__pycache__/
+*.pyc
