@@ -114,6 +114,7 @@ _try_backend() {
     _SECRET_CACHE="$cache"
     return 0
   fi
+  begin_wait "Building secret cache ($(basename "$script" .sh))" "a few seconds; may prompt to unlock"
   "$script" --build >/dev/null 2>&1 && { _SECRET_CACHE="$cache"; return 0; }
   return 1
 }
@@ -233,7 +234,7 @@ fi
 
 # ── OpenCode MCP health check ────────────────────────────────────────────
 if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
-  echo "Checking OpenCode MCP servers..."
+  begin_wait "Checking OpenCode MCP servers" "up to 30s"
   mcp_out=$(mktemp)
   mcp_err=$(mktemp)
 
@@ -279,7 +280,7 @@ fi
 
 # ── Neovim startup test ──────────────────────────────────────────────────
 if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
-  echo "Testing Neovim startup..."
+  begin_wait "Testing Neovim startup" "up to 1 min"
   run_with_timeout 60 nvim --headless +qa! 2>/tmp/nvim-startup.log || true
 
   if grep -E '^E[0-9]+:|Error while calling lua chunk|Error loading plugin config' /tmp/nvim-startup.log 2>/dev/null \
@@ -293,7 +294,7 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
 
   # LSP validation
   if [ -f "$_scripts/validate_lsp.lua" ]; then
-    echo "Validating LSP attachments..."
+    begin_wait "Validating LSP attachments" "up to 5 min"
     lsp_out=$(mktemp)
     lsp_ignore=$(mktemp)
     cat > "$lsp_ignore" <<'LSP_FILTERS'

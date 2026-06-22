@@ -52,3 +52,15 @@ run_with_timeout() {
     "$@"
   fi
 }
+
+# ── Announce a step that may pause for a while ───────────────────────────
+# Prints a clear "waiting expected" indicator so a long pause does not look
+# like a hang. Highlights in yellow on a TTY; plain text otherwise.
+# Usage: begin_wait "Validating LSP attachments" "up to 5 min"
+begin_wait() {
+  if [ -t 1 ]; then
+    printf '\033[33m⏳ %s — this can take %s, please wait...\033[0m\n' "$1" "$2"
+  else
+    printf '==> %s — this can take %s, please wait...\n' "$1" "$2"
+  fi
+}
