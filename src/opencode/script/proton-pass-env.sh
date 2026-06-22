@@ -112,7 +112,7 @@ _build_cache() {
     val=$(_fetch_secret "Personal" "GitHub" "Personal Access Token") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
 
     # --- Home Assistant ---
-    val=$(_fetch_secret "Personal" "Home Assistant" "CLI Long-Lived Token") && _write "HA_TOKEN" "$val" >> "$_tmp"
+    val=$(_fetch_secret "Personal" "Home Assistant" "PAT") && _write "HA_TOKEN" "$val" >> "$_tmp"
 
     # --- Bluesky (app password is in hidden field) ---
     val=$(_fetch_secret "Personal" "Bluesky" "App Password") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
