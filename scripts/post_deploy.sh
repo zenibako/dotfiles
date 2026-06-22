@@ -319,8 +319,9 @@ stack traceback:
 [C]: in function '_with'
 [C]: in function 'nvim_exec2'
 [C]: at 0x
-vim/lsp/client.lua:
-vim/_core/editor.lua: in function
+vim/lsp/client
+vim/_core/editor
+[string "vim/_core/editor"]
 filetype.lua:27:
 validate_lsp.lua:
 python3_provider

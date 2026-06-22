@@ -140,8 +140,8 @@ _build_cache() {
     # Using existing "last.fm" login item (password field)
     val=$(_fetch_secret "Personal" "last.fm") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
 
-    # --- Obsidian MCP (not yet in Proton Pass; disabled until created) ---
-    # val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
+    # --- Obsidian MCP ---
+    val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
 
     # --- Rocksky (not yet in Proton Pass; disabled until created) ---
     # val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
