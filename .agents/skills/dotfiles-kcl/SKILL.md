@@ -28,7 +28,7 @@ metadata:
 KCL is the **single source of truth**. The pipeline is:
 
 ```
-src/main.k ──→ kcl run src/main.k ──→ out/config.json
+src/main.k + local.k ──→ kcl run src/main.k local.k ──→ out/config.json
                                               │
                                               ├──→ file.write() ──→ out/ghostty/config
                                               ├──→ file.write() ──→ out/gitconfig
@@ -78,7 +78,6 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
 │   ├── jj.k                # jj config (TOML template with Handlebars)
 │   ├── tmux.k              # tmux theme plugin/config markers
 │   ├── aerospace.k         # macOS window manager config
-│   ├── local.k             # Machine-specific secrets/overrides (gitignored)
 │   ├── local.k.example     # Template for local.k (committed)
 │   ├── atuin/
 │   │   ├── main.k          # Atuin shell history config
@@ -105,13 +104,14 @@ src/main.k ──→ kcl run src/main.k ──→ out/config.json
 - **`src/_shared/`** — Shared schemas and helpers (imported as `import _shared`).
 - **Directory modules** (`src/foo/main.k`) — KCL resolves `import foo` to `src/foo/main.k`. Static assets for the same domain live inside `src/foo/` (e.g., `src/atuin/bin/`, `src/ghostty/shaders/`).
 - **Bare `.k` files** (`src/aerospace.k`, `src/jj.k`) — Single-file configs with no directory structure.
-- **`src/local.k`** — Machine-specific secrets and overrides (gitignored). Generates `.dotter/local.toml`. Copy from `src/local.k.example` on new machines.
+- **`local.k`** (repo root) — Machine-specific secrets and overrides (gitignored). Generates `.dotter/local.toml`. Copy from `src/local.k.example` on new machines. The build checks root `local.k` first, then falls back to `src/local.k`. Passed as a second `kcl run` input: `kcl run src/main.k local.k`.
 
 ## Quick Commands
 
 ```bash
 # Generate all configs from KCL (run from repo root)
-kcl run src/main.k >/dev/null
+# local.k is passed as a second input so its top-level values become globals
+kcl run src/main.k local.k >/dev/null
 
 # Run the full pipeline (generation + validation)
 python3 scripts/dotter/generate_from_kcl.py
@@ -360,7 +360,7 @@ All schemas live in `src/_shared/schemas.k`:
 Always run the full pipeline before committing:
 
 ```bash
-kcl run src/main.k >/dev/null
+kcl run src/main.k local.k >/dev/null
 python3 scripts/dotter/generate_from_kcl.py
 python3 scripts/dotter/validate_generated.py
 ```

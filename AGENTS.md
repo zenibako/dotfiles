@@ -28,7 +28,7 @@ When automating browsers or running end-to-end tests, use the `e2e-testing` skil
 - Profiles: `nvim/{default,work,personal}` deployed via dotter (don't edit `~/.config/nvim` directly!)
 - Packages: Select ONE profile (personal/work), ONE platform (mac/linux), ONE theme (monokai/nightowl/tokyonight)
 - Profile inheritance: `work` and `personal` depend on `default` via `depends = ["default"]`
-- Secrets: Never commit `local.toml` or `src/local.k` (use `src/local.k.example` as template; KCL generates `.dotter/local.toml`)
+- Secrets: Never commit `local.toml` or `local.k` (use `src/local.k.example` as template; KCL generates `.dotter/local.toml`)
 
 ## Platform-Specific Init
 

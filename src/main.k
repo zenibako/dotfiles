@@ -21,7 +21,6 @@ import claude_code
 import kiro_config as kiro_mod
 import zshenv
 import gitconfig
-import local
 
 # Force side-effect evaluation of modules with file.write
 _kiro_eval = kiro_mod.kiro_config
@@ -96,12 +95,15 @@ packages_meta = {
 file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))
 
 # ── Write .dotter/local.toml from local.k ─────────────────────────────
+# `local_packages` and `local_variables` are provided as top-level globals by
+# the second KCL input file (local.k at repo root, or src/local.k as fallback).
+# The shell scripts that invoke `kcl run` resolve which file to pass.
 _local_lines = ["packages = ["]
-_local_lines += ['  "{}",'.format(p) for p in local.packages]
+_local_lines += ['  "{}",'.format(p) for p in local_packages]
 _local_lines += ["]\n", "[variables]"]
 _local_lines += ['{} = {}'.format(k, \
     "true" if v == True else \
     "false" if v == False else \
     '"{}"'.format(v)) \
-    for k, v in local.variables]
+    for k, v in local_variables]
 file.write(".dotter/local.toml", "\n".join(_local_lines) + "\n")

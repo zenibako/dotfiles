@@ -1,31 +1,86 @@
 # Local machine-specific overrides — NOT committed (gitignored).
-# Copy to local.k and fill in your values:
-#   cp src/local.k.example src/local.k
+# Copy to local.k at the repo root and fill in your values:
+#   cp src/local.k.example local.k
+# The build checks root local.k first, then falls back to src/local.k.
 
-packages = ["personal", "mac", "tokyonight"]
+local_packages = ["personal", "mac", "tokyonight"]
 
-variables = {
+local_variables = {
     name = ""
     email = ""
     username = "chanderson"
     shell_bin_path = "/opt/homebrew/bin"
+    gpg_pinentry_program = "/opt/homebrew/bin/pinentry-mac"
     apex_lsp_jar_path = ""
     github_personal_access_token = ""
     gitlab_personal_access_token = ""
     gitlab_api_url = ""
     gitlab_url = ""
-    mcp_atlassian_enabled = False
-    opencode_build_agent_model = ""
-    opencode_plan_agent_model = ""
-    node_extra_ca_certs = ""
+    gitea_url = ""
+    gitea_token = ""
+    home_assistant_token = ""
+    home_assistant_url = ""
+    home_assistant_webhook_id = ""
+    bluesky_handle = ""
+    bluesky_app_password = ""
+    plex_user_token = ""
+    plex_server_token = ""
+    plex_url = ""
+    tmdb_key = ""
+    reddit_session = ""
+    reddit_token_v2 = ""
+    brave_search_api_key = ""
+    proton_user = ""
+    proton_password = ""
+    telegram_bot_token = ""
+    youtube_api_key = ""
+    google_places_api_key = ""
+    slack_d_cookie = ""
+    slack_token = ""
     sonarqube_token = ""
     sonarqube_url = ""
     gpg_key = ""
-    claude_remote_tools_device_name = ""
+    vim_set_num_relnum = "set number relativenumber"
+    playdate_sdk_enabled = False
+    bartender_hooks_enabled = False
+    claude_remote_tools_device_name = "mac-mini"
     claude_model = "opus"
     claude_effort_level = "high"
     claude_effort_level_enabled = False
     claude_plugin_clangd_lsp = False
     claude_plugin_pyright_lsp = False
+    claude_plugin_extra_lsps = True
+    claude_model_at_top = True
     kiro_enabled = False
+    mcp_atlassian_enabled = False
+    mcp_obsidian_enabled = False
+    mcp_obsidian_url = ""
+    mcp_obsidian_token = ""
+    mcp_coderabbit = False
+    mcp_home_assistant_enabled = False
+    mcp_netlify = True
+    mcp_postman_enabled = False
+    mcp_sonarqube_enabled = True
+    mcp_salesforce_dx_enabled = False
+    mcp_salesforce_hosted_enabled = False
+    mcp_odaseva_enabled = False
+    opencode_build_agent_model = ""
+    opencode_plan_agent_model = ""
+    opencode_test_agent_model = ""
+    opencode_review_agent_model = ""
+    opencode_slack_webhook_url = ""
+    node_extra_ca_certs = ""
+    postman_api_key = ""
+    p10k_root_dir = ""
+    claude_agent_push_notif_enabled = True
+    claude_bypass_permissions_account_id = ""
+    claude_bypass_permissions_value = False
+    claude_bypass_permissions_extras_enabled = False
+    claude_cowork_scheduled_tasks_enabled = False
+    claude_epitaxy_personal_prefs_enabled = False
+    tripit_username = ""
+    tripit_password = ""
+    sf_pg5_oauth_json = ""
+    sf_pg5_oauth_client_id = ""
+    sf_pg5_refresh_token = ""
 }

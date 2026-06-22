@@ -70,7 +70,7 @@ src/                    # Source of truth
 ├── main.k              # KCL entrypoint
 ├── profiles.k          # Profile/package definitions
 ├── *.k                 # KCL modules (env, packages, themes, etc.)
-├── local.k.example     # Template for src/local.k (generates .dotter/local.toml)
+├── local.k.example     # Template for local.k (generates .dotter/local.toml)
 ├── zshrc               # Zsh interactive config (template)
 ├── nvim/               # Neovim configs (default/work/personal)
 ├── opencode/           # OpenCode commands, prompts, skills

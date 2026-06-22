@@ -21,7 +21,16 @@ elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
   echo "Regenerating configs from KCL..."
   cd "$REPO_ROOT"
   mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
-  kcl run src/main.k >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
+  # Resolve local.k: prefer repo root, fall back to src/local.k
+  if [ -f "$REPO_ROOT/local.k" ]; then
+    LOCAL_K="$REPO_ROOT/local.k"
+  elif [ -f "$REPO_ROOT/src/local.k" ]; then
+    LOCAL_K="$REPO_ROOT/src/local.k"
+  else
+    echo "ERROR: local.k not found at repo root or src/. Copy src/local.k.example to local.k and fill in values." >&2
+    exit 1
+  fi
+  kcl run src/main.k "$LOCAL_K" >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
   "$PYTHON" scripts/dotter/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
   "$PYTHON" scripts/dotter/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
   echo "  Configs regenerated."

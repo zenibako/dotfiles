@@ -268,8 +268,19 @@ fi
 echo "Regenerating configs from KCL..."
 if command -v kcl >/dev/null 2>&1; then
     mkdir -p generated
-    kcl run src/main.k > /dev/null || { echo "WARNING: KCL run failed" >&2; }
-    python3 scripts/dotter/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
+    # Resolve local.k: prefer repo root, fall back to src/local.k
+    if [ -f local.k ]; then
+        LOCAL_K="local.k"
+    elif [ -f src/local.k ]; then
+        LOCAL_K="src/local.k"
+    else
+        echo "WARNING: local.k not found. Copy src/local.k.example to local.k and fill in values." >&2
+        LOCAL_K=""
+    fi
+    if [ -n "$LOCAL_K" ]; then
+        kcl run src/main.k "$LOCAL_K" > /dev/null || { echo "WARNING: KCL run failed" >&2; }
+        python3 scripts/dotter/generate_from_kcl.py || { echo "WARNING: Python config generation failed" >&2; }
+    fi
 else
     echo "WARNING: KCL not found; skipping config regeneration." >&2
 fi
