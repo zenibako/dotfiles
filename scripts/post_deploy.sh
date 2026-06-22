@@ -161,11 +161,39 @@ else:
 " 2>/dev/null || echo "  WARNING: Failed to patch $(basename "$config_file")"
 }
 
+# Patch the Obsidian MCP bearer token into a Claude config's env. The template
+# renders env.MCP_OBSIDIAN_AUTH as "Bearer " (token kept out of the repo), so the
+# real value is injected here from the secret cache.
+_inject_obsidian_token() {
+  local config_file="$1"
+  [ -f "$config_file" ] || return 0
+  local token
+  token=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") || return 0
+  echo "  Injecting Obsidian token into $(basename "$config_file")..."
+  "$PYTHON" -c "
+import json
+cfg_path = '$config_file'
+with open(cfg_path, 'r') as f:
+    cfg = json.load(f)
+obs = cfg.get('mcpServers', {}).get('Obsidian')
+if obs:
+    env = obs.setdefault('env', {})
+    env['MCP_OBSIDIAN_AUTH'] = 'Bearer $token'
+    with open(cfg_path, 'w') as f:
+        json.dump(cfg, f, indent=2)
+    print('  OK')
+else:
+    print('  SKIP: Obsidian MCP not found')
+" 2>/dev/null || echo "  WARNING: Failed to patch $(basename "$config_file")"
+}
+
 if _ensure_secret_cache; then
   echo "Applying secrets to deployed configs..."
   _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
   _inject_github_token "$HOME/.claude/settings.json"
+  _inject_obsidian_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+  _inject_obsidian_token "$HOME/.claude/settings.json"
 
   # OpenCode MCP config
   _opencode_config="$HOME/.config/opencode/opencode.jsonc"
@@ -224,7 +252,7 @@ if _ensure_secret_cache; then
   fi
   unset _deployed_env
 fi
-unset -f _ensure_secret_cache _lookup_secret _inject_github_token _try_backend _cache_is_fresh
+unset -f _ensure_secret_cache _lookup_secret _inject_github_token _inject_obsidian_token _try_backend _cache_is_fresh
 unset _SECRET_CACHE
 
 # ── Post-deploy validation ────────────────────────────────────────────────
