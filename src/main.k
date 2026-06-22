@@ -96,8 +96,8 @@ file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))
 
 # ── Write .dotter/local.toml from local.k ─────────────────────────────
 # `local_packages` and `local_variables` are provided as top-level globals by
-# the second KCL input file (local.k at repo root, or src/local.k as fallback).
-# The shell scripts that invoke `kcl run` resolve which file to pass.
+# the second KCL input file (local.k at the repo root), passed via
+# `kcl run src/main.k local.k`.
 _local_lines = ["packages = ["]
 _local_lines += ['  "{}",'.format(p) for p in local_packages]
 _local_lines += ["]\n", "[variables]"]

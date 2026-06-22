@@ -21,13 +21,11 @@ elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
   echo "Regenerating configs from KCL..."
   cd "$REPO_ROOT"
   mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
-  # Resolve local.k: prefer repo root, fall back to src/local.k
+  # Resolve local.k at the repo root
   if [ -f "$REPO_ROOT/local.k" ]; then
     LOCAL_K="$REPO_ROOT/local.k"
-  elif [ -f "$REPO_ROOT/src/local.k" ]; then
-    LOCAL_K="$REPO_ROOT/src/local.k"
   else
-    echo "ERROR: local.k not found at repo root or src/. Copy src/local.k.example to local.k and fill in values." >&2
+    echo "ERROR: local.k not found at repo root. Copy local.k.example to local.k and fill in values." >&2
     exit 1
   fi
   kcl run src/main.k "$LOCAL_K" >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }

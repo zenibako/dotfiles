@@ -70,7 +70,6 @@ src/                    # Source of truth
 ├── main.k              # KCL entrypoint
 ├── profiles.k          # Profile/package definitions
 ├── *.k                 # KCL modules (env, packages, themes, etc.)
-├── local.k.example     # Template for local.k (generates .dotter/local.toml)
 ├── zshrc               # Zsh interactive config (template)
 ├── nvim/               # Neovim configs (default/work/personal)
 ├── opencode/           # OpenCode commands, prompts, skills
@@ -97,6 +96,7 @@ scripts/                # Deploy pipeline scripts
 out/                    # Generated config files (gitignored, written by KCL)
 deploy.sh               # Deploy wrapper (creates .dotter/, runs pipeline)
 init.sh                 # First-time machine setup
+local.k.example         # Template for local.k (generates .dotter/local.toml)
 local.toml.example      # Template for .dotter/local.toml
 ```
 

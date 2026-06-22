@@ -1,0 +1,118 @@
+# Local machine-specific overrides — NOT committed (gitignored).
+# Copy to local.k at the repo root and fill in your values:
+#   cp local.k.example local.k
+
+# Pick one profile (personal/work), one platform (mac/linux), one theme
+# (e.g. monokai/nightowl/tokyonight).
+local_packages = ["personal", "mac", "tokyonight"]
+
+local_variables = {
+    # ── Identity & shell ──────────────────────────────────────────────
+    name = ""
+    email = ""
+    username = ""
+    shell_bin_path = "/opt/homebrew/bin"
+    gpg_pinentry_program = "/opt/homebrew/bin/pinentry-mac"
+    gpg_key = ""
+
+    # ── Git forges ────────────────────────────────────────────────────
+    github_personal_access_token = ""
+    gitlab_personal_access_token = ""
+    gitlab_api_url = ""
+    gitlab_url = ""
+    gitea_url = ""
+    gitea_token = ""
+
+    # ── Editor / LSP ──────────────────────────────────────────────────
+    apex_lsp_jar_path = ""
+    vim_set_num_relnum = "set number relativenumber"
+
+    # ── Home Assistant ────────────────────────────────────────────────
+    home_assistant_token = ""
+    home_assistant_url = ""
+    home_assistant_webhook_id = ""
+
+    # ── Media & social ────────────────────────────────────────────────
+    bluesky_handle = ""
+    bluesky_app_password = ""
+    plex_user_token = ""
+    plex_server_token = ""
+    plex_url = ""
+    tmdb_key = ""
+    reddit_session = ""
+    reddit_token_v2 = ""
+    telegram_bot_token = ""
+    youtube_api_key = ""
+    tripit_username = ""
+    tripit_password = ""
+
+    # ── Search / location APIs ────────────────────────────────────────
+    brave_search_api_key = ""
+    google_places_api_key = ""
+
+    # ── Proton ────────────────────────────────────────────────────────
+    proton_user = ""
+    proton_password = ""
+
+    # ── Slack ─────────────────────────────────────────────────────────
+    slack_d_cookie = ""
+    slack_token = ""
+    opencode_slack_webhook_url = ""
+
+    # ── SonarQube ─────────────────────────────────────────────────────
+    sonarqube_token = ""
+    sonarqube_url = ""
+
+    # ── Salesforce ────────────────────────────────────────────────────
+    sf_pg5_oauth_json = ""
+    sf_pg5_oauth_client_id = ""
+    sf_pg5_refresh_token = ""
+
+    # ── Postman ───────────────────────────────────────────────────────
+    postman_api_key = ""
+
+    # ── Network / shell extras ────────────────────────────────────────
+    node_extra_ca_certs = ""
+    p10k_root_dir = "$HOME/.p10k"
+
+    # ── Feature toggles ───────────────────────────────────────────────
+    playdate_sdk_enabled = False
+    bartender_hooks_enabled = False
+    kiro_enabled = False
+
+    # ── Claude Code ───────────────────────────────────────────────────
+    claude_remote_tools_device_name = "mac-mini"
+    claude_model = "opus"
+    claude_effort_level = "high"
+    claude_effort_level_enabled = False
+    claude_plugin_clangd_lsp = False
+    claude_plugin_pyright_lsp = False
+    claude_plugin_extra_lsps = True
+    claude_model_at_top = True
+    claude_agent_push_notif_enabled = True
+    claude_bypass_permissions_account_id = ""
+    claude_bypass_permissions_value = False
+    claude_bypass_permissions_extras_enabled = False
+    claude_cowork_scheduled_tasks_enabled = False
+    claude_epitaxy_personal_prefs_enabled = False
+
+    # ── OpenCode ──────────────────────────────────────────────────────
+    opencode_build_agent_model = ""
+    opencode_plan_agent_model = ""
+    opencode_test_agent_model = ""
+    opencode_review_agent_model = ""
+
+    # ── MCP servers ───────────────────────────────────────────────────
+    mcp_atlassian_enabled = False
+    mcp_obsidian_enabled = False
+    mcp_obsidian_url = ""
+    mcp_obsidian_token = ""
+    mcp_coderabbit = False
+    mcp_home_assistant_enabled = False
+    mcp_netlify = True
+    mcp_postman_enabled = False
+    mcp_sonarqube_enabled = True
+    mcp_salesforce_dx_enabled = False
+    mcp_salesforce_hosted_enabled = False
+    mcp_odaseva_enabled = False
+}

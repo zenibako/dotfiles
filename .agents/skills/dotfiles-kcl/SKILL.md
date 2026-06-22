@@ -67,6 +67,7 @@ src/main.k + local.k ──→ kcl run src/main.k local.k ──→ out/config.j
 
 ```
 .
+├── local.k.example         # Template for local.k (committed, at repo root)
 ├── src/
 │   ├── main.k              # orchestration: imports all modules, writes JSON
 │   ├── packages.k          # Fedora packages, Homebrew taps/formulae/casks, VS Code extensions
@@ -78,7 +79,6 @@ src/main.k + local.k ──→ kcl run src/main.k local.k ──→ out/config.j
 │   ├── jj.k                # jj config (TOML template with Handlebars)
 │   ├── tmux.k              # tmux theme plugin/config markers
 │   ├── aerospace.k         # macOS window manager config
-│   ├── local.k.example     # Template for local.k (committed)
 │   ├── atuin/
 │   │   ├── main.k          # Atuin shell history config
 │   │   └── bin/              # Shell integration scripts (deployed from src/)
@@ -104,7 +104,7 @@ src/main.k + local.k ──→ kcl run src/main.k local.k ──→ out/config.j
 - **`src/_shared/`** — Shared schemas and helpers (imported as `import _shared`).
 - **Directory modules** (`src/foo/main.k`) — KCL resolves `import foo` to `src/foo/main.k`. Static assets for the same domain live inside `src/foo/` (e.g., `src/atuin/bin/`, `src/ghostty/shaders/`).
 - **Bare `.k` files** (`src/aerospace.k`, `src/jj.k`) — Single-file configs with no directory structure.
-- **`local.k`** (repo root) — Machine-specific secrets and overrides (gitignored). Generates `.dotter/local.toml`. Copy from `src/local.k.example` on new machines. The build checks root `local.k` first, then falls back to `src/local.k`. Passed as a second `kcl run` input: `kcl run src/main.k local.k`.
+- **`local.k`** (repo root) — Machine-specific secrets and overrides (gitignored). Generates `.dotter/local.toml`. Copy from `local.k.example` on new machines. Passed as a second `kcl run` input: `kcl run src/main.k local.k`.
 
 ## Quick Commands
 
