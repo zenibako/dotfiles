@@ -23,11 +23,9 @@ _mcp_servers = [
     }
     {
         name = "GitHub"
-        # Remote GitHub MCP server. Claude Code/Desktop are first-party OAuth
-        # clients, so they authenticate automatically with no token in config.
-        # opencode can't OAuth here (GitHub doesn't support Dynamic Client
-        # Registration), so it uses a PAT bearer header injected by
-        # patch_opencode_secrets.py at post-deploy time.
+        # Remote GitHub MCP server. opencode can't OAuth here (GitHub doesn't
+        # support Dynamic Client Registration), so it uses a PAT bearer header
+        # injected by patch_opencode_secrets.py at post-deploy time.
         # NOTE: Do NOT set a blank Authorization header here — opencode sends
         # it as-is, resulting in "Authorization header is badly formatted".
         opencode = {
@@ -35,10 +33,11 @@ _mcp_servers = [
             "url" = "https://api.githubcopilot.com/mcp/"
             "enabled" = True
         }
-        claude = {
-            "type" = "http"
-            "url" = "https://api.githubcopilot.com/mcp/"
-        }
+        # Claude Desktop's config schema only supports stdio servers, so this
+        # remote server is added natively as a Custom Connector via the Claude
+        # Settings → Connectors UI (URL: https://api.githubcopilot.com/mcp/),
+        # which lives in Claude's internal storage and can't be managed here.
+        claude = None
     }
     {
         name = "Backlog"
@@ -116,10 +115,9 @@ _mcp_servers = [
             "url" = "https://mcp.atlassian.com/v1/mcp"
             "enabled" = False
         }
-        claude = {
-            "type" = "http"
-            "url" = "https://mcp.atlassian.com/v1/mcp"
-        }
+        # Native Custom Connector in Claude (Settings → Connectors UI).
+        # URL: https://mcp.atlassian.com/v1/mcp — not managed by this config.
+        claude = None
     }
     {
         name = "Postman"
@@ -202,10 +200,9 @@ _mcp_servers = [
             "url" = "{{gitlab_url}}/api/v4/mcp"
             "enabled" = False
         }
-        claude = {
-            "type" = "http"
-            "url" = "{{gitlab_url}}/api/v4/mcp"
-        }
+        # Native Custom Connector in Claude (Settings → Connectors UI).
+        # URL: {{gitlab_url}}/api/v4/mcp — not managed by this config.
+        claude = None
     }
 ]
 
