@@ -13,7 +13,7 @@ cd "$SCRIPT_DIR"
 ensure_dotter_dir "$SCRIPT_DIR"
 
 # Run pre-deploy (KCL generation + validation)
-echo "==> Running pre-deploy (KCL generation)..."
+echo "==> Running pre-deploy (KCL generation + validation)..."
 bash scripts/pre_deploy.sh
 
 # Run dotter with any passed arguments

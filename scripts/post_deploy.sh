@@ -264,17 +264,20 @@ fi
 # ── Lua validation ────────────────────────────────────────────────────────
 if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
   echo "Validating Lua files..."
-  _failed=0
+  # Single pass: collect failures via a temp marker (the while loop runs in a
+  # subshell, so a plain variable wouldn't survive the pipe).
+  _lua_errs=$(mktemp)
   find "$DEPLOYED/nvim" -name '*.lua' -type f 2>/dev/null | while IFS= read -r _lua_file; do
     if ! luac -p "$_lua_file" >/dev/null 2>&1; then
       echo "ERROR: Lua syntax error in $_lua_file" >&2
-      _failed=1
+      echo x >> "$_lua_errs"
     fi
   done
-  # Note: subshell pipe means _failed won't propagate; use explicit check
-  if find "$DEPLOYED/nvim" -name '*.lua' -type f -exec luac -p {} \; 2>&1 | grep -q "error"; then
+  if [ -s "$_lua_errs" ]; then
+    rm -f "$_lua_errs"
     exit 1
   fi
+  rm -f "$_lua_errs"
   echo "  All Lua files OK"
 fi
 
