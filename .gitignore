@@ -26,3 +26,5 @@ out/
 # Python bytecode caches
 __pycache__/
 *.pyc
+
+.mcp-auth/

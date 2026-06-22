@@ -212,3 +212,7 @@ mcp_opencode = {s.name: s.opencode for s in _mcp_servers}
 # Build Claude Desktop mcpServers dict from shared definitions
 # Only include servers that have a claude representation
 mcp_claude = {s.name: s.claude for s in _mcp_servers if s.claude}
+
+# Build Kiro mcpServers dict from shared definitions
+# Only include servers that have a kiro representation
+mcp_kiro = {s.name: s.kiro for s in _mcp_servers if s.kiro}

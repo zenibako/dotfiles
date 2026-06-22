@@ -97,6 +97,9 @@ default = _shared.Profile {
         sonarqube_url = ""
         sonarqube_token = ""
         gitlab_url = ""
+        sf_pg5_oauth_json = ""
+        sf_pg5_oauth_client_id = ""
+        sf_pg5_refresh_token = ""
     }
 }
 
@@ -136,6 +139,7 @@ work = _shared.Profile {
     variables = {
         opencode_profile_work = True
         mcp_salesforce_dx_enabled = False
+        mcp_salesforce_hosted_enabled = False
         mcp_atlassian_enabled = False
         mcp_odaseva_enabled = False
         mcp_postman_enabled = True
