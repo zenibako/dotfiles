@@ -65,10 +65,13 @@ fi
 # so dotter always sees them as externally modified and skips. Merge the
 # dotfiles content in, preserving runtime state and post-deploy-injected
 # secrets (those live only in keys absent from the rendered template).
-# Only Claude Desktop's mcpServers is fully replaced (--replace) so removed
-# servers disappear; it carries no post-deploy secret (its only token is
-# rendered from a Handlebars variable). The others must NOT use --replace or a
-# deploy without secret access would blank their injected tokens.
+# Claude Desktop's and Claude Code's mcpServers are fully replaced (--replace)
+# so servers removed upstream disappear; both render every value from Handlebars
+# variables (no post-deploy secret lives only in the live file), which is what
+# makes --replace safe. The others must NOT use --replace or a deploy without
+# secret access would blank their injected tokens.
+# Claude Code reads user-global MCP servers from ~/.claude.json, NOT from
+# settings.json, so the rendered mcp.json is merged into ~/.claude.json.
 _merge_config() {
   _rendered="$1"
   _live="$2"
@@ -83,6 +86,9 @@ _merge_config "$HOME/.cache/dotfiles/claude_desktop_config.rendered.json" \
   --replace mcpServers
 _merge_config "$HOME/.cache/dotfiles/claude_code_settings.rendered.json" \
   "$HOME/.claude/settings.json"
+_merge_config "$HOME/.cache/dotfiles/claude_code_mcp.rendered.json" \
+  "$HOME/.claude.json" \
+  --replace mcpServers
 _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
   "$HOME/.config/opencode/opencode.jsonc"
 unset -f _merge_config
@@ -191,9 +197,10 @@ if _ensure_secret_cache; then
   echo "Applying secrets to deployed configs..."
   _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
-  _inject_github_token "$HOME/.claude/settings.json"
+  # Claude Code's GitHub MCP is now remote http (OAuth) with no env token, so
+  # there is nothing to inject. Obsidian lives in ~/.claude.json (see merge above).
   _inject_obsidian_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  _inject_obsidian_token "$HOME/.claude/settings.json"
+  _inject_obsidian_token "$HOME/.claude.json"
 
   # OpenCode MCP config
   _opencode_config="$HOME/.config/opencode/opencode.jsonc"

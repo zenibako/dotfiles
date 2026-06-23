@@ -6,60 +6,10 @@ import file
 # (resolved by dotter during deploy), so the source file is valid JSONC
 # but the deployed file is plain JSON after dotter renders it.
 
-_SHELL_PATH = "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-
-# Build the full config dict with Handlebars markers for conditionals
-settings = {
-    "enabledPlugins" = {
-        "chrome-devtools-mcp@claude-plugins-official": True
-        "coderabbit@claude-plugins-official": True
-        "frontend-design@claude-plugins-official": True
-        "gopls-lsp@claude-plugins-official": True
-        "lattice@lattice": True
-        "lua-lsp@claude-plugins-official": True
-        "swift-lsp@claude-plugins-official": True
-        "typescript-lsp@claude-plugins-official": True
-    }
-    "extraKnownMarketplaces" = {
-        "lattice": {
-            "source": {
-                "source": "github"
-                "repo": "techygarg/lattice"
-            }
-        }
-    }
-    "autoUpdatesChannel": "stable"
-    "editorMode": "vim"
-    "skipAutoPermissionPrompt": True
-    "mcpServers": {
-        "Backlog": {
-            "command": "{{shell_bin_path}}/backlog"
-            "args": ["mcp", "start"]
-        }
-        "Chrome DevTools": {
-            "command": "{{shell_bin_path}}/npx"
-            "args": ["-y", "chrome-devtools-mcp@latest", "--launch"]
-            "env": {"PATH": _SHELL_PATH}
-        }
-        "GitHub": {
-            "command": "{{shell_bin_path}}/npx"
-            "args": ["-y", "@modelcontextprotocol/server-github"]
-        }
-        "Jujutsu": {
-            "command": "{{shell_bin_path}}/npx"
-            "args": ["-y", "jj-mcp-server"]
-            "env": {"PATH": _SHELL_PATH}
-        }
-        "Playwright": {
-            "command": "{{shell_bin_path}}/npx"
-            "args": ["-y", "@playwright/mcp@latest"]
-            "env": {"PATH": _SHELL_PATH}
-        }
-    }
-}
-
-# Emit as JSON with Handlebars conditionals
-# We build the JSON string manually to include Handlebars markers
+# Emit settings.json as JSON with Handlebars conditionals. We build the JSON
+# string manually to include Handlebars markers. MCP servers are NOT emitted
+# here — Claude Code ignores `mcpServers` in settings.json. They live in a
+# separate file (out/claude-code/mcp.json) merged into ~/.claude.json.
 _json_parts = [
     """{
 {{#if (eq claude_model_at_top true)}}
@@ -100,8 +50,7 @@ _json_parts = [
   "editorMode": "vim",
 {{#if (eq claude_agent_push_notif_enabled true)}}
   "agentPushNotifEnabled": true,
-{{/if}}
-  "skipAutoPermissionPrompt": true,"""
+{{/if}}"""
     """{{#if (eq bartender_hooks_enabled true)}}
   "hooks": {
     "Notification": [
@@ -246,24 +195,35 @@ _json_parts = [
     ]
   },
 {{/if}}"""
-    """  "mcpServers": {
+    """  "skipAutoPermissionPrompt": true{{#if (eq claude_model_at_top false)}},
+  "model": "{{claude_model}}"{{/if}}
+}"""
+]
+
+# Join all parts — no outer wrapping, each part is self-contained
+_settings_json = "\n".join(_json_parts)
+
+file.write("out/claude-code/settings.json", _settings_json)
+
+# ── Claude Code MCP servers (out/claude-code/mcp.json) ──────────────────
+# Claude Code ignores `mcpServers` in settings.json; user-global MCP servers
+# must live in ~/.claude.json top-level `mcpServers`. post_deploy.sh merges
+# this file into ~/.claude.json with `--replace mcpServers`, which is safe
+# because every value here is rendered (tokens come from Handlebars vars, not
+# post-deploy injection) — see merge_json_config.py.
+#
+# Each optional server is its own independent {{#if}} with a LEADING comma, so
+# enabling one never depends on another. "Chrome DevTools" is intentionally
+# omitted: it is provided by the chrome-devtools-mcp plugin (enabledPlugins),
+# and an explicit entry here would create a duplicate server.
+_mcp_json = """{
+  "mcpServers": {
     "Backlog": {
       "args": [
         "mcp",
         "start"
       ],
       "command": "{{shell_bin_path}}/backlog"
-    },
-    "Chrome DevTools": {
-      "args": [
-        "-y",
-        "chrome-devtools-mcp@latest",
-        "--launch"
-      ],
-      "command": "{{shell_bin_path}}/npx",
-      "env": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
     },
     "GitHub": {
       "type": "http",
@@ -292,7 +252,7 @@ _json_parts = [
     "Atlassian": {
       "type": "http",
       "url": "https://mcp.atlassian.com/v1/mcp"
-    }{{#if (eq mcp_obsidian_enabled true)}},
+    }{{/if}}{{#if (eq mcp_obsidian_enabled true)}},
     "Obsidian": {
       "args": [
         "-y",
@@ -307,13 +267,27 @@ _json_parts = [
         "MCP_OBSIDIAN_AUTH": "Bearer {{mcp_obsidian_token}}",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }{{/if}}{{/if}}
-  }{{#if (eq claude_model_at_top false)}},
-  "model": "{{claude_model}}"{{/if}}
+    }{{/if}}{{#if mcp_sonarqube_enabled}},
+    "SonarQube": {
+      "args": [
+        "run",
+        "--init",
+        "--pull=never",
+        "-i",
+        "--rm",
+        "-e",
+        "SONARQUBE_URL",
+        "-e",
+        "SONARQUBE_TOKEN",
+        "mcp/sonarqube:latest"
+      ],
+      "command": "docker",
+      "env": {
+        "SONARQUBE_URL": "{{sonarqube_url}}",
+        "SONARQUBE_TOKEN": "{{sonarqube_token}}"
+      }
+    }{{/if}}
+  }
 }"""
-]
 
-# Join all parts — no outer wrapping, each part is self-contained
-_full_json = "\n".join(_json_parts)
-
-file.write("out/claude-code/settings.json", _full_json)
+file.write("out/claude-code/mcp.json", _mcp_json)

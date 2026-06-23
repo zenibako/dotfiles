@@ -145,6 +145,7 @@ def main():
         ("opencode.jsonc", "opencode config", check_template_file),
         ("claude_desktop_config.json", "Claude Desktop config", check_template_file),
         ("claude-code/settings.json", "Claude Code settings", check_template_file),
+        ("claude-code/mcp.json", "Claude Code MCP config", check_template_file),
         ("zshenv", "zshenv", check_template_file),
     ]
 

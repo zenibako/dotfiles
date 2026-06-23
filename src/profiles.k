@@ -43,6 +43,10 @@ default = _shared.Profile {
         # live config (Claude Code rewrites the live file at runtime and
         # post_deploy injects a token, so dotter must not own it directly).
         "out/claude-code/settings.json" = { target = "~/.cache/dotfiles/claude_code_settings.rendered.json", type = "template" }
+        # MCP servers go to ~/.claude.json (Claude Code ignores mcpServers in
+        # settings.json). Rendered to a private staging file; post_deploy.sh
+        # merges it into ~/.claude.json with --replace mcpServers.
+        "out/claude-code/mcp.json" = { target = "~/.cache/dotfiles/claude_code_mcp.rendered.json", type = "template" }
         "src/agents/commands/go.md" = { target = "~/.claude/commands/go.md", type = "symbolic" }
         "src/agents/commands/fix-pipeline.md" = { target = "~/.claude/commands/fix-pipeline.md", type = "symbolic" }
         "src/agents/commands/coderabbit-review.md" = { target = "~/.claude/commands/coderabbit-review.md", type = "symbolic" }

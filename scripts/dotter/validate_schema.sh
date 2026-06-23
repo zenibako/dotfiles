@@ -580,17 +580,19 @@ elif [ "$MODE" = "--post-deploy" ]; then
   fi
   unset _claude_config
 
-  # Claude Code settings.json
+  # Claude Code settings.json (MCP servers are reported from ~/.claude.json,
+  # which is where Claude Code actually reads user-global mcpServers).
   _cc_settings="$HOME/.claude/settings.json"
+  _cc_mcp="$HOME/.claude.json"
   if [ -f "$_cc_settings" ] && has_python3; then
-    if _python3 "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings"; then
+    if _python3 "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings" "$_cc_mcp"; then
       echo "  Claude Code settings OK"
     else
       		_ERR "Claude Code settings validation failed" >&2
       FAILED=1
     fi
   fi
-  unset _cc_settings
+  unset _cc_settings _cc_mcp
 
   echo "==> Post-deploy validation finished."
   exit "$FAILED"
