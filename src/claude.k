@@ -51,5 +51,20 @@ claude_config = {
     }
 }
 
-# Emit the Claude Desktop config file
-file.write("out/claude_desktop_config.json", json.encode(claude_config, indent=2))
+# Emit the Claude Desktop config file.
+#
+# These preferences must render as JSON booleans, but their values come from
+# Handlebars variables that dotter substitutes at deploy time. json.encode wraps
+# every string value in quotes, so the rendered token is "{{var}}" and dotter
+# replaces only the inner {{var}}, leaving "true"/"false" — a string the app
+# rejects ("expected boolean, received string"). Strip the surrounding quotes
+# here so dotter emits a bare boolean.
+_rendered = json.encode(claude_config, indent=2).replace(
+    "\"{{claude_cowork_scheduled_tasks_enabled}}\"", "{{claude_cowork_scheduled_tasks_enabled}}"
+).replace(
+    "\"{{claude_bypass_permissions_value}}\"", "{{claude_bypass_permissions_value}}"
+).replace(
+    "\"{{claude_agent_push_notif_enabled}}\"", "{{claude_agent_push_notif_enabled}}"
+)
+
+file.write("out/claude_desktop_config.json", _rendered)
