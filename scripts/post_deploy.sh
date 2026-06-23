@@ -296,6 +296,41 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
   rm -f "$mcp_out" "$mcp_err"
 fi
 
+# ── Claude Code MCP health check ─────────────────────────────────────────
+# Mirrors the OpenCode check above for the servers we deploy to ~/.claude.json.
+# `claude mcp list` health-checks every server and can hang on a slow/broken
+# one, so it runs under a hard timeout and a failure/timeout is a non-fatal
+# WARNING (never aborts the deploy).
+if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
+  begin_wait "Checking Claude Code MCP servers" "up to 45s"
+  cc_mcp_out=$(mktemp)
+  cc_mcp_err=$(mktemp)
+
+  # Run from $HOME so only user-global servers are checked, not a project's
+  # local .mcp.json that might exist in the deploy working directory.
+  if ! ( cd "$HOME" && run_with_timeout 45 claude mcp list ) > "$cc_mcp_out" 2> "$cc_mcp_err"; then
+    echo "WARNING: claude mcp list command failed or timed out" >&2
+    [ -s "$cc_mcp_err" ] && cat "$cc_mcp_err" >&2
+  else
+    if command -v perl >/dev/null 2>&1; then
+      cc_mcp_clean=$(perl -pe 's/\e\[[0-9;]*m//g' < "$cc_mcp_out")
+    else
+      cc_mcp_clean=$(cat "$cc_mcp_out")
+    fi
+
+    cc_connected=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /✓ Connected/ {c++} END {print c}')
+    cc_failed=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /✗ Failed/ {c++} END {print c}')
+    : "${cc_connected:=0}" "${cc_failed:=0}"
+    cc_total=$((cc_connected + cc_failed))
+
+    [ "$cc_failed" -gt 0 ] && echo "WARNING: $cc_failed Claude Code MCP server(s) failed" >&2
+    if [ "$cc_total" -gt 0 ]; then
+      echo "  Claude Code MCPs: $cc_connected/$cc_total connected"
+    fi
+  fi
+  rm -f "$cc_mcp_out" "$cc_mcp_err"
+fi
+
 # ── Lua validation ────────────────────────────────────────────────────────
 if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
   echo "Validating Lua files..."
