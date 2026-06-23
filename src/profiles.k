@@ -104,6 +104,10 @@ default = _shared.Profile {
         sf_pg5_oauth_json = ""
         sf_pg5_oauth_client_id = ""
         sf_pg5_refresh_token = ""
+        # Netskope corporate CA bundle — work profile overrides with the real
+        # path. Defined here (empty) so unconditional references in default
+        # files (out/kiro/mcp.json) resolve under non-work profiles.
+        node_extra_ca_certs = ""
     }
 }
 
