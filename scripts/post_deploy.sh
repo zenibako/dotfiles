@@ -302,13 +302,15 @@ fi
 # one, so it runs under a hard timeout and a failure/timeout is a non-fatal
 # WARNING (never aborts the deploy).
 if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
-  begin_wait "Checking Claude Code MCP servers" "up to 45s"
+  begin_wait "Checking Claude Code MCP servers" "up to 90s"
   cc_mcp_out=$(mktemp)
   cc_mcp_err=$(mktemp)
 
   # Run from $HOME so only user-global servers are checked, not a project's
-  # local .mcp.json that might exist in the deploy working directory.
-  if ! ( cd "$HOME" && run_with_timeout 45 claude mcp list ) > "$cc_mcp_out" 2> "$cc_mcp_err"; then
+  # local .mcp.json that might exist in the deploy working directory. The
+  # timeout is generous: cold `npx`/`docker` startups plus remote/OAuth servers
+  # can be slow, and a too-short limit yields a spurious "timed out" warning.
+  if ! ( cd "$HOME" && run_with_timeout 90 claude mcp list ) > "$cc_mcp_out" 2> "$cc_mcp_err"; then
     echo "WARNING: claude mcp list command failed or timed out" >&2
     [ -s "$cc_mcp_err" ] && cat "$cc_mcp_err" >&2
   else
@@ -318,14 +320,23 @@ if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
       cc_mcp_clean=$(cat "$cc_mcp_out")
     fi
 
-    cc_connected=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /✓ Connected/ {c++} END {print c}')
-    cc_failed=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /✗ Failed/ {c++} END {print c}')
-    : "${cc_connected:=0}" "${cc_failed:=0}"
-    cc_total=$((cc_connected + cc_failed))
+    # Match on the status words, not the glyphs: `claude mcp list` renders the
+    # status as "Connected", "Failed to connect", or "Needs authentication"
+    # (an expected state for OAuth servers the user has not logged into), and
+    # the exact ✔/✘/! glyphs vary by version.
+    cc_connected=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /Connected/ {c++} END {print c}')
+    cc_failed=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /Failed to connect/ {c++} END {print c}')
+    cc_auth=$(echo "$cc_mcp_clean" | awk 'BEGIN{c=0} /Needs authentication/ {c++} END {print c}')
+    : "${cc_connected:=0}" "${cc_failed:=0}" "${cc_auth:=0}"
+    cc_total=$((cc_connected + cc_failed + cc_auth))
 
     [ "$cc_failed" -gt 0 ] && echo "WARNING: $cc_failed Claude Code MCP server(s) failed" >&2
     if [ "$cc_total" -gt 0 ]; then
-      echo "  Claude Code MCPs: $cc_connected/$cc_total connected"
+      if [ "$cc_auth" -gt 0 ]; then
+        echo "  Claude Code MCPs: $cc_connected/$cc_total connected ($cc_auth need auth)"
+      else
+        echo "  Claude Code MCPs: $cc_connected/$cc_total connected"
+      fi
     fi
   fi
   rm -f "$cc_mcp_out" "$cc_mcp_err"
