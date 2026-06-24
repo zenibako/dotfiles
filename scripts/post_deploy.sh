@@ -78,7 +78,7 @@ _merge_config() {
   shift 2
   [ -f "$_rendered" ] && command -v "$PYTHON" >/dev/null 2>&1 || return 0
   "$PYTHON" "$_scripts/merge_json_config.py" "$_rendered" "$_live" "$@" \
-    || echo "  WARNING: Failed to merge $(basename "$_live")"
+    || _WARN "Failed to merge $(basename "$_live")"
 }
 echo "Merging dotfiles-managed app configs..."
 _merge_config "$HOME/.cache/dotfiles/claude_desktop_config.rendered.json" \
@@ -242,7 +242,7 @@ _ensure_secret_cache() {
   fi
   _try_backend "$_kc_script" "$HOME/.cache/macos-keychain-secrets.env" && return 0
   _diagnose_backend_failure "macOS Keychain" "$_kc_script" || true
-  echo "WARNING: No secret backend available; secrets will not be injected." >&2
+  _WARN "No secret backend available; secrets will not be injected."
   return 1
 }
 
@@ -278,7 +278,7 @@ if gh:
     print('  OK')
 else:
     print('  SKIP: GitHub MCP not found')
-" 2>/dev/null || echo "  WARNING: Failed to patch $(basename "$config_file")"
+" 2>/dev/null || _WARN "Failed to patch $(basename "$config_file")"
 }
 
 # Patch the Obsidian MCP bearer token into a Claude config's env. The template
@@ -304,7 +304,7 @@ if obs:
     print('  OK')
 else:
     print('  SKIP: Obsidian MCP not found')
-" 2>/dev/null || echo "  WARNING: Failed to patch $(basename "$config_file")"
+" 2>/dev/null || _WARN "Failed to patch $(basename "$config_file")"
 }
 
 if _ensure_secret_cache; then
@@ -328,7 +328,7 @@ if _ensure_secret_cache; then
     _tok=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") && _patch_args="$_patch_args --obsidian-token $_tok"
     if [ -n "$_patch_args" ]; then
       echo "  Patching OpenCode MCP config..."
-      "$PYTHON" "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || echo "  WARNING: Failed to patch OpenCode config"
+      "$PYTHON" "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || _WARN "Failed to patch OpenCode config"
     fi
     unset _patch_args _tok
   fi
@@ -388,7 +388,7 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
   mcp_err=$(mktemp)
 
   if ! run_with_timeout 30 opencode mcp list > "$mcp_out" 2> "$mcp_err"; then
-    echo "WARNING: opencode mcp list command failed or timed out" >&2
+    _WARN "opencode mcp list command failed or timed out"
     [ -s "$mcp_err" ] && cat "$mcp_err" >&2
   else
     if command -v perl >/dev/null 2>&1; then
@@ -402,7 +402,7 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
     failed=$(echo "$mcp_clean" | awk 'BEGIN{c=0} /^[[:space:]]*●[[:space:]]+✗/ {c++} END {print c}')
     : "${total:=0}" "${connected:=0}" "${failed:=0}"
 
-    [ "$failed" -gt 0 ] && echo "WARNING: $failed MCP server(s) failed" >&2
+    [ "$failed" -gt 0 ] && _WARN "$failed MCP server(s) failed"
     if [ "$total" -gt 0 ]; then
       echo "  OpenCode MCPs: $connected/$total connected"
     fi
@@ -425,7 +425,7 @@ if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
   # timeout is generous: cold `npx`/`docker` startups plus remote/OAuth servers
   # can be slow, and a too-short limit yields a spurious "timed out" warning.
   if ! ( cd "$HOME" && run_with_timeout 90 claude mcp list ) > "$cc_mcp_out" 2> "$cc_mcp_err"; then
-    echo "WARNING: claude mcp list command failed or timed out" >&2
+    _WARN "claude mcp list command failed or timed out"
     [ -s "$cc_mcp_err" ] && cat "$cc_mcp_err" >&2
   else
     if command -v perl >/dev/null 2>&1; then
@@ -444,7 +444,7 @@ if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
     : "${cc_connected:=0}" "${cc_failed:=0}" "${cc_auth:=0}"
     cc_total=$((cc_connected + cc_failed + cc_auth))
 
-    [ "$cc_failed" -gt 0 ] && echo "WARNING: $cc_failed Claude Code MCP server(s) failed" >&2
+    [ "$cc_failed" -gt 0 ] && _WARN "$cc_failed Claude Code MCP server(s) failed"
     if [ "$cc_total" -gt 0 ]; then
       if [ "$cc_auth" -gt 0 ]; then
         echo "  Claude Code MCPs: $cc_connected/$cc_total connected ($cc_auth need auth)"
@@ -464,7 +464,7 @@ if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
   _lua_errs=$(mktemp)
   find "$DEPLOYED/nvim" -name '*.lua' -type f 2>/dev/null | while IFS= read -r _lua_file; do
     if ! luac -p "$_lua_file" >/dev/null 2>&1; then
-      echo "ERROR: Lua syntax error in $_lua_file" >&2
+      _ERR "Lua syntax error in $_lua_file"
       echo x >> "$_lua_errs"
     fi
   done
@@ -484,7 +484,7 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
   if grep -E '^E[0-9]+:|Error while calling lua chunk|Error loading plugin config' /tmp/nvim-startup.log 2>/dev/null \
        | grep -v 'image\.nvim\|image\.lua\|image/backends\|terminal size\|non-terminal' \
        | grep -q .; then
-    echo "ERROR: Neovim startup errors detected:" >&2
+    _ERR "Neovim startup errors detected:"
     cat /tmp/nvim-startup.log >&2
     exit 1
   fi

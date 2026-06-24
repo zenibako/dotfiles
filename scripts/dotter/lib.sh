@@ -3,6 +3,26 @@
 # Usage: . "$(dirname "$0")/dotter/lib.sh"  (from scripts/)
 #        . "$_scripts/lib.sh"               (when $_scripts is set)
 
+# ── ANSI colors + output helpers ─────────────────────────────────────────
+# Single source of truth for every deploy script. Colors are emitted only when
+# stdout is a terminal and NO_COLOR is unset, so piped/CI output and captured
+# logs stay free of escape sequences. _ERR/_WARN go to stderr, _OK to stdout.
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+  COLOR_RED='\033[31m'
+  COLOR_YELLOW='\033[33m'
+  COLOR_GREEN='\033[32m'
+  COLOR_RESET='\033[0m'
+else
+  COLOR_RED=''
+  COLOR_YELLOW=''
+  COLOR_GREEN=''
+  COLOR_RESET=''
+fi
+
+_ERR()  { printf "${COLOR_RED}ERROR:${COLOR_RESET} %s\n" "$1" >&2; }
+_WARN() { printf "${COLOR_YELLOW}WARNING:${COLOR_RESET} %s\n" "$1" >&2; }
+_OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
+
 # ── Repo root resolution ─────────────────────────────────────────────────
 # Sets REPO_ROOT. Tries git first, then walks up from the caller's location.
 resolve_repo_root() {
@@ -59,7 +79,7 @@ run_with_timeout() {
 # Usage: begin_wait "Validating LSP attachments" "up to 5 min"
 begin_wait() {
   if [ -t 1 ]; then
-    printf '\033[33m⏳ %s — this can take %s, please wait...\033[0m\n' "$1" "$2"
+    printf "${COLOR_YELLOW}⏳ %s — this can take %s, please wait...${COLOR_RESET}\n" "$1" "$2"
   else
     printf '==> %s — this can take %s, please wait...\n' "$1" "$2"
   fi

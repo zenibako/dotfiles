@@ -22,7 +22,7 @@ if command -v uv >/dev/null 2>&1 && [ -n "$REPO_ROOT" ]; then
 fi
 
 if [ -z "$REPO_ROOT" ]; then
-  echo "WARNING: could not locate repo root for KCL regeneration" >&2
+  _WARN "could not locate repo root for KCL regeneration"
 elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
   echo "Regenerating configs from KCL..."
   cd "$REPO_ROOT"
@@ -31,15 +31,15 @@ elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
   if [ -f "$REPO_ROOT/local.k" ]; then
     LOCAL_K="$REPO_ROOT/local.k"
   else
-    echo "ERROR: local.k not found at repo root. Copy local.k.example to local.k and fill in values." >&2
+    _ERR "local.k not found at repo root. Copy local.k.example to local.k and fill in values."
     exit 1
   fi
-  kcl run src/main.k "$LOCAL_K" >/dev/null || { echo "ERROR: KCL generation failed" >&2; exit 1; }
-  "$PYTHON" scripts/dotter/generate_from_kcl.py || { echo "ERROR: Python conversion failed" >&2; exit 1; }
-  "$PYTHON" scripts/dotter/validate_generated.py || { echo "ERROR: Generated config validation failed" >&2; exit 1; }
+  kcl run src/main.k "$LOCAL_K" >/dev/null || { _ERR "KCL generation failed"; exit 1; }
+  "$PYTHON" scripts/dotter/generate_from_kcl.py || { _ERR "Python conversion failed"; exit 1; }
+  "$PYTHON" scripts/dotter/validate_generated.py || { _ERR "Generated config validation failed"; exit 1; }
   echo "  Configs regenerated."
 else
-  echo "ERROR: KCL is required for this repository but was not found." >&2
+  _ERR "KCL is required for this repository but was not found."
   echo "       Install it with: brew install kcl-lang/tap/kcl" >&2
   exit 1
 fi
@@ -47,7 +47,7 @@ fi
 LOCAL_CONFIG="${DOTTER_LOCAL_CONFIG:-.dotter/local.toml}"
 
 if [ ! -f "$LOCAL_CONFIG" ]; then
-  echo "Missing local config: $LOCAL_CONFIG" >&2
+  _ERR "Missing local config: $LOCAL_CONFIG"
   exit 1
 fi
 

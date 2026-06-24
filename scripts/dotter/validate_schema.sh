@@ -5,14 +5,9 @@
 
 set -eu
 
-# ANSI color codes for warnings and errors
-COLOR_YELLOW='\033[33m'
-COLOR_RED='\033[31m'
-COLOR_GREEN='\033[32m'
-COLOR_RESET='\033[0m'
-_WARN() { printf "${COLOR_YELLOW}WARNING:${COLOR_RESET} %s\n" "$1" >&2; }
-_ERR()  { printf "${COLOR_RED}ERROR:${COLOR_RESET} %s\n" "$1" >&2; }
-_OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
+# Shared ANSI colors + output helpers (COLOR_*, _ERR/_WARN/_OK).
+# shellcheck source=lib.sh
+. "$(cd "$(dirname "$0")" 2>/dev/null && pwd)/lib.sh"
 
 MODE="${1:---pre-deploy}"
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
@@ -177,7 +172,7 @@ except ImportError:
     echo "  Skipping TOML validation (no toml module)"
     return 0
   elif [ "$rc" -ne 0 ]; then
-    		_ERR "TOML validation failed: $_file" >&2
+    		_ERR "TOML validation failed: $_file"
     _python3 -c "
 import sys
 try:
@@ -218,7 +213,7 @@ validate_jsonc() {
   if _python3 "$_SCRIPTS/validate_jsonc.py" "$_file"; then
     echo "  JSONC OK: $_file"
   else
-    		_ERR "JSONC validation failed: $_file" >&2
+    		_ERR "JSONC validation failed: $_file"
     return 1
   fi
 }
@@ -236,7 +231,7 @@ validate_jsonc_schema() {
     if _python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
-      		_WARN "JSONC schema validation failed: $_file (schema may be outdated)" >&2
+      		_WARN "JSONC schema validation failed: $_file (schema may be outdated)"
       # Fall through to basic validation
     fi
   else
@@ -268,7 +263,7 @@ validate_aerospace() {
       echo "  Skipping AeroSpace validation (AeroSpace.app not running)"
       return 0 ;;
     *)
-      _ERR "AeroSpace config validation failed: $_file" >&2
+      _ERR "AeroSpace config validation failed: $_file"
       printf '%s\n' "$_modes" | sed 's/^/    /' >&2
       return 1 ;;
   esac
@@ -285,7 +280,7 @@ validate_ghostty() {
   fi
 
   if ! ghostty +validate-config --config-file="$_file" 2>&1 >/dev/null; then
-    		_ERR "Ghostty config validation failed: $_file" >&2
+    		_ERR "Ghostty config validation failed: $_file"
     return 1
   fi
   echo "  Ghostty OK: $_file"
@@ -304,7 +299,7 @@ validate_handlebars_placeholders() {
   if ! has_python3; then
     # Fallback: naive grep for all placeholders (no local.toml cross-reference)
     if grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >/dev/null 2>/dev/null; then
-      		_WARN "Possible unreplaced Handlebars in $_file:" >&2
+      		_WARN "Possible unreplaced Handlebars in $_file:"
       grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >&2
     fi
     return 0
@@ -487,7 +482,7 @@ json.loads(s)
 " >/dev/null 2>&1; then
       echo "  Claude Desktop config source OK"
     else
-      _ERR "Claude Desktop config source validation failed" >&2
+      _ERR "Claude Desktop config source validation failed"
       FAILED=1
     fi
   fi
@@ -537,7 +532,7 @@ except ImportError:
       echo "  Skipping YAML validation (no yaml module)"
       continue
     elif [ "$rc" -ne 0 ]; then
-      		_ERR "YAML validation failed: $_file" >&2
+      		_ERR "YAML validation failed: $_file"
       _python3 -c "import yaml; yaml.safe_load(open('$_file'))" >&2 || true
       FAILED=1
     else
@@ -587,7 +582,7 @@ elif [ "$MODE" = "--post-deploy" ]; then
     if _python3 -c "import json; json.load(open('$_claude_config'))" >/dev/null 2>&1; then
       echo "  Claude Desktop config OK"
     else
-      		_ERR "Claude Desktop config validation failed" >&2
+      		_ERR "Claude Desktop config validation failed"
       FAILED=1
     fi
   fi
@@ -601,7 +596,7 @@ elif [ "$MODE" = "--post-deploy" ]; then
     if _python3 "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings" "$_cc_mcp"; then
       echo "  Claude Code settings OK"
     else
-      		_ERR "Claude Code settings validation failed" >&2
+      		_ERR "Claude Code settings validation failed"
       FAILED=1
     fi
   fi
