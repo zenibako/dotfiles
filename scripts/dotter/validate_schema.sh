@@ -172,7 +172,7 @@ except ImportError:
     echo "  Skipping TOML validation (no toml module)"
     return 0
   elif [ "$rc" -ne 0 ]; then
-    		_ERR "TOML validation failed: $_file"
+    _ERR "TOML validation failed: $_file"
     _python3 -c "
 import sys
 try:
@@ -213,7 +213,7 @@ validate_jsonc() {
   if _python3 "$_SCRIPTS/validate_jsonc.py" "$_file"; then
     echo "  JSONC OK: $_file"
   else
-    		_ERR "JSONC validation failed: $_file"
+    _ERR "JSONC validation failed: $_file"
     return 1
   fi
 }
@@ -231,7 +231,7 @@ validate_jsonc_schema() {
     if _python3 "$_SCRIPTS/validate_jsonc_schema.py" "$_file" >/dev/null 2>&1; then
       echo "  JSONC schema OK: $_file"
     else
-      		_WARN "JSONC schema validation failed: $_file (schema may be outdated)"
+      _WARN "JSONC schema validation failed: $_file (schema may be outdated)"
       # Fall through to basic validation
     fi
   else
@@ -280,7 +280,7 @@ validate_ghostty() {
   fi
 
   if ! ghostty +validate-config --config-file="$_file" 2>&1 >/dev/null; then
-    		_ERR "Ghostty config validation failed: $_file"
+    _ERR "Ghostty config validation failed: $_file"
     return 1
   fi
   echo "  Ghostty OK: $_file"
@@ -299,7 +299,7 @@ validate_handlebars_placeholders() {
   if ! has_python3; then
     # Fallback: naive grep for all placeholders (no local.toml cross-reference)
     if grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >/dev/null 2>/dev/null; then
-      		_WARN "Possible unreplaced Handlebars in $_file:"
+      _WARN "Possible unreplaced Handlebars in $_file:"
       grep -nE '\{\{\s*[#/]?[a-zA-Z0-9_\.]+(\s[^}]*)?\}\}' "$_file" >&2
     fi
     return 0
@@ -532,7 +532,7 @@ except ImportError:
       echo "  Skipping YAML validation (no yaml module)"
       continue
     elif [ "$rc" -ne 0 ]; then
-      		_ERR "YAML validation failed: $_file"
+      _ERR "YAML validation failed: $_file"
       _python3 -c "import yaml; yaml.safe_load(open('$_file'))" >&2 || true
       FAILED=1
     else
@@ -582,7 +582,7 @@ elif [ "$MODE" = "--post-deploy" ]; then
     if _python3 -c "import json; json.load(open('$_claude_config'))" >/dev/null 2>&1; then
       echo "  Claude Desktop config OK"
     else
-      		_ERR "Claude Desktop config validation failed"
+      _ERR "Claude Desktop config validation failed"
       FAILED=1
     fi
   fi
@@ -596,7 +596,7 @@ elif [ "$MODE" = "--post-deploy" ]; then
     if _python3 "$_SCRIPTS/validate_cc_settings.py" "$_cc_settings" "$_cc_mcp"; then
       echo "  Claude Code settings OK"
     else
-      		_ERR "Claude Code settings validation failed"
+      _ERR "Claude Code settings validation failed"
       FAILED=1
     fi
   fi
