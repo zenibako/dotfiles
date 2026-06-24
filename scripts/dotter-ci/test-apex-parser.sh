@@ -4,6 +4,10 @@
 
 set -e
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 PARSERS_LUA=$(mktemp)
 trap 'rm -f "$PARSERS_LUA"' EXIT
 
@@ -20,7 +24,7 @@ REVISION=$(awk '
 ' "$PARSERS_LUA")
 
 if [ -z "$REVISION" ]; then
-  echo "ERROR: Could not extract apex revision from $PARSERS_LUA"
+  _ERR "Could not extract apex revision from $PARSERS_LUA"
   exit 1
 fi
 
@@ -33,12 +37,12 @@ git clone --quiet https://github.com/aheber/tree-sitter-sfapex "$WORKDIR/sfapex"
 git -C "$WORKDIR/sfapex" checkout --quiet "$REVISION"
 
 if ! tree-sitter build -o "$WORKDIR/apex.so" "$WORKDIR/sfapex/apex"; then
-  echo "ERROR: Apex tree-sitter parser failed to compile"
+  _ERR "Apex tree-sitter parser failed to compile"
   exit 1
 fi
 
 if [ ! -s "$WORKDIR/apex.so" ]; then
-  echo "ERROR: tree-sitter build reported success but apex.so is missing or empty"
+  _ERR "tree-sitter build reported success but apex.so is missing or empty"
   exit 1
 fi
 

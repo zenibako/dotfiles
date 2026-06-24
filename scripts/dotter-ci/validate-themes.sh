@@ -5,6 +5,10 @@
 
 set -euo pipefail
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 # Array to track all temp directories for cleanup
 DEPLOY_DIRS=()
 
@@ -58,9 +62,9 @@ EOF
   # Run dotter from the copied repo so post_deploy.sh can resolve scripts/
   pushd "$DEPLOY_DIR" > /dev/null
   if HOME="$DEPLOY_DIR" dotter deploy --force --verbose --noconfirm 2>&1 | tee "/tmp/theme-$theme.log"; then
-    echo "✓ Theme $theme deployed successfully"
+    _PASS "Theme $theme deployed successfully"
   else
-    echo "✗ Theme $theme failed to deploy"
+    _FAIL "Theme $theme failed to deploy"
     cat "/tmp/theme-$theme.log"
     FAILED=1
   fi
@@ -68,9 +72,9 @@ EOF
 done
 
 if [ $FAILED -eq 1 ]; then
-  echo "ERROR: Some themes failed validation"
+  _ERR "Some themes failed validation"
   exit 1
 fi
 
-echo "✓ All themes validated successfully!"
+_PASS "All themes validated successfully!"
 rm -f /tmp/theme-*.log

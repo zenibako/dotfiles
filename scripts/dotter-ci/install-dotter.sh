@@ -4,6 +4,10 @@
 
 set -e
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 if command -v dotter &> /dev/null; then
   echo "dotter already installed: $(dotter --version)"
   exit 0
@@ -21,7 +25,7 @@ case "$OSTYPE" in
     brew install dotter
     ;;
   *)
-    echo "Unknown platform: $OSTYPE"
+    _ERR "Unknown platform: $OSTYPE"
     exit 1
     ;;
 esac

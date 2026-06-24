@@ -4,10 +4,14 @@
 
 set -e
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 DEPLOY_DIR="${1:-$(cat /tmp/dotter_deploy_dir 2>/dev/null)}"
 
 if [ -z "$DEPLOY_DIR" ] || [ ! -d "$DEPLOY_DIR" ]; then
-  echo "Error: Deploy directory not found"
+  _ERR "Deploy directory not found"
   echo "Usage: install-nvim-plugins.sh <deploy-dir>"
   exit 1
 fi

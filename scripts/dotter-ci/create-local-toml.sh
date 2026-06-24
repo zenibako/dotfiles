@@ -10,6 +10,10 @@
 
 set -e
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 FORCE=0
 CI_MODE=0
 
@@ -48,7 +52,7 @@ while [ $# -gt 0 ]; do
       break
       ;;
     -*)
-      echo "Unknown option: $1" >&2
+      _ERR "Unknown option: $1"
       usage >&2
       exit 1
       ;;
@@ -81,7 +85,7 @@ fi
 if [ -n "$REAL_LOCAL" ] && [ "$OUTPUT_ABS" = "$REAL_LOCAL" ]; then
   # Writing to the real local.toml — only allowed in CI/testing context
   if [ "$CI_MODE" -ne 1 ] && [ -z "${CI:-}" ] && [ -z "${DOTTER_TESTING:-}" ]; then
-    echo "SAFETY BLOCKED: refusing to overwrite real .dotter/local.toml with test data." >&2
+    _ERR "SAFETY BLOCKED: refusing to overwrite real .dotter/local.toml with test data."
     echo "" >&2
     echo "Target: $OUTPUT_ABS" >&2
     echo "This script generates sample/test values that will destroy your secrets." >&2
@@ -96,7 +100,7 @@ if [ -n "$REAL_LOCAL" ] && [ "$OUTPUT_ABS" = "$REAL_LOCAL" ]; then
 fi
 
 if [ -e "$OUTPUT" ] && [ "$FORCE" -ne 1 ]; then
-  echo "Refusing to overwrite existing file: $OUTPUT" >&2
+  _ERR "Refusing to overwrite existing file: $OUTPUT"
   echo "Use a temporary output path, or pass --force only when overwriting is intentional." >&2
   exit 1
 fi
@@ -107,7 +111,7 @@ case "$OSTYPE" in
   linux-gnu*) PLATFORM_PKG="linux" ;;
   darwin*) PLATFORM_PKG="mac" ;;
   *)
-    echo "Unknown platform: $OSTYPE"
+    _ERR "Unknown platform: $OSTYPE"
     exit 1
     ;;
 esac

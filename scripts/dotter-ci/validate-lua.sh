@@ -5,10 +5,14 @@
 
 set -e
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 DEPLOY_DIR="${1:-$HOME/.config/nvim}"
 
 if [ ! -d "$DEPLOY_DIR" ]; then
-  echo "⚠ No nvim config found in $DEPLOY_DIR, skipping Lua validation"
+  _WARN "No nvim config found in $DEPLOY_DIR, skipping Lua validation"
   exit 0
 fi
 
@@ -28,17 +32,17 @@ FAILED=0
 
 while IFS= read -r file; do
   if ! luac -p "$file" > /dev/null 2>&1; then
-    echo "✗ Syntax error in $file"
+    _FAIL "Syntax error in $file"
     luac -p "$file" 2>&1 || true
     FAILED=1
   else
-    echo "✓ $file"
+    _PASS "$file"
   fi
 done < <(find "$DEPLOY_DIR" -name "*.lua" -type f 2>/dev/null)
 
 if [ $FAILED -eq 1 ]; then
-  echo "ERROR: Lua validation failed"
+  _ERR "Lua validation failed"
   exit 1
 fi
 
-echo "✓ All Lua files are valid!"
+_PASS "All Lua files are valid!"

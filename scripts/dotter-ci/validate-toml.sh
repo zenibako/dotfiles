@@ -5,6 +5,10 @@
 
 set -e
 
+# Shared ANSI colors + output helpers (_ERR/_WARN/_OK/_PASS/_FAIL).
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 # Check if we have toml support
 # Returns: 0=valid, 1=invalid, 2=no toml module
 check_toml() {
@@ -38,20 +42,20 @@ fi
 FAILED=0
 for file in "${FILES[@]}"; do
   if [ ! -f "$file" ]; then
-    echo "⚠ $file not found, skipping"
+    _WARN "$file not found, skipping"
     continue
   fi
-  
+
   check_toml "$file"
   rc=$?
-  
+
   if [ $rc -eq 0 ]; then
-    echo "✓ $file is valid TOML"
+    _PASS "$file is valid TOML"
   elif [ $rc -eq 2 ]; then
-    echo "⚠ Python toml module not available (install with: pip install toml)"
+    _WARN "Python toml module not available (install with: pip install toml)"
     exit 1
   else
-    echo "✗ $file failed validation"
+    _FAIL "$file failed validation"
     python3 -c '
 import sys
 try:

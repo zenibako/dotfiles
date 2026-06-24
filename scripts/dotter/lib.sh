@@ -23,6 +23,11 @@ _ERR()  { printf "${COLOR_RED}ERROR:${COLOR_RESET} %s\n" "$1" >&2; }
 _WARN() { printf "${COLOR_YELLOW}WARNING:${COLOR_RESET} %s\n" "$1" >&2; }
 _OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
 
+# Per-item check results (used in validation loops). _PASS to stdout, _FAIL to
+# stderr; both keep the ✓/✗ glyph idiom but pull their color from above.
+_PASS() { printf "${COLOR_GREEN}✓${COLOR_RESET} %s\n" "$1"; }
+_FAIL() { printf "${COLOR_RED}✗${COLOR_RESET} %s\n" "$1" >&2; }
+
 # ── Repo root resolution ─────────────────────────────────────────────────
 # Sets REPO_ROOT. Tries git first, then walks up from the caller's location.
 resolve_repo_root() {
