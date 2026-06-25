@@ -1,7 +1,9 @@
 ---@type vim.lsp.Config
 return {
   cmd = { "yaml-language-server", "--stdio" },
-  filetypes = { "yaml", "yaml.docker-compose", "yaml.gitlab" },
+  -- `yaml.gitlab` intentionally omitted: gitlab_ci_ls owns GitLab CI files
+  -- (avoids duplicate completion/diagnostics from two servers on one buffer).
+  filetypes = { "yaml", "yaml.docker-compose" },
   root_markers = { ".git" },
   single_file_support = true,
   settings = {

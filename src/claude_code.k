@@ -26,9 +26,6 @@ _json_parts = [
 {{/if}}
     "lattice@lattice": true,
     "lua-lsp@claude-plugins-official": true,
-{{#if (eq claude_plugin_extra_lsps true)}}
-    "python-lsp@claude-plugins-official": true,
-{{/if}}
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true{{#if (eq claude_plugin_extra_lsps true)}},
     "yaml-lsp@claude-plugins-official": true{{/if}}{{#if (eq claude_plugin_clangd_lsp true)}},

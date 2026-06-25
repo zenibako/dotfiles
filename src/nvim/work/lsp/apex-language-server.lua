@@ -114,7 +114,9 @@ if not apex_jar_path then
 end
 
 local config = {
-	filetypes = { "java", "trigger", "apex", "apexcode" },
+	-- "java" intentionally omitted: jorje would otherwise attach to real Java
+	-- files and parse them as Apex. Apex sources resolve to apex/apexcode.
+	filetypes = { "trigger", "apex", "apexcode" },
 	root_markers = { "sfdx-project.json" },
 	apex_jar_path = apex_jar_path,
 	apex_enable_semantic_errors = false,

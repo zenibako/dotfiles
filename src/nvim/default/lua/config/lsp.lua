@@ -76,13 +76,11 @@ vim.lsp.enable({
   "lwc_ls",
   "starlark_rust",
   "terraformls",
-  "ts_ls",
   "visualforce_ls",
 {{/if}}
   "yamlls",
   "taplo",
 {{#if opencode_profile_personal}}
-  "ts_ls",
   "cue",
   "starlark_rust",
   "sourcekit",
