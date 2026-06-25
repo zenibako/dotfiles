@@ -15,6 +15,12 @@ fi
 resolve_repo_root
 resolve_python
 
+# Ensure Python venv and dependencies exist
+if command -v uv >/dev/null 2>&1 && [ -n "$REPO_ROOT" ]; then
+  [ -d "$REPO_ROOT/.venv" ] || uv venv "$REPO_ROOT/.venv" >/dev/null 2>&1
+  uv pip install -q -r "$REPO_ROOT/requirements.txt" 2>/dev/null || true
+fi
+
 if [ -z "$REPO_ROOT" ]; then
   echo "WARNING: could not locate repo root for KCL regeneration" >&2
 elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then

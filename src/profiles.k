@@ -160,7 +160,6 @@ work = _shared.Profile {
         opencode_plan_agent_model = "openai/gpt-5.4"
         opencode_test_agent_model = "openai/gpt-5.4"
         opencode_review_agent_model = "openai/gpt-5.4"
-        node_extra_ca_certs = ""
         p10k_root_dir = "$HOME/.p10k"
         claude_agent_push_notif_enabled = False
         claude_bypass_permissions_account_id = "cc63eabd-b672-4570-871a-fd0d4607e75d"
