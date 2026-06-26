@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Dotfiles-managed Colima autostart.
+
+  Replaces Homebrew's `brew services` agent (homebrew.mxcl.colima) so that the
+  daemon launches with XDG_CONFIG_HOME set. launchd agents do NOT load the shell
+  profile and do NOT expand `~`/`$HOME` in EnvironmentVariables, so without an
+  explicit XDG_CONFIG_HOME here Colima falls back to its legacy ~/.colima home —
+  which is exactly the split-brain (CLI uses ~/.config/colima, autostart uses
+  ~/.colima) this file exists to prevent.
+
+  Do NOT run `brew services start colima`: it would recreate its own agent and
+  you'd have two `colima start -f` instances fighting over the same VM.
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.colima.autostart</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>HOME</key>
+		<string>/Users/{{username}}</string>
+		<key>XDG_CONFIG_HOME</key>
+		<string>/Users/{{username}}/.config</string>
+	</dict>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/colima</string>
+		<string>start</string>
+		<string>-f</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<true/>
+	</dict>
+	<key>LimitLoadToSessionType</key>
+	<array>
+		<string>Aqua</string>
+		<string>Background</string>
+		<string>LoginWindow</string>
+		<string>StandardIO</string>
+		<string>System</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/{{username}}</string>
+	<key>StandardOutPath</key>
+	<string>/opt/homebrew/var/log/colima.log</string>
+	<key>StandardErrorPath</key>
+	<string>/opt/homebrew/var/log/colima.log</string>
+</dict>
+</plist>
