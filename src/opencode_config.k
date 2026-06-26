@@ -157,5 +157,10 @@ _jsonc_header = """/**
  */
 """
 
-# Build the JSONC output for the Python converter to write
-output_jsonc = _jsonc_header + json.encode(opencode, indent=2)
+# Build the JSONC output for the Python converter to write.
+# Obsidian's "enabled" is gated on the per-profile mcp_obsidian_enabled flag
+# (Personal only). json.encode quotes it as a string, so strip the quotes to
+# leave a bare Handlebars marker that dotter renders as a JSON boolean.
+output_jsonc = (_jsonc_header + json.encode(opencode, indent=2)).replace(
+    "\"{{mcp_obsidian_enabled}}\"", "{{mcp_obsidian_enabled}}"
+)

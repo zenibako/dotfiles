@@ -133,6 +133,12 @@ personal = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = True
         claude_epitaxy_personal_prefs_enabled = True
         claude_effort_level_enabled = True
+        # Obsidian MCP — Personal profile only (Work inherits disabled).
+        # TODO: confirm this endpoint matches your Obsidian Local REST API
+        # plugin's MCP URL on the personal machine; the token is injected from
+        # the keychain (MCP_OBSIDIAN_TOKEN) at post-deploy.
+        mcp_obsidian_enabled = True
+        mcp_obsidian_url = "http://127.0.0.1:27123/mcp"
     }
 }
 
@@ -168,6 +174,8 @@ work = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = False
         claude_epitaxy_personal_prefs_enabled = False
         claude_effort_level_enabled = False
+        # Obsidian MCP is Personal-only — keep it off on Work (also the default).
+        mcp_obsidian_enabled = False
     }
 }
 

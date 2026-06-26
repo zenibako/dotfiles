@@ -82,20 +82,20 @@ _mcp_servers = [
     {
         name = "Obsidian"
         # Local REST API plugin's built-in MCP endpoint (streamable HTTP).
-        # url + token injected by patch_opencode_secrets.py at post-deploy.
+        # Personal-profile only: gated on mcp_obsidian_enabled (True in the
+        # personal profile, False in default/work). url + token injected by
+        # patch_opencode_secrets.py at post-deploy.
         opencode = {
             "type" = "remote"
             "url" = "{{mcp_obsidian_url}}"
-            "enabled" = True
+            # Rendered as a bare boolean via the .replace() in opencode_config.k.
+            "enabled" = "{{mcp_obsidian_enabled}}"
         }
-        claude = {
-            "command" = "{{shell_bin_path}}/npx"
-                "args" = ["-y", "mcp-remote", "{{mcp_obsidian_url}}", "--allow-http", "--header", "Authorization:\${MCP_OBSIDIAN_AUTH}"]
-            "env" = {
-                "MCP_OBSIDIAN_AUTH" = "Bearer {{mcp_obsidian_token}}"
-                "PATH" = _SHELL_PATH
-            }
-        }
+        # Claude Desktop's mcpServers has no per-server "enabled" flag, so the
+        # whole entry must be wrapped in a Handlebars {{#if}} guard. KCL can't
+        # emit that through json.encode, so it is spliced in as raw text by
+        # claude.k (see the _obsidian_entry block there); None excludes it here.
+        claude = None
     }
     {
         name = "Salesforce DX"
