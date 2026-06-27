@@ -14,6 +14,12 @@
 #
 # Design principle: secrets are injected into specific config files only
 # (e.g. during `dotter deploy`) and never exported as shell env vars.
+#
+# Profile filtering: retrieval is scoped to the active dotter profile(s).
+# Shared secrets (GitHub PAT) are always fetched; personal-only and work-only
+# secrets are fetched solely under the matching profile. The active profile is
+# auto-detected from .dotter/local.toml's `packages` array, and can be
+# overridden with OPENCODE_PROFILE_PERSONAL / OPENCODE_PROFILE_WORK env vars.
 
 set -uo pipefail
 
@@ -24,6 +30,62 @@ _log_warn() { printf "[proton-pass] %s\n" "$1" >&2; }
 _log_info() { printf "[proton-pass] %s\n" "$1" >&2; }
 
 _has_proton_pass() { command -v pass-cli >/dev/null 2>&1; }
+
+# ── Active-profile detection ─────────────────────────────────────────────
+# Determine which dotter profiles (personal / work) are active so secret
+# retrieval can be filtered to the relevant set. Resolution order:
+#   1. Explicit env vars OPENCODE_PROFILE_PERSONAL / OPENCODE_PROFILE_WORK —
+#      if either is set it fully pins the decision ("true"/"1"/"yes"/"on" = on,
+#      anything else = off). Lets a caller override auto-detection.
+#   2. Otherwise, the `packages` array in .dotter/local.toml (the deployed
+#      profile set, which mirrors the profiles in src/profiles.k).
+# Sets PROFILE_PERSONAL and PROFILE_WORK to "1" (active) or "0" (inactive).
+_is_truthy() {
+    case "$1" in true|TRUE|True|1|yes|YES|on|ON) return 0 ;; *) return 1 ;; esac
+}
+
+# Emit one profile name per line from the `packages = [...]` array of a
+# .dotter/local.toml file. Handles both inline and multi-line array forms.
+_active_profiles_from_toml() {
+    local toml="$1"
+    [ -f "$toml" ] || return 0
+    awk '
+        /^[[:space:]]*packages[[:space:]]*=/ { inarr=1 }
+        inarr {
+            line=$0
+            while (match(line, /"[^"]*"/)) {
+                print substr(line, RSTART+1, RLENGTH-2)
+                line=substr(line, RSTART+RLENGTH)
+            }
+            if (index($0, "]")) inarr=0
+        }
+    ' "$toml"
+}
+
+_resolve_profiles() {
+    PROFILE_PERSONAL=0
+    PROFILE_WORK=0
+
+    # Explicit env-var override (presence of either var pins both decisions).
+    if [ -n "${OPENCODE_PROFILE_PERSONAL:-}" ] || [ -n "${OPENCODE_PROFILE_WORK:-}" ]; then
+        _is_truthy "${OPENCODE_PROFILE_PERSONAL:-}" && PROFILE_PERSONAL=1
+        _is_truthy "${OPENCODE_PROFILE_WORK:-}" && PROFILE_WORK=1
+        return 0
+    fi
+
+    # Auto-detect from the deployed dotter profile set.
+    local _repo _toml _p
+    _repo="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
+    _toml="$_repo/.dotter/local.toml"
+    while IFS= read -r _p; do
+        case "$_p" in
+            personal) PROFILE_PERSONAL=1 ;;
+            work) PROFILE_WORK=1 ;;
+        esac
+    done <<EOF
+$(_active_profiles_from_toml "$_toml")
+EOF
+}
 
 _cache_is_fresh() {
     if [ ! -f "$PROTON_PASS_CACHE" ]; then return 1; fi
@@ -108,46 +170,54 @@ _build_cache() {
 
     local val
 
-    # --- GitHub (PAT is in hidden field) ---
+    # Filter secret retrieval to the active dotter profile(s). The "Personal"
+    # argument below is the Proton Pass *vault* that stores everything — it is
+    # unrelated to the personal/work dotter profile gating.
+    _resolve_profiles
+    _log_info "Active profiles: personal=$PROFILE_PERSONAL work=$PROFILE_WORK"
+
+    # --- Shared credentials (fetched under every profile) ---
+    # GitHub PAT — the GitHub MCP is enabled in both profiles (see
+    # src/_shared/mcp.k) and its token is injected regardless of profile.
     val=$(_fetch_secret "Personal" "GitHub" "Personal Access Token") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
 
-    # --- Home Assistant ---
-    val=$(_fetch_secret "Personal" "Home Assistant" "PAT") && _write "HA_TOKEN" "$val" >> "$_tmp"
+    # --- Personal credentials (only if personal profile is active) ---
+    if [ "$PROFILE_PERSONAL" = "1" ]; then
+        # Home Assistant
+        val=$(_fetch_secret "Personal" "Home Assistant" "PAT") && _write "HA_TOKEN" "$val" >> "$_tmp"
 
-    # --- Bluesky (app password is in hidden field) ---
-    val=$(_fetch_secret "Personal" "Bluesky" "App Password") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
+        # Bluesky (app password is in hidden field)
+        val=$(_fetch_secret "Personal" "Bluesky" "App Password") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Plex (tokens are in hidden fields) ---
-    val=$(_fetch_secret "Personal" "Plex (DigitalGlue)" "User Token") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "Personal" "Plex (Personal)" "Server Token") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
+        # Plex (tokens are in hidden fields)
+        val=$(_fetch_secret "Personal" "Plex (DigitalGlue)" "User Token") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "Personal" "Plex (Personal)" "Server Token") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
 
-    # --- Brave Search ---
-    val=$(_fetch_secret "Personal" "Brave Search API") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
+        # Brave Search
+        val=$(_fetch_secret "Personal" "Brave Search API") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
 
-    # --- Proton Mail Bridge ---
-    # Using "Proton" login item; the bridge password is not in a hidden field,
-    # so we use the main password. Note: this is the account password.
-    val=$(_fetch_secret "Personal" "Proton") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
+        # Proton Mail Bridge — using "Proton" login item; the bridge password is
+        # not in a hidden field, so we use the main (account) password.
+        val=$(_fetch_secret "Personal" "Proton") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Telegram ---
-    val=$(_fetch_secret "Personal" "Telegram Bot Token") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
+        # Telegram
+        val=$(_fetch_secret "Personal" "Telegram Bot Token") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
 
-    # --- TripIt ---
-    # Using existing "TripIt" login item (password field)
-    val=$(_fetch_secret "Personal" "TripIt") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
+        # TripIt — using existing "TripIt" login item (password field)
+        val=$(_fetch_secret "Personal" "TripIt") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Last.fm ---
-    # Using existing "last.fm" login item (password field)
-    val=$(_fetch_secret "Personal" "last.fm") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
+        # Last.fm — using existing "last.fm" login item (password field)
+        val=$(_fetch_secret "Personal" "last.fm") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
 
-    # --- Obsidian MCP ---
-    val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
+        # Obsidian MCP
+        val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
 
-    # --- Rocksky (not yet in Proton Pass; disabled until created) ---
-    # val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+        # Rocksky (not yet in Proton Pass; disabled until created)
+        # val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+    fi
 
     # --- Work credentials (only if work profile is active) ---
-    if [ "${OPENCODE_PROFILE_WORK:-}" = "true" ] || [ "${OPENCODE_PROFILE_WORK:-}" = "1" ]; then
+    if [ "$PROFILE_WORK" = "1" ]; then
         val=$(_fetch_secret "Personal" "GitLab" "Personal Access Token") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "SonarQube Token") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "Personal" "Postman API Key") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"

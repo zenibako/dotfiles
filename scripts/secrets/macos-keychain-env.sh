@@ -24,6 +24,12 @@
 #
 # Design principle: secrets are injected into specific config files only
 # (e.g. during `dotter deploy`) and never exported as shell env vars.
+#
+# Profile filtering: retrieval is scoped to the active dotter profile(s).
+# Shared secrets (GitHub PAT) are always fetched; personal-only and work-only
+# secrets are fetched solely under the matching profile. The active profile is
+# auto-detected from .dotter/local.toml's `packages` array, and can be
+# overridden with OPENCODE_PROFILE_PERSONAL / OPENCODE_PROFILE_WORK env vars.
 
 set -uo pipefail
 
@@ -35,6 +41,62 @@ _log_info() { printf "[keychain] %s\n" "$1" >&2; }
 
 # Check if security CLI is available (macOS only)
 _has_security() { command -v security >/dev/null 2>&1; }
+
+# ── Active-profile detection ─────────────────────────────────────────────
+# Determine which dotter profiles (personal / work) are active so secret
+# retrieval can be filtered to the relevant set. Resolution order:
+#   1. Explicit env vars OPENCODE_PROFILE_PERSONAL / OPENCODE_PROFILE_WORK —
+#      if either is set it fully pins the decision ("true"/"1"/"yes"/"on" = on,
+#      anything else = off). Lets a caller override auto-detection.
+#   2. Otherwise, the `packages` array in .dotter/local.toml (the deployed
+#      profile set, which mirrors the profiles in src/profiles.k).
+# Sets PROFILE_PERSONAL and PROFILE_WORK to "1" (active) or "0" (inactive).
+_is_truthy() {
+    case "$1" in true|TRUE|True|1|yes|YES|on|ON) return 0 ;; *) return 1 ;; esac
+}
+
+# Emit one profile name per line from the `packages = [...]` array of a
+# .dotter/local.toml file. Handles both inline and multi-line array forms.
+_active_profiles_from_toml() {
+    local toml="$1"
+    [ -f "$toml" ] || return 0
+    awk '
+        /^[[:space:]]*packages[[:space:]]*=/ { inarr=1 }
+        inarr {
+            line=$0
+            while (match(line, /"[^"]*"/)) {
+                print substr(line, RSTART+1, RLENGTH-2)
+                line=substr(line, RSTART+RLENGTH)
+            }
+            if (index($0, "]")) inarr=0
+        }
+    ' "$toml"
+}
+
+_resolve_profiles() {
+    PROFILE_PERSONAL=0
+    PROFILE_WORK=0
+
+    # Explicit env-var override (presence of either var pins both decisions).
+    if [ -n "${OPENCODE_PROFILE_PERSONAL:-}" ] || [ -n "${OPENCODE_PROFILE_WORK:-}" ]; then
+        _is_truthy "${OPENCODE_PROFILE_PERSONAL:-}" && PROFILE_PERSONAL=1
+        _is_truthy "${OPENCODE_PROFILE_WORK:-}" && PROFILE_WORK=1
+        return 0
+    fi
+
+    # Auto-detect from the deployed dotter profile set.
+    local _repo _toml _p
+    _repo="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
+    _toml="$_repo/.dotter/local.toml"
+    while IFS= read -r _p; do
+        case "$_p" in
+            personal) PROFILE_PERSONAL=1 ;;
+            work) PROFILE_WORK=1 ;;
+        esac
+    done <<EOF
+$(_active_profiles_from_toml "$_toml")
+EOF
+}
 
 _cache_is_fresh() {
     if [ ! -f "$KEYCHAIN_CACHE" ]; then return 1; fi
@@ -94,54 +156,63 @@ _build_cache() {
     # The service name is whatever you used with `security add-generic-password -s ...`
     local val
 
-    # --- GitHub ---
+    # Filter secret retrieval to the active dotter profile(s).
+    _resolve_profiles
+    _log_info "Active profiles: personal=$PROFILE_PERSONAL work=$PROFILE_WORK"
+
+    # --- Shared credentials (fetched under every profile) ---
+    # GitHub PAT — the GitHub MCP is enabled in both profiles (see
+    # src/_shared/mcp.k) and its token is injected regardless of profile.
     val=$(_fetch_secret "GITHUB_PERSONAL_ACCESS_TOKEN") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
 
-    # --- Home Assistant ---
-    val=$(_fetch_secret "HA_TOKEN") && _write "HA_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "HA_WEBHOOK_ID") && _write "HA_WEBHOOK_ID" "$val" >> "$_tmp"
+    # --- Personal credentials (only if personal profile is active) ---
+    if [ "$PROFILE_PERSONAL" = "1" ]; then
+        # Home Assistant
+        val=$(_fetch_secret "HA_TOKEN") && _write "HA_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "HA_WEBHOOK_ID") && _write "HA_WEBHOOK_ID" "$val" >> "$_tmp"
 
-    # --- Bluesky ---
-    val=$(_fetch_secret "BSKY_APP_PASSWORD") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
+        # Bluesky
+        val=$(_fetch_secret "BSKY_APP_PASSWORD") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Plex ---
-    val=$(_fetch_secret "PLEX_USER_TOKEN") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
-    val=$(_fetch_secret "PLEX_SERVER_TOKEN") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
+        # Plex
+        val=$(_fetch_secret "PLEX_USER_TOKEN") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
+        val=$(_fetch_secret "PLEX_SERVER_TOKEN") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
 
-    # --- TMDB ---
-    val=$(_fetch_secret "TMDB_KEY") && _write "TMDB_KEY" "$val" >> "$_tmp"
+        # TMDB
+        val=$(_fetch_secret "TMDB_KEY") && _write "TMDB_KEY" "$val" >> "$_tmp"
 
-    # --- Google ---
-    val=$(_fetch_secret "GOOGLE_PLACES_API_KEY") && _write "GOOGLE_PLACES_API_KEY" "$val" >> "$_tmp"
-    val=$(_fetch_secret "YOUTUBE_API_KEY") && _write "YOUTUBE_API_KEY" "$val" >> "$_tmp"
+        # Google
+        val=$(_fetch_secret "GOOGLE_PLACES_API_KEY") && _write "GOOGLE_PLACES_API_KEY" "$val" >> "$_tmp"
+        val=$(_fetch_secret "YOUTUBE_API_KEY") && _write "YOUTUBE_API_KEY" "$val" >> "$_tmp"
 
-    # --- Reddit ---
-    val=$(_fetch_secret "REDDIT_SESSION") && _write "REDDIT_SESSION" "$val" >> "$_tmp"
-    val=$(_fetch_secret "TOKEN_V2") && _write "TOKEN_V2" "$val" >> "$_tmp"
+        # Reddit
+        val=$(_fetch_secret "REDDIT_SESSION") && _write "REDDIT_SESSION" "$val" >> "$_tmp"
+        val=$(_fetch_secret "TOKEN_V2") && _write "TOKEN_V2" "$val" >> "$_tmp"
 
-    # --- Brave Search ---
-    val=$(_fetch_secret "BRAVE_API_KEY") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
+        # Brave Search
+        val=$(_fetch_secret "BRAVE_API_KEY") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
 
-    # --- Proton Mail Bridge ---
-    val=$(_fetch_secret "PROTON_PASSWORD") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
+        # Proton Mail Bridge
+        val=$(_fetch_secret "PROTON_PASSWORD") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Telegram ---
-    val=$(_fetch_secret "TELEGRAM_BOT_TOKEN") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
+        # Telegram
+        val=$(_fetch_secret "TELEGRAM_BOT_TOKEN") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
 
-    # --- TripIt ---
-    val=$(_fetch_secret "TRIPIT_PASSWORD") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
+        # TripIt
+        val=$(_fetch_secret "TRIPIT_PASSWORD") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
 
-    # --- Last.fm ---
-    val=$(_fetch_secret "LAST_FM_API_KEY") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
+        # Last.fm
+        val=$(_fetch_secret "LAST_FM_API_KEY") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
 
-    # --- Obsidian MCP ---
-    val=$(_fetch_secret "MCP_OBSIDIAN_TOKEN") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
+        # Obsidian MCP
+        val=$(_fetch_secret "MCP_OBSIDIAN_TOKEN") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
 
-    # --- Rocksky ---
-    val=$(_fetch_secret "ROCKSKY_PASSWORD") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+        # Rocksky
+        val=$(_fetch_secret "ROCKSKY_PASSWORD") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+    fi
 
     # --- Work credentials (only if work profile is active) ---
-    if [ "${OPENCODE_PROFILE_WORK:-}" = "true" ] || [ "${OPENCODE_PROFILE_WORK:-}" = "1" ]; then
+    if [ "$PROFILE_WORK" = "1" ]; then
         val=$(_fetch_secret "GITLAB_TOKEN") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "SONAR_TOKEN") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
         val=$(_fetch_secret "POSTMAN_API_KEY") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"
