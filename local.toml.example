@@ -87,14 +87,14 @@ java_tool_options = ""
 # during `dotter deploy`. No secrets are ever exported as shell env vars.
 #
 # Supported backends (tried in order):
-#   1. Proton Pass CLI  -> ~/.config/opencode/script/proton-pass-env.sh
-#   2. macOS Keychain   -> ~/.config/opencode/script/macos-keychain-env.sh
+#   1. Proton Pass CLI  -> scripts/secrets/proton-pass-env.sh
+#   2. macOS Keychain   -> scripts/secrets/macos-keychain-env.sh
 #
 # Choose the backend that matches what you have installed on this machine.
 #
 # Proton Pass setup:
 #   Store each secret in your Proton Pass vault with the vault/item name shown
-#   in opencode/script/proton-pass-env.sh.
+#   in scripts/secrets/proton-pass-env.sh.
 #
 # macOS Keychain setup:
 #   security add-generic-password -s KEY_NAME -a dotfiles -w SECRET_VALUE -U login.keychain

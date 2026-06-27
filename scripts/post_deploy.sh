@@ -96,6 +96,7 @@ unset _rendered _live
 
 # ── Secret injection ─────────────────────────────────────────────────────
 _SECRET_CACHE=""
+_LAST_BACKEND_ERR=""
 
 # Check if a cache file is fresh (< 1 hour old)
 _cache_is_fresh() {
@@ -112,22 +113,135 @@ _cache_is_fresh() {
   [ "$age" -lt 3600 ]
 }
 
+# Check if the macOS login keychain is locked. Returns 0 if unlocked, 1 if locked.
+# `security show-keychain-info` fails with rc=36 when the keychain is locked
+# and succeeds (rc=0) when unlocked — this is the most reliable probe.
+_keychain_is_unlocked() {
+  [ "$(uname -s)" = "Darwin" ] || return 0
+  security show-keychain-info ~/Library/Keychains/login.keychain-db >/dev/null 2>&1
+}
+
+# Attempt to unlock the keychain non-interactively (works if the keychain
+# password is cached in the system). Returns 0 on success.
+# Uses a short timeout to avoid hanging on a password prompt in headless contexts.
+_try_unlock_keychain() {
+  [ "$(uname -s)" = "Darwin" ] || return 0
+  # `security unlock-keychain` without -p prompts for the password. On macOS
+  # with TouchID/Keychain cached, this can succeed without user input. In a
+  # headless context it would hang — the 5s timeout prevents that.
+  if run_with_timeout 5 security unlock-keychain >/dev/null 2>&1; then
+    return 0
+  fi
+  return 1
+}
+
 # Try to ensure a backend's cache is ready. Sets _SECRET_CACHE on success.
+# On failure, captures stderr and returns 1 (caller decides what to do).
 _try_backend() {
-  local script="$1" cache="$2"
+  local script="$1" cache="$2" _err
   [ -x "$script" ] && "$script" --configured >/dev/null 2>&1 || return 1
   if _cache_is_fresh "$cache"; then
     _SECRET_CACHE="$cache"
     return 0
   fi
-  begin_wait "Building secret cache ($(basename "$script" .sh))" "a few seconds; may prompt to unlock"
-  "$script" --build >/dev/null 2>&1 && { _SECRET_CACHE="$cache"; return 0; }
+
+  # Proton Pass needs the macOS keychain unlocked to access its encryption key.
+  # Detect this before calling --build so we get a clear, actionable message
+  # instead of a cascade of "pass-cli view failed" warnings.
+  local _backend_name
+  _backend_name="$(basename "$script" .sh)"
+  if [ "$_backend_name" = "proton-pass-env" ] && [ "$(uname -s)" = "Darwin" ]; then
+    if ! _keychain_is_unlocked; then
+      _LAST_BACKEND_ERR="KEYCHAIN_LOCKED"
+      begin_wait "Building secret cache ($_backend_name)" "a few seconds; may prompt to unlock"
+      if _try_unlock_keychain && _keychain_is_unlocked; then
+        # Keychain unlocked; proceed to build (with timeout for vault prompt)
+        _err=$(run_with_timeout 15 "$script" --build 2>&1 >/dev/null) && { _SECRET_CACHE="$cache"; return 0; }
+        _LAST_BACKEND_ERR="$_err"
+      else
+        # Could not unlock non-interactively
+        return 1
+      fi
+    fi
+  fi
+
+  begin_wait "Building secret cache ($_backend_name)" "a few seconds; may prompt to unlock"
+  # Timeout: the build can prompt for a vault/keychain password interactively.
+  # In a headless deploy context that prompt hangs forever; a 15s timeout
+  # lets it fail fast so we can show actionable guidance instead.
+  _err=$(run_with_timeout 15 "$script" --build 2>&1 >/dev/null) && { _SECRET_CACHE="$cache"; return 0; }
+  _LAST_BACKEND_ERR="$_err"
+  return 1
+}
+
+# Diagnose a backend failure and print actionable guidance.
+# Args: $1 = display name (e.g. "Proton Pass"), $2 = full script path.
+# Returns 0 if the user resolved the issue (caller should retry), 1 if not.
+_diagnose_backend_failure() {
+  local display_name="$1" script_path="$2" err="${_LAST_BACKEND_ERR:-}"
+
+  # Keychain was locked and we couldn't unlock it non-interactively
+  if [ "$err" = "KEYCHAIN_LOCKED" ]; then
+    echo "" >&2
+    echo "  ⚠ The macOS keychain is locked, blocking $display_name" >&2
+    echo "    from accessing its encryption key." >&2
+    echo "" >&2
+    # Try to unlock (non-interactive; works if keychain password is cached)
+    if _try_unlock_keychain && _keychain_is_unlocked; then
+      echo "  Keychain unlocked. Retrying..." >&2
+      return 0
+    fi
+    echo "  Could not unlock keychain automatically." >&2
+    echo "  Please run this in a terminal, then re-deploy:" >&2
+    echo "    security unlock-keychain" >&2
+    return 1
+  fi
+
+  # Keychain backend: no secrets found (check this before the generic "No secrets" pattern)
+  if printf '%s' "$err" | grep -q "No secrets were fetched from macOS Keychain"; then
+    echo "  $display_name found no secrets in macOS Keychain." >&2
+    echo "  Secrets may not have been stored yet, or the keychain is locked." >&2
+    echo "  To check: security unlock-keychain && $script_path --build" >&2
+    return 1
+  fi
+
+  # Proton Pass: vault locked / no secrets fetched
+  if printf '%s' "$err" | grep -q "No secrets were fetched"; then
+    echo "  $display_name could not fetch any secrets from the vault." >&2
+    echo "  The vault may be locked or items are missing/misnamed." >&2
+    echo "  To fix:" >&2
+    echo "    1. Run: $script_path --build" >&2
+    echo "    2. Unlock the vault when prompted" >&2
+    echo "    3. Re-run deploy" >&2
+    return 1
+  fi
+
+  # Timeout: --build was killed (likely waiting for vault unlock prompt)
+  if printf '%s' "$err" | grep -q "Fetching secrets from Proton Pass"; then
+    echo "  $display_name timed out waiting for the Proton Pass vault to unlock." >&2
+    echo "  To fix:" >&2
+    echo "    1. Run: $script_path --build" >&2
+    echo "    2. Enter your Proton Pass password when prompted" >&2
+    echo "    3. Re-run deploy (the cache will be fresh for 1 hour)" >&2
+    return 1
+  fi
+
+  # Generic fallback
+  echo "  $display_name failed to build its secret cache." >&2
+  [ -n "$err" ] && printf '%s\n' "$err" | sed 's/^/    /' >&2
   return 1
 }
 
 _ensure_secret_cache() {
-  _try_backend "$HOME/.config/opencode/script/proton-pass-env.sh" "$HOME/.cache/proton-pass-secrets.env" && return 0
-  _try_backend "$HOME/.config/opencode/script/macos-keychain-env.sh" "$HOME/.cache/macos-keychain-secrets.env" && return 0
+  local _pp_script="$REPO_ROOT/scripts/secrets/proton-pass-env.sh"
+  local _kc_script="$REPO_ROOT/scripts/secrets/macos-keychain-env.sh"
+  _try_backend "$_pp_script" "$HOME/.cache/proton-pass-secrets.env" && return 0
+  if _diagnose_backend_failure "Proton Pass" "$_pp_script"; then
+    # Keychain was unlocked; retry once
+    _try_backend "$_pp_script" "$HOME/.cache/proton-pass-secrets.env" && return 0
+  fi
+  _try_backend "$_kc_script" "$HOME/.cache/macos-keychain-secrets.env" && return 0
+  _diagnose_backend_failure "macOS Keychain" "$_kc_script" || true
   echo "WARNING: No secret backend available; secrets will not be injected." >&2
   return 1
 }
@@ -259,7 +373,7 @@ if _ensure_secret_cache; then
   fi
   unset _deployed_env
 fi
-unset -f _ensure_secret_cache _lookup_secret _inject_github_token _inject_obsidian_token _try_backend _cache_is_fresh
+unset -f _ensure_secret_cache _lookup_secret _inject_github_token _inject_obsidian_token _try_backend _cache_is_fresh _keychain_is_unlocked _try_unlock_keychain _diagnose_backend_failure
 unset _SECRET_CACHE
 
 # ── Post-deploy validation ────────────────────────────────────────────────
