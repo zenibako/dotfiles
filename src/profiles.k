@@ -56,6 +56,8 @@ default = _shared.Profile {
         "src/agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
         "out/kiro/mcp.json" = { target = "~/.kiro/settings/mcp.json", type = "template" }
         "src/kiro/steering" = { target = "~/.kiro/steering", type = "symbolic" }
+        "src/codex/AGENTS.md" = { target = "~/.codex/AGENTS.md", type = "symbolic" }
+        "out/codex/config.toml" = { target = "~/.codex/config.toml", type = "template" }
     }
     variables = {
         name = ""

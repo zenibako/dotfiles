@@ -22,7 +22,7 @@ When automating browsers or running end-to-end tests, use the `e2e-testing` skil
 - **Merge tool**: `jj-diffconflicts` via nvim (`merge-tools.diffconflicts`)
 - **GPG Signing**: ALL commits must be GPG signed. Never bypass signing.
 - **Agent Commits**: Agents may commit directly when signing works non-interactively. If signing would block on a GPG/pinentry prompt, stop and prompt the user to make the commit manually with `jj commit -m "message"` so the GPG agent cache is warmed first.
-- **GPG cache warming**: Run `gpg-preset-from-keychain` to pre-seed the passphrase from macOS Keychain. Kiro and Claude Code do this automatically via SessionStart hooks; OpenCode agents should run it before their first commit.
+- **GPG cache warming**: Run `gpg-preset-from-keychain` to pre-seed the passphrase from macOS Keychain. Kiro and Claude Code do this automatically via SessionStart hooks; OpenCode and Codex agents should run it before their first commit.
 
 ## Repository Structure
 - Profiles: `nvim/{default,work,personal}` deployed via dotter (don't edit `~/.config/nvim` directly!)
@@ -53,6 +53,10 @@ The system supports **per-command model attribution** via the `AI_CO_AUTHOR` she
 ### Git Commits
 
 The Git `prepare-commit-msg` hook in `~/.config/git/hooks/prepare-commit-msg` automatically appends `Co-authored-by`. It respects `$AI_CO_AUTHOR` if set, otherwise falls back to `Co-authored-by: AI Model <ai@example.com>`.
+
+### Codex CLI Commits
+
+Codex has a built-in `commit_attribution` field in `~/.codex/config.toml` that automatically appends a `Co-authored-by` trailer. No manual env var needed — the value is set in the deployed config.
 
 ```bash
 # Example: Commit with proper attribution

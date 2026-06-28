@@ -23,14 +23,13 @@ _mcp_servers = [
     }
     {
         name = "GitHub"
-        # Remote GitHub MCP server. opencode can't OAuth here (GitHub doesn't
-        # support Dynamic Client Registration), so it uses a PAT bearer header
-        # injected by patch_opencode_secrets.py at post-deploy time.
-        # NOTE: Do NOT set a blank Authorization header here — opencode sends
-        # it as-is, resulting in "Authorization header is badly formatted".
+        # Remote GitHub MCP server. GitHub doesn't support Dynamic Client
+        # Registration so OAuth won't work. Auth token injected at deploy
+        # time from `gh auth token` via post_deploy.sh.
         opencode = {
             "type" = "remote"
             "url" = "https://api.githubcopilot.com/mcp/"
+            "oauth" = False
             "enabled" = True
         }
         # Claude Desktop's config schema only supports stdio servers, so this

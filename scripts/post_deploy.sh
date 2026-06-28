@@ -254,6 +254,12 @@ _lookup_secret() {
   return 1
 }
 
+# GitHub token from gh CLI (preferred over secrets store)
+_gh_token() {
+  command -v gh >/dev/null 2>&1 || return 1
+  gh auth token 2>/dev/null
+}
+
 _inject_github_token() {
   local config_file="$1"
   # Missing file or absent token means "nothing to inject here" — not an error.
@@ -261,7 +267,7 @@ _inject_github_token() {
   # this function is called as a bare statement under `set -e`, abort the hook.
   [ -f "$config_file" ] || return 0
   local token
-  token=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") || return 0
+  token=$(_gh_token) || return 0
   echo "  Injecting GitHub token into $(basename "$config_file")..."
   "$PYTHON" -c "
 import json, sys
@@ -307,12 +313,12 @@ else:
 " 2>/dev/null || _WARN "Failed to patch $(basename "$config_file")"
 }
 
+# GitHub token injection — uses `gh auth token` directly (no secrets store needed)
+_inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+_inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
+
 if _ensure_secret_cache; then
   echo "Applying secrets to deployed configs..."
-  _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
-  # Claude Code's GitHub MCP is now remote http (OAuth) with no env token, so
-  # there is nothing to inject. Obsidian lives in ~/.claude.json (see merge above).
   _inject_obsidian_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_obsidian_token "$HOME/.claude.json"
 
@@ -320,7 +326,7 @@ if _ensure_secret_cache; then
   _opencode_config="$HOME/.config/opencode/opencode.jsonc"
   if [ -f "$_opencode_config" ] && command -v "$PYTHON" >/dev/null 2>&1; then
     _patch_args=""
-    _tok=$(_lookup_secret "GITHUB_PERSONAL_ACCESS_TOKEN") && _patch_args="$_patch_args --github-token $_tok"
+    _tok=$(_gh_token) && _patch_args="$_patch_args --github-token $_tok"
     _tok=$(_lookup_secret "GITLAB_TOKEN") && _patch_args="$_patch_args --gitlab-token $_tok"
     _tok=$(_lookup_secret "POSTMAN_API_KEY") && _patch_args="$_patch_args --postman-token $_tok"
     _tok=$(_lookup_secret "SONAR_TOKEN") && _patch_args="$_patch_args --sonar-token $_tok"

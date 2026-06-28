@@ -229,6 +229,11 @@ then
   [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 fi
 
+# Export GitHub token for Codex CLI MCP (avoids OAuth which GitHub doesn't support)
+if (( ${+commands[gh]} )) && [[ -z "$CODEX_GITHUB_TOKEN" ]]; then
+  export CODEX_GITHUB_TOKEN="$(gh auth token 2>/dev/null)"
+fi
+
 # Load shared completions from completions.toml
 # This is the single source of truth for CLI tool completions shared with nushell
 _load_shared_completions() {
