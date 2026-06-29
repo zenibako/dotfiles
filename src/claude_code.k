@@ -15,10 +15,16 @@ _json_parts = [
 {{#if (eq claude_model_at_top true)}}
   "model": "{{claude_model}}",
 {{/if}}"""
+    # gitlab@claude-plugins-official is explicitly disabled (not just omitted):
+    # the post-deploy merge into ~/.claude/settings.json is additive, so a value
+    # only present in the live file survives forever. Its MCP server hardcodes
+    # https://gitlab.com — we use the self-hosted `GitLab` http server from
+    # _shared/mcp.k ({{gitlab_url}}) instead, so this plugin must stay off.
     """  "enabledPlugins": {
     "chrome-devtools-mcp@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
+    "gitlab@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": true,
 {{#if (eq claude_plugin_extra_lsps true)}}
     "html-lsp@claude-plugins-official": true,
