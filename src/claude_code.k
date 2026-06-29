@@ -51,6 +51,9 @@ _json_parts = [
 {{/if}}"""
     """  "autoUpdatesChannel": "stable",
   "editorMode": "vim",
+  "permissions": {
+    "defaultMode": "auto"
+  },
 {{#if (eq claude_agent_push_notif_enabled true)}}
   "agentPushNotifEnabled": true,
 {{/if}}"""
