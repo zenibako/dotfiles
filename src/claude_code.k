@@ -222,6 +222,17 @@ file.write("out/claude-code/settings.json", _settings_json)
 # enabling one never depends on another. "Chrome DevTools" is intentionally
 # omitted: it is provided by the chrome-devtools-mcp plugin (enabledPlugins),
 # and an explicit entry here would create a duplicate server.
+#
+# GitHub: remote http server with no Dynamic Client Registration (OAuth won't
+# work), so it authenticates with a static bearer header. Claude Code expands
+# ${CODEX_GITHUB_TOKEN} at launch — the same env var Codex uses, exported from
+# `gh auth token` by zshenv.k/zshrc. Escaped as \\${...} so KCL emits it literally.
+#
+# SonarQube: runs the MCP as a Java process in Docker (Colima). Behind Netskope
+# SSL inspection the container's JVM must trust the corporate CA, so a custom
+# Java trust store is mounted read-only over the image's cacerts. Build it once
+# per machine (and after image updates) — see the `sonarqube-netskope-fix` skill.
+# `--pull=never` requires the image to be present locally first.
 _mcp_json = """{
   "mcpServers": {
     "Backlog": {
@@ -233,7 +244,10 @@ _mcp_json = """{
     },
     "GitHub": {
       "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer \${CODEX_GITHUB_TOKEN}"
+      }
     },
     "Jujutsu": {
       "args": [
@@ -281,14 +295,18 @@ _mcp_json = """{
         "--pull=never",
         "-i",
         "--rm",
+        "-v",
+        "/Users/{{username}}/.docker/sonarqube/cacerts:/opt/jdk/jdk-21/lib/security/cacerts:ro",
         "-e",
         "SONARQUBE_URL",
         "-e",
         "SONARQUBE_TOKEN",
         "mcp/sonarqube:latest"
       ],
-      "command": "docker",
+      "command": "{{shell_bin_path}}/docker",
       "env": {
+        "DOCKER_CONTEXT": "colima",
+        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       }
