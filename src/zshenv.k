@@ -100,12 +100,13 @@ if [ -z "$_ZSHENV_LOADED" ]; then
   # opencode
   export PATH="$HOME/.opencode/bin:$PATH"
 
-  # Codex: the GitHub Copilot MCP authenticates with a bearer token, which Codex
-  # reads from $CODEX_GITHUB_TOKEN (see ~/.codex/config.toml). Resolve it once per
-  # shell tree from the gh CLI; the export lets child shells — and Codex — inherit
-  # it without re-invoking gh. (GitLab MCP uses OAuth instead: `codex mcp login`.)
-  if [ -z "$CODEX_GITHUB_TOKEN" ] && command -v gh >/dev/null 2>&1; then
-    export CODEX_GITHUB_TOKEN="$(gh auth token 2>/dev/null)"
+  # GitHub Copilot MCP authenticates with a bearer token (GitHub has no OAuth/DCR
+  # support). Both Codex (~/.codex/config.toml) and Claude Code (~/.claude.json)
+  # read it from $GITHUB_MCP_TOKEN. Resolve it once per shell tree from the gh CLI;
+  # the export lets child shells — and the agents — inherit it without re-invoking
+  # gh. (GitLab MCP uses OAuth instead: `codex mcp login`.)
+  if [ -z "$GITHUB_MCP_TOKEN" ] && command -v gh >/dev/null 2>&1; then
+    export GITHUB_MCP_TOKEN="$(gh auth token 2>/dev/null)"
   fi
 
 """

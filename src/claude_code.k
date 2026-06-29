@@ -225,7 +225,7 @@ file.write("out/claude-code/settings.json", _settings_json)
 #
 # GitHub: remote http server with no Dynamic Client Registration (OAuth won't
 # work), so it authenticates with a static bearer header. Claude Code expands
-# ${CODEX_GITHUB_TOKEN} at launch — the same env var Codex uses, exported from
+# ${GITHUB_MCP_TOKEN} at launch — the same env var Codex uses, exported from
 # `gh auth token` by zshenv.k/zshrc. Escaped as \\${...} so KCL emits it literally.
 #
 # SonarQube: runs the MCP as a Java process in Docker (Colima). Behind Netskope
@@ -246,7 +246,7 @@ _mcp_json = """{
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {
-        "Authorization": "Bearer \${CODEX_GITHUB_TOKEN}"
+        "Authorization": "Bearer \${GITHUB_MCP_TOKEN}"
       }
     },
     "Jujutsu": {

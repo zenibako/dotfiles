@@ -36,11 +36,11 @@ enabled = true
 [mcp_servers.playwright.env]
 PATH = "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
 
-# GitHub Copilot MCP — bearer auth. $CODEX_GITHUB_TOKEN is exported by ~/.zshenv
-# from `gh auth token` (see zshenv.k).
+# GitHub Copilot MCP — bearer auth. $GITHUB_MCP_TOKEN is exported by ~/.zshenv
+# from `gh auth token` (see zshenv.k); shared with Claude Code's GitHub MCP.
 [mcp_servers.github]
 url = "https://api.githubcopilot.com/mcp/"
-bearer_token_env_var = "CODEX_GITHUB_TOKEN"
+bearer_token_env_var = "GITHUB_MCP_TOKEN"
 enabled = true
 {{#if mcp_gitlab_enabled}}
 # Self-hosted GitLab MCP — OAuth only (protected resource, scope "mcp"); it does
