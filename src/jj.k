@@ -3,7 +3,10 @@ import _shared.templates as tpl
 # ── Constants ───────────────────────────────────────────────────────────
 _gpg_backend = "gpg"
 _builtin_editor = ":builtin"
-_sign_all = True
+# jj >= 0.30 replaced the boolean `signing.sign_all` with the `signing.behavior`
+# enum; the old key is silently ignored (behavior defaults to "keep" = never
+# auto-sign). "own" signs commits authored by the configured user.
+_signing_behavior = "own"
 
 # ── jj config (TOML template) ──────────────────────────────────────────
 jj = {
@@ -17,7 +20,7 @@ jj = {
         show_cryptographic_signatures = True
     }
     signing = {
-        sign_all = _sign_all
+        behavior = _signing_behavior
         backend = _gpg_backend
         key = tpl.hb("gpg_key")
     }

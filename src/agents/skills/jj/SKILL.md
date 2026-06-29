@@ -113,7 +113,7 @@ All commits are GPG signed automatically via `jj/config.toml`:
 
 ```toml
 [signing]
-sign-all = true
+behavior = "own"
 backend = "gpg"
 ```
 
