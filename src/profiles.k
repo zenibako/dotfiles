@@ -81,6 +81,12 @@ default = _shared.Profile {
         claude_model_at_top = True
         claude_plugin_clangd_lsp = False
         kiro_enabled = False
+        # GitLab MCP is disabled by default: the self-hosted endpoint
+        # ({{gitlab_url}}/api/v4/mcp) is only served when the instance has
+        # GitLab Duo + beta/experimental features enabled (Premium/Ultimate);
+        # otherwise it 404s. Flip to True in local.k once the instance supports
+        # it (then `codex mcp login gitlab` / authenticate in Claude Code).
+        mcp_gitlab_enabled = False
         mcp_obsidian_enabled = False
         mcp_obsidian_url = ""
         mcp_obsidian_token = ""

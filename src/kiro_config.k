@@ -17,7 +17,11 @@ _stdio_servers = {
 _remote_servers = {
     "GitHub": {"type" = "http", "url" = "https://api.githubcopilot.com/mcp/"}
     "Atlassian": {"type" = "http", "url" = "https://mcp.atlassian.com/v1/mcp"}
-    "GitLab": {"type" = "http", "url" = "{{gitlab_url}}/api/v4/mcp"}
+    # Disabled until the GitLab instance serves the MCP endpoint (needs Duo +
+    # beta/experimental features); otherwise it 404s. Kiro's config is plain
+    # KCL-built JSON with no Handlebars conditionals, so it can't read the
+    # mcp_gitlab_enabled flag — re-enable here by removing "disabled".
+    "GitLab": {"type" = "http", "url" = "{{gitlab_url}}/api/v4/mcp", "disabled" = True}
 }
 
 # SF PG5 servers (direct HTTP proxy — no OAuth discovery, instant connect)

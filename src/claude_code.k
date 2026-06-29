@@ -289,7 +289,7 @@ _mcp_json = """{
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       }
-    }{{/if}}{{#if gitlab_url}},
+    }{{/if}}{{#if mcp_gitlab_enabled}},
     "GitLab": {
       "type": "http",
       "url": "{{gitlab_url}}/api/v4/mcp"

@@ -197,7 +197,11 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "{{gitlab_url}}/api/v4/mcp"
-            "enabled" = False
+            # Gated on mcp_gitlab_enabled (off by default). The self-hosted MCP
+            # endpoint only exists when the instance has GitLab Duo +
+            # beta/experimental features enabled; otherwise it 404s. Rendered as
+            # a bare boolean via the .replace() in opencode_config.k.
+            "enabled" = "{{mcp_gitlab_enabled}}"
         }
         # Native Custom Connector in Claude (Settings → Connectors UI).
         # URL: {{gitlab_url}}/api/v4/mcp — not managed by this config.
