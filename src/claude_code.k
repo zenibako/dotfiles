@@ -268,11 +268,11 @@ _mcp_json = """{
       "env": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }{{#if mcp_atlassian_enabled}},
+    }{{#if mcp_atlassian_included}},
     "Atlassian": {
       "type": "http",
       "url": "https://mcp.atlassian.com/v1/mcp"
-    }{{/if}}{{#if (eq mcp_obsidian_enabled true)}},
+    }{{/if}}{{#if (eq mcp_obsidian_included true)}},
     "Obsidian": {
       "args": [
         "-y",
@@ -287,7 +287,7 @@ _mcp_json = """{
         "MCP_OBSIDIAN_AUTH": "Bearer {{mcp_obsidian_token}}",
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
-    }{{/if}}{{#if mcp_sonarqube_enabled}},
+    }{{/if}}{{#if mcp_sonarqube_included}},
     "SonarQube": {
       "args": [
         "run",
@@ -310,7 +310,7 @@ _mcp_json = """{
         "SONARQUBE_URL": "{{sonarqube_url}}",
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       }
-    }{{/if}}{{#if mcp_gitlab_enabled}},
+    }{{/if}}{{#if mcp_gitlab_included}},
     "GitLab": {
       "type": "http",
       "url": "{{gitlab_url}}/api/v4/mcp"

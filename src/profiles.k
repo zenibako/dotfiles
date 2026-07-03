@@ -82,21 +82,21 @@ default = _shared.Profile {
         claude_model_at_top = True
         claude_plugin_clangd_lsp = False
         kiro_enabled = False
-        # Core MCPs enabled in every profile. These are declared in default so
-        # child profiles inherit them without redeclaration (dotter forbids
-        # duplicate variables across inherited profiles).
-        mcp_jujutsu_enabled = True
-        mcp_github_enabled = True
-        mcp_backlog_enabled = True
-        mcp_gitea_enabled = True
-        # GitLab MCP: the self-hosted endpoint ({{gitlab_url}}/api/v4/mcp) is only
-        # served when the instance has GitLab Duo + beta/experimental features
-        # enabled (Premium/Ultimate); otherwise it 404s. Enabled by default so
-        # authenticated users can use it; set to False in local.k if unsupported.
-        mcp_gitlab_enabled = True
-        mcp_atlassian_enabled = True
-        # Obsidian defaults to false; enable per-machine in local.k.
-        mcp_obsidian_enabled = False
+        # All MCP servers are disabled by default in the dotfiles repo.
+        # Profiles (work/personal) and local.k opt into only the servers they
+        # need. This keeps the base config minimal and avoids failed connections
+        # on machines that lack the required binaries, URLs, or tokens.
+        #
+        # `_included` means "render this server into the config". The server's
+        # own `enabled` field (set in src/_shared/mcp.k) controls whether it
+        # starts at runtime.
+        mcp_jujutsu_included = False
+        mcp_github_included = False
+        mcp_backlog_included = False
+        mcp_gitea_included = False
+        mcp_gitlab_included = False
+        mcp_atlassian_included = False
+        mcp_obsidian_included = False
         mcp_obsidian_url = ""
         mcp_obsidian_token = ""
         # Profile-specific MCPs are NOT declared here — they are defined only in
@@ -141,7 +141,7 @@ personal = _shared.Profile {
     variables = {
         opencode_profile_personal = True
         mcp_coderabbit = False
-        # mcp_netlify_enabled is defined in the default profile; setting it here
+        # mcp_netlify_included is defined in the default profile; setting it here
         # would duplicate the variable and break dotter inheritance. Override via
         # local.k if a machine needs a different value.
         opencode_build_agent_model = "ollama-cloud/kimi-k2.6:cloud"
@@ -155,7 +155,7 @@ personal = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = True
         claude_epitaxy_personal_prefs_enabled = True
         claude_effort_level_enabled = True
-        # Obsidian MCP — enabled per-machine via local.k (mcp_obsidian_enabled,
+        # Obsidian MCP — enabled per-machine via local.k (mcp_obsidian_included,
         # mcp_obsidian_url, mcp_obsidian_token). The base definitions live in
         # the default profile; do NOT redeclare them here (dotter errors on
         # duplicate inherited variables).
@@ -172,14 +172,13 @@ work = _shared.Profile {
     }
     variables = {
         opencode_profile_work = True
-        # Core VCS/planning MCPs are inherited from the default profile. Work
-        # disables Atlassian via local.k or by setting the inherited default
-        # variable there if needed; redeclaring it here breaks dotter merge.
-        mcp_salesforce_dx_enabled = False
-        mcp_salesforce_hosted_enabled = False
-        mcp_odaseva_enabled = False
-        mcp_postman_enabled = True
-        mcp_sonarqube_enabled = True
+        # Atlassian MCP is work-only; the default profile leaves it disabled.
+        mcp_atlassian_included = True
+        mcp_salesforce_dx_included = False
+        mcp_salesforce_hosted_included = False
+        mcp_odaseva_included = False
+        mcp_postman_included = True
+        mcp_sonarqube_included = True
         postman_api_key = ""
         gitlab_personal_access_token = ""
         gitlab_api_url = "https://gitlab.com/api/v4"

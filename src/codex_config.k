@@ -42,12 +42,12 @@ PATH = "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
 url = "https://api.githubcopilot.com/mcp/"
 bearer_token_env_var = "GITHUB_MCP_TOKEN"
 enabled = true
-{{#if mcp_gitlab_enabled}}
+{{#if mcp_gitlab_included}}
 # Self-hosted GitLab MCP — OAuth only (protected resource, scope "mcp"); it does
-# NOT accept a personal access token. Gated on mcp_gitlab_enabled (off by
+# NOT accept a personal access token. Gated on mcp_gitlab_included (off by
 # default) because the endpoint only exists when the instance has GitLab Duo +
 # beta/experimental features enabled — otherwise it 404s. Once enabled on the
-# instance, set mcp_gitlab_enabled = True and run `codex mcp login gitlab` (the
+# instance, set mcp_gitlab_included = True and run `codex mcp login gitlab` (the
 # server supports dynamic client registration, so no client ID is needed).
 [mcp_servers.gitlab]
 url = "{{gitlab_url}}/api/v4/mcp"

@@ -13,7 +13,7 @@ _mcp_servers = [
             "type" = "local"
             "command" = ["{{shell_bin_path}}/npx", "-y", "jj-mcp-server"]
             "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_jujutsu_enabled}}"
+            "enabled" = "{{mcp_jujutsu_included}}"
         }
         claude = {
             "command" = "{{shell_bin_path}}/npx"
@@ -30,7 +30,7 @@ _mcp_servers = [
             "type" = "remote"
             "url" = "https://api.githubcopilot.com/mcp/"
             "oauth" = False
-            "enabled" = "{{mcp_github_enabled}}"
+            "enabled" = "{{mcp_github_included}}"
         }
         # Claude Desktop's config schema only supports stdio servers, so this
         # remote server is added natively as a Custom Connector via the Claude
@@ -43,7 +43,7 @@ _mcp_servers = [
         opencode = {
             "type" = "local"
             "command" = ["{{shell_bin_path}}/backlog", "mcp", "start"]
-            "enabled" = "{{mcp_backlog_enabled}}"
+            "enabled" = "{{mcp_backlog_included}}"
         }
         claude = {
             "command" = "{{shell_bin_path}}/backlog"
@@ -56,7 +56,7 @@ _mcp_servers = [
             "type" = "local"
             "command" = ["{{shell_bin_path}}/npx", "-y", "@playwright/mcp@latest"]
             "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_playwright_enabled}}"
+            "enabled" = "{{mcp_playwright_included}}"
         }
         claude = {
             "command" = "{{shell_bin_path}}/npx"
@@ -70,7 +70,7 @@ _mcp_servers = [
             "type" = "local"
             "command" = ["{{shell_bin_path}}/npx", "-y", "chrome-devtools-mcp@latest", "--launch"]
             "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_chrome_devtools_enabled}}"
+            "enabled" = "{{mcp_chrome_devtools_included}}"
         }
         claude = {
             "command" = "{{shell_bin_path}}/npx"
@@ -81,14 +81,14 @@ _mcp_servers = [
     {
         name = "Obsidian"
         # Local REST API plugin's built-in MCP endpoint (streamable HTTP).
-        # Personal-profile only: gated on mcp_obsidian_enabled (True in the
+        # Personal-profile only: gated on mcp_obsidian_included (True in the
         # personal profile, False in default/work). url + token injected by
         # patch_opencode_secrets.py at post-deploy.
         opencode = {
             "type" = "remote"
             "url" = "{{mcp_obsidian_url}}"
             # Rendered as a bare boolean via the .replace() in opencode_config.k.
-            "enabled" = "{{mcp_obsidian_enabled}}"
+            "enabled" = "{{mcp_obsidian_included}}"
         }
         # Claude Desktop's mcpServers has no per-server "enabled" flag, so the
         # whole entry must be wrapped in a Handlebars {{#if}} guard. KCL can't
@@ -102,7 +102,7 @@ _mcp_servers = [
             "type" = "local"
             "command" = ["{{shell_bin_path}}/npx", "-y", "@salesforce/mcp", "--orgs", "DEFAULT_TARGET_ORG", "--toolsets", "all", "--allow-non-ga-tools"]
             "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_salesforce_dx_enabled}}"
+            "enabled" = "{{mcp_salesforce_dx_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -112,7 +112,7 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "https://mcp.atlassian.com/v1/mcp"
-            "enabled" = "{{mcp_atlassian_enabled}}"
+            "enabled" = "{{mcp_atlassian_included}}"
         }
         # Native Custom Connector in Claude (Settings → Connectors UI).
         # URL: https://mcp.atlassian.com/v1/mcp — not managed by this config.
@@ -123,7 +123,7 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "https://mcp.postman.com/mcp"
-            "enabled" = "{{mcp_postman_enabled}}"
+            "enabled" = "{{mcp_postman_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -139,7 +139,7 @@ _mcp_servers = [
                 "SONARQUBE_URL" = "{{sonarqube_url}}"
                 "SONARQUBE_TOKEN" = "{{sonarqube_token}}"
             }
-            "enabled" = "{{mcp_sonarqube_enabled}}"
+            "enabled" = "{{mcp_sonarqube_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -150,7 +150,7 @@ _mcp_servers = [
             "type" = "local"
             "command" = ["{{shell_bin_path}}/npx", "-y", "@netlify/mcp"]
             "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_netlify_enabled}}"
+            "enabled" = "{{mcp_netlify_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -165,7 +165,7 @@ _mcp_servers = [
                 "NVIM_SOCKET_PATH" = "/tmp/nvim"
                 "PATH" = _SHELL_PATH
             }
-            "enabled" = "{{mcp_neovim_enabled}}"
+            "enabled" = "{{mcp_neovim_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -176,7 +176,7 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "{{home_assistant_url}}/api/mcp"
-            "enabled" = "{{mcp_home_assistant_enabled}}"
+            "enabled" = "{{mcp_home_assistant_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -187,7 +187,7 @@ _mcp_servers = [
             "type" = "local"
             "command" = ["/Users/{{username}}/go/bin/forgejo-mcp", "stdio", "--server", "{{gitea_url}}", "--token", "{{gitea_token}}"]
             "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_gitea_enabled}}"
+            "enabled" = "{{mcp_gitea_included}}"
         }
         # Not available in Claude Desktop
         claude = None
@@ -197,11 +197,11 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "{{gitlab_url}}/api/v4/mcp"
-            # Gated on mcp_gitlab_enabled (off by default). The self-hosted MCP
+            # Gated on mcp_gitlab_included (off by default). The self-hosted MCP
             # endpoint only exists when the instance has GitLab Duo +
             # beta/experimental features enabled; otherwise it 404s. Rendered as
             # a bare boolean via the .replace() in opencode_config.k.
-            "enabled" = "{{mcp_gitlab_enabled}}"
+            "enabled" = "{{mcp_gitlab_included}}"
         }
         # Native Custom Connector in Claude (Settings → Connectors UI).
         # URL: {{gitlab_url}}/api/v4/mcp — not managed by this config.
@@ -227,12 +227,15 @@ _opencode_mcp_always = """    "Jujutsu": {
       ],
       "environment": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
+      },
+      "enabled": true
     },
     "GitHub": {
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp/",
-      "oauth": false
+      "oauth": false,
+      "headers": {},
+      "enabled": true
     },
     "Backlog": {
       "type": "local",
@@ -240,9 +243,12 @@ _opencode_mcp_always = """    "Jujutsu": {
         "{{shell_bin_path}}/backlog",
         "mcp",
         "start"
-      ]
-    },
-    "Gitea": {
+      ],
+      "enabled": true
+    }"""
+
+_opencode_mcp_conditional = [
+    ["mcp_gitea_included", """    ,"Gitea": {
       "type": "local",
       "command": [
         "/Users/{{username}}/go/bin/forgejo-mcp",
@@ -254,23 +260,23 @@ _opencode_mcp_always = """    "Jujutsu": {
       ],
       "environment": {
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    },
-    "GitLab": {
-      "type": "remote",
-      "url": "{{gitlab_url}}/api/v4/mcp"
-    }"""
-
-_opencode_mcp_conditional = [
-    ["mcp_atlassian_enabled", """    ,"Atlassian": {
-      "type": "remote",
-      "url": "https://mcp.atlassian.com/v1/mcp"
+      },
+      "enabled": true
     }"""],
-    ["mcp_obsidian_enabled", """    ,"Obsidian": {
+    ["mcp_gitlab_included", """    ,"GitLab": {
       "type": "remote",
-      "url": "{{mcp_obsidian_url}}"
+      "url": "{{gitlab_url}}/api/v4/mcp",
+      "oauth": false,
+      "headers": {},
+      "enabled": true
     }"""],
-    ["mcp_salesforce_dx_enabled", """    ,"Salesforce DX": {
+    ["mcp_obsidian_included", """    ,"Obsidian": {
+      "type": "remote",
+      "url": "{{mcp_obsidian_url}}",
+      "oauth": false,
+      "headers": {}
+    }"""],
+    ["mcp_salesforce_dx_included", """    ,"Salesforce DX": {
       "type": "local",
       "command": [
         "{{shell_bin_path}}/npx",
@@ -286,11 +292,11 @@ _opencode_mcp_conditional = [
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }"""],
-    ["mcp_postman_enabled", """    ,"Postman": {
+    ["mcp_postman_included", """    ,"Postman": {
       "type": "remote",
       "url": "https://mcp.postman.com/mcp"
     }"""],
-    ["mcp_sonarqube_enabled", """    ,"SonarQube": {
+    ["mcp_sonarqube_included", """    ,"SonarQube": {
       "type": "local",
       "command": [
         "{{shell_bin_path}}/docker",
@@ -312,7 +318,7 @@ _opencode_mcp_conditional = [
         "SONARQUBE_TOKEN": "{{sonarqube_token}}"
       }
     }"""],
-    ["mcp_netlify_enabled", """    ,"Netlify": {
+    ["mcp_netlify_included", """    ,"Netlify": {
       "type": "local",
       "command": [
         "{{shell_bin_path}}/npx",
@@ -323,7 +329,7 @@ _opencode_mcp_conditional = [
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }"""],
-    ["mcp_neovim_enabled", """    ,"Neovim": {
+    ["mcp_neovim_included", """    ,"Neovim": {
       "type": "local",
       "command": [
         "{{shell_bin_path}}/npx",
@@ -336,11 +342,13 @@ _opencode_mcp_conditional = [
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }"""],
-    ["mcp_home_assistant_enabled", """    ,"Home Assistant": {
+    ["mcp_home_assistant_included", """    ,"Home Assistant": {
       "type": "remote",
-      "url": "{{home_assistant_url}}/api/mcp"
+      "url": "{{home_assistant_url}}/api/mcp",
+      "oauth": false,
+      "headers": {}
     }"""],
-    ["mcp_playwright_enabled", """    ,"Playwright": {
+    ["mcp_playwright_included", """    ,"Playwright": {
       "type": "local",
       "command": [
         "{{shell_bin_path}}/npx",
@@ -351,7 +359,7 @@ _opencode_mcp_conditional = [
         "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
       }
     }"""],
-    ["mcp_chrome_devtools_enabled", """    ,"Chrome DevTools": {
+    ["mcp_chrome_devtools_included", """    ,"Chrome DevTools": {
       "type": "local",
       "command": [
         "{{shell_bin_path}}/npx",

@@ -74,7 +74,7 @@ _rendered = json.encode(claude_config, indent=2).replace(
 # (claude = None in _shared/mcp.k) and spliced in here as the last mcpServers
 # entry. The leading comma lives inside the {{#if}} so that when the guard is
 # false the preceding entry (Chrome DevTools) stays the valid last member.
-_obsidian_entry = "{{#if (eq mcp_obsidian_enabled true)}},\n    \"Obsidian\": {\n      \"command\": \"{{shell_bin_path}}/npx\",\n      \"args\": [\n        \"-y\",\n        \"mcp-remote\",\n        \"{{mcp_obsidian_url}}\",\n        \"--allow-http\",\n        \"--header\",\n        \"Authorization:\${MCP_OBSIDIAN_AUTH}\"\n      ],\n      \"env\": {\n        \"MCP_OBSIDIAN_AUTH\": \"Bearer {{mcp_obsidian_token}}\",\n        \"PATH\": \"{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin\"\n      }\n    }{{/if}}"
+_obsidian_entry = "{{#if (eq mcp_obsidian_included true)}},\n    \"Obsidian\": {\n      \"command\": \"{{shell_bin_path}}/npx\",\n      \"args\": [\n        \"-y\",\n        \"mcp-remote\",\n        \"{{mcp_obsidian_url}}\",\n        \"--allow-http\",\n        \"--header\",\n        \"Authorization:\${MCP_OBSIDIAN_AUTH}\"\n      ],\n      \"env\": {\n        \"MCP_OBSIDIAN_AUTH\": \"Bearer {{mcp_obsidian_token}}\",\n        \"PATH\": \"{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin\"\n      }\n    }{{/if}}"
 
 # Anchor on the mcpServers close + the next top-level key (unique in the output).
 _rendered = _rendered.replace(

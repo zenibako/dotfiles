@@ -177,7 +177,7 @@ _jsonc_header = """/**
 
 # Build the JSONC output for the Python converter to write.
 # Obsidian's and GitLab's "enabled" are gated on per-profile flags
-# (mcp_obsidian_enabled, mcp_gitlab_enabled). json.encode quotes them as strings,
+# (mcp_obsidian_included, mcp_gitlab_included). json.encode quotes them as strings,
 # so strip the quotes to leave bare Handlebars markers that dotter renders as
 # JSON booleans.
 # Splice the Handlebars-conditional MCP section into the generated JSONC.

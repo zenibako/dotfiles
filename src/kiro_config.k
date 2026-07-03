@@ -20,7 +20,7 @@ _remote_servers = {
     # Disabled until the GitLab instance serves the MCP endpoint (needs Duo +
     # beta/experimental features); otherwise it 404s. Kiro's config is plain
     # KCL-built JSON with no Handlebars conditionals, so it can't read the
-    # mcp_gitlab_enabled flag — re-enable here by removing "disabled".
+    # mcp_gitlab_included flag — re-enable here by removing "disabled".
     "GitLab": {"type" = "http", "url" = "{{gitlab_url}}/api/v4/mcp", "disabled" = True}
 }
 
