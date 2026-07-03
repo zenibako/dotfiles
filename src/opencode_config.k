@@ -121,7 +121,7 @@ _provider = {
         "models" = {
             "gemma4-coder" = {
                 "name" = "Gemma 4 12B Coder"
-                "contextWindow" = 16000
+                "contextWindow" = 20000
                 "maxTokens" = 4096
             }
         }
