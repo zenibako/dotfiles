@@ -154,7 +154,7 @@ opencode = {
             "/private/tmp/**" = "allow"
         }
     }
-    "mcp" = "{{opencode_mcp_section}}"
+    "mcp" = {}  # Replaced by `build()` with the KCL-generated mcp dict
     "lsp" = _lsp
     "provider" = _provider
     "agent" = _agent
@@ -175,13 +175,12 @@ _jsonc_header = """/**
  */
 """
 
-# Build the JSONC output for the Python converter to write.
-# Obsidian's and GitLab's "enabled" are gated on per-profile flags
-# (mcp_obsidian_included, mcp_gitlab_included). json.encode quotes them as strings,
-# so strip the quotes to leave bare Handlebars markers that dotter renders as
-# JSON booleans.
-# Splice the Handlebars-conditional MCP section into the generated JSONC.
-# The section is rendered by dotter, which literally omits disabled servers.
-output_jsonc = (_jsonc_header + json.encode(opencode, indent=2)).replace(
-    '"{{opencode_mcp_section}}"', mcp_shared.opencode_mcp_section
-)
+# Build the JSONC output for the given effective MCP inclusion list.
+# The mcp dict is generated at KCL time so excluded servers are literally
+# omitted and the rendered JSON is always valid (no Handlebars leading-comma
+# tricks). URLs/tokens remain Handlebars placeholders resolved by dotter, and
+# post-deploy secret injection adds bearer tokens to the live file.
+build = lambda included {
+    _opencode_with_mcp = {k: v for k, v in opencode if k != "mcp"} | {"mcp": mcp_shared.opencode_mcp_for(included)}
+    _jsonc_header + json.encode(_opencode_with_mcp, indent=2)
+}

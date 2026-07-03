@@ -22,6 +22,14 @@ import kiro_config as kiro_mod
 import codex_config
 import zshenv
 import gitconfig
+import _shared.mcp as mcp_shared
+
+# Effective MCP inclusion list for this machine. local.k's `mcp_included` wins,
+# then the active dotter profile (personal/work), then none. This is used to
+# generate the exact OpenCode mcp dict at KCL time (so excluded servers are
+# literally omitted) and to derive the per-server flags used by Claude/Codex/Kiro
+# templates.
+_mcp_included = mcp_shared.effective_mcp_included(local_packages, local_variables)
 
 # Force side-effect evaluation of modules with file.write
 _kiro_eval = kiro_mod.kiro_config
@@ -53,7 +61,7 @@ config = _shared.ConfigMap {
     gitlogue = gitlogue.gitlogue
     pnpm = pnpm.pnpm
     gitconfig = gitconfig.gitconfig
-    opencode = opencode_config.output_jsonc
+    opencode = opencode_config.build(_mcp_included)
 }
 
 # ── Write JSON for Python TOML converter ──────────────────────────────
@@ -99,12 +107,21 @@ file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))
 # `local_packages` and `local_variables` are provided as top-level globals by
 # the second KCL input file (local.k at the repo root), passed via
 # `kcl run src/main.k local.k`.
+
+# If local.k declares `mcp_included`, derive the per-server boolean flags here
+# so the dotter templates (opencode.jsonc, claude mcp.json, etc.) see them.
+# This mirrors the expansion done for global profiles in src/profiles.k.
+_local_variables = mcp_shared.expand_mcp_included(local_variables)
+
+# Simple TOML value formatter. For strings we use JSON encoding so quotes and
+# backslashes are escaped; booleans/numbers are emitted directly; arrays are
+# emitted as TOML arrays (JSON arrays are valid TOML for simple values).
+_format_local_value = lambda v {
+    "true" if v == True else "false" if v == False else json.encode(v)
+}
+
 _local_lines = ["packages = ["]
 _local_lines += ['  "{}",'.format(p) for p in local_packages]
 _local_lines += ["]\n", "[variables]"]
-_local_lines += ['{} = {}'.format(k, \
-    "true" if v == True else \
-    "false" if v == False else \
-    '"{}"'.format(v)) \
-    for k, v in local_variables]
+_local_lines += ['{} = {}'.format(k, _format_local_value(v)) for k, v in _local_variables]
 file.write(".dotter/local.toml", "\n".join(_local_lines) + "\n")

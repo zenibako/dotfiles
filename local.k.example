@@ -103,16 +103,14 @@ local_variables = {
     opencode_review_agent_model = ""
 
     # ── MCP servers ───────────────────────────────────────────────────
-    mcp_atlassian_enabled = False
-    mcp_obsidian_enabled = False
+    # Declare only the servers this machine should include. The per-server
+    # `mcp_*_included` flags are derived automatically. See src/_shared/mcp.k.
+    #
+    # Available: Jujutsu, GitHub, Backlog, Playwright, Chrome DevTools,
+    #            Obsidian, Salesforce DX, Atlassian, Postman, SonarQube,
+    #            Netlify, Neovim, Home Assistant, Gitea, GitLab
+    mcp_included = []
     mcp_obsidian_url = ""
     mcp_obsidian_token = ""
     mcp_coderabbit = False
-    mcp_home_assistant_enabled = False
-    mcp_netlify = True
-    mcp_postman_enabled = False
-    mcp_sonarqube_enabled = True
-    mcp_salesforce_dx_enabled = False
-    mcp_salesforce_hosted_enabled = False
-    mcp_odaseva_enabled = False
 }

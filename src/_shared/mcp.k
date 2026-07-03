@@ -1,10 +1,86 @@
 import json
 
 # ── Shared MCP Server Definitions ───────────────────────────────────
-# Single source of truth for MCP servers used by both OpenCode and Claude Desktop.
-# Each server defines its OpenCode and Claude Desktop representations.
+# Single source of truth for MCP servers used by OpenCode, Claude Desktop,
+# Claude Code, Codex, and Kiro.
 
 _SHELL_PATH = "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
+
+# Canonical server name → flag-slug mapping. Profiles declare which servers to
+# include via a single `mcp_included = ["Jujutsu", "GitHub", ...]` array; this
+# map expands that array into the per-server `mcp_<slug>_included` booleans used
+# by the Handlebars conditionals below.
+_MCP_SERVER_SLUGS = {
+    "Jujutsu" = "jujutsu"
+    "GitHub" = "github"
+    "Backlog" = "backlog"
+    "Playwright" = "playwright"
+    "Chrome DevTools" = "chrome_devtools"
+    "Obsidian" = "obsidian"
+    "Salesforce DX" = "salesforce_dx"
+    "Atlassian" = "atlassian"
+    "Postman" = "postman"
+    "SonarQube" = "sonarqube"
+    "Netlify" = "netlify"
+    "Neovim" = "neovim"
+    "Home Assistant" = "home_assistant"
+    "Gitea" = "gitea"
+    "GitLab" = "gitlab"
+}
+
+# Derived variable names: {"Jujutsu": "mcp_jujutsu_included", ...}
+_MCP_FLAG_NAMES = {
+    name: "mcp_" + slug + "_included"
+    for name, slug in _MCP_SERVER_SLUGS
+}
+
+# Expand an `mcp_included` list into a dict of dotter variables.
+# Merged into each profile's `variables` block in src/profiles.k.
+included_map = lambda included {
+    {
+        flag: name in included
+        for name, flag in _MCP_FLAG_NAMES
+    }
+}
+
+# Expand a variables dict that contains `mcp_included` into a dict that also
+# contains the per-server `mcp_<slug>_included` boolean flags dotter templates
+# need. Safe to call when `mcp_included` is absent; in that case no flags are
+# added. This lets default/personal/work/local each declare only the array while
+# the per-server booleans are derived in exactly one place per profile.
+expand_mcp_included = lambda variables {
+    variables | included_map(variables.mcp_included) if "mcp_included" in variables else variables
+}
+
+# Profile-level default inclusion lists. These are the MCPs a personal or work
+# machine expects unless local.k overrides `mcp_included`.
+MCP_PERSONAL = ["Jujutsu", "GitHub", "Backlog", "Obsidian", "Home Assistant"]
+MCP_WORK = ["Jujutsu", "GitHub", "Backlog", "Atlassian", "Postman", "SonarQube"]
+
+# Compute the effective `mcp_included` list for this machine. The local.k
+# override wins, then the active dotter profile (personal/work), then none.
+effective_mcp_included = lambda packages, variables {
+    variables.mcp_included if "mcp_included" in variables else \
+    MCP_PERSONAL if "personal" in packages else \
+    MCP_WORK if "work" in packages else []
+}
+
+# Build the OpenCode `mcp` dict for a given inclusion list. Included servers are
+# emitted with a real boolean `enabled`; excluded servers are literally omitted.
+# This avoids the leading-comma problem that plagues Handlebars-conditional
+# JSON objects when the first included server is not first in source order.
+opencode_mcp_for = lambda included {
+    {
+        s.name: {
+            k: v
+            for k, v in s.opencode
+            if k != "enabled"
+        } | {"enabled": True}
+        for s in _mcp_servers
+        if s.name in included
+    }
+}
+
 
 _mcp_servers = [
     {
@@ -30,6 +106,7 @@ _mcp_servers = [
             "type" = "remote"
             "url" = "https://api.githubcopilot.com/mcp/"
             "oauth" = False
+            "headers" = {}
             "enabled" = "{{mcp_github_included}}"
         }
         # Claude Desktop's config schema only supports stdio servers, so this
@@ -87,6 +164,8 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "{{mcp_obsidian_url}}"
+            "oauth" = False
+            "headers" = {}
             # Rendered as a bare boolean via the .replace() in opencode_config.k.
             "enabled" = "{{mcp_obsidian_included}}"
         }
@@ -112,6 +191,8 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "https://mcp.atlassian.com/v1/mcp"
+            "oauth" = False
+            "headers" = {}
             "enabled" = "{{mcp_atlassian_included}}"
         }
         # Native Custom Connector in Claude (Settings → Connectors UI).
@@ -123,6 +204,8 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "https://mcp.postman.com/mcp"
+            "oauth" = False
+            "headers" = {}
             "enabled" = "{{mcp_postman_included}}"
         }
         # Not available in Claude Desktop
@@ -176,6 +259,8 @@ _mcp_servers = [
         opencode = {
             "type" = "remote"
             "url" = "{{home_assistant_url}}/api/mcp"
+            "oauth" = False
+            "headers" = {}
             "enabled" = "{{mcp_home_assistant_included}}"
         }
         # Not available in Claude Desktop
@@ -201,6 +286,8 @@ _mcp_servers = [
             # endpoint only exists when the instance has GitLab Duo +
             # beta/experimental features enabled; otherwise it 404s. Rendered as
             # a bare boolean via the .replace() in opencode_config.k.
+            "oauth" = False
+            "headers" = {}
             "enabled" = "{{mcp_gitlab_included}}"
         }
         # Native Custom Connector in Claude (Settings → Connectors UI).
@@ -208,179 +295,6 @@ _mcp_servers = [
         claude = None
     }
 ]
-
-# Build OpenCode mcp dict from shared definitions (used by Claude Desktop via
-# the claude.k pipeline; OpenCode itself uses opencode_mcp_section below).
-mcp_opencode = {s.name: s.opencode for s in _mcp_servers}
-
-# OpenCode MCP section rendered with Handlebars conditionals so dotter can
-# literally omit disabled servers at deploy time. The first entries are
-# always enabled in the default profile; subsequent entries are gated on
-# per-profile flags and prefixed with a comma so the JSON stays valid when
-# they are omitted.
-_opencode_mcp_always = """    "Jujutsu": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "jj-mcp-server"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      },
-      "enabled": true
-    },
-    "GitHub": {
-      "type": "remote",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "oauth": false,
-      "headers": {},
-      "enabled": true
-    },
-    "Backlog": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/backlog",
-        "mcp",
-        "start"
-      ],
-      "enabled": true
-    }"""
-
-_opencode_mcp_conditional = [
-    ["mcp_gitea_included", """    ,"Gitea": {
-      "type": "local",
-      "command": [
-        "/Users/{{username}}/go/bin/forgejo-mcp",
-        "stdio",
-        "--server",
-        "{{gitea_url}}",
-        "--token",
-        "{{gitea_token}}"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      },
-      "enabled": true
-    }"""],
-    ["mcp_gitlab_included", """    ,"GitLab": {
-      "type": "remote",
-      "url": "{{gitlab_url}}/api/v4/mcp",
-      "oauth": false,
-      "headers": {},
-      "enabled": true
-    }"""],
-    ["mcp_obsidian_included", """    ,"Obsidian": {
-      "type": "remote",
-      "url": "{{mcp_obsidian_url}}",
-      "oauth": false,
-      "headers": {}
-    }"""],
-    ["mcp_salesforce_dx_included", """    ,"Salesforce DX": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "@salesforce/mcp",
-        "--orgs",
-        "DEFAULT_TARGET_ORG",
-        "--toolsets",
-        "all",
-        "--allow-non-ga-tools"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }"""],
-    ["mcp_postman_included", """    ,"Postman": {
-      "type": "remote",
-      "url": "https://mcp.postman.com/mcp"
-    }"""],
-    ["mcp_sonarqube_included", """    ,"SonarQube": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/docker",
-        "run",
-        "--init",
-        "--pull=always",
-        "-i",
-        "--rm",
-        "-e",
-        "SONARQUBE_URL",
-        "-e",
-        "SONARQUBE_TOKEN",
-        "mcp/sonarqube"
-      ],
-      "environment": {
-        "DOCKER_CONTEXT": "colima",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin",
-        "SONARQUBE_URL": "{{sonarqube_url}}",
-        "SONARQUBE_TOKEN": "{{sonarqube_token}}"
-      }
-    }"""],
-    ["mcp_netlify_included", """    ,"Netlify": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "@netlify/mcp"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }"""],
-    ["mcp_neovim_included", """    ,"Neovim": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "mcp-neovim-server"
-      ],
-      "environment": {
-        "ALLOW_SHELL_COMMANDS": "true",
-        "NVIM_SOCKET_PATH": "/tmp/nvim",
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }"""],
-    ["mcp_home_assistant_included", """    ,"Home Assistant": {
-      "type": "remote",
-      "url": "{{home_assistant_url}}/api/mcp",
-      "oauth": false,
-      "headers": {}
-    }"""],
-    ["mcp_playwright_included", """    ,"Playwright": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "@playwright/mcp@latest"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }"""],
-    ["mcp_chrome_devtools_included", """    ,"Chrome DevTools": {
-      "type": "local",
-      "command": [
-        "{{shell_bin_path}}/npx",
-        "-y",
-        "chrome-devtools-mcp@latest",
-        "--launch"
-      ],
-      "environment": {
-        "PATH": "{{shell_bin_path}}:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
-    }"""],
-]
-
-# Build conditional blocks with leading commas so JSON stays valid when entries
-# are omitted by dotter's Handlebars rendering.
-_conditional_blocks = [
-    "{{#if " + pair[0] + "}}" + pair[1] + "{{/if}}"
-    for pair in _opencode_mcp_conditional
-]
-
-opencode_mcp_section = "{\n" + _opencode_mcp_always + "\n" + "\n".join(_conditional_blocks) + "\n  }"
 
 # Build Claude Desktop mcpServers dict from shared definitions
 # Only include servers that have a claude representation

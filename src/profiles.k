@@ -1,4 +1,5 @@
 import _shared
+import _shared.mcp as mcp_shared
 
 # ── Default profile ────────────────────────────────────────────────────
 default = _shared.Profile {
@@ -82,27 +83,15 @@ default = _shared.Profile {
         claude_model_at_top = True
         claude_plugin_clangd_lsp = False
         kiro_enabled = False
-        # All MCP servers are disabled by default in the dotfiles repo.
-        # Profiles (work/personal) and local.k opt into only the servers they
-        # need. This keeps the base config minimal and avoids failed connections
-        # on machines that lack the required binaries, URLs, or tokens.
-        #
-        # `_included` means "render this server into the config". The server's
-        # own `enabled` field (set in src/_shared/mcp.k) controls whether it
-        # starts at runtime.
-        mcp_jujutsu_included = False
-        mcp_github_included = False
-        mcp_backlog_included = False
-        mcp_gitea_included = False
-        mcp_gitlab_included = False
-        mcp_atlassian_included = False
-        mcp_obsidian_included = False
+        # MCP servers are configured per profile (personal/work) and per machine
+        # (local.k). default does not declare `mcp_included` because dotter
+        # does not allow child profiles to redeclare variables that exist in a
+        # parent profile. Each active profile declares its own `mcp_included`
+        # array; the per-server `mcp_*_included` flags are derived from it in
+        # src/_shared/mcp.k.
         mcp_obsidian_url = ""
         mcp_obsidian_token = ""
-        # Profile-specific MCPs are NOT declared here — they are defined only in
-        # the profile that uses them (work/personal/local.k) so dotter does not
-        # see duplicate variables. The Handlebars conditionals in the rendered
-        # opencode.jsonc omit them when undefined/false.
+        # Non-MCP variables follow below.
         bluesky_handle = ""
         bluesky_app_password = ""
         plex_user_token = ""
@@ -132,18 +121,24 @@ default = _shared.Profile {
     }
 }
 
-# ── Personal profile ───────────────────────────────────────────────────
+# Personal-profile MCPs — these are the servers a personal machine is expected
+# to use. The default profile sets `mcp_included = []`, so overriding the array
+# here (and deriving the per-server flags) is the single source of truth for
+# which MCPs the personal profile renders.
+_mcp_personal = ["Jujutsu", "GitHub", "Backlog", "Obsidian", "Home Assistant"]
+
 personal = _shared.Profile {
     depends = ["default"]
     files = {
         "src/nvim/personal" = { target = "~/.config/nvim", type = "symbolic" }
     }
-    variables = {
+    variables = mcp_shared.expand_mcp_included({
         opencode_profile_personal = True
         mcp_coderabbit = False
-        # mcp_netlify_included is defined in the default profile; setting it here
-        # would duplicate the variable and break dotter inheritance. Override via
-        # local.k if a machine needs a different value.
+        mcp_included = _mcp_personal
+        # Tokens/URLs for Obsidian and Home Assistant still come from local.k
+        # so secrets are not committed. local.k can also override `mcp_included`
+        # per-machine if needed.
         opencode_build_agent_model = "ollama-cloud/kimi-k2.6:cloud"
         opencode_plan_agent_model = "ollama-cloud/gemma4:31b"
         opencode_test_agent_model = "ollama-cloud/glm-5.1"
@@ -155,12 +150,11 @@ personal = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = True
         claude_epitaxy_personal_prefs_enabled = True
         claude_effort_level_enabled = True
-        # Obsidian MCP — enabled per-machine via local.k (mcp_obsidian_included,
-        # mcp_obsidian_url, mcp_obsidian_token). The base definitions live in
-        # the default profile; do NOT redeclare them here (dotter errors on
-        # duplicate inherited variables).
-    }
+    })
 }
+
+# Work-profile MCPs — core VCS/planning tools plus work-specific servers.
+_mcp_work = ["Jujutsu", "GitHub", "Backlog", "Atlassian", "Postman", "SonarQube"]
 
 # ── Work profile ────────────────────────────────────────────────────────
 work = _shared.Profile {
@@ -170,15 +164,9 @@ work = _shared.Profile {
         "src/opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
         "src/opencode/script/lwc-lsp-wrapper.sh" = { target = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
     }
-    variables = {
+    variables = mcp_shared.expand_mcp_included({
         opencode_profile_work = True
-        # Atlassian MCP is work-only; the default profile leaves it disabled.
-        mcp_atlassian_included = True
-        mcp_salesforce_dx_included = False
-        mcp_salesforce_hosted_included = False
-        mcp_odaseva_included = False
-        mcp_postman_included = True
-        mcp_sonarqube_included = True
+        mcp_included = _mcp_work
         postman_api_key = ""
         gitlab_personal_access_token = ""
         gitlab_api_url = "https://gitlab.com/api/v4"
@@ -195,9 +183,7 @@ work = _shared.Profile {
         claude_cowork_scheduled_tasks_enabled = False
         claude_epitaxy_personal_prefs_enabled = False
         claude_effort_level_enabled = False
-        # Obsidian MCP is disabled by default (see default profile). Work
-        # inherits the False value; local.k can override per-machine.
-    }
+    })
 }
 
 # ── Platform profiles ─────────────────────────────────────────────────
