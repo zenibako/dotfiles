@@ -15,6 +15,7 @@ default = _shared.Profile {
         "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
         "out/zshenv" = { target = "~/.zshenv", type = "template" }
         "src/zshrc" = "~/.zshrc"
+        "src/zprofile" = "~/.zprofile"
         "src/carapace" = "~/.config/carapace"
         "src/ghostty/shaders" = { target = "~/.config/ghostty/shaders", type = "symbolic" }
         "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
