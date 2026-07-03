@@ -1,0 +1,8 @@
+# .lattice/config.yaml -- Lattice Framework Configuration
+# All paths are relative to the repository root.
+# Run refiners to populate: /knowledge-priming-refiner, /language-idioms-refiner, /architecture-refiner, /ddd-refiner, /clean-code-refiner, /review-refiner
+
+version: 1
+language: kcl
+paths:
+  knowledge_base: .lattice/standards/knowledge-base.md

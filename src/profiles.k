@@ -82,15 +82,27 @@ default = _shared.Profile {
         claude_model_at_top = True
         claude_plugin_clangd_lsp = False
         kiro_enabled = False
-        # GitLab MCP is disabled by default: the self-hosted endpoint
-        # ({{gitlab_url}}/api/v4/mcp) is only served when the instance has
-        # GitLab Duo + beta/experimental features enabled (Premium/Ultimate);
-        # otherwise it 404s. Flip to True in local.k once the instance supports
-        # it (then `codex mcp login gitlab` / authenticate in Claude Code).
-        mcp_gitlab_enabled = False
+        # Core MCPs enabled in every profile. These are declared in default so
+        # child profiles inherit them without redeclaration (dotter forbids
+        # duplicate variables across inherited profiles).
+        mcp_jujutsu_enabled = True
+        mcp_github_enabled = True
+        mcp_backlog_enabled = True
+        mcp_gitea_enabled = True
+        # GitLab MCP: the self-hosted endpoint ({{gitlab_url}}/api/v4/mcp) is only
+        # served when the instance has GitLab Duo + beta/experimental features
+        # enabled (Premium/Ultimate); otherwise it 404s. Enabled by default so
+        # authenticated users can use it; set to False in local.k if unsupported.
+        mcp_gitlab_enabled = True
+        mcp_atlassian_enabled = True
+        # Obsidian defaults to false; enable per-machine in local.k.
         mcp_obsidian_enabled = False
         mcp_obsidian_url = ""
         mcp_obsidian_token = ""
+        # Profile-specific MCPs are NOT declared here — they are defined only in
+        # the profile that uses them (work/personal/local.k) so dotter does not
+        # see duplicate variables. The Handlebars conditionals in the rendered
+        # opencode.jsonc omit them when undefined/false.
         bluesky_handle = ""
         bluesky_app_password = ""
         plex_user_token = ""
@@ -129,8 +141,9 @@ personal = _shared.Profile {
     variables = {
         opencode_profile_personal = True
         mcp_coderabbit = False
-        mcp_home_assistant_enabled = False
-        mcp_netlify = True
+        # mcp_netlify_enabled is defined in the default profile; setting it here
+        # would duplicate the variable and break dotter inheritance. Override via
+        # local.k if a machine needs a different value.
         opencode_build_agent_model = "ollama-cloud/kimi-k2.6:cloud"
         opencode_plan_agent_model = "ollama-cloud/gemma4:31b"
         opencode_test_agent_model = "ollama-cloud/glm-5.1"
@@ -159,9 +172,11 @@ work = _shared.Profile {
     }
     variables = {
         opencode_profile_work = True
+        # Core VCS/planning MCPs are inherited from the default profile. Work
+        # disables Atlassian via local.k or by setting the inherited default
+        # variable there if needed; redeclaring it here breaks dotter merge.
         mcp_salesforce_dx_enabled = False
         mcp_salesforce_hosted_enabled = False
-        mcp_atlassian_enabled = False
         mcp_odaseva_enabled = False
         mcp_postman_enabled = True
         mcp_sonarqube_enabled = True

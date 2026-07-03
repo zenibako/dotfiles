@@ -40,6 +40,10 @@ _lsp = {
         "command" = ["typescript-language-server", "--stdio"]
         "extensions" = [".ts", ".tsx", ".js", ".jsx"]
     }
+    "kcl-lsp" = {
+        "command" = ["kcl-language-server"]
+        "extensions" = [".k", ".kcl"]
+    }
     # Work profile LSPs (disabled by default)
     "apex-language-server" = {
         "command" = [
@@ -108,6 +112,20 @@ _provider = {
             }
         }
     }
+    "lmstudio-gemma4" = {
+        "npm" = "@ai-sdk/openai-compatible"
+        "options" = {
+            "baseURL" = "http://127.0.0.1:8080"
+            "apiKey" = "none"
+        }
+        "models" = {
+            "gemma4-coder" = {
+                "name" = "Gemma 4 12B Coder"
+                "contextWindow" = 16000
+                "maxTokens" = 4096
+            }
+        }
+    }
 }
 
 # Agent config
@@ -136,7 +154,7 @@ opencode = {
             "/private/tmp/**" = "allow"
         }
     }
-    "mcp" = mcp_shared.mcp_opencode
+    "mcp" = "{{opencode_mcp_section}}"
     "lsp" = _lsp
     "provider" = _provider
     "agent" = _agent
@@ -162,8 +180,8 @@ _jsonc_header = """/**
 # (mcp_obsidian_enabled, mcp_gitlab_enabled). json.encode quotes them as strings,
 # so strip the quotes to leave bare Handlebars markers that dotter renders as
 # JSON booleans.
+# Splice the Handlebars-conditional MCP section into the generated JSONC.
+# The section is rendered by dotter, which literally omits disabled servers.
 output_jsonc = (_jsonc_header + json.encode(opencode, indent=2)).replace(
-    "\"{{mcp_obsidian_enabled}}\"", "{{mcp_obsidian_enabled}}"
-).replace(
-    "\"{{mcp_gitlab_enabled}}\"", "{{mcp_gitlab_enabled}}"
+    '"{{opencode_mcp_section}}"', mcp_shared.opencode_mcp_section
 )

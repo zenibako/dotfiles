@@ -68,8 +68,11 @@ fi
 # Claude Desktop's and Claude Code's mcpServers are fully replaced (--replace)
 # so servers removed upstream disappear; both render every value from Handlebars
 # variables (no post-deploy secret lives only in the live file), which is what
-# makes --replace safe. The others must NOT use --replace or a deploy without
-# secret access would blank their injected tokens.
+# makes --replace safe. OpenCode's mcp key is also fully rendered with
+# Handlebars-conditional servers (disabled servers are literally omitted), and
+# patch_opencode_secrets.py re-injects tokens afterward, so --replace mcp is
+# safe and required for "exclude means omit". The others must NOT use --replace
+# or a deploy without secret access would blank their injected tokens.
 # Claude Code reads user-global MCP servers from ~/.claude.json, NOT from
 # settings.json, so the rendered mcp.json is merged into ~/.claude.json.
 _merge_config() {
@@ -90,7 +93,8 @@ _merge_config "$HOME/.cache/dotfiles/claude_code_mcp.rendered.json" \
   "$HOME/.claude.json" \
   --replace mcpServers
 _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
-  "$HOME/.config/opencode/opencode.jsonc"
+  "$HOME/.config/opencode/opencode.jsonc" \
+  --replace mcp
 unset -f _merge_config
 unset _rendered _live
 
