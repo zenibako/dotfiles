@@ -1,49 +1,27 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [],
-  "permission": {
-    "external_directory": {
-      "/tmp/**": "allow",
-      "/private/tmp/**": "allow"
+  "mcp": {
+    "Jujutsu": {
+      "enabled": true
+    },
+    "Backlog": {
+      "enabled": false
+    },
+    "GitHub": {
+      "enabled": false
+    },
+    "Playwright": {
+      "enabled": false
+    },
+    "Chrome DevTools": {
+      "enabled": false
+    },
+    "Obsidian": {
+      "enabled": false
     }
   },
-  "mcp": {},
   "lsp": {
-    "basedpyright": {
-      "command": ["basedpyright-langserver", "--stdio"],
-      "extensions": [".py"]
-    },
-    "gopls": {
-      "command": ["gopls"],
-      "extensions": [".go"]
-    },
-    "html": {
-      "command": ["vscode-html-language-server", "--stdio"],
-      "extensions": [".html", ".templ"]
-    },
-    "jsonls": {
-      "command": ["vscode-json-language-server", "--stdio"],
-      "extensions": [".json", ".jsonc"]
-    },
-    "lua_ls": {
-      "command": ["lua-language-server"],
-      "extensions": [".lua"]
-    },
-    "yamlls": {
-      "command": ["yaml-language-server", "--stdio"],
-      "extensions": [".yml", ".yaml"]
-    },
-    "cue": {
-      "command": ["cue", "lsp"],
-      "extensions": [".cue"]
-    },
-    "typescript-language-server": {
-      "command": ["typescript-language-server", "--stdio"],
-      "extensions": [".ts", ".tsx", ".js", ".jsx"]
-    },
     "kcl-lsp": {
-      "command": ["kcl-language-server"],
-      "extensions": [".k", ".kcl"]
     }
   }
 }
