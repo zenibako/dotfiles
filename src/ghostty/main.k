@@ -29,6 +29,14 @@ keybind = super+j=goto_split:bottom
 keybind = super+k=goto_split:top
 keybind = super+l=goto_split:right
 
+# Quick terminal (quake-style dropdown) — toggle with Ctrl+`
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-size = 30%
+quick-terminal-screen = main
+quick-terminal-animation-duration = 0.2
+quick-terminal-autohide = true
+
 # Split pane visual distinction
 unfocused-split-opacity = 0.7
 unfocused-split-fill = {{ ghostty_unfocused_split_fill }}
