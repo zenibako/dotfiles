@@ -59,6 +59,17 @@ except Exception:
   unset _claude_app _ops_file _account_id _plugin_dir _plugin_uuid _skills_base _skills_dir _manifest _sd _sname
 fi
 
+# ── OpenCode plugins (conditional on installed commands) ─────────────────
+# Deploy adrafinil plugin only when the `adrafinil` command is present on PATH.
+_oc_plugins="$HOME/.config/opencode/plugins"
+mkdir -p "$_oc_plugins"
+if command -v adrafinil >/dev/null 2>&1; then
+  ln -sf "$REPO_ROOT/src/opencode/plugins/adrafinil.ts" "$_oc_plugins/adrafinil.ts"
+else
+  rm -f "$_oc_plugins/adrafinil.ts"
+fi
+unset _oc_plugins
+
 # ── Merge dotfiles-managed configs into app-owned live files ─────────────
 # dotter renders these to private staging files because it can't own the live
 # files: the apps rewrite them at runtime and/or post_deploy injects secrets,
