@@ -4,21 +4,29 @@
 
 set -eo pipefail
 
-echo "Fetching latest changes..."
+# Shared ANSI colors + output helpers (_STEP/_CMD/_INFO/_ERR/_WARN/_OK).
+# shellcheck source=dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/dotter/lib.sh"
+
+_STEP "Fetching latest changes"
+_CMD "jj git fetch"
 jj git fetch
 echo ""
 
-echo "Syncing to origin/main..."
-# Rebase working copy onto the latest main at origin
+_STEP "Syncing to origin/main"
+_INFO "Rebasing working copy onto the latest main"
+_CMD 'jj rebase -s "@" -d "main"'
 jj rebase -s "@" -d "main"
 echo ""
 
-echo "Deploying dotfiles with dotter..."
+_STEP "Deploying dotfiles with dotter"
+_CMD "dotter deploy"
 dotter deploy
 echo ""
 
-echo "Status:"
+_STEP "Status"
+_CMD "jj status"
 jj status
 
 echo ""
-echo "Done. Restart your shell or source ~/.zshrc for all changes to take effect."
+_OK "Done. Restart your shell or source ~/.zshrc for all changes to take effect."

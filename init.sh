@@ -6,8 +6,12 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DOTFILES_DIR"
-echo "Dotfiles directory is $DOTFILES_DIR"
-echo "Home is $HOME"
+
+# Shared ANSI colors + output helpers.
+# shellcheck source=scripts/dotter/lib.sh
+. "$DOTFILES_DIR/scripts/dotter/lib.sh"
+
+_STEP "Dotfiles directory is $DOTFILES_DIR (home: $HOME)"
 
 ensure_dir() {
     local dir="$1"
@@ -284,29 +288,28 @@ else
 fi
 
 # Deploy dotfiles
-echo "Deploying dotfiles..."
-. scripts/dotter/lib.sh
+_STEP "Deploying dotfiles"
 ensure_dotter_dir "$DOTFILES_DIR"
 dotter deploy -f
 
 # Setup dotter-managed gitconfig via include (avoids conflicts with gh auth setup-git)
 DOTTER_GITCONFIG="$HOME/.config/git/dotter-gitconfig"
 if [ -f "$DOTTER_GITCONFIG" ]; then
-    if [ -f "$HOME/.gitconfig" ]; then
-        if ! git config --global --get-all include.path 2>/dev/null | grep -qF "$DOTTER_GITCONFIG"; then
-            echo "Adding dotter gitconfig include to ~/.gitconfig..."
-            git config --global --add include.path "$DOTTER_GITCONFIG"
-        fi
-    else
-        echo "Creating ~/.gitconfig with dotter include..."
-        git config --global include.path "$DOTTER_GITCONFIG"
+  if [ -f "$HOME/.gitconfig" ]; then
+    if ! git config --global --get-all include.path 2>/dev/null | grep -qF "$DOTTER_GITCONFIG"; then
+      _INFO "Adding dotter gitconfig include to ~/.gitconfig"
+      git config --global --add include.path "$DOTTER_GITCONFIG"
     fi
+  else
+    _INFO "Creating ~/.gitconfig with dotter include"
+    git config --global include.path "$DOTTER_GITCONFIG"
+  fi
 fi
 
 # Configure gh credential helper (writes to ~/.gitconfig, not the dotter-managed file)
 if command -v gh >/dev/null 2>&1; then
-    echo "Configuring gh credential helper..."
-    gh auth setup-git 2>/dev/null || echo "  (skipped: not authenticated with gh yet)"
+  _INFO "Configuring gh credential helper"
+  gh auth setup-git 2>/dev/null || _WARN "not authenticated with gh yet"
 fi
 
-echo "Done! Start a new zsh session: exec zsh"
+_OK "Done! Start a new zsh session: exec zsh"

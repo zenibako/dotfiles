@@ -34,7 +34,7 @@ FAILED=0
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 for theme in "${THEMES[@]}"; do
-  echo "Testing theme: $theme"
+  _STEP "Testing theme: $theme"
   
   DEPLOY_DIR=$(mktemp -d)
   DEPLOY_DIRS+=("$DEPLOY_DIR")
@@ -76,5 +76,5 @@ if [ $FAILED -eq 1 ]; then
   exit 1
 fi
 
-_PASS "All themes validated successfully!"
+_OK "All themes validated successfully"
 rm -f /tmp/theme-*.log

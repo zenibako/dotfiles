@@ -54,15 +54,25 @@ If you need to clean or reset the repository on the HA host, **only do so after 
 When making commits on behalf of the user, **always include the AI co-author attribution** in the commit message body:
 
 ```
-fat: add new feature
+feat: add new feature
 
 Implementation details...
 
-Co-authored-by: Kimi <kimi-k2.6:cloud@ai>
-```
+Co-authored-by: <Model-Name> <<model-name>@ai>
 
 - This must be the **last line** of the commit message body, separated by a blank line.
 - It applies to **all commits** made by the agent (Git or Jujutsu).
+
+### Determining the Co-Author Identity
+
+**Use the model identity from the system prompt** — do not hard-code or look up a model from config files. The system prompt identifies the active model (e.g., "You are powered by the model named `glm-5.2`").
+
+Derive the `Co-authored-by` line from that model name:
+- Normalize to a display name: `glm-5.2` → `GLM-5.2`, `kimi-k2.7-code` → `Kimi-K2.7-Code`, `gpt-5.4` → `GPT-5.4`
+- Format: `Co-authored-by: <Display-Name> <<model-name>@ai>`
+- Example for `glm-5.2`: `Co-authored-by: GLM-5.2 <glm-5.2@ai>`
+
+Do NOT consult `.dotter/global.toml`, `opencode_*_agent_model` variables, or any other config source — the system prompt is the single source of truth for the active model at commit time.
 
 ### Git Commits
 
@@ -71,10 +81,10 @@ The Git `prepare-commit-msg` hook automatically appends `Co-authored-by`. It res
 **Before committing, set the env var:**
 
 ```bash
-AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" git commit -m "feat: add new feature"
+AI_CO_AUTHOR="GLM-5.2 <glm-5.2@ai>" git commit -m "feat: add new feature"
 
 # Or use the convenience wrapper (passes through to git commit)
-AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" gitc -m "feat: add new feature"
+AI_CO_AUTHOR="GLM-5.2 <glm-5.2@ai>" gitc -m "feat: add new feature"
 ```
 
 ### Jujutsu (jj) Commits
@@ -83,35 +93,19 @@ JJ configs do not support environment variable interpolation, but the shell help
 
 ```bash
 # Interactive shells only
-AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+AI_CO_AUTHOR="GLM-5.2 <glm-5.2@ai>" jjc "feat: add new feature"
 
 # Non-interactive fallback — source zshrc first
-source ~/.zshrc && AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjc "feat: add new feature"
+source ~/.zshrc && AI_CO_AUTHOR="GLM-5.2 <glm-5.2@ai>" jjc "feat: add new feature"
 
 # Manual inline command (works everywhere, no shell helpers needed)
 jj commit -m "feat: add new feature
 
-Co-authored-by: Kimi <kimi-k2.6:cloud@ai>"
+Co-authored-by: GLM-5.2 <glm-5.2@ai>"
 
 # Describe working copy without creating new commit (interactive)
-AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjd "fix: correct typo"
+AI_CO_AUTHOR="GLM-5.2 <glm-5.2@ai>" jjd "fix: correct typo"
 ```
-
-### Required Action Before Committing
-
-1. **Identify the active model**: Check the `opencode_*_agent_model` variables in `.dotter/global.toml` (e.g., `opencode_build_agent_model` for the build agent)
-2. **Set the env var**: Export `AI_CO_AUTHOR` with the correct identity
-3. **Commit**: Use `git commit`, `gitc`, `jjc`, or `jjd`
-
-### Model Identity Mapping
-
-| Profile | Model (as of current config) | Co-authored-by |
-|---|---|---|
-| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
-| Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
-| Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
-
-**Format**: Extract the model name from the config value. For `ollama-cloud/kimi-k2.6:cloud`, use `Kimi <kimi-k2.6:cloud@ai>`. For `openai/gpt-5.4`, use `GPT-5.4 <gpt-5.4@ai>`.
 
 **Note**: The `gitc`, `jjc`, and `jjd` shell functions are defined in `zshrc` and deployed via dotter. Reload your shell or source `~/.zshrc` to use them.
 

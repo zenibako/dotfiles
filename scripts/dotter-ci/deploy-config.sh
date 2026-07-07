@@ -6,6 +6,10 @@
 
 set -euo pipefail
 
+# Shared ANSI colors + output helpers.
+# shellcheck source=../dotter/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
+
 PROFILE="${1:-default}"
 THEME="${2:-monokai}"
 
@@ -13,19 +17,20 @@ THEME="${2:-monokai}"
 DEPLOY_DIR=$(mktemp -d)
 export HOME="$DEPLOY_DIR"
 
-echo "Deploying to: $DEPLOY_DIR" >&2
+_STEP "Deploying to: $DEPLOY_DIR" >&2
 
 # Create local.toml (CI context)
 "$(dirname "$0")/create-local-toml.sh" "$PROFILE" "$THEME" .dotter/local.toml
 
-echo "Generated local.toml:" >&2
+_INFO "Generated local.toml:" >&2
 cat .dotter/local.toml >&2
 
 # Deploy with dotter
+_CMD "dotter deploy --force --verbose --noconfirm"
 dotter deploy --force --verbose --noconfirm
 
 # Verify deployment
-echo "Verifying deployment..." >&2
+_STEP "Verifying deployment" >&2
 ls -la "$DEPLOY_DIR" >&2 || true
 find "$DEPLOY_DIR" -type f | head -20 >&2 || true
 

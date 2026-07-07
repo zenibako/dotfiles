@@ -12,10 +12,9 @@ cd "$SCRIPT_DIR"
 
 ensure_dotter_dir "$SCRIPT_DIR"
 
-# Run pre-deploy (KCL generation + validation)
-echo "==> Running pre-deploy (KCL generation + validation)..."
-bash scripts/pre_deploy.sh
-
-# Run dotter with any passed arguments
-echo "==> Running dotter deploy..."
+# dotter's pre_deploy hook (configured in .dotter/global.toml) runs KCL
+# generation and validation automatically before deploying files, so we just
+# invoke dotter directly and let the hooks do the rest.
+_STEP "Running dotter deploy"
+_CMD "dotter deploy $*"
 exec dotter deploy "$@"

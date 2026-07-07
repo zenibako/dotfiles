@@ -14,11 +14,28 @@ Exit codes:
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
 OUT = Path("out")
 ROOT = Path(".")
+
+# ANSI colors (matched to scripts/dotter/lib.sh: green ✓ on TTY only)
+if sys.stdout.isatty() and not os.environ.get("NO_COLOR"):
+    _c = ("\033[32m", "\033[31m", "\033[0m")
+else:
+    _c = ("", "", "")
+_G, _R, _X = _c
+
+def _ok(msg):
+    print(f"  {_G}✓{_X} {msg}")
+
+def _fail(msg):
+    print(f"  {_R}✗{_X} {msg}", file=sys.stderr)
+
+def _skip(msg):
+    print(f"  ⊘ {msg}")
 
 
 def check_file_exists(path, desc):
@@ -28,7 +45,7 @@ def check_file_exists(path, desc):
     else:
         full = OUT / path
     if not full.exists():
-        print(f"  FAIL: Missing {desc}: {full}")
+        _fail(f"Missing {desc}: {full}")
         return False
     return True
 
@@ -50,12 +67,12 @@ def check_toml_parses(path, desc):
             with open(full, "rb") as f:
                 tomli.load(f)
         except ImportError:
-            print(f"  SKIP: No TOML parser available for {desc}")
+            _skip(f"No TOML parser available for {desc}")
             return True
     except Exception as e:
-        print(f"  FAIL: {desc} is invalid TOML: {e}")
+        _fail(f"{desc} is invalid TOML: {e}")
         return False
-    print(f"  OK: {desc}")
+    _ok(desc)
     return True
 
 
@@ -70,9 +87,9 @@ def check_json_parses(path, desc):
         with open(full) as f:
             json.load(f)
     except Exception as e:
-        print(f"  FAIL: {desc} is invalid JSON: {e}")
+        _fail(f"{desc} is invalid JSON: {e}")
         return False
-    print(f"  OK: {desc}")
+    _ok(desc)
     return True
 
 
@@ -88,7 +105,7 @@ def check_template_file(path, desc):
         with open(full) as f:
             content = f.read()
     except Exception as e:
-        print(f"  FAIL: {desc} unreadable: {e}")
+        _fail(f"{desc} unreadable: {e}")
         return False
 
     # Check for balanced {{#if}} / {{/if}}
@@ -96,7 +113,7 @@ def check_template_file(path, desc):
     open_if = len(re.findall(r'\{\{#if\b', content))
     close_if = len(re.findall(r'\{\{/if\}\}', content))
     if open_if != close_if:
-        print(f"  FAIL: {desc} has unbalanced {{{{#if}}}} blocks ({open_if} open, {close_if} close)")
+        _fail(f"{desc} has unbalanced {{{{#if}}}} blocks ({open_if} open, {close_if} close)")
         return False
 
     # Check for other common block tags
@@ -104,20 +121,20 @@ def check_template_file(path, desc):
         open_tags = len(re.findall(r'\{\{#' + tag + r'\b', content))
         close_tags = len(re.findall(r'\{\{/' + tag + r'\}\}', content))
         if open_tags != close_tags:
-            print(f"  FAIL: {desc} has unbalanced {{{{#{tag}}}}} blocks")
+            _fail(f"{desc} has unbalanced {{{{#{tag}}}}} blocks")
             return False
 
     # Check that jj config still has template markers for identity fields
     if path == "jj/config.toml" and ('{{name}}' not in content or '{{email}}' not in content):
-        print(f"  FAIL: {desc} missing required Handlebars placeholders ({{name}}, {{email}})")
+        _fail(f"{desc} missing required Handlebars placeholders ({{name}}, {{email}})")
         return False
 
     # Check that gitconfig has template markers for identity fields
     if path == "gitconfig" and ('{{name}}' not in content or '{{email}}' not in content):
-        print(f"  FAIL: {desc} missing required Handlebars placeholders ({{name}}, {{email}})")
+        _fail(f"{desc} missing required Handlebars placeholders ({{name}}, {{email}})")
         return False
 
-    print(f"  OK: {desc}")
+    _ok(desc)
     return True
 
 
@@ -154,10 +171,10 @@ def main():
             all_ok = False
 
     if all_ok:
-        print("\nAll generated configs valid.")
+        print(f"\n{_G}All generated configs valid.{_X}")
         return 0
     else:
-        print("\nValidation FAILED — fix issues before deploying.")
+        print(f"\n{_R}Validation FAILED — fix issues before deploying.{_X}", file=sys.stderr)
         return 1
 
 

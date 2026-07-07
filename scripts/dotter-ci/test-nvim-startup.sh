@@ -20,7 +20,8 @@ fi
 export HOME="$DEPLOY_DIR"
 
 # Test 1: Basic Neovim startup
-echo "=== Test 1: Basic startup ==="
+_STEP "Test 1: Basic startup"
+_CMD 'nvim --headless +"qa!"'
 timeout 60 nvim --headless +"qa!" 2>&1 | tee /tmp/nvim-output.txt
 NVIM_EXIT=${PIPESTATUS[0]}
 
@@ -37,11 +38,12 @@ if grep -E "^E[0-9]+:|Error while calling lua chunk|Error loading plugin config"
   fi
 fi
 
-echo "Neovim started successfully!"
+_OK "Neovim started successfully"
 
 # Test 2: LSP subsystem health check
 echo ""
-echo "=== Test 2: LSP subsystem check ==="
+_STEP "Test 2: LSP subsystem check"
+_CMD "nvim --headless -c checkhealth vim.lsp -c qa!"
 timeout 60 nvim --headless \
   -c "lua vim.cmd('checkhealth vim.lsp')" \
   -c "qa!" 2>&1 | tee /tmp/nvim-lsp-output.txt
@@ -60,11 +62,12 @@ if grep -E "^E[0-9]+:|ERROR" /tmp/nvim-lsp-output.txt > /tmp/lsp-errors.txt 2>/d
   fi
 fi
 
-echo "LSP subsystem OK!"
+_OK "LSP subsystem"
 
 # Test 3: nvim-lint (PMD) loads without errors
 echo ""
-echo "=== Test 3: nvim-lint (PMD) plugin load ==="
+_STEP "Test 3: nvim-lint (PMD) plugin load"
+_CMD "nvim --headless -c 'lua require(\"lint\")' -c qa!"
 timeout 60 nvim --headless \
   -c "lua require('lint')" \
   -c "qa!" 2>&1 | tee /tmp/nvim-lint-output.txt
@@ -83,6 +86,6 @@ if grep -E "^E[0-9]+:|Error" /tmp/nvim-lint-output.txt > /tmp/lint-errors.txt 2>
   fi
 fi
 
-echo "nvim-lint (PMD) loads successfully!"
+_OK "nvim-lint (PMD) loads successfully"
 echo ""
-echo "All Neovim tests passed."
+_OK "All Neovim tests passed"

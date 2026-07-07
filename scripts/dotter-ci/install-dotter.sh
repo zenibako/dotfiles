@@ -9,11 +9,11 @@ set -e
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../dotter/lib.sh"
 
 if command -v dotter &> /dev/null; then
-  echo "dotter already installed: $(dotter --version)"
+  _OK "dotter already installed: $(dotter --version)"
   exit 0
 fi
 
-echo "Installing dotter..."
+_STEP "Installing dotter"
 
 case "$OSTYPE" in
   linux-gnu*)
@@ -30,4 +30,4 @@ case "$OSTYPE" in
     ;;
 esac
 
-echo "dotter installed: $(dotter --version)"
+_OK "dotter installed: $(dotter --version)"

@@ -6,6 +6,16 @@
 - **Init setup**: `sh init.sh` (cross-distro package install, oh-my-zsh, tpm, carapace, zoxide, atuin, starship, dotter deploy)
 - **OpenCode plugins**: `cd ~/.config/opencode && npm install`
 
+## Python Environment
+This repo uses `uv` to manage a venv at `.venv/` (repo root). **Always init before running any Python script** (validators, KCL generators, deploy hooks):
+
+```bash
+uv venv .venv
+uv pip install -r requirements.txt
+```
+
+`pre_deploy.sh` does this automatically and now hard-fails if `uv` is missing. The repo `.venv` uses Python ≥3.11 (has stdlib `tomllib`); the `scripts/dotter/.venv` is a separate py3.9 venv for legacy validator dependencies and must not be used for scripts that need `tomllib`. When in doubt, run scripts via `uv run --project <repo-root> python <script>` or the repo `.venv/bin/python3` directly.
+
 ## CI/CD
 - **Gitea Actions** stored in `.gitea/workflows/`
 - `validate-dotter.yml` is present in `.gitea/workflows/` and runs on Gitea

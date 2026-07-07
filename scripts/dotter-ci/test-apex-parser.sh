@@ -28,7 +28,7 @@ if [ -z "$REVISION" ]; then
   exit 1
 fi
 
-echo "Building tree-sitter-sfapex apex parser at revision $REVISION"
+_STEP "Building tree-sitter-sfapex apex parser at revision $REVISION"
 
 WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR" "$PARSERS_LUA"' EXIT
@@ -46,4 +46,4 @@ if [ ! -s "$WORKDIR/apex.so" ]; then
   exit 1
 fi
 
-echo "Apex parser compiled successfully ($(stat -c%s "$WORKDIR/apex.so" 2>/dev/null || stat -f%z "$WORKDIR/apex.so" 2>/dev/null) bytes)"
+_OK "Apex parser compiled successfully ($(stat -c%s "$WORKDIR/apex.so" 2>/dev/null || stat -f%z "$WORKDIR/apex.so" 2>/dev/null) bytes)"

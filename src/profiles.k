@@ -139,8 +139,8 @@ personal = _shared.Profile {
         # Tokens/URLs for Obsidian and Home Assistant still come from local.k
         # so secrets are not committed. local.k can also override `mcp_included`
         # per-machine if needed.
-        opencode_build_agent_model = "ollama-cloud/kimi-k2.6:cloud"
-        opencode_plan_agent_model = "ollama-cloud/gemma4:31b"
+        opencode_build_agent_model = "ollama-cloud/glm-5.2"
+        opencode_plan_agent_model = "ollama-cloud/kimi-k2.7-code"
         opencode_test_agent_model = "ollama-cloud/glm-5.1"
         opencode_review_agent_model = "ollama-cloud/glm-5.1"
         claude_agent_push_notif_enabled = True

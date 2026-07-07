@@ -27,7 +27,7 @@ if ! command -v luac &> /dev/null; then
   fi
 fi
 
-echo "Validating Lua files in $DEPLOY_DIR..."
+_STEP "Validating Lua files in $DEPLOY_DIR"
 FAILED=0
 
 while IFS= read -r file; do

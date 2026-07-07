@@ -15,16 +15,30 @@ fi
 resolve_repo_root
 resolve_python
 
-# Ensure Python venv and dependencies exist
-if command -v uv >/dev/null 2>&1 && [ -n "$REPO_ROOT" ]; then
-  [ -d "$REPO_ROOT/.venv" ] || uv venv "$REPO_ROOT/.venv" >/dev/null 2>&1
-  uv pip install -q -r "$REPO_ROOT/requirements.txt" 2>/dev/null || true
+# Ensure Python venv and dependencies exist (hard-fail if uv is missing —
+# every deploy script depends on the repo .venv being present and up to date).
+if ! command -v uv >/dev/null 2>&1; then
+  _ERR "uv is required but was not found on PATH."
+  echo "       Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh" >&2
+  exit 1
 fi
+if [ -z "$REPO_ROOT" ]; then
+  _ERR "could not locate repo root for uv venv creation"
+  exit 1
+fi
+[ -d "$REPO_ROOT/.venv" ] || uv venv "$REPO_ROOT/.venv" >/dev/null 2>&1 || {
+  _ERR "failed to create .venv at $REPO_ROOT/.venv"
+  exit 1
+}
+uv pip install -q -r "$REPO_ROOT/requirements.txt" 2>/dev/null || {
+  _ERR "uv pip install failed (requirements.txt)"
+  exit 1
+}
 
 if [ -z "$REPO_ROOT" ]; then
   _WARN "could not locate repo root for KCL regeneration"
 elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
-  echo "Regenerating configs from KCL..."
+  _STEP "Regenerating configs from KCL"
   cd "$REPO_ROOT"
   mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
   # Resolve local.k at the repo root
@@ -34,10 +48,14 @@ elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
     _ERR "local.k not found at repo root. Copy local.k.example to local.k and fill in values."
     exit 1
   fi
+  _INFO "Running kcl run src/main.k"
+  _CMD "kcl run src/main.k <local.k>"
   kcl run src/main.k "$LOCAL_K" >/dev/null || { _ERR "KCL generation failed"; exit 1; }
+  _INFO "Converting KCL output to dotter config"
   "$PYTHON" scripts/dotter/generate_from_kcl.py || { _ERR "Python conversion failed"; exit 1; }
+  _INFO "Validating generated configs"
   "$PYTHON" scripts/dotter/validate_generated.py || { _ERR "Generated config validation failed"; exit 1; }
-  echo "  Configs regenerated."
+  _OK "Configs regenerated"
 else
   _ERR "KCL is required for this repository but was not found."
   echo "       Install it with: brew install kcl-lang/tap/kcl" >&2
@@ -68,7 +86,7 @@ require_var() {
 require_var name
 require_var email
 
-# Pre-deploy schema validation
+# Pre-deploy schema validation (validate_schema.sh prints its own header)
 if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/scripts/dotter/validate_schema.sh" ]; then
   cd "$REPO_ROOT"
   "$REPO_ROOT/scripts/dotter/validate_schema.sh" --pre-deploy || true

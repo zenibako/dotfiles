@@ -6,16 +6,25 @@
 # ── ANSI colors + output helpers ─────────────────────────────────────────
 # Single source of truth for every deploy script. Colors are emitted only when
 # stdout is a terminal and NO_COLOR is unset, so piped/CI output and captured
-# logs stay free of escape sequences. _ERR/_WARN go to stderr, _OK to stdout.
+# logs stay free of escape sequences. _ERR/_WARN go to stderr, _OK/_STEP/_INFO
+# to stdout.
 if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
   COLOR_RED='\033[31m'
-  COLOR_YELLOW='\033[33m'
   COLOR_GREEN='\033[32m'
+  COLOR_YELLOW='\033[33m'
+  COLOR_BLUE='\033[34m'
+  COLOR_CYAN='\033[36m'
+  COLOR_GRAY='\033[90m'
+  COLOR_BOLD='\033[1m'
   COLOR_RESET='\033[0m'
 else
   COLOR_RED=''
-  COLOR_YELLOW=''
   COLOR_GREEN=''
+  COLOR_YELLOW=''
+  COLOR_BLUE=''
+  COLOR_CYAN=''
+  COLOR_GRAY=''
+  COLOR_BOLD=''
   COLOR_RESET=''
 fi
 
@@ -27,6 +36,33 @@ _OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
 # stderr; both keep the ✓/✗ glyph idiom but pull their color from above.
 _PASS() { printf "${COLOR_GREEN}✓${COLOR_RESET} %s\n" "$1"; }
 _FAIL() { printf "${COLOR_RED}✗${COLOR_RESET} %s\n" "$1" >&2; }
+
+# Major phase header. Bold blue arrow stands out from the body lines so the
+# high-level pipeline stages (pre-deploy, dotter, post-deploy) are scannable.
+# Usage: _STEP "Running pre-deploy validation"
+_STEP() { printf "${COLOR_BOLD}${COLOR_BLUE}==>${COLOR_RESET} ${COLOR_BOLD}%s${COLOR_RESET}\n" "$1"; }
+
+# Neutral informational line (a nested action inside a step). Cyan keeps it
+# distinct from _STEP headers and from the green/red status lines.
+# Usage: _INFO "Regenerating configs from KCL..."
+_INFO() { printf "${COLOR_CYAN}  • %s${COLOR_RESET}\n" "$1"; }
+
+# A command being run on the user's behalf. Gray prefix marks it as a quoted
+# command rather than narrative output. Goes to stderr so it doesn't pollute
+# stdout when scripts are piped.
+# Usage: _CMD "dotter deploy --force"
+_CMD()  { printf "${COLOR_GRAY}  $ %s${COLOR_RESET}\n" "$1" >&2; }
+
+# Skip notice: the step was intentionally bypassed (tool missing, file absent,
+# not applicable on this platform). Yellow so it's visible but not alarming.
+# Usage: _SKIP "Skipping Lua validation (luac not installed)"
+_SKIP() { printf "${COLOR_YELLOW}  ⊘ %s${COLOR_RESET}\n" "$1"; }
+
+# Guidance step (indented, gray) — for actionable "to fix:" lines that follow
+# a _WARN or _ERR. Keeps the recovery instructions visually quiet so the
+# headline warning stays the focus. Goes to stderr.
+# Usage: _GUIDE "Run: scripts/secrets/proton-pass-env.sh --build"
+_GUIDE() { printf "${COLOR_GRAY}    %s${COLOR_RESET}\n" "$1" >&2; }
 
 # ── Repo root resolution ─────────────────────────────────────────────────
 # Sets REPO_ROOT. Tries git first, then walks up from the caller's location.
@@ -88,4 +124,15 @@ begin_wait() {
   else
     printf '==> %s — this can take %s, please wait...\n' "$1" "$2"
   fi
+}
+
+# Convenience for the common "announce + run" pattern. Prints the step header
+# then runs a command. Echoes the command first (via _CMD) so the user can see
+# exactly what is being executed.
+# Usage: _RUN "Deploying with dotter" dotter deploy --force
+_RUN() {
+  local _msg="$1"; shift
+  _STEP "$_msg"
+  _CMD "$*"
+  "$@"
 }

@@ -24,6 +24,7 @@ for _cmd in go.md fix-pipeline.md coderabbit-review.md; do
   ln -sf "$HOME/.claude/commands/$_cmd" "$_oc_cmd/$_cmd"
 done
 unset _oc_cmd _cmd
+_OK "Linked OpenCode command symlinks"
 
 # ── Deploy skills to Claude Desktop ──────────────────────────────────────
 if [ -n "$REPO_ROOT" ]; then
@@ -45,13 +46,13 @@ except Exception:
       _skills_dir="$_skills_base/skills"
       _manifest="$_skills_base/manifest.json"
       mkdir -p "$_skills_dir"
-      echo "Deploying Claude Desktop skills..."
+      _INFO "Deploying Claude Desktop skills"
       for _sd in "$REPO_ROOT/src/claude-desktop/skills"/*/; do
         [ -d "$_sd" ] || continue
         _sname=$(basename "$_sd")
         mkdir -p "$_skills_dir/$_sname"
         cp "$_sd/SKILL.md" "$_skills_dir/$_sname/SKILL.md"
-        echo "  Copied skill: $_sname"
+        _INFO "Copied skill: $_sname"
       done
       "$PYTHON" "$_scripts/deploy_skills.py" "$_manifest" "$REPO_ROOT/src/claude-desktop/skills"
     fi
@@ -94,7 +95,7 @@ _merge_config() {
   "$PYTHON" "$_scripts/merge_json_config.py" "$_rendered" "$_live" "$@" \
     || _WARN "Failed to merge $(basename "$_live")"
 }
-echo "Merging dotfiles-managed app configs..."
+_STEP "Merging dotfiles-managed app configs"
 _merge_config "$HOME/.cache/dotfiles/claude_desktop_config.rendered.json" \
   "$HOME/Library/Application Support/Claude/claude_desktop_config.json" \
   --replace mcpServers
@@ -150,10 +151,29 @@ _try_unlock_keychain() {
   return 1
 }
 
+# Run a secret backend's --build, adapting to interactive vs headless context.
+# - Interactive (stdin is a TTY): no timeout, no capture — let the vault unlock
+#   prompt reach the user so they can type their password.
+# - Headless (stdin not a TTY, e.g. CI/cron): 15s timeout + capture stderr for
+#   diagnostics, so a hanging prompt fails fast with actionable guidance.
+# Sets _SECRET_CACHE on success, _LAST_BACKEND_ERR on failure.
+_build_backend() {
+  local script="$1" cache="$2"
+  if [ -t 0 ]; then
+    "$script" --build && { _SECRET_CACHE="$cache"; return 0; }
+    _LAST_BACKEND_ERR="build failed (see output above)"
+    return 1
+  fi
+  local _err
+  _err=$(run_with_timeout 15 "$script" --build 2>&1 >/dev/null) && { _SECRET_CACHE="$cache"; return 0; }
+  _LAST_BACKEND_ERR="$_err"
+  return 1
+}
+
 # Try to ensure a backend's cache is ready. Sets _SECRET_CACHE on success.
 # On failure, captures stderr and returns 1 (caller decides what to do).
 _try_backend() {
-  local script="$1" cache="$2" _err
+  local script="$1" cache="$2"
   [ -x "$script" ] && "$script" --configured >/dev/null 2>&1 || return 1
   if _cache_is_fresh "$cache"; then
     _SECRET_CACHE="$cache"
@@ -170,23 +190,15 @@ _try_backend() {
       _LAST_BACKEND_ERR="KEYCHAIN_LOCKED"
       begin_wait "Building secret cache ($_backend_name)" "a few seconds; may prompt to unlock"
       if _try_unlock_keychain && _keychain_is_unlocked; then
-        # Keychain unlocked; proceed to build (with timeout for vault prompt)
-        _err=$(run_with_timeout 15 "$script" --build 2>&1 >/dev/null) && { _SECRET_CACHE="$cache"; return 0; }
-        _LAST_BACKEND_ERR="$_err"
+        _build_backend "$script" "$cache" && return 0
       else
-        # Could not unlock non-interactively
         return 1
       fi
     fi
   fi
 
   begin_wait "Building secret cache ($_backend_name)" "a few seconds; may prompt to unlock"
-  # Timeout: the build can prompt for a vault/keychain password interactively.
-  # In a headless deploy context that prompt hangs forever; a 15s timeout
-  # lets it fail fast so we can show actionable guidance instead.
-  _err=$(run_with_timeout 15 "$script" --build 2>&1 >/dev/null) && { _SECRET_CACHE="$cache"; return 0; }
-  _LAST_BACKEND_ERR="$_err"
-  return 1
+  _build_backend "$script" "$cache"
 }
 
 # Diagnose a backend failure and print actionable guidance.
@@ -198,51 +210,47 @@ _diagnose_backend_failure() {
   # Keychain was locked and we couldn't unlock it non-interactively
   if [ "$err" = "KEYCHAIN_LOCKED" ]; then
     echo "" >&2
-    echo "  ⚠ The macOS keychain is locked, blocking $display_name" >&2
-    echo "    from accessing its encryption key." >&2
-    echo "" >&2
+    _WARN "The macOS keychain is locked, blocking $display_name from accessing its encryption key."
     # Try to unlock (non-interactive; works if keychain password is cached)
     if _try_unlock_keychain && _keychain_is_unlocked; then
-      echo "  Keychain unlocked. Retrying..." >&2
+      _INFO "Keychain unlocked. Retrying..." >&2
       return 0
     fi
-    echo "  Could not unlock keychain automatically." >&2
-    echo "  Please run this in a terminal, then re-deploy:" >&2
-    echo "    security unlock-keychain" >&2
+    _ERR "Could not unlock keychain automatically."
+    _GUIDE "Run this in a terminal, then re-deploy: security unlock-keychain"
     return 1
   fi
 
   # Keychain backend: no secrets found (check this before the generic "No secrets" pattern)
   if printf '%s' "$err" | grep -q "No secrets were fetched from macOS Keychain"; then
-    echo "  $display_name found no secrets in macOS Keychain." >&2
-    echo "  Secrets may not have been stored yet, or the keychain is locked." >&2
-    echo "  To check: security unlock-keychain && $script_path --build" >&2
+    _WARN "$display_name found no secrets in macOS Keychain."
+    _GUIDE "Secrets may not have been stored yet, or the keychain is locked."
+    _GUIDE "Check: security unlock-keychain && $script_path --build"
     return 1
   fi
 
   # Proton Pass: vault locked / no secrets fetched
   if printf '%s' "$err" | grep -q "No secrets were fetched"; then
-    echo "  $display_name could not fetch any secrets from the vault." >&2
-    echo "  The vault may be locked or items are missing/misnamed." >&2
-    echo "  To fix:" >&2
-    echo "    1. Run: $script_path --build" >&2
-    echo "    2. Unlock the vault when prompted" >&2
-    echo "    3. Re-run deploy" >&2
+    _WARN "$display_name could not fetch any secrets from the vault."
+    _GUIDE "The vault may be locked or items are missing/misnamed. To fix:"
+    _GUIDE "1. Run: $script_path --build"
+    _GUIDE "2. Unlock the vault when prompted"
+    _GUIDE "3. Re-run deploy"
     return 1
   fi
 
   # Timeout: --build was killed (likely waiting for vault unlock prompt)
   if printf '%s' "$err" | grep -q "Fetching secrets from Proton Pass"; then
-    echo "  $display_name timed out waiting for the Proton Pass vault to unlock." >&2
-    echo "  To fix:" >&2
-    echo "    1. Run: $script_path --build" >&2
-    echo "    2. Enter your Proton Pass password when prompted" >&2
-    echo "    3. Re-run deploy (the cache will be fresh for 1 hour)" >&2
+    _WARN "$display_name timed out waiting for the Proton Pass vault to unlock."
+    _GUIDE "To fix:"
+    _GUIDE "1. Run: $script_path --build"
+    _GUIDE "2. Enter your Proton Pass password when prompted"
+    _GUIDE "3. Re-run deploy (the cache will be fresh for 1 hour)"
     return 1
   fi
 
   # Generic fallback
-  echo "  $display_name failed to build its secret cache." >&2
+  _WARN "$display_name failed to build its secret cache."
   [ -n "$err" ] && printf '%s\n' "$err" | sed 's/^/    /' >&2
   return 1
 }
@@ -333,7 +341,7 @@ _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_co
 _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
 
 if _ensure_secret_cache; then
-  echo "Applying secrets to deployed configs..."
+  _STEP "Applying secrets to deployed configs"
   _inject_obsidian_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_obsidian_token "$HOME/.claude.json"
 
@@ -348,7 +356,7 @@ if _ensure_secret_cache; then
     _tok=$(_lookup_secret "HA_TOKEN") && _patch_args="$_patch_args --ha-token $_tok"
     _tok=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") && _patch_args="$_patch_args --obsidian-token $_tok"
     if [ -n "$_patch_args" ]; then
-      echo "  Patching OpenCode MCP config..."
+      _INFO "Patching OpenCode MCP config"
       "$PYTHON" "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || _WARN "Failed to patch OpenCode config"
     fi
     unset _patch_args _tok
@@ -383,10 +391,10 @@ if _ensure_secret_cache; then
       _tmp="${_deployed_env}.tmp.$$"
       if grep -q "^$_placeholder = \"\"" "$_deployed_env" 2>/dev/null; then
         sed "s/^$_placeholder = \"\"/$_placeholder = \"$_val\"/" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
-        echo "  Injected $_placeholder into env.toml"
+        _INFO "Injected $_placeholder into env.toml"
       elif grep -q "^$_placeholder = \"\x7b\x7b.*\"" "$_deployed_env" 2>/dev/null; then
         sed "s|^$_placeholder = \"\x7b\x7b.*\"|$_placeholder = \"$_val\"|" "$_deployed_env" > "$_tmp" && mv "$_tmp" "$_deployed_env"
-        echo "  Injected $_placeholder into env.toml"
+        _INFO "Injected $_placeholder into env.toml"
       fi
       rm -f "$_tmp"
     done
@@ -425,7 +433,7 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
 
     [ "$failed" -gt 0 ] && _WARN "$failed MCP server(s) failed"
     if [ "$total" -gt 0 ]; then
-      echo "  OpenCode MCPs: $connected/$total connected"
+      _OK "OpenCode MCPs: $connected/$total connected"
     fi
   fi
   rm -f "$mcp_out" "$mcp_err"
@@ -468,9 +476,9 @@ if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
     [ "$cc_failed" -gt 0 ] && _WARN "$cc_failed Claude Code MCP server(s) failed"
     if [ "$cc_total" -gt 0 ]; then
       if [ "$cc_auth" -gt 0 ]; then
-        echo "  Claude Code MCPs: $cc_connected/$cc_total connected ($cc_auth need auth)"
+        _OK "Claude Code MCPs: $cc_connected/$cc_total connected ($cc_auth need auth)"
       else
-        echo "  Claude Code MCPs: $cc_connected/$cc_total connected"
+        _OK "Claude Code MCPs: $cc_connected/$cc_total connected"
       fi
     fi
   fi
@@ -479,7 +487,7 @@ fi
 
 # ── Lua validation ────────────────────────────────────────────────────────
 if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
-  echo "Validating Lua files..."
+  _STEP "Validating Lua files"
   # Single pass: collect failures via a temp marker (the while loop runs in a
   # subshell, so a plain variable wouldn't survive the pipe).
   _lua_errs=$(mktemp)
@@ -494,7 +502,7 @@ if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
     exit 1
   fi
   rm -f "$_lua_errs"
-  echo "  All Lua files OK"
+  _OK "All Lua files valid"
 fi
 
 # ── Neovim startup test ──────────────────────────────────────────────────
@@ -509,7 +517,7 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
     cat /tmp/nvim-startup.log >&2
     exit 1
   fi
-  echo "  Neovim startup OK"
+  _OK "Neovim startup"
 
   # LSP validation
   if [ -f "$_scripts/validate_lsp.lua" ]; then
@@ -554,4 +562,4 @@ LSP_FILTERS
   fi
 fi
 
-echo "==> Post-deploy validation complete."
+_STEP "Post-deploy validation complete"
