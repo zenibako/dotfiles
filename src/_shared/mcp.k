@@ -270,8 +270,12 @@ _mcp_servers = [
         name = "Gitea"
         opencode = {
             "type" = "local"
-            "command" = ["/Users/{{username}}/go/bin/forgejo-mcp", "stdio", "--server", "{{gitea_url}}", "--token", "{{gitea_token}}"]
-            "environment" = {"PATH" = _SHELL_PATH}
+            "command" = ["{{shell_bin_path}}/npx", "-y", "gitea-mcp"]
+            "environment" = {
+                "PATH" = _SHELL_PATH
+                "GITEA_HOST" = "{{gitea_url}}"
+                "GITEA_ACCESS_TOKEN" = "{{gitea_token}}"
+            }
             "enabled" = "{{mcp_gitea_included}}"
         }
         # Not available in Claude Desktop
