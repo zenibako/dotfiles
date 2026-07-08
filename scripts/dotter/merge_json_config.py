@@ -33,7 +33,15 @@ Usage: merge_json_config.py <rendered> <live> [--replace KEY]...
 import argparse
 import copy
 import json
+import os
 import sys
+
+# ANSI colors (matched to scripts/dotter/lib.sh)
+if sys.stdout.isatty() and not os.environ.get("NO_COLOR"):
+    _c = ("\033[32m", "\033[33m", "\033[90m", "\033[0m")
+else:
+    _c = ("", "", "", "")
+_G, _Y, _GY, _X = _c
 
 
 def strip_jsonc_comments(text):
@@ -92,7 +100,7 @@ def load_jsonc(path, default):
     except FileNotFoundError:
         return default
     except (json.JSONDecodeError, OSError) as exc:
-        print(f"  WARNING: could not read {path}: {exc}", file=sys.stderr)
+        print(f"  {_Y}WARNING:{_X} could not read {path}: {exc}", file=sys.stderr)
         return default
 
 
@@ -111,9 +119,7 @@ def main():
 
     rendered = load_jsonc(args.rendered, None)
     if not isinstance(rendered, dict):
-        # Nothing to merge (dotter did not render the staging file); leave the
-        # live config alone rather than failing the whole deploy.
-        print(f"  SKIP: rendered config missing or invalid: {args.rendered}")
+        print(f"  {_Y}⊘{_X} rendered config missing or invalid: {args.rendered}")
         return 0
 
     live = load_jsonc(args.live, {})
@@ -129,13 +135,13 @@ def main():
             merged[key] = rendered[key]
 
     if merged == live:
-        print(f"  {args.live.split('/')[-1]} already up to date")
+        print(f"  {_G}✓{_X} {args.live.split('/')[-1]} already up to date")
         return 0
 
     with open(args.live, "w", encoding="utf-8") as f:
         json.dump(merged, f, indent=2)
         f.write("\n")
-    print(f"  Merged {args.live.split('/')[-1]}")
+    print(f"  {_G}✓{_X} Merged {args.live.split('/')[-1]}")
     return 0
 
 

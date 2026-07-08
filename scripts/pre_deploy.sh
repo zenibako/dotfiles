@@ -12,6 +12,7 @@ else
 fi
 
 # ── Regenerate configs from KCL first (includes .dotter/local.toml) ─────
+_STEP "Pre-deploy: environment setup"
 resolve_repo_root
 resolve_python
 
@@ -19,7 +20,7 @@ resolve_python
 # every deploy script depends on the repo .venv being present and up to date).
 if ! command -v uv >/dev/null 2>&1; then
   _ERR "uv is required but was not found on PATH."
-  echo "       Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh" >&2
+  _GUIDE "Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh"
   exit 1
 fi
 if [ -z "$REPO_ROOT" ]; then
@@ -58,7 +59,7 @@ elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
   _OK "Configs regenerated"
 else
   _ERR "KCL is required for this repository but was not found."
-  echo "       Install it with: brew install kcl-lang/tap/kcl" >&2
+  _GUIDE "Install it with: brew install kcl-lang/tap/kcl"
   exit 1
 fi
 
@@ -78,7 +79,7 @@ require_var() {
   value=$(get_var "$1")
   case "$value" in
     ""|"Your Name"|"your@email.com")
-      echo "dotter deploy blocked: set '$1' in $LOCAL_CONFIG before deploying." >&2
+      _ERR "dotter deploy blocked: set '$1' in $LOCAL_CONFIG before deploying."
       exit 1 ;;
   esac
 }

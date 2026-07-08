@@ -28,14 +28,16 @@ else
   COLOR_RESET=''
 fi
 
-_ERR()  { printf "${COLOR_RED}ERROR:${COLOR_RESET} %s\n" "$1" >&2; }
-_WARN() { printf "${COLOR_YELLOW}WARNING:${COLOR_RESET} %s\n" "$1" >&2; }
-_OK()   { printf "${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
+_ERR()  { printf "  ${COLOR_RED}ERROR:${COLOR_RESET} %s\n" "$1" >&2; }
+_WARN() { printf "  ${COLOR_YELLOW}WARNING:${COLOR_RESET} %s\n" "$1" >&2; }
+_OK()   { printf "  ${COLOR_GREEN}OK:${COLOR_RESET} %s\n" "$1"; }
 
 # Per-item check results (used in validation loops). _PASS to stdout, _FAIL to
-# stderr; both keep the ✓/✗ glyph idiom but pull their color from above.
-_PASS() { printf "${COLOR_GREEN}✓${COLOR_RESET} %s\n" "$1"; }
-_FAIL() { printf "${COLOR_RED}✗${COLOR_RESET} %s\n" "$1" >&2; }
+# stderr; both use a 2-space indent + ✓/✗ glyph to align with the Python
+# validators (validate_generated.py, validate_opencode_models.py) which emit
+# `  ✓ message` via their own _ok() helper.
+_PASS() { printf "  ${COLOR_GREEN}✓${COLOR_RESET} %s\n" "$1"; }
+_FAIL() { printf "  ${COLOR_RED}✗${COLOR_RESET} %s\n" "$1" >&2; }
 
 # Major phase header. Bold blue arrow stands out from the body lines so the
 # high-level pipeline stages (pre-deploy, dotter, post-deploy) are scannable.
@@ -45,24 +47,24 @@ _STEP() { printf "${COLOR_BOLD}${COLOR_BLUE}==>${COLOR_RESET} ${COLOR_BOLD}%s${C
 # Neutral informational line (a nested action inside a step). Cyan keeps it
 # distinct from _STEP headers and from the green/red status lines.
 # Usage: _INFO "Regenerating configs from KCL..."
-_INFO() { printf "${COLOR_CYAN}  • %s${COLOR_RESET}\n" "$1"; }
+_INFO() { printf "  ${COLOR_CYAN}• %s${COLOR_RESET}\n" "$1"; }
 
 # A command being run on the user's behalf. Gray prefix marks it as a quoted
 # command rather than narrative output. Goes to stderr so it doesn't pollute
 # stdout when scripts are piped.
 # Usage: _CMD "dotter deploy --force"
-_CMD()  { printf "${COLOR_GRAY}  $ %s${COLOR_RESET}\n" "$1" >&2; }
+_CMD()  { printf "  ${COLOR_GRAY}$ %s${COLOR_RESET}\n" "$1" >&2; }
 
 # Skip notice: the step was intentionally bypassed (tool missing, file absent,
 # not applicable on this platform). Yellow so it's visible but not alarming.
 # Usage: _SKIP "Skipping Lua validation (luac not installed)"
-_SKIP() { printf "${COLOR_YELLOW}  ⊘ %s${COLOR_RESET}\n" "$1"; }
+_SKIP() { printf "  ${COLOR_YELLOW}⊘ %s${COLOR_RESET}\n" "$1"; }
 
 # Guidance step (indented, gray) — for actionable "to fix:" lines that follow
 # a _WARN or _ERR. Keeps the recovery instructions visually quiet so the
 # headline warning stays the focus. Goes to stderr.
 # Usage: _GUIDE "Run: scripts/secrets/proton-pass-env.sh --build"
-_GUIDE() { printf "${COLOR_GRAY}    %s${COLOR_RESET}\n" "$1" >&2; }
+_GUIDE() { printf "    ${COLOR_GRAY}%s${COLOR_RESET}\n" "$1" >&2; }
 
 # ── Repo root resolution ─────────────────────────────────────────────────
 # Sets REPO_ROOT. Tries git first, then walks up from the caller's location.
@@ -77,7 +79,7 @@ resolve_repo_root() {
     fi
     _dir="$(dirname "$_dir")"
   done
-  echo "WARNING: could not locate repo root" >&2
+  _WARN "could not locate repo root"
   REPO_ROOT=""
 }
 
@@ -119,10 +121,10 @@ run_with_timeout() {
 # like a hang. Highlights in yellow on a TTY; plain text otherwise.
 # Usage: begin_wait "Validating LSP attachments" "up to 5 min"
 begin_wait() {
-  if [ -t 1 ]; then
-    printf "${COLOR_YELLOW}⏳ %s — this can take %s, please wait...${COLOR_RESET}\n" "$1" "$2"
+  if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    printf "  ${COLOR_YELLOW}⏳ %s — this can take %s, please wait...${COLOR_RESET}\n" "$1" "$2"
   else
-    printf '==> %s — this can take %s, please wait...\n' "$1" "$2"
+    printf '  ⏳ %s — this can take %s, please wait...\n' "$1" "$2"
   fi
 }
 

@@ -4,6 +4,11 @@
 --
 -- This checks that enabled LSPs have their binaries available and can attach
 -- to test buffers.
+--
+-- Output format matches scripts/dotter/lib.sh conventions (2-space indent,
+-- ✓/⚠/⊘ glyphs). ANSI colors are emitted when stdout is a TTY (which it
+-- never is under `nvim --headless`, but the shell wrapper preserves them
+-- if NO_COLOR is unset and the deploy runs on a real terminal).
 
 local test_dir = vim.fn.tempname() .. "-nvim-lsp-test"
 vim.fn.mkdir(test_dir, "p")
@@ -319,7 +324,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
 end
 
 -- Print results
-print("\n== LSP Validation Results ==")
+print("\n==> LSP Validation Results")
 local ok_count, warn_count, skip_count = 0, 0, 0
 
 for _, r in ipairs(results) do
@@ -335,24 +340,25 @@ for _, r in ipairs(results) do
   end
 end
 
-print(string.format("\n%d OK, %d warnings, %d skipped", ok_count, warn_count, skip_count))
+local summary_glyph = "✓"
+if warn_count > 0 then summary_glyph = "⚠" end
+if skip_count > 0 and ok_count == 0 then summary_glyph = "⊘" end
+print(string.format("\n  %s %d LSPs OK, %d warnings, %d skipped",
+  summary_glyph, ok_count, warn_count, skip_count))
 
 -- Print install hints for missing binaries
 if #missing_installs > 0 then
-  print("\n╔══════════════════════════════════════════════════════════════════════╗")
-  print("║  MISSING LSP BINARIES - Install with:                              ║")
-  print("╠══════════════════════════════════════════════════════════════════════╣")
+  print("\n  ⚠ Missing LSP binaries — install with:")
   for _, m in ipairs(missing_installs) do
-    print(string.format("║  %-20s → %-44s ║", m.lsp, string.sub(m.cmd, 1, 44)))
+    print(string.format("    %s: %s", m.lsp, m.cmd))
   end
-  print("╚══════════════════════════════════════════════════════════════════════╝")
 end
 
 -- ── nvim-lint linter validation ──────────────────────────────────────────────
 -- Run sf code-analyzer synchronously (blocking os.execute is fine in headless)
 -- rather than going through the async nvim-lint job system, which doesn't
 -- complete reliably in a headless session.
-print("\n== Linter Validation Results ==")
+print("\n==> Linter Validation Results")
 
 local lint_ok, lint = pcall(require, "lint")
 if not lint_ok then

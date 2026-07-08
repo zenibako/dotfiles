@@ -14,8 +14,16 @@ Text files (ghostty, gitconfig, pnpm/rc, tmux.conf) are now written
 
 import io
 import json
+import os
 import sys
 from pathlib import Path
+
+# ANSI colors (matched to scripts/dotter/lib.sh)
+if sys.stdout.isatty() and not os.environ.get("NO_COLOR"):
+    _c = ("\033[36m", "\033[32m", "\033[31m", "\033[90m", "\033[0m")
+else:
+    _c = ("", "", "", "", "")
+_CY, _G, _R, _GY, _X = _c
 
 OUT_DIR = Path("out")
 META_DIR = OUT_DIR  # Metadata files are alongside output
@@ -23,7 +31,7 @@ META_DIR = OUT_DIR  # Metadata files are alongside output
 try:
     import tomli_w
 except ImportError:
-    print("ERROR: 'tomli_w' module not found. Install it with:", file=sys.stderr)
+    print(f"{_R}ERROR:{_X} 'tomli_w' module not found. Install it with:", file=sys.stderr)
     print("  pip3 install tomli_w", file=sys.stderr)
     print("  uv pip install tomli_w", file=sys.stderr)
     sys.exit(1)
@@ -32,7 +40,7 @@ except ImportError:
 def _load_json(path):
     p = Path(path)
     if not p.exists():
-        print(f"ERROR: {path} not found. Run `kcl run src/main.k` first.", file=sys.stderr)
+        print(f"{_R}ERROR:{_X} {path} not found. Run `kcl run src/main.k` first.", file=sys.stderr)
         sys.exit(1)
     with open(p) as f:
         return json.load(f)
@@ -61,7 +69,7 @@ def _write_raw_text(content, out_path, *, strip_trailing_newline=False):
         content = content.rstrip("\n")
     with open(out_path, "w") as f:
         f.write(content)
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def _write_toml(data, out_path, *, header=None, template=False):
@@ -86,7 +94,7 @@ def _write_toml(data, out_path, *, header=None, template=False):
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines))
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def _write_env_toml(env_meta):
@@ -153,7 +161,7 @@ def _write_env_toml(env_meta):
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def _write_completions_toml(completions_meta):
@@ -192,7 +200,7 @@ def _write_completions_toml(completions_meta):
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def _write_dotter_toml(cfg, out_path):
@@ -276,14 +284,14 @@ def _write_dotter_toml(cfg, out_path):
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines))
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def _write_packages_txt(packages, out_path):
     with open(out_path, "w") as f:
         for pkg in packages:
             f.write(pkg + "\n")
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def _write_brewfile(data, out_path):
@@ -299,13 +307,13 @@ def _write_brewfile(data, out_path):
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"  Wrote {out_path}")
+    print(f"  {_GY}Wrote{_X} {out_path}")
 
 
 def main():
     cfg = _load_json("out/config.json")
 
-    print("Generating dotfiles from KCL config...")
+    print(f"  {_CY}• Generating dotfiles from KCL config...{_X}")
 
     # 1. dotter global.toml
     _write_dotter_toml(cfg, Path(".dotter/global.toml"))
@@ -350,7 +358,7 @@ def main():
     if cfg.get("opencode"):
         _write_raw_text(cfg["opencode"], OUT_DIR / "opencode.jsonc")
 
-    print("Done.")
+    print(f"  {_G}✓{_X} Done")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ _scripts="$REPO_ROOT/scripts/dotter"
 
 DEPLOYED="$HOME/.config"
 
+_STEP "Post-deploy: linking commands and deploying skills"
+
 # ── OpenCode command symlinks ─────────────────────────────────────────────
 _oc_cmd="$HOME/.config/opencode/command"
 mkdir -p "$_oc_cmd"
@@ -71,6 +73,8 @@ else
 fi
 unset _oc_plugins
 
+_STEP "Post-deploy: merging app configs"
+
 # ── Merge dotfiles-managed configs into app-owned live files ─────────────
 # dotter renders these to private staging files because it can't own the live
 # files: the apps rewrite them at runtime and/or post_deploy injects secrets,
@@ -95,7 +99,6 @@ _merge_config() {
   "$PYTHON" "$_scripts/merge_json_config.py" "$_rendered" "$_live" "$@" \
     || _WARN "Failed to merge $(basename "$_live")"
 }
-_STEP "Merging dotfiles-managed app configs"
 _merge_config "$HOME/.cache/dotfiles/claude_desktop_config.rendered.json" \
   "$HOME/Library/Application Support/Claude/claude_desktop_config.json" \
   --replace mcpServers
@@ -109,6 +112,8 @@ _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
   --replace mcp
 unset -f _merge_config
 unset _rendered _live
+
+_STEP "Post-deploy: injecting secrets"
 
 # ── Secret injection ─────────────────────────────────────────────────────
 _SECRET_CACHE=""
@@ -188,7 +193,7 @@ _try_backend() {
   if [ "$_backend_name" = "proton-pass-env" ] && [ "$(uname -s)" = "Darwin" ]; then
     if ! _keychain_is_unlocked; then
       _LAST_BACKEND_ERR="KEYCHAIN_LOCKED"
-      begin_wait "Building secret cache ($_backend_name)" "a few seconds; may prompt to unlock"
+      begin_wait "Building secret cache ($_backend_name)" "up to 1 min; may prompt to unlock"
       if _try_unlock_keychain && _keychain_is_unlocked; then
         _build_backend "$script" "$cache" && return 0
       else
@@ -197,7 +202,7 @@ _try_backend() {
     fi
   fi
 
-  begin_wait "Building secret cache ($_backend_name)" "a few seconds; may prompt to unlock"
+  begin_wait "Building secret cache ($_backend_name)" "up to 1 min; may prompt to unlock"
   _build_backend "$script" "$cache"
 }
 
@@ -291,9 +296,14 @@ _inject_github_token() {
   [ -f "$config_file" ] || return 0
   local token
   token=$(_gh_token) || return 0
-  echo "  Injecting GitHub token into $(basename "$config_file")..."
-  "$PYTHON" -c "
-import json, sys
+  _INFO "Injecting GitHub token into $(basename "$config_file")"
+  _NO_COLOR=""
+  [ -z "${NO_COLOR:-}" ] || _NO_COLOR=1
+  NO_COLOR="$_NO_COLOR" "$PYTHON" -c "
+import json, os, sys
+_G = '\033[32m' if sys.stdout.isatty() and not os.environ.get('NO_COLOR') else ''
+_Y = '\033[33m' if sys.stdout.isatty() and not os.environ.get('NO_COLOR') else ''
+_X = '\033[0m' if _G or _Y else ''
 cfg_path = '$config_file'
 with open(cfg_path, 'r') as f:
     cfg = json.load(f)
@@ -304,10 +314,11 @@ if gh:
     env.setdefault('PATH', '/usr/bin:/bin:/usr/sbin:/sbin')
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    print('  OK')
+    print(f'  {_G}✓{_X} GitHub token injected')
 else:
-    print('  SKIP: GitHub MCP not found')
+    print(f'  {_Y}⊘{_X} SKIP: GitHub MCP not found')
 " 2>/dev/null || _WARN "Failed to patch $(basename "$config_file")"
+  unset _NO_COLOR
 }
 
 # Patch the Obsidian MCP bearer token into a Claude config's env. The template
@@ -318,9 +329,14 @@ _inject_obsidian_token() {
   [ -f "$config_file" ] || return 0
   local token
   token=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") || return 0
-  echo "  Injecting Obsidian token into $(basename "$config_file")..."
-  "$PYTHON" -c "
-import json
+  _INFO "Injecting Obsidian token into $(basename "$config_file")"
+  _NO_COLOR=""
+  [ -z "${NO_COLOR:-}" ] || _NO_COLOR=1
+  NO_COLOR="$_NO_COLOR" "$PYTHON" -c "
+import json, os, sys
+_G = '\033[32m' if sys.stdout.isatty() and not os.environ.get('NO_COLOR') else ''
+_Y = '\033[33m' if sys.stdout.isatty() and not os.environ.get('NO_COLOR') else ''
+_X = '\033[0m' if _G or _Y else ''
 cfg_path = '$config_file'
 with open(cfg_path, 'r') as f:
     cfg = json.load(f)
@@ -330,10 +346,11 @@ if obs:
     env['MCP_OBSIDIAN_AUTH'] = 'Bearer $token'
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    print('  OK')
+    print(f'  {_G}✓{_X} Obsidian token injected')
 else:
-    print('  SKIP: Obsidian MCP not found')
+    print(f'  {_Y}⊘{_X} SKIP: Obsidian MCP not found')
 " 2>/dev/null || _WARN "Failed to patch $(basename "$config_file")"
+  unset _NO_COLOR
 }
 
 # GitHub token injection — uses `gh auth token` directly (no secrets store needed)
@@ -341,7 +358,6 @@ _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_co
 _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
 
 if _ensure_secret_cache; then
-  _STEP "Applying secrets to deployed configs"
   _inject_obsidian_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_obsidian_token "$HOME/.claude.json"
 
@@ -405,10 +421,14 @@ fi
 unset -f _ensure_secret_cache _lookup_secret _inject_github_token _inject_obsidian_token _try_backend _cache_is_fresh _keychain_is_unlocked _try_unlock_keychain _diagnose_backend_failure
 unset _SECRET_CACHE
 
+_STEP "Post-deploy: schema validation"
+
 # ── Post-deploy validation ────────────────────────────────────────────────
 if [ -d "$REPO_ROOT" ]; then
   REPO_ROOT="$REPO_ROOT" "$_scripts/validate_schema.sh" --post-deploy || exit 1
 fi
+
+_STEP "Post-deploy: MCP health checks"
 
 # ── OpenCode MCP health check ────────────────────────────────────────────
 if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
@@ -484,6 +504,8 @@ if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
   fi
   rm -f "$cc_mcp_out" "$cc_mcp_err"
 fi
+
+_STEP "Post-deploy: Neovim validation"
 
 # ── Lua validation ────────────────────────────────────────────────────────
 if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then

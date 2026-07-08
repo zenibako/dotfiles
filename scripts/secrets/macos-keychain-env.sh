@@ -36,8 +36,15 @@ set -uo pipefail
 KEYCHAIN_CACHE="${HOME}/.cache/macos-keychain-secrets.env"
 CACHE_MAX_AGE_HOURS=1
 
-_log_warn() { printf "[keychain] %s\n" "$1" >&2; }
-_log_info() { printf "[keychain] %s\n" "$1" >&2; }
+# ANSI colors (matched to scripts/dotter/lib.sh)
+if [ -t 2 ] && [ -z "${NO_COLOR:-}" ]; then
+  _c_red='\033[31m'; _c_ylw='\033[33m'; _c_gry='\033[90m'; _c_rst='\033[0m'
+else
+  _c_red=''; _c_ylw=''; _c_gry=''; _c_rst=''
+fi
+
+_log_warn() { printf "${_c_ylw}[keychain]${_c_rst} %s\n" "$1" >&2; }
+_log_info() { printf "${_c_gry}[keychain]${_c_rst} %s\n" "$1" >&2; }
 
 # Check if security CLI is available (macOS only)
 _has_security() { command -v security >/dev/null 2>&1; }

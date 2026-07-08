@@ -139,7 +139,7 @@ def check_template_file(path, desc):
 
 
 def main():
-    print("== Validating KCL-generated configs ==")
+    print("==> Validating KCL-generated configs")
     all_ok = True
 
     checks = [
@@ -171,10 +171,10 @@ def main():
             all_ok = False
 
     if all_ok:
-        print(f"\n{_G}All generated configs valid.{_X}")
+        print(f"\n  {_G}✓{_X} All generated configs valid")
         return 0
     else:
-        print(f"\n{_R}Validation FAILED — fix issues before deploying.{_X}", file=sys.stderr)
+        print(f"\n  {_R}✗ Validation FAILED — fix issues before deploying{_X}", file=sys.stderr)
         return 1
 
 

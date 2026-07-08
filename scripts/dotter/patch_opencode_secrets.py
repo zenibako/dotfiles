@@ -14,8 +14,16 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import sys
+
+# ANSI colors (matched to scripts/dotter/lib.sh)
+if sys.stdout.isatty() and not os.environ.get("NO_COLOR"):
+    _c = ("\033[32m", "\033[31m", "\033[33m", "\033[90m", "\033[0m")
+else:
+    _c = ("", "", "", "", "")
+_G, _R, _Y, _GY, _X = _c
 
 
 def strip_jsonc_comments(text: str) -> str:
@@ -81,14 +89,14 @@ def main() -> int:
         with open(path, encoding="utf-8") as f:
             raw = f.read()
     except FileNotFoundError:
-        print(f"ERROR: Config not found: {path}", file=sys.stderr)
+        print(f"{_R}ERROR:{_X} Config not found: {path}", file=sys.stderr)
         return 1
 
     cleaned = strip_jsonc_comments(raw)
     try:
         cfg = json.loads(cleaned)
     except json.JSONDecodeError as e:
-        print(f"ERROR: Failed to parse JSONC: {e}", file=sys.stderr)
+        print(f"{_R}ERROR:{_X} Failed to parse JSONC: {e}", file=sys.stderr)
         return 1
 
     modified = False
@@ -101,7 +109,7 @@ def main() -> int:
             headers = gh.setdefault("headers", {})
             headers["Authorization"] = f"Bearer {args.github_token}"
             modified = True
-            print("  Patched GitHub MCP token")
+            print(f"  {_G}✓{_X} Patched GitHub MCP token")
 
     # --- GitLab MCP: inject env token ---
     if args.gitlab_token:
@@ -112,7 +120,7 @@ def main() -> int:
             env["GITLAB_PERSONAL_ACCESS_TOKEN"] = args.gitlab_token
             env.setdefault("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")
             modified = True
-            print("  Patched GitLab MCP token")
+            print(f"  {_G}✓{_X} Patched GitLab MCP token")
 
     # --- Postman MCP: inject header token ---
     if args.postman_token:
@@ -122,7 +130,7 @@ def main() -> int:
             headers = pm.setdefault("headers", {})
             headers["Authorization"] = f"Bearer {args.postman_token}"
             modified = True
-            print("  Patched Postman MCP token")
+            print(f"  {_G}✓{_X} Patched Postman MCP token")
 
     # --- SonarQube MCP: inject env token ---
     if args.sonar_token:
@@ -132,7 +140,7 @@ def main() -> int:
             env = sq.setdefault("environment", {})
             env["SONARQUBE_TOKEN"] = args.sonar_token
             modified = True
-            print("  Patched SonarQube MCP token")
+            print(f"  {_G}✓{_X} Patched SonarQube MCP token")
 
     # --- Home Assistant MCP: inject header token ---
     if args.ha_token:
@@ -142,7 +150,7 @@ def main() -> int:
             headers = ha.setdefault("headers", {})
             headers["Authorization"] = f"Bearer {args.ha_token}"
             modified = True
-            print("  Patched Home Assistant MCP token")
+            print(f"  {_G}✓{_X} Patched Home Assistant MCP token")
 
     # --- Obsidian MCP: inject header token ---
     if args.obsidian_token:
@@ -152,10 +160,10 @@ def main() -> int:
             headers = obs.setdefault("headers", {})
             headers["Authorization"] = f"Bearer {args.obsidian_token}"
             modified = True
-            print("  Patched Obsidian MCP token")
+            print(f"  {_G}✓{_X} Patched Obsidian MCP token")
 
     if not modified:
-        print("  Nothing to patch (no matching MCP servers found)")
+        print(f"  {_Y}\u2298{_X} Nothing to patch (no matching MCP servers found)")
         return 0
 
     # Write back — preserve original comments by rewriting only the JSON portion
@@ -166,7 +174,7 @@ def main() -> int:
         json.dump(cfg, f, indent=2)
         f.write("\n")
 
-    print("  Config saved.")
+    print(f"  {_G}✓{_X} Config saved")
     return 0
 
 

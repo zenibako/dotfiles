@@ -255,7 +255,7 @@ validate_aerospace() {
   # file), so it cannot validate a config offline. Treat a "server not running"
   # failure as a skip; only a genuine config rejection is an error.
   if _modes=$(AEROSPACE_CONFIG="$_file" aerospace list-modes 2>&1); then
-    _OK "AeroSpace ($_file): modes detected"
+      _PASS "AeroSpace ($_file): modes detected"
     return 0
   fi
   case "$_modes" in
@@ -566,11 +566,10 @@ except ImportError:
     unset _repo_venv_python
   fi
 
-  echo "==> Pre-deploy validation finished."
+  _STEP "Pre-deploy validation finished"
   exit "$FAILED"
 
 elif [ "$MODE" = "--post-deploy" ]; then
-  _STEP "Running post-deploy schema validation"
 
   FAILED=0
 
