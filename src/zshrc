@@ -368,6 +368,18 @@ Co-authored-by: ${coauthor}"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# --- OpenCode MCP Auto-Detection ---
+# Detects git remotes and project signals to write a project-level
+# .opencode/opencode.json enabling relevant MCP servers.
+_mcp_autodetect() {
+    local script="$HOME/.config/opencode/script/mcp-autodetect.sh"
+    [[ -x "$script" ]] || return 0
+    [[ -d ".git" || -d ".jj" ]] || return 0
+    "$script" "$PWD" 2>/dev/null
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _mcp_autodetect
+_mcp_autodetect
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"

@@ -65,19 +65,19 @@ effective_mcp_included = lambda packages, variables {
     MCP_WORK if "work" in packages else []
 }
 
-# Build the OpenCode `mcp` dict for a given inclusion list. Included servers are
-# emitted with a real boolean `enabled`; excluded servers are literally omitted.
-# This avoids the leading-comma problem that plagues Handlebars-conditional
-# JSON objects when the first included server is not first in source order.
+# Build the OpenCode `mcp` dict for a given inclusion list. ALL servers are
+# emitted so project-level configs can flip individual servers on without
+# needing to duplicate connection details. Included servers get `enabled: true`;
+# excluded servers get `enabled: false` so they don't load or contribute tools
+# to context.
 opencode_mcp_for = lambda included {
     {
         s.name: {
             k: v
             for k, v in s.opencode
             if k != "enabled"
-        } | {"enabled": True}
+        } | {"enabled": s.name in included}
         for s in _mcp_servers
-        if s.name in included
     }
 }
 

@@ -115,12 +115,22 @@ _provider = {
     "lmstudio-gemma4" = {
         "npm" = "@ai-sdk/openai-compatible"
         "options" = {
-            "baseURL" = "http://127.0.0.1:8080"
+            "baseURL" = "http://127.0.0.1:1234/v1"
             "apiKey" = "none"
         }
         "models" = {
             "gemma4-coder" = {
                 "name" = "Gemma 4 12B Coder"
+                "contextWindow" = 20000
+                "maxTokens" = 4096
+            }
+            "gemma-4-12b-coder-fable5-composer2.5@8bit" = {
+                "name" = "Gemma 4 12B Coder Fable5 Composer 2.5 (8bit)"
+                "contextWindow" = 32768
+                "maxTokens" = 8192
+            }
+            "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-mlx-optiq" = {
+                "name" = "Gemma 4 12B Agentic Fable5 Composer 2.5 v2 (MLX)"
                 "contextWindow" = 20000
                 "maxTokens" = 4096
             }
@@ -148,6 +158,12 @@ _agent = {
 opencode = {
     "$schema" = "https://opencode.ai/config.json"
     "plugin" = ["opencode-cmux"]
+    "small_model" = "lmstudio-gemma4/gemma4-coder"
+    "compaction" = {
+        "auto" = True
+        "prune" = True
+        "reserved" = 4096
+    }
     "permission" = {
         "external_directory" = {
             "/tmp/**" = "allow"

@@ -23,7 +23,11 @@ export const Adrafinil = async ({ $ }) => {
         return
       }
 
-      await $`adrafinil ${adrafinilAction} ${event.properties.info.id} --tool opencode`
+      const sessionId = event.properties?.info?.id
+      if (!sessionId) {
+        return
+      }
+      await $`adrafinil ${adrafinilAction} ${sessionId} --tool opencode`
     }
   }
 }
