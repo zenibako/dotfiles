@@ -8,7 +8,7 @@
       "enabled": false
     },
     "GitHub": {
-      "enabled": false
+      "enabled": true
     },
     "Playwright": {
       "enabled": false

@@ -119,20 +119,10 @@ _provider = {
             "apiKey" = "none"
         }
         "models" = {
-            "gemma4-coder" = {
-                "name" = "Gemma 4 12B Coder"
-                "contextWindow" = 20000
-                "maxTokens" = 4096
-            }
             "gemma-4-12b-coder-fable5-composer2.5@8bit" = {
                 "name" = "Gemma 4 12B Coder Fable5 Composer 2.5 (8bit)"
                 "contextWindow" = 32768
                 "maxTokens" = 8192
-            }
-            "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-mlx-optiq" = {
-                "name" = "Gemma 4 12B Agentic Fable5 Composer 2.5 v2 (MLX)"
-                "contextWindow" = 20000
-                "maxTokens" = 4096
             }
         }
     }
@@ -158,7 +148,7 @@ _agent = {
 opencode = {
     "$schema" = "https://opencode.ai/config.json"
     "plugin" = ["opencode-cmux"]
-    "small_model" = "lmstudio-gemma4/gemma4-coder"
+    "small_model" = "lmstudio-gemma4/gemma-4-12b-coder-fable5-composer2.5@8bit"
     "compaction" = {
         "auto" = True
         "prune" = True

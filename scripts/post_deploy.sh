@@ -109,7 +109,7 @@ _merge_config "$HOME/.cache/dotfiles/claude_code_mcp.rendered.json" \
   --replace mcpServers
 _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
   "$HOME/.config/opencode/opencode.jsonc" \
-  --replace mcp
+  --replace mcp --replace provider
 unset -f _merge_config
 unset _rendered _live
 
