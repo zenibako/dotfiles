@@ -110,19 +110,24 @@ _provider = {
                 "contextWindow" = 16384
                 "maxTokens" = 8192
             }
+            "qwen3.5:9b" = {
+                "name" = "Qwen 3.5 9B"
+                "contextWindow" = 49152
+                "maxTokens" = 8192
+            }
         }
     }
-    "lmstudio-gemma4" = {
+    "lmstudio" = {
         "npm" = "@ai-sdk/openai-compatible"
         "options" = {
             "baseURL" = "http://127.0.0.1:1234/v1"
             "apiKey" = "none"
         }
         "models" = {
-            "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-mlx-optiq" = {
-                "name" = "Gemma 4 12B Agentic Fable5 Composer 2.5 v2 (MLX)"
+            "qwen3.5-9b" = {
+                "name" = "Qwen 3.5 9B"
                 "contextWindow" = 49152
-                "maxTokens" = 4096
+                "maxTokens" = 8192
             }
         }
     }
@@ -148,7 +153,7 @@ _agent = {
 opencode = {
     "$schema" = "https://opencode.ai/config.json"
     "plugin" = ["opencode-cmux"]
-    "small_model" = "lmstudio-gemma4/gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-mlx-optiq"
+    "small_model" = "ollama/qwen3.5:9b"
     "compaction" = {
         "auto" = True
         "prune" = True
