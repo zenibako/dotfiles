@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": "/Users/chanderson/.config/opencode/node_modules",
+    "paths": {
+      "@opencode-ai/plugin": ["@opencode-ai/plugin/dist/index.d.ts"],
+      "@opencode-ai/plugin/*": ["@opencode-ai/plugin/*"],
+      "@opencode-ai/sdk": ["@opencode-ai/sdk/dist/index.d.ts"],
+      "@opencode-ai/sdk/*": ["@opencode-ai/sdk/*"]
+    }
+  },
+  "include": ["plugins/**/*.ts"]
+}
