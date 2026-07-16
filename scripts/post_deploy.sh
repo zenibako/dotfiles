@@ -357,22 +357,32 @@ else:
 _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
 
+# OpenCode MCP config — GitHub token injected first (doesn't need secret cache)
+_opencode_config="$HOME/.config/opencode/opencode.jsonc"
+if [ -f "$_opencode_config" ] && command -v "$PYTHON" >/dev/null 2>&1; then
+  _patch_args=""
+  _tok=$(_gh_token) && _patch_args="$_patch_args --github-token $_tok"
+  if [ -n "$_patch_args" ]; then
+    _INFO "Patching OpenCode MCP config (GitHub token)"
+    "$PYTHON" "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || _WARN "Failed to patch OpenCode config (GitHub)"
+  fi
+  unset _patch_args _tok
+fi
+
 if _ensure_secret_cache; then
   _inject_obsidian_token "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   _inject_obsidian_token "$HOME/.claude.json"
 
-  # OpenCode MCP config
-  _opencode_config="$HOME/.config/opencode/opencode.jsonc"
+  # OpenCode MCP config — remaining secrets (need secret cache)
   if [ -f "$_opencode_config" ] && command -v "$PYTHON" >/dev/null 2>&1; then
     _patch_args=""
-    _tok=$(_gh_token) && _patch_args="$_patch_args --github-token $_tok"
     _tok=$(_lookup_secret "GITLAB_TOKEN") && _patch_args="$_patch_args --gitlab-token $_tok"
     _tok=$(_lookup_secret "POSTMAN_API_KEY") && _patch_args="$_patch_args --postman-token $_tok"
     _tok=$(_lookup_secret "SONAR_TOKEN") && _patch_args="$_patch_args --sonar-token $_tok"
     _tok=$(_lookup_secret "HA_TOKEN") && _patch_args="$_patch_args --ha-token $_tok"
     _tok=$(_lookup_secret "MCP_OBSIDIAN_TOKEN") && _patch_args="$_patch_args --obsidian-token $_tok"
     if [ -n "$_patch_args" ]; then
-      _INFO "Patching OpenCode MCP config"
+      _INFO "Patching OpenCode MCP config (remaining secrets)"
       "$PYTHON" "$_scripts/patch_opencode_secrets.py" "$_opencode_config" $_patch_args 2>/dev/null || _WARN "Failed to patch OpenCode config"
     fi
     unset _patch_args _tok
