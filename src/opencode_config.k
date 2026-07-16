@@ -110,22 +110,17 @@ _provider = {
                 "contextWindow" = 16384
                 "maxTokens" = 8192
             }
-            "qwen3.5:9b" = {
-                "name" = "Qwen 3.5 9B"
-                "contextWindow" = 49152
-                "maxTokens" = 8192
-            }
         }
     }
     "lmstudio" = {
         "npm" = "@ai-sdk/openai-compatible"
+        "name" = "LM Studio (local)"
         "options" = {
             "baseURL" = "http://127.0.0.1:1234/v1"
-            "apiKey" = "none"
         }
         "models" = {
             "qwen3.5-9b" = {
-                "name" = "Qwen 3.5 9B (LM Studio)"
+                "name" = "Qwen 3.5 9B"
                 "contextWindow" = 49152
                 "maxTokens" = 8192
             }
