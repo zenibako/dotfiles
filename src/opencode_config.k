@@ -125,7 +125,7 @@ _provider = {
         }
         "models" = {
             "qwen3.5-9b" = {
-                "name" = "Qwen 3.5 9B"
+                "name" = "Qwen 3.5 9B (LM Studio)"
                 "contextWindow" = 49152
                 "maxTokens" = 8192
             }
@@ -152,8 +152,8 @@ _agent = {
 
 opencode = {
     "$schema" = "https://opencode.ai/config.json"
-    "plugin" = ["opencode-cmux"]
-    "small_model" = "ollama/qwen3.5:9b"
+    "plugin" = []
+    "small_model" = "lmstudio/qwen3.5-9b"
     "compaction" = {
         "auto" = True
         "prune" = True
