@@ -16,7 +16,7 @@ default = _shared.Profile {
         "out/tmux.conf" = { target = "~/.tmux.conf", type = "template" }
         "out/zshenv" = { target = "~/.zshenv", type = "template" }
         "src/zshrc" = "~/.zshrc"
-        "src/zprofile" = "~/.zprofile"
+        "src/zprofile" = { target = "~/.zprofile", type = "symbolic" }
         "src/carapace" = "~/.config/carapace"
         "src/ghostty/shaders" = { target = "~/.config/ghostty/shaders", type = "symbolic" }
         "out/ghostty/config" = { target = "~/.config/ghostty/config", type = "template" }
@@ -59,7 +59,7 @@ default = _shared.Profile {
         "out/kiro/mcp.json" = { target = "~/.kiro/settings/mcp.json", type = "template" }
         "src/kiro/steering" = { target = "~/.kiro/steering", type = "symbolic" }
         "src/codex/AGENTS.md" = { target = "~/.codex/AGENTS.md", type = "symbolic" }
-        "out/codex/config.toml" = { target = "~/.codex/config.toml", type = "template" }
+        "src/codex/config.toml" = { target = "~/.codex/config.toml", type = "symbolic" }
     }
     variables = {
         name = ""
@@ -161,7 +161,6 @@ work = _shared.Profile {
     depends = ["default"]
     files = {
         "src/nvim/work" = { target = "~/.config/nvim", type = "symbolic" }
-        "src/opencode/plugin/slack-workflow.ts" = { target = "~/.config/opencode/plugin/slack-workflow.ts", type = "template" }
         "src/opencode/script/lwc-lsp-wrapper.sh" = { target = "~/.config/opencode/script/lwc-lsp-wrapper.sh", type = "symbolic" }
     }
     variables = mcp_shared.expand_mcp_included({

@@ -11,56 +11,19 @@ else
   . "$(git rev-parse --show-toplevel 2>/dev/null || pwd)/scripts/dotter/lib.sh"
 fi
 
-# ── Regenerate configs from KCL first (includes .dotter/local.toml) ─────
+# ── Regenerate configs from KCL first ─────────────────────────────────────
 _STEP "Pre-deploy: environment setup"
 resolve_repo_root
 resolve_python
 
-# Ensure Python venv and dependencies exist (hard-fail if uv is missing —
-# every deploy script depends on the repo .venv being present and up to date).
-if ! command -v uv >/dev/null 2>&1; then
-  _ERR "uv is required but was not found on PATH."
-  _GUIDE "Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh"
-  exit 1
-fi
-if [ -z "$REPO_ROOT" ]; then
-  _ERR "could not locate repo root for uv venv creation"
-  exit 1
-fi
-[ -d "$REPO_ROOT/.venv" ] || uv venv "$REPO_ROOT/.venv" >/dev/null 2>&1 || {
-  _ERR "failed to create .venv at $REPO_ROOT/.venv"
-  exit 1
-}
-uv pip install -q -r "$REPO_ROOT/requirements.txt" 2>/dev/null || {
-  _ERR "uv pip install failed (requirements.txt)"
-  exit 1
-}
-
-if [ -z "$REPO_ROOT" ]; then
-  _WARN "could not locate repo root for KCL regeneration"
-elif command -v kcl >/dev/null 2>&1 && [ -f "$REPO_ROOT/src/main.k" ]; then
-  _STEP "Regenerating configs from KCL"
-  cd "$REPO_ROOT"
-  mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
-  # Resolve local.k at the repo root
-  if [ -f "$REPO_ROOT/local.k" ]; then
-    LOCAL_K="$REPO_ROOT/local.k"
-  else
-    _ERR "local.k not found at repo root. Copy local.k.example to local.k and fill in values."
-    exit 1
-  fi
-  _INFO "Running kcl run src/main.k"
-  _CMD "kcl run src/main.k <local.k>"
-  kcl run src/main.k "$LOCAL_K" >/dev/null || { _ERR "KCL generation failed"; exit 1; }
-  _INFO "Converting KCL output to dotter config"
-  "$PYTHON" scripts/dotter/generate_from_kcl.py || { _ERR "Python conversion failed"; exit 1; }
-  _INFO "Validating generated configs"
-  "$PYTHON" scripts/dotter/validate_generated.py || { _ERR "Generated config validation failed"; exit 1; }
-  _OK "Configs regenerated"
+# deploy.sh already regenerates before invoking dotter (dotter reads global.toml
+# at config-load time, before this hook fires). It exports DOTTER_SKIP_KCL_REGEN
+# so we don't redo the same work here. A direct `dotter deploy` leaves the flag
+# unset, so this hook regenerates on its own.
+if [ "${DOTTER_SKIP_KCL_REGEN:-}" = "1" ]; then
+  _SKIP "KCL regeneration (already done by deploy.sh)"
 else
-  _ERR "KCL is required for this repository but was not found."
-  _GUIDE "Install it with: brew install kcl-lang/tap/kcl"
-  exit 1
+  regenerate_from_kcl "$REPO_ROOT"
 fi
 
 LOCAL_CONFIG="${DOTTER_LOCAL_CONFIG:-.dotter/local.toml}"

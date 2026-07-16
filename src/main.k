@@ -19,7 +19,6 @@ import opencode_config
 import claude
 import claude_code
 import kiro_config as kiro_mod
-import codex_config
 import zshenv
 import gitconfig
 import _shared.mcp as mcp_shared

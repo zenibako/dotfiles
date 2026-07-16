@@ -1,0 +1,88 @@
+# Codex CLI config — symlinked from dotfiles (src/codex/config.toml), NOT KCL-generated.
+# Codex writes runtime state here (tool approvals, project trust, hook hashes); review
+# drift with `git status`. Edit this file directly to change the managed baseline.
+# OpenAI Codex CLI config — https://openai-codex.mintlify.app/configuration
+
+model = "gpt-5.5"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+commit_attribution = "Codex <codex@ai>"
+
+[tui]
+notifications = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
+[mcp_servers.jujutsu]
+command = "/opt/homebrew/bin/npx"
+args = ["-y", "jj-mcp-server"]
+enabled = true
+
+[mcp_servers.jujutsu.env]
+PATH = "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+[mcp_servers.jujutsu.tools.status]
+approval_mode = "approve"
+
+[mcp_servers.backlog]
+command = "/opt/homebrew/bin/backlog"
+args = ["mcp", "start"]
+enabled = true
+
+[mcp_servers.backlog.tools.task_edit]
+approval_mode = "approve"
+
+[mcp_servers.backlog.tools.task_create]
+approval_mode = "approve"
+
+[mcp_servers.playwright]
+command = "/opt/homebrew/bin/npx"
+args = ["-y", "@playwright/mcp@latest"]
+enabled = true
+
+[mcp_servers.playwright.env]
+PATH = "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+[mcp_servers.playwright.tools.browser_resize]
+approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_navigate]
+approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_run_code_unsafe]
+approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_tabs]
+approval_mode = "approve"
+
+# GitHub Copilot MCP — bearer auth. $GITHUB_MCP_TOKEN is exported by ~/.zshenv
+# from `gh auth token` (see zshenv.k); shared with Claude Code's GitHub MCP.
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GITHUB_MCP_TOKEN"
+enabled = true
+
+[projects."/Users/chandler.anderson/Projects/workspaces/mvp-codex"]
+trust_level = "trusted"
+
+[projects."/Users/chandler.anderson/Projects/mvp"]
+trust_level = "trusted"
+
+[hooks.state]
+
+[hooks.state."/Users/chandler.anderson/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:0fa90362de5751e5c8c74bd52f5ba4ffdfe66385f13532892518ceb68d3cc955"
+
+[hooks.state."/Users/chandler.anderson/Projects/workspaces/mvp-codex/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:119da7b6318e8d05e8163fffacbd4d5167780b892066d2cc03c4ad39b7990931"
+
+[hooks.state."/Users/chandler.anderson/Projects/workspaces/mvp-codex/.codex/hooks.json:post_tool_use:0:1"]
+trusted_hash = "sha256:260ad8343e4471a6bc36b61fdb29eff1323c826b2a5e39562f0caae58e04b480"
+
+[hooks.state."/Users/chandler.anderson/Projects/mvp/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:119da7b6318e8d05e8163fffacbd4d5167780b892066d2cc03c4ad39b7990931"
+
+[hooks.state."/Users/chandler.anderson/Projects/mvp/.codex/hooks.json:post_tool_use:0:1"]
+trusted_hash = "sha256:260ad8343e4471a6bc36b61fdb29eff1323c826b2a5e39562f0caae58e04b480"
+enabled = false

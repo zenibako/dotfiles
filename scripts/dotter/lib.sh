@@ -103,6 +103,88 @@ ensure_dotter_dir() {
   ln -sf ../scripts/post_deploy.sh "$root/.dotter/post_deploy.sh"
 }
 
+# ── Regenerate .dotter/global.toml + out/ files from the KCL source ───────
+# Runs the full generation pipeline: ensure the uv venv + deps, `kcl run`, the
+# Python converter, then the generated-config validator. Hard-fails (exit 1) on
+# any missing tool or generation error.
+#
+# This is the single source of truth for KCL regeneration, shared by two
+# callers with different needs around dotter's config read-order:
+#   • deploy.sh runs it BEFORE `dotter deploy`, because dotter parses
+#     .dotter/global.toml (file mappings + settings) at config-load time —
+#     before any hook fires. Regenerating only in the pre_deploy hook would
+#     leave the current deploy using a stale (or, on a fresh clone, missing)
+#     global.toml.
+#   • the pre_deploy hook runs it so a direct `dotter deploy` (no wrapper)
+#     still regenerates out/ file contents before they are copied.
+# To avoid regenerating twice on the deploy.sh path, deploy.sh exports
+# DOTTER_SKIP_KCL_REGEN=1 and the hook skips its own call.
+#
+# Requires REPO_ROOT and PYTHON to be set (call resolve_repo_root /
+# resolve_python first), or pass the repo root as $1.
+regenerate_from_kcl() {
+  local root="${1:-$REPO_ROOT}"
+
+  if [ -z "$root" ]; then
+    _ERR "could not locate repo root for KCL regeneration"
+    exit 1
+  fi
+
+  # Ensure Python venv and dependencies exist (hard-fail if uv is missing —
+  # every deploy script depends on the repo .venv being present and current).
+  if ! command -v uv >/dev/null 2>&1; then
+    _ERR "uv is required but was not found on PATH."
+    _GUIDE "Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh"
+    exit 1
+  fi
+  [ -d "$root/.venv" ] || uv venv "$root/.venv" >/dev/null 2>&1 || {
+    _ERR "failed to create .venv at $root/.venv"
+    exit 1
+  }
+
+  local venv_py="$root/.venv/bin/python3"
+
+  # Only reach the network when a required module is actually missing, so a
+  # normal deploy still succeeds offline once the venv is populated (and does
+  # not hard-fail on a transient network blip). --system-certs makes uv use the
+  # OS trust store so corporate TLS interception (e.g. Netskope) doesn't break
+  # the PyPI fetch with an UnknownIssuer error. stderr is intentionally NOT
+  # suppressed — a failed install should show its real cause.
+  if ! "$venv_py" -c 'import tomli_w, tomli' >/dev/null 2>&1; then
+    _INFO "Installing Python dependencies"
+    uv pip install -q --system-certs --python "$venv_py" -r "$root/requirements.txt" || {
+      _ERR "uv pip install failed (requirements.txt)"
+      exit 1
+    }
+  fi
+
+  # KCL is mandatory for this repository.
+  if ! command -v kcl >/dev/null 2>&1 || [ ! -f "$root/src/main.k" ]; then
+    _ERR "KCL is required for this repository but was not found."
+    _GUIDE "Install it with: brew install kcl-lang/tap/kcl"
+    exit 1
+  fi
+
+  _STEP "Regenerating configs from KCL"
+  cd "$root"
+  mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
+
+  # Resolve local.k at the repo root.
+  if [ ! -f "$root/local.k" ]; then
+    _ERR "local.k not found at repo root. Copy local.k.example to local.k and fill in values."
+    exit 1
+  fi
+
+  _INFO "Running kcl run src/main.k"
+  _CMD "kcl run src/main.k <local.k>"
+  kcl run src/main.k "$root/local.k" >/dev/null || { _ERR "KCL generation failed"; exit 1; }
+  _INFO "Converting KCL output to dotter config"
+  "$venv_py" scripts/dotter/generate_from_kcl.py || { _ERR "Python conversion failed"; exit 1; }
+  _INFO "Validating generated configs"
+  "$venv_py" scripts/dotter/validate_generated.py || { _ERR "Generated config validation failed"; exit 1; }
+  _OK "Configs regenerated"
+}
+
 # ── Cross-platform timeout wrapper ───────────────────────────────────────
 # Usage: run_with_timeout SECONDS command [args...]
 run_with_timeout() {

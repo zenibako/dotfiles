@@ -10,11 +10,21 @@ cd "$SCRIPT_DIR"
 # shellcheck source=scripts/dotter/lib.sh
 . scripts/dotter/lib.sh
 
+resolve_repo_root
+resolve_python
 ensure_dotter_dir "$SCRIPT_DIR"
 
-# dotter's pre_deploy hook (configured in .dotter/global.toml) runs KCL
-# generation and validation automatically before deploying files, so we just
-# invoke dotter directly and let the hooks do the rest.
+# Regenerate .dotter/global.toml (+ out/ files) from KCL BEFORE running dotter.
+# dotter parses global.toml — its file mappings and settings — at config-load
+# time, before any pre_deploy hook fires, so the hook alone cannot refresh the
+# config the current deploy actually uses (and on a fresh clone global.toml
+# does not exist yet, since it is gitignored). Regenerating here guarantees a
+# fresh, present global.toml when dotter reads it.
+regenerate_from_kcl "$SCRIPT_DIR"
+
+# Tell the pre_deploy hook to skip its own regeneration — we just did it.
+export DOTTER_SKIP_KCL_REGEN=1
+
 _STEP "Running dotter deploy"
 _CMD "dotter deploy $*"
 exec dotter deploy "$@"
