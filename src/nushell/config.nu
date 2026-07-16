@@ -76,6 +76,57 @@ $env.config.show_banner = false
 
 $env.STARSHIP_SHELL = "nu"
 
+# --- Per-project uv venv PATH injection ---
+# Automatically prepends .venv/bin to PATH when you cd into a project that
+# has a uv-managed .venv/, so tools like task/pytest/ruff are directly
+# runnable without manually activating the venv. Removes the entry when you
+# leave the directory, so global tools are never shadowed. Opt-in per
+# directory: no .venv/ means nothing happens. Guarded on uv availability.
+$env.__venv_bin_path = ""
+
+# Append our PWD hook to the existing env_change.PWD list (zoxide already
+# registers one). Using `++` on the list avoids clobbering prior hooks.
+$env.config.hooks.env_change.PWD = (
+    $env.config.hooks.env_change.PWD | append {
+        code: {|before, after|
+            let venv_bin = ($after | path join ".venv/bin")
+            # Remove old entry if present
+            if ($env.__venv_bin_path? | default "") != "" {
+                $env.PATH = ($env.PATH | where $it != $env.__venv_bin_path)
+                $env.__venv_bin_path = ""
+            }
+            # Add new entry if .venv/bin exists
+            if ($venv_bin | path exists) {
+                $env.PATH = ($env.PATH | prepend $venv_bin)
+                $env.__venv_bin_path = $venv_bin
+            }
+        }
+    }
+)
+
+# Apply to the initial directory at startup
+let _startup_venv_bin = ($env.PWD | path join ".venv/bin")
+if ($_startup_venv_bin | path exists) {
+    $env.PATH = ($env.PATH | prepend $_startup_venv_bin)
+    $env.__venv_bin_path = $_startup_venv_bin
+}
+
+# task wrapper: prefer local .venv/bin/task, then `uv run task`, then PATH.
+# Handles projects that use taskipy (installs `task` into .venv/bin) without
+# requiring manual venv activation.
+def --wrapped task [...rest] {
+    let local_task = ($env.PWD | path join ".venv/bin/task")
+    if ($local_task | path exists) {
+        ^$local_task ...$rest
+    } else if (which uv | is-not-empty) {
+        ^uv run task ...$rest
+    } else if (which task | is-not-empty) {
+        ^task ...$rest
+    } else {
+        print "task: not found. Install taskipy in your venv or globally."
+    }
+}
+
 def create_left_prompt [] {
     # Set window title to current directory name (OSC 2)
     printf $"\e]2;($env.PWD | path basename)\a"

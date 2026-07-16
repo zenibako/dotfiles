@@ -381,6 +381,58 @@ autoload -Uz add-zsh-hook
 add-zsh-hook chpwd _mcp_autodetect
 _mcp_autodetect
 
+# --- Per-project uv venv PATH injection ---
+# Automatically prepends .venv/bin to PATH when you cd into a project that
+# has a uv-managed .venv/, so tools like task/pytest/ruff are directly
+# runnable without manually activating the venv. Removes the entry when you
+# leave the directory, so global tools are never shadowed. Opt-in per
+# directory: no .venv/ means nothing happens. Guarded on uv availability.
+__venv_bin_path=""
+__venv_bin_added=0
+
+_venv_chpwd() {
+    (( ${+commands[uv]} )) || return 0
+    local venv_bin="$PWD/.venv/bin"
+    if (( __venv_bin_added )); then
+        if [[ "$__venv_bin_path" == "$venv_bin" && -d "$venv_bin" ]]; then
+            return 0
+        fi
+        # Remove old entry: handle leading (venv:rest) and middle (x:venv:rest)
+        local _cleaned="$PATH"
+        _cleaned="${_cleaned/#$__venv_bin_path:/}"
+        _cleaned="${_cleaned//:$__venv_bin_path:/:}"
+        _cleaned="${_cleaned/%:$__venv_bin_path/}"
+        [[ "$_cleaned" == "$__venv_bin_path" ]] && _cleaned=""
+        export PATH="$_cleaned"
+        __venv_bin_added=0
+        __venv_bin_path=""
+    fi
+    if [[ -d "$venv_bin" ]]; then
+        export PATH="$venv_bin:$PATH"
+        __venv_bin_path="$venv_bin"
+        __venv_bin_added=1
+    fi
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _venv_chpwd
+_venv_chpwd
+
+# task() wrapper: prefer local .venv/bin/task, then `uv run task`, then PATH.
+# Handles projects that use taskipy (installs `task` into .venv/bin) without
+# requiring manual venv activation.
+task() {
+    if [[ -x "$PWD/.venv/bin/task" ]]; then
+        "$PWD/.venv/bin/task" "$@"
+    elif (( ${+commands[uv]} )); then
+        uv run task "$@"
+    elif (( ${+commands[task]} )); then
+        command task "$@"
+    else
+        print -u2 "task: not found. Install taskipy in your venv or globally."
+        return 127
+    fi
+}
+
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
 
