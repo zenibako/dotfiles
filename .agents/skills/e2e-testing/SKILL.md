@@ -17,15 +17,15 @@ based on availability and context.
 
 | Priority | Backend | When to use |
 |----------|---------|-------------|
-| 1 | **cmux** | Installed (`command -v cmux`). Interactive browser automation with native wait/snapshot support. |
+| 1 | **cmux** | Running in a **cmux context** (any `CMUX_*` env var set, e.g. `CMUX_SURFACE_ID`) with the `cmux` binary available. Interactive browser automation with native wait/snapshot support. **Preferred over the Chrome DevTools / Playwright MCP servers whenever in a cmux context** — being merely *installed* is not enough; you must be running inside cmux. |
 | 2 | **Playwright** | E2E test scripts exist in the repo (e.g., `e2e/`, `tests/e2e/`, `playwright.config.*`). |
-| 3 | **Chrome DevTools** | Fallback when neither cmux nor Playwright scripts are available. Direct CDP-based debugging. |
+| 3 | **Chrome DevTools** | Fallback when not in a cmux context and no Playwright scripts exist. Also the right choice for DevTools-only work (Lighthouse, network, performance/heap traces) even inside cmux, since cmux's browser CLI doesn't cover those. |
 
 ### How to choose
 
 ```bash
-# Check if cmux is available
-if command -v cmux &> /dev/null; then
+# Prefer cmux only when running IN a cmux context (not merely installed)
+if env | grep -q '^CMUX_' && command -v cmux &> /dev/null; then
   echo "→ Use cmux backend"
   exit 0
 fi
@@ -61,6 +61,7 @@ All backends follow the same loop:
 ## Backend 1: cmux (Interactive Automation)
 
 ### When to use
+- **You are running in a cmux context** (any `CMUX_*` env var set) — prefer this over the Chrome DevTools / Playwright MCP servers for UI investigations.
 - You need quick, ad-hoc browser automation.
 - The page is complex (shadow DOM, iframes) and `cmux` handles them natively.
 - You want built-in wait strategies (`--load-state`, `--selector`, `--text`).

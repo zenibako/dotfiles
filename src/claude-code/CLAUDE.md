@@ -35,6 +35,15 @@ If you need to clean or reset the repository on the HA host, **only do so after 
 - **Important**: If the default shell is Nushell (`nu`), note that it is NOT POSIX compliant — use `help` command if an error is thrown for incompatible commands/syntax.
 - If a POSIX shell is necessary, use `zsh`.
 
+## Browser & UI Investigations
+
+When automating a browser or investigating UI behavior, **prefer the cmux browser CLI over the Chrome DevTools MCP and Playwright MCP servers whenever running in a cmux context.** In Claude Code those MCP servers are first-class tools while cmux is "just" a Bash CLI, so cmux loses by default unless this preference is stated.
+
+- **Detect the cmux context**: any `CMUX_*` env var is set (e.g. `CMUX_SURFACE_ID`, `CMUX_SOCKET_PATH`). Quick check: `env | grep -q '^CMUX_'`.
+- **In a cmux context** → drive the browser with `cmux --json browser ...` (open, snapshot, click, fill, wait, eval, screenshot). See `.agents/skills/e2e-testing/SKILL.md` → Backend 1 for the command reference.
+- **Not in a cmux context** → fall back to Playwright MCP when the repo has E2E test scripts, otherwise Chrome DevTools MCP.
+- **Exception**: Chrome DevTools MCP remains the right tool for DevTools-only work — Lighthouse audits, network inspection, performance/heap traces — even inside cmux, since the cmux browser CLI doesn't cover those.
+
 ## Version Control
 
 - **Use Jujutsu (jj)** when available (i.e., if the root directory has a `.jj` folder) instead of Git.

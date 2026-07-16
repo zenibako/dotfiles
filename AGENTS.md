@@ -23,9 +23,9 @@ uv pip install -r requirements.txt
 
 ## E2E Testing
 When automating browsers or running end-to-end tests, use the `e2e-testing` skill:
-- **Preferred**: cmux (if installed). See `.agents/skills/e2e-testing/SKILL.md` → Backend 1.
+- **Preferred**: cmux, when running in a cmux context (any `CMUX_*` env var set, e.g. `CMUX_SURFACE_ID`). Prefer it over the Chrome DevTools / Playwright MCP servers for UI investigations. See `.agents/skills/e2e-testing/SKILL.md` → Backend 1.
 - **Test scripts available**: Playwright. See `.agents/skills/e2e-testing/SKILL.md` → Backend 2.
-- **Fallback**: Chrome DevTools MCP tools. See `.agents/skills/e2e-testing/SKILL.md` → Backend 3.
+- **Fallback**: Chrome DevTools MCP tools (also for DevTools-only work like Lighthouse/network/perf traces, even inside cmux). See `.agents/skills/e2e-testing/SKILL.md` → Backend 3.
 
 ## Version Control
 - Config in `jj/config.toml`
