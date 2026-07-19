@@ -15,7 +15,7 @@ import aerospace
 import iamb
 import gitlogue
 import pnpm
-import opencode_config
+import opencode
 import claude
 import claude_code
 import kiro_config as kiro_mod

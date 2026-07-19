@@ -157,3 +157,16 @@ if ($cargo_env | path exists) {
 }
 
 $env.GPG_TTY = (try { tty } catch { "" })
+
+# GitHub Copilot MCP for Nushell (same as zsh env)
+# Resolve token from gh CLI if $env.GITHUB_MCP_TOKEN is not already set
+if ($env.GITHUB_MCP_TOKEN? | is-empty) {
+    # gh is available in PATH; use bash to run gh auth token
+    if ("gh" | which | is-not-empty) {
+        # Capture output safely by running through bash and storing in temp var
+        let token = (bash -c "gh auth token 2>/dev/null")
+        if ("$token" | is-not-empty) {
+            load-env { GITHUB_MCP_TOKEN: $token }
+        }
+    }
+}

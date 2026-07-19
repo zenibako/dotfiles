@@ -104,10 +104,19 @@ if [ -z "$_ZSHENV_LOADED" ]; then
   # support). Both Codex (~/.codex/config.toml) and Claude Code (~/.claude.json)
   # read it from $GITHUB_MCP_TOKEN. Resolve it once per shell tree from the gh CLI;
   # the export lets child shells — and the agents — inherit it without re-invoking
-  # gh. (GitLab MCP uses OAuth instead: `codex mcp login`.)
+  # gh. (GitLab MCP uses OAuth instead: `codex mcp login`).
   if [ -z "$GITHUB_MCP_TOKEN" ] && command -v gh >/dev/null 2>&1; then
     export GITHUB_MCP_TOKEN="$(gh auth token 2>/dev/null)"
   fi
+} > "$_env_cache"  # Clear/create cache
+_load_shared_env
+unset -f _tomlq _load_shared_env
+fi
+
+# GitHub Copilot MCP for Nushell (non-interactive env.nu is sourced before config.nu)
+if [ -z "$GITHUB_MCP_TOKEN" ] && command -v gh >/dev/null 2>&1; then
+  export GITHUB_MCP_TOKEN="$(gh auth token 2>/dev/null)"
+fi
 
 """
 
