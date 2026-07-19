@@ -78,6 +78,7 @@ vim.lsp.enable({
   "terraformls",
   "visualforce_ls",
 {{/if}}
+  "kcl_lsp",
   "yamlls",
   "taplo",
 {{#if opencode_profile_personal}}

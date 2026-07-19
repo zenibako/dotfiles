@@ -16,11 +16,12 @@ import iamb
 import gitlogue
 import pnpm
 import opencode.config as opencode
+import kiro.config as kiro_mod
 import claude
 import claude_code
-import kiro.config as kiro_mod
 import zshenv
 import gitconfig
+import local
 import _shared.mcp as mcp_shared
 
 # Effective MCP inclusion list for this machine. local.k's `mcp_included` wins,
@@ -28,10 +29,13 @@ import _shared.mcp as mcp_shared
 # generate the exact OpenCode mcp dict at KCL time (so excluded servers are
 # literally omitted) and to derive the per-server flags used by Claude/Codex/Kiro
 # templates.
-_mcp_included = mcp_shared.effective_mcp_included(local_packages, local_variables)
+_mcp_included = mcp_shared.effective_mcp_included(local.packages, local.variables)
 
 # Force side-effect evaluation of modules with file.write
 _kiro_eval = kiro_mod.kiro_config
+_claude_eval = claude.claude_config
+_claude_code_eval = claude_code._settings_json
+_zshenv_eval = zshenv._final_zshenv
 
 # ── Assemble config data ──────────────────────────────────────────────
 config = _shared.ConfigMap {
@@ -103,14 +107,15 @@ packages_meta = {
 file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))
 
 # ── Write .dotter/local.toml from local.k ─────────────────────────────
-# `local_packages` and `local_variables` are provided as top-level globals by
-# the second KCL input file (local.k at the repo root), passed via
-# `kcl run src/main.k local.k`.
+# `local.packages` and `local.variables` come from src/local.k (gitignored,
+# per-machine overrides), pulled in via `import local` at the top of this file.
+# Run with `kcl run src/main.k` — local.k is resolved by the package, not as a
+# second CLI input.
 
 # If local.k declares `mcp_included`, derive the per-server boolean flags here
 # so the dotter templates (opencode.jsonc, claude mcp.json, etc.) see them.
 # This mirrors the expansion done for global profiles in src/profiles.k.
-_local_variables = mcp_shared.expand_mcp_included(local_variables)
+_local_variables = mcp_shared.expand_mcp_included(local.variables)
 
 # Simple TOML value formatter. For strings we use JSON encoding so quotes and
 # backslashes are escaped; booleans/numbers are emitted directly; arrays are
@@ -120,7 +125,7 @@ _format_local_value = lambda v {
 }
 
 _local_lines = ["packages = ["]
-_local_lines += ['  "{}",'.format(p) for p in local_packages]
+_local_lines += ['  "{}",'.format(p) for p in local.packages]
 _local_lines += ["]\n", "[variables]"]
 _local_lines += ['{} = {}'.format(k, _format_local_value(v)) for k, v in _local_variables]
 file.write(".dotter/local.toml", "\n".join(_local_lines) + "\n")

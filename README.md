@@ -66,9 +66,12 @@ security add-generic-password -s KEY_NAME -a dotfiles -w SECRET_VALUE -U login.k
 ## Architecture
 
 ```
-src/                    # Source of truth
+src/                    # Source of truth (KCL package root; contains kcl.mod)
+├── kcl.mod             # KCL package manifest (makes `import local` resolve to local.k)
 ├── main.k              # KCL entrypoint
 ├── profiles.k          # Profile/package definitions
+├── local.k             # Per-machine overrides (gitignored; created from local.k.example)
+├── local.k.example     # Template for local.k
 ├── *.k                 # KCL modules (env, packages, themes, etc.)
 ├── zshrc               # Zsh interactive config (template)
 ├── nvim/               # Neovim configs (default/work/personal)
@@ -96,8 +99,6 @@ scripts/                # Deploy pipeline scripts
 out/                    # Generated config files (gitignored, written by KCL)
 deploy.sh               # Deploy wrapper (creates .dotter/, runs pipeline)
 init.sh                 # First-time machine setup
-local.k.example         # Template for local.k (generates .dotter/local.toml)
-local.toml.example      # Template for .dotter/local.toml
 ```
 
 ## Pipeline

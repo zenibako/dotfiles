@@ -169,15 +169,16 @@ regenerate_from_kcl() {
   cd "$root"
   mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
 
-  # Resolve local.k at the repo root.
-  if [ ! -f "$root/local.k" ]; then
-    _ERR "local.k not found at repo root. Copy local.k.example to local.k and fill in values."
+  # Resolve the per-machine overrides file. It is gitignored and lives next to
+  # main.k inside the KCL package; src/main.k pulls it in via `import local`.
+  if [ ! -f "$root/src/local.k" ]; then
+    _ERR "src/local.k not found. Copy src/local.k.example to src/local.k and fill in values."
     exit 1
   fi
 
   _INFO "Running kcl run src/main.k"
-  _CMD "kcl run src/main.k <local.k>"
-  kcl run src/main.k "$root/local.k" >/dev/null || { _ERR "KCL generation failed"; exit 1; }
+  _CMD "kcl run src/main.k"
+  kcl run src/main.k >/dev/null || { _ERR "KCL generation failed"; exit 1; }
   _INFO "Converting KCL output to dotter config"
   "$venv_py" scripts/dotter/generate_from_kcl.py || { _ERR "Python conversion failed"; exit 1; }
   _INFO "Validating generated configs"

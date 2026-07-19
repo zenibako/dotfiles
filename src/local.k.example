@@ -1,12 +1,13 @@
 # Local machine-specific overrides — NOT committed (gitignored).
-# Copy to local.k at the repo root and fill in your values:
-#   cp local.k.example local.k
+# Lives at src/local.k; src/main.k pulls it in via `import local`.
+# Copy this template and fill in your values:
+#   cp src/local.k.example src/local.k
 
 # Pick one profile (personal/work), one platform (mac/linux), one theme
 # (e.g. monokai/nightowl/tokyonight).
-local_packages = ["personal", "mac", "tokyonight"]
+packages = ["personal", "mac", "tokyonight"]
 
-local_variables = {
+variables = {
     # ── Identity & shell ──────────────────────────────────────────────
     name = ""
     email = ""
