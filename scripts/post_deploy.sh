@@ -113,6 +113,24 @@ _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
 unset -f _merge_config
 unset _rendered _live
 
+# ── Adrafinil hooks (Claude Code) ─────────────────────────────────────────
+# Re-assert adrafinil's acquire/release hooks in ~/.claude/settings.json AFTER
+# the merge above. These are not rendered from the dotfiles — adrafinil owns its
+# own hook definitions and installs them idempotently (each entry carries an
+# `_adrafinil` marker, so re-running never duplicates and leaves other hooks,
+# e.g. bartender's, intact). Running here — after the settings merge — is what
+# makes them survive: a bartender-enabled merge replaces the shared hook arrays
+# (UserPromptSubmit/Stop/Notification) wholesale and would otherwise drop
+# adrafinil's entries. Gated on the command being present, mirroring the
+# OpenCode adrafinil plugin above; a no-op on machines without adrafinil.
+if command -v adrafinil >/dev/null 2>&1; then
+  if adrafinil install-hooks --tool claude-code >/dev/null 2>&1; then
+    _OK "Ensured adrafinil hooks in Claude Code settings"
+  else
+    _WARN "Failed to install adrafinil hooks into Claude Code settings"
+  fi
+fi
+
 _STEP "Post-deploy: injecting secrets"
 
 # ── Secret injection ─────────────────────────────────────────────────────
