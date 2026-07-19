@@ -21,7 +21,6 @@ _MCP_SERVER_SLUGS = {
     "Atlassian" = "atlassian"
     "Postman" = "postman"
     "SonarQube" = "sonarqube"
-    "Netlify" = "netlify"
     "Neovim" = "neovim"
     "Home Assistant" = "home_assistant"
     "Gitea" = "gitea"
@@ -223,17 +222,6 @@ _mcp_servers = [
                 "SONARQUBE_TOKEN" = "{{sonarqube_token}}"
             }
             "enabled" = "{{mcp_sonarqube_included}}"
-        }
-        # Not available in Claude Desktop
-        claude = None
-    }
-    {
-        name = "Netlify"
-        opencode = {
-            "type" = "local"
-            "command" = ["{{shell_bin_path}}/npx", "-y", "@netlify/mcp"]
-            "environment" = {"PATH" = _SHELL_PATH}
-            "enabled" = "{{mcp_netlify_included}}"
         }
         # Not available in Claude Desktop
         claude = None
