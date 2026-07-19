@@ -4,6 +4,9 @@
 
 version: 1
 language: kcl
+architecture_mode: custom
 paths:
   knowledge_base: .lattice/standards/knowledge-base.md
   language_idioms: .lattice/standards/language-idioms.md
+  architecture: .lattice/standards/architecture.md
+  clean_code: .lattice/standards/clean-code.md
