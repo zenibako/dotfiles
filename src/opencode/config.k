@@ -171,6 +171,12 @@ _agent = {
         # Same model as the plan agent — strong reasoning, lower cost than build.
         "model" = "{{opencode_plan_agent_model}}"
         "prompt" = _agent_prompt("reviewer")
+        # Read-only: the reviewer reports issues but never edits files. It still
+        # needs bash (for `jj diff`/`git diff`/`git show`) and read/grep/glob for
+        # context, so only `edit` is denied.
+        "permission" = {
+            "edit" = "deny"
+        }
         "mcp" = {
             "Backlog" = {
                 "enabled" = False

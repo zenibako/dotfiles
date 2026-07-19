@@ -33,6 +33,7 @@ default = _shared.Profile {
         # dotter must not own it directly). See merge_json_config.py.
         "out/opencode.jsonc" = { target = "~/.cache/dotfiles/opencode.rendered.jsonc", type = "template" }
         "src/opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
+        "src/opencode/skills" = { target = "~/.config/opencode/skills", type = "symbolic" }
         # Rendered to a private staging file dotter owns exclusively;
         # post_deploy.sh merges it into the live config. Claude Desktop rewrites
         # the live file at runtime, so dotter must not own it directly (it would
