@@ -21,6 +21,15 @@ These guides cover:
 
 You MUST read the overview resource to understand the complete workflow. The information is NOT summarized here.
 
+## Skills & Standards
+
+Reusable skills live under `~/.agents/skills/` (shared) and OpenCode's own `skills/`. Load one with the `skill` tool whenever it fits the task instead of reimplementing what it already covers.
+
+When the current repo contains a `.lattice/` directory, it is a **Lattice project** with committed engineering standards — honor them:
+
+- Read and follow `.lattice/standards/*.md` (architecture, clean-code, knowledge-base, language-idioms). These override generic defaults for this repo.
+- Use the Lattice workflow skills for substantial work: `design-blueprint` (design a feature), `code-forge` (implement from an approved design), `refactor-safely`, `bug-fix`, and `review` (structured code review that applies `.lattice/standards`).
+
 ## Shell
 - Before running the first command, check which shell is being used.
 - **Important**: If the default shell is Nushell (`nu`), note that it is NOT POSIX compliant - use `help` command if an error is thrown for incompatible commands/syntax.
