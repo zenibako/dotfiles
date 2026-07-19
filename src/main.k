@@ -15,10 +15,10 @@ import aerospace
 import iamb
 import gitlogue
 import pnpm
-import opencode
+import opencode.config as opencode
 import claude
 import claude_code
-import kiro_config as kiro_mod
+import kiro.config as kiro_mod
 import zshenv
 import gitconfig
 import _shared.mcp as mcp_shared
@@ -60,7 +60,7 @@ config = _shared.ConfigMap {
     gitlogue = gitlogue.gitlogue
     pnpm = pnpm.pnpm
     gitconfig = gitconfig.gitconfig
-    opencode = opencode_config.build(_mcp_included)
+    opencode = opencode.build(_mcp_included)
 }
 
 # ── Write JSON for Python TOML converter ──────────────────────────────

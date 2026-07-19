@@ -132,16 +132,55 @@ _provider = {
 _agent = {
     "build" = {"model" = "{{opencode_build_agent_model}}"}
     "plan" = {"model" = "{{opencode_plan_agent_model}}"}
-    "test" = {
+    "local" = {
+        "description" = "Local machine agent with all MCPs disabled"
+        "model" = "{{opencode_local_agent_model}}"
+        "prompt" = "You are the Local agent..."
+    }
+    "tester" = {
         "description" = "Writes and runs tests, checks coverage, and fixes failing tests"
         "mode" = "subagent"
         "model" = "{{opencode_test_agent_model}}"
     }
-    "code-review" = {
+    "reviewer" = {
         "description" = "Reviews code using available review tools plus direct analysis"
         "mode" = "subagent"
         "model" = "{{opencode_review_agent_model}}"
         "prompt" = "You are a code reviewer..."
+    }
+    "local-pm" = {
+        "description" = "Local Project Management subagent that uses Backlog.md to write and read tasks"
+        "mode" = "subagent"
+        "model" = "{{opencode_local_agent_model}}"
+        "prompt" = "You are the Local PM agent. Use Backlog to set priorities for the caller..."
+        "mcp" = {
+            "Backlog" = {
+                "enabled" = True
+            }
+            "Jujutsu" = {
+                "enabled" = True
+            }
+            "GitHub" = {
+                "enabled" = False
+            }
+        }
+    }
+    "local-dev" = {
+        "description" = "Local Development subagent that writes code and commits/pushes work"
+        "mode" = "subagent"
+        "model" = "{{opencode_local_agent_model}}"
+        "prompt" = "You are the Local Dev subagent. Build and commit changes based on the caller's requirements..."
+        "mcp" = {
+            "Backlog" = {
+                "enabled" = False
+            }
+            "Jujutsu" = {
+                "enabled" = True
+            }
+            "GitHub" = {
+                "enabled" = True
+            }
+        }
     }
 }
 

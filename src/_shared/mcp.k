@@ -166,7 +166,7 @@ _mcp_servers = [
             "url" = "{{mcp_obsidian_url}}"
             "oauth" = False
             "headers" = {}
-            # Rendered as a bare boolean via the .replace() in opencode_config.k.
+            # Rendered as a bare boolean via the .replace() in opencode/config.k.
             "enabled" = "{{mcp_obsidian_included}}"
         }
         # Claude Desktop's mcpServers has no per-server "enabled" flag, so the
@@ -289,7 +289,7 @@ _mcp_servers = [
             # Gated on mcp_gitlab_included (off by default). The self-hosted MCP
             # endpoint only exists when the instance has GitLab Duo +
             # beta/experimental features enabled; otherwise it 404s. Rendered as
-            # a bare boolean via the .replace() in opencode_config.k.
+            # a bare boolean via the .replace() in opencode/config.k.
             "oauth" = False
             "headers" = {}
             "enabled" = "{{mcp_gitlab_included}}"
