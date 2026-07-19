@@ -108,15 +108,6 @@ if [ -z "$_ZSHENV_LOADED" ]; then
   if [ -z "$GITHUB_MCP_TOKEN" ] && command -v gh >/dev/null 2>&1; then
     export GITHUB_MCP_TOKEN="$(gh auth token 2>/dev/null)"
   fi
-} > "$_env_cache"  # Clear/create cache
-_load_shared_env
-unset -f _tomlq _load_shared_env
-fi
-
-# GitHub Copilot MCP for Nushell (non-interactive env.nu is sourced before config.nu)
-if [ -z "$GITHUB_MCP_TOKEN" ] && command -v gh >/dev/null 2>&1; then
-  export GITHUB_MCP_TOKEN="$(gh auth token 2>/dev/null)"
-fi
 
 """
 

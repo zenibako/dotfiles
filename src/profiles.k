@@ -142,7 +142,9 @@ personal = _shared.Profile {
         opencode_build_agent_model = "ollama-cloud/glm-5.2"
         opencode_plan_agent_model = "ollama-cloud/kimi-k2.7-code"
         opencode_test_agent_model = "ollama-cloud/glm-5.1"
-        opencode_review_agent_model = "ollama-cloud/glm-5.1"
+        # Local orchestrator + subagents use a small/local model. Machines with
+        # a stronger local runtime (e.g. LM Studio) override this in local.k.
+        opencode_local_agent_model = "lmstudio/qwen3.5-9b"
         claude_agent_push_notif_enabled = True
         claude_bypass_permissions_account_id = "c5055d6d-b6e9-46de-a26f-0dad4c6255fc"
         claude_bypass_permissions_value = True
@@ -173,7 +175,9 @@ work = _shared.Profile {
         opencode_build_agent_model = "openai/gpt-5.4"
         opencode_plan_agent_model = "openai/gpt-5.4"
         opencode_test_agent_model = "openai/gpt-5.4"
-        opencode_review_agent_model = "openai/gpt-5.4"
+        # Work machines may not run a local LM Studio; default to the same model
+        # as the other work agents. Per-machine overrides live in local.k.
+        opencode_local_agent_model = "openai/gpt-5.4"
         p10k_root_dir = "$HOME/.p10k"
         claude_agent_push_notif_enabled = False
         claude_bypass_permissions_account_id = "cc63eabd-b672-4570-871a-fd0d4607e75d"

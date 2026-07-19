@@ -88,6 +88,91 @@ _python3() {
   fi
 }
 
+# Strip Handlebars block tags and replace variable placeholders with a bare
+# literal so source templates can be syntax-checked before dotter renders them.
+# - {{#if x}} / {{/if}} / {{else}} → removed (their body is always kept)
+# - {{var}} → `true` (valid as a bare command in zsh/bash, valid as a value in nu)
+_strip_handlebars() {
+  sed -e 's/{{#[^}]*}}//g' \
+      -e 's|{{/[^}]*}}||g' \
+      -e 's/{{else}}//g' \
+      -e 's/{{[^}]*}}/true/g' "$1"
+}
+
+# Parse-only shell syntax check (zsh or bash). Strips Handlebars so source
+# templates (out/zshenv, etc.) can be validated before dotter renders them.
+# -n = parse only, no execution. Returns nonzero on syntax error.
+validate_shell_syntax() {
+  _file="$1"
+  _interp="$2"
+  if [ ! -f "$_file" ]; then return 0; fi
+  if ! command -v "$_interp" >/dev/null 2>&1; then
+    _SKIP "$_interp syntax validation ($_interp not available): $_file"
+    return 0
+  fi
+
+  _err_file=$(mktemp)
+  _stripped=$(mktemp)
+  _strip_handlebars "$_file" > "$_stripped"
+  "$_interp" -n "$_stripped" 2>"$_err_file"
+  _rc=$?
+  if [ "$_rc" -eq 0 ]; then
+    _PASS "$_file ($_interp syntax)"
+  else
+    _ERR "$_interp syntax validation failed: $_file"
+    # Reparse the original (with Handlebars stripped) to surface line numbers
+    # close to the source — the sed transform preserves line count.
+    "$_interp" -n "$_stripped" 2>&1 | sed 's/^/    /' >&2 || true
+  fi
+  rm -f "$_err_file" "$_stripped"
+  return "$_rc"
+}
+
+# Parse-only nushell syntax check. Strips Handlebars first since src/nushell/*
+# are dotter templates. Uses `nu-check` (parses, does not execute) to avoid
+# side effects in env.nu (which calls `gh auth token`). On failure, re-runs
+# with `source` to surface the parser's file:line error message.
+validate_nushell_syntax() {
+  _file="$1"
+  if [ ! -f "$_file" ]; then return 0; fi
+  if ! command -v nu >/dev/null 2>&1; then
+    _SKIP "nushell syntax validation (nu not available): $_file"
+    return 0
+  fi
+
+  _stripped=$(mktemp)
+  _strip_handlebars "$_file" > "$_stripped"
+  # nu-check returns boolean true/false; exit code is always 0.
+  _ok=$(nu -c "nu-check '$_stripped'" 2>/dev/null | tr -d '[:space:]')
+  case "$_ok" in
+    true)
+      _PASS "$_file (nu syntax)"
+      rm -f "$_stripped"
+      return 0
+      ;;
+    false)
+      _ERR "nushell syntax validation failed: $_file"
+      # Reparse via `source` for a real error message with source location.
+      nu -c "source '$_stripped'" 2>&1 | sed 's/^/    /' >&2 || true
+      rm -f "$_stripped"
+      return 1
+      ;;
+    *)
+      # nu-check itself errored — fall back to `source` for the verdict.
+      if nu -c "source '$_stripped'" >/dev/null 2>&1; then
+        _PASS "$_file (nu syntax via source)"
+        rm -f "$_stripped"
+        return 0
+      else
+        _ERR "nushell validation failed: $_file"
+        nu -c "source '$_stripped'" 2>&1 | sed 's/^/    /' >&2 || true
+        rm -f "$_stripped"
+        return 1
+      fi
+      ;;
+  esac
+}
+
 has_aerospace() { command -v aerospace >/dev/null 2>&1; }
 
 # Pip command to recommend for installing missing Python packages
@@ -566,6 +651,14 @@ except ImportError:
     unset _repo_venv_python
   fi
 
+  # Shell syntax — parse-only check on source templates before they ship.
+  # Catches the class of bug where a template typo breaks every new shell
+  # session (zshenv parse error, nushell input-type change, etc.). Source
+  # templates have Handlebars markers, which the validator strips first.
+  validate_shell_syntax "$REPO_ROOT/out/zshenv" zsh || FAILED=1
+  validate_nushell_syntax "$REPO_ROOT/src/nushell/env.nu" || FAILED=1
+  validate_nushell_syntax "$REPO_ROOT/src/nushell/config.nu" || FAILED=1
+
   _STEP "Pre-deploy validation finished"
   exit "$FAILED"
 
@@ -623,6 +716,14 @@ elif [ "$MODE" = "--post-deploy" ]; then
     fi
   fi
   unset _cc_settings _cc_mcp
+
+  # Shell syntax — validate the deployed (rendered) files. This catches the
+  # same class of bugs as the pre-deploy check, but on the actual installed
+  # content. Belt-and-suspenders for the case where dotter renders something
+  # unexpected from a passing template.
+  validate_shell_syntax "$HOME/.zshenv" zsh || FAILED=1
+  validate_nushell_syntax "$DEPLOYED/nushell/env.nu" || FAILED=1
+  validate_nushell_syntax "$DEPLOYED/nushell/config.nu" || FAILED=1
 
   exit "$FAILED"
 

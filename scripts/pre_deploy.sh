@@ -50,8 +50,14 @@ require_var() {
 require_var name
 require_var email
 
-# Pre-deploy schema validation (validate_schema.sh prints its own header)
+# Pre-deploy schema validation (validate_schema.sh prints its own header).
+# Hard-fail on parse errors so a broken template can't ship and break every
+# shell session. The validator returns 0 when tooling is missing (via _SKIP),
+# so this only blocks on genuine file validation failures.
 if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/scripts/dotter/validate_schema.sh" ]; then
   cd "$REPO_ROOT"
-  "$REPO_ROOT/scripts/dotter/validate_schema.sh" --pre-deploy || true
+  if ! "$REPO_ROOT/scripts/dotter/validate_schema.sh" --pre-deploy; then
+    _ERR "Pre-deploy validation failed — blocking deploy. Fix the errors above and re-run."
+    exit 1
+  fi
 fi

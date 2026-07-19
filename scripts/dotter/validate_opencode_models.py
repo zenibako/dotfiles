@@ -33,7 +33,7 @@ AGENT_MODEL_VARS = (
     "opencode_build_agent_model",
     "opencode_plan_agent_model",
     "opencode_test_agent_model",
-    "opencode_review_agent_model",
+    "opencode_local_agent_model",
 )
 
 
