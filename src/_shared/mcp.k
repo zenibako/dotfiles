@@ -64,11 +64,19 @@ effective_mcp_included = lambda packages, variables {
     MCP_WORK if "work" in packages else []
 }
 
-# Build the OpenCode `mcp` dict for a given inclusion list. ALL servers are
-# emitted so project-level configs can flip individual servers on without
-# needing to duplicate connection details. Included servers get `enabled: true`;
-# excluded servers get `enabled: false` so they don't load or contribute tools
-# to context.
+# Servers that are project-scoped for OpenCode: never emitted into the host
+# (~/.config/opencode) config, so their tool schemas never load — or consume
+# context — in general host sessions. Each is instead defined in its own
+# project's `.opencode/opencode.json`. This is the include/exclude axis (whether
+# a server is visible on the host at all), distinct from enable/disable (a
+# host-visible server toggled on or off via its `enabled` flag).
+_MCP_HOST_EXCLUDED = ["Obsidian", "Home Assistant"]
+
+# Build the OpenCode host `mcp` dict for a given inclusion list. Host-visible
+# servers (everything except _MCP_HOST_EXCLUDED) are emitted so project-level
+# configs can flip individual servers on without duplicating connection details.
+# Included servers get `enabled: true`; the rest get `enabled: false` so they
+# don't load or contribute tools to context.
 opencode_mcp_for = lambda included {
     {
         s.name: {
@@ -77,6 +85,7 @@ opencode_mcp_for = lambda included {
             if k != "enabled"
         } | {"enabled": s.name in included}
         for s in _mcp_servers
+        if s.name not in _MCP_HOST_EXCLUDED
     }
 }
 
