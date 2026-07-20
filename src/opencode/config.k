@@ -180,8 +180,10 @@ _agent = {
         "prompt" = _agent_prompt("local")
         # Router only: no MCP servers, no file edits (edit deny also removes the
         # edit/write/apply_patch schemas), no skills — keeps the small local
-        # model's context as lean as possible.
-        "permission" = _deny_all_mcp | {"edit" = "deny", "skill" = "deny"}
+        # model's context as lean as possible. bash is denied too: with it
+        # available, the small model bypasses the edit denial via sed/cat
+        # instead of delegating to local-dev (observed with qwen3.5-9b).
+        "permission" = _deny_all_mcp | {"edit" = "deny", "bash" = "deny", "skill" = "deny"}
     }
     "tester" = {
         "description" = "Writes and runs tests via the project's own test runner and reports results"
@@ -210,9 +212,10 @@ _agent = {
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-pm")
         # Backlog MCP only (its core function; Backlog commits its own task
-        # files, so Jujutsu isn't needed). No file edits, no skills — neither
-        # skill is relevant to PM work.
-        "permission" = _mcp_only(["Backlog"]) | {"edit" = "deny", "skill" = "deny"}
+        # files, so Jujutsu isn't needed). No file edits, no bash (same
+        # sed/cat bypass risk as the orchestrator; its prompt already forbids
+        # VCS commands), no skills — neither skill is relevant to PM work.
+        "permission" = _mcp_only(["Backlog"]) | {"edit" = "deny", "bash" = "deny", "skill" = "deny"}
     }
     "local-dev" = {
         "description" = "Local Development subagent that writes code and commits work (VCS via jj/git CLI)"
