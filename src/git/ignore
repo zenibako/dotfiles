@@ -1,0 +1,9 @@
+# Global git ignore — deployed to ~/.config/git/ignore, which git reads by
+# default (no core.excludesfile needed).
+
+# Claude Code per-project local settings
+**/.claude/settings.local.json
+
+# radar — disposable local code-navigation index (a committed MAP.md, if used,
+# is intentionally NOT ignored)
+.radar/

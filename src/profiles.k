@@ -7,6 +7,7 @@ default = _shared.Profile {
         "out/gitconfig" = { target = "~/.config/git/dotter-gitconfig", type = "template" }
         "src/git/commit-template" = "~/.git-commit-template"
         "src/git/hooks/prepare-commit-msg" = "~/.config/git/hooks/prepare-commit-msg"
+        "src/git/ignore" = "~/.config/git/ignore"
         "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
         "out/shared/completions.toml" = "~/.config/shared/completions.toml"
         "src/atuin/bin" = "~/.atuin/bin"
