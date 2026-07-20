@@ -362,15 +362,21 @@ if [ -d "$REPO_ROOT" ]; then
   REPO_ROOT="$REPO_ROOT" "$_scripts/validate_schema.sh" --post-deploy || exit 1
 fi
 
-_STEP "Post-deploy: MCP health checks"
+# ── MCP health checks (backgrounded) ─────────────────────────────────────
+# Both `mcp list` commands only read configs the merge/secret steps above
+# already wrote, and share nothing with the Neovim validation below — so they
+# run in the background while nvim does its much longer LSP attach pass, and
+# their captured output is printed under the "MCP health checks" step at the
+# end. COLOR_* was resolved when lib.sh was sourced, so the captured _OK/_WARN
+# lines keep their colors. Timeouts are more generous than the old sequential
+# ones (30s/90s) because the checks now compete with ~18 LSP server spawns
+# (including the jorje JVM) for CPU and network.
 
-# ── OpenCode MCP health check ────────────────────────────────────────────
-if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
-  begin_wait "Checking OpenCode MCP servers" "up to 30s"
+_check_opencode_mcps() {
   mcp_out=$(mktemp)
   mcp_err=$(mktemp)
 
-  if ! run_with_timeout 30 opencode mcp list > "$mcp_out" 2> "$mcp_err"; then
+  if ! run_with_timeout 60 opencode mcp list > "$mcp_out" 2> "$mcp_err"; then
     _WARN "opencode mcp list command failed or timed out"
     [ -s "$mcp_err" ] && cat "$mcp_err" >&2
   else
@@ -391,23 +397,21 @@ if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json
     fi
   fi
   rm -f "$mcp_out" "$mcp_err"
-fi
+}
 
-# ── Claude Code MCP health check ─────────────────────────────────────────
-# Mirrors the OpenCode check above for the servers we deploy to ~/.claude.json.
+# Mirrors the OpenCode check for the servers we deploy to ~/.claude.json.
 # `claude mcp list` health-checks every server and can hang on a slow/broken
 # one, so it runs under a hard timeout and a failure/timeout is a non-fatal
-# WARNING (never aborts the deploy).
-if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
-  begin_wait "Checking Claude Code MCP servers" "up to 90s"
+# WARNING (never aborts the deploy). It runs from $HOME so only user-global
+# servers are checked, not a project's local .mcp.json that might exist in
+# the deploy working directory. The timeout is generous: cold `npx`/`docker`
+# startups plus remote/OAuth servers can be slow, and a too-short limit
+# yields a spurious "timed out" warning.
+_check_claude_mcps() {
   cc_mcp_out=$(mktemp)
   cc_mcp_err=$(mktemp)
 
-  # Run from $HOME so only user-global servers are checked, not a project's
-  # local .mcp.json that might exist in the deploy working directory. The
-  # timeout is generous: cold `npx`/`docker` startups plus remote/OAuth servers
-  # can be slow, and a too-short limit yields a spurious "timed out" warning.
-  if ! ( cd "$HOME" && run_with_timeout 90 claude mcp list ) > "$cc_mcp_out" 2> "$cc_mcp_err"; then
+  if ! ( cd "$HOME" && run_with_timeout 120 claude mcp list ) > "$cc_mcp_out" 2> "$cc_mcp_err"; then
     _WARN "claude mcp list command failed or timed out"
     [ -s "$cc_mcp_err" ] && cat "$cc_mcp_err" >&2
   else
@@ -437,6 +441,25 @@ if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
     fi
   fi
   rm -f "$cc_mcp_out" "$cc_mcp_err"
+}
+
+_oc_mcp_result=""; _oc_mcp_pid=""
+_cc_mcp_result=""; _cc_mcp_pid=""
+if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
+  _oc_mcp_result=$(mktemp)
+  _check_opencode_mcps > "$_oc_mcp_result" 2>&1 &
+  _oc_mcp_pid=$!
+fi
+if command -v claude >/dev/null 2>&1 && [ -f "$HOME/.claude.json" ]; then
+  _cc_mcp_result=$(mktemp)
+  _check_claude_mcps > "$_cc_mcp_result" 2>&1 &
+  _cc_mcp_pid=$!
+fi
+if [ -n "$_oc_mcp_pid$_cc_mcp_pid" ]; then
+  _INFO "MCP health checks running in background — results after Neovim validation"
+  # Reap the checks if an earlier validation aborts the deploy with exit 1
+  # (their own hard timeouts bound the orphan window regardless).
+  trap 'kill $_oc_mcp_pid $_cc_mcp_pid 2>/dev/null || true' EXIT
 fi
 
 _STEP "Post-deploy: Neovim validation"
@@ -561,5 +584,19 @@ _STEP "Post-deploy: agent LSP validation"
 if [ -f "$_scripts/validate_agent_lsp.py" ] && command -v "$PYTHON" >/dev/null 2>&1; then
   "$PYTHON" "$_scripts/validate_agent_lsp.py" || _WARN "Agent LSP validation failed"
 fi
+
+_STEP "Post-deploy: MCP health checks"
+
+# ── MCP health check results ──────────────────────────────────────────────
+# The checks were backgrounded before the Neovim validation; by now they have
+# almost always finished, so the waits below block at most until the checks'
+# own hard timeouts.
+[ -n "$_oc_mcp_pid" ] && { wait "$_oc_mcp_pid" 2>/dev/null || true; }
+[ -n "$_cc_mcp_pid" ] && { wait "$_cc_mcp_pid" 2>/dev/null || true; }
+trap - EXIT
+[ -n "$_oc_mcp_result" ] && { cat "$_oc_mcp_result"; rm -f "$_oc_mcp_result"; }
+[ -n "$_cc_mcp_result" ] && { cat "$_cc_mcp_result"; rm -f "$_cc_mcp_result"; }
+unset _oc_mcp_result _cc_mcp_result _oc_mcp_pid _cc_mcp_pid
+unset -f _check_opencode_mcps _check_claude_mcps
 
 _STEP "Post-deploy validation complete"
