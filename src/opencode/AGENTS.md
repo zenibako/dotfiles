@@ -34,7 +34,8 @@ When the current repo contains a `.lattice/` directory, it is a **Lattice projec
 
 Re-exploring an unfamiliar codebase every task is the single biggest recurring token cost. Orient cheaply, then read narrowly:
 
-- **Look for a map before exploring.** Check for a `MAP.md`, a `.lattice/` knowledge base, structure notes in `AGENTS.md`, or a navigation index (`radar`, `ctags`, tree-sitter). Use it to jump to an exact `file#symbol` instead of listing trees or grepping many terms.
+- **Orient before exploring.** Use whatever durable orientation the repo already provides — a `.lattice/` knowledge base, structure notes in `AGENTS.md`/`README`, or a code index (`ctags`, tree-sitter, `radar`) — to jump to an exact `file#symbol` instead of listing trees or grepping many terms.
+- **Delegate discovery to the `explore` subagent.** For anything beyond a trivial lookup, hand the search to `explore` (or `@general`) so it happens in an isolated context and only the resulting anchors return — the primary context stays lean.
 - **Navigate before you grep.** Prefer one targeted lookup (exact symbol / rare term) over broad directory walks and speculative reads; open the specific region you need, not whole trees.
 - **Prefer deterministic tools over model exploration.** A CLI/index that returns an anchor costs no model tokens; reasoning through the tree costs many.
 - **Pass anchors down.** When delegating to a subagent, hand it the paths/anchors you already found so it doesn't re-explore from scratch.
