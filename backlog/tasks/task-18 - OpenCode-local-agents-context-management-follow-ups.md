@@ -1,9 +1,10 @@
 ---
 id: TASK-18
 title: 'OpenCode local agents: context-management follow-ups'
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-07-20 14:32'
+updated_date: '2026-07-20 15:22'
 labels:
   - opencode
   - context-management
