@@ -28,6 +28,7 @@ default = _shared.Profile {
         "src/opencode/.gitignore" = { target = "~/.config/opencode/.gitignore", type = "symbolic" }
         "src/opencode/AGENTS.md" = { target = "~/.config/opencode/AGENTS.md", type = "symbolic" }
         "src/opencode/command/review.md" = { target = "~/.config/opencode/command/review.md", type = "symbolic" }
+        "src/opencode/plugin" = { target = "~/.config/opencode/plugin", type = "symbolic" }
         "src/opencode/prompt" = { target = "~/.config/opencode/prompt", type = "symbolic" }
         # Rendered to a private staging file; post_deploy.sh merges it into the
         # live config (post-deploy secret injection rewrites the live file, so

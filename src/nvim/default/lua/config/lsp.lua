@@ -41,6 +41,7 @@ if visualforce_ext ~= "" then
       },
     },
   })
+  vim.lsp.enable("visualforce-language-server")
 end
 {{/if}}
 
@@ -61,39 +62,42 @@ vim.diagnostic.config({
 	update_in_insert = false,
 })
 
+-- NOTE: no runtime directory checks here. Profile dirs (src/nvim/work,
+-- src/nvim/personal) deploy INTO ~/.config/nvim (merged flat), so paths like
+-- ~/.config/nvim/work/lsp never exist at runtime — and vim.fn.isdirectory()
+-- doesn't expand `~` anyway. The handlebars profile gates are the guard: they
+-- guarantee the corresponding lsp/<name>.lua configs were deployed.
+
 {{#if opencode_profile_work}}
-  -- Work LSP servers: configs in src/nvim/work/lsp/
-  if vim.fn.isdirectory("~/.config/nvim/work/lsp/") == 1 then
-    vim.lsp.enable({
-      "apex-language-server",
-      "gitlab-ci-ls",
-      "lwc-language-server",
-      "terraform-ls",
-    })
-  end
+-- Work LSP servers: configs from src/nvim/work/lsp/ (visualforce is enabled
+-- above, only when the VS Code extension provides its server).
+vim.lsp.enable({
+  "apex-language-server",
+  "gitlab-ci-ls",
+  "lwc-language-server",
+  "terraform-ls",
+})
 {{/if}}
 
 {{#if opencode_profile_personal}}
-  -- Personal LSP servers: configs in src/nvim/personal/lsp/
-  if vim.fn.isdirectory("~/.config/nvim/personal/lsp/") == 1 then
-    vim.lsp.enable({
-      "cue",
-      "starlark-rust",
-      "sourcekit-lsp",
-      "jinja-lsp",
-    })
-  end
+-- Personal LSP servers: configs from src/nvim/personal/lsp/
+vim.lsp.enable({
+  "jinja-lsp",
+  "sourcekit-lsp",
+})
 {{/if}}
 
 -- Default LSP servers (configs in src/nvim/default/lsp/ — always available).
 vim.lsp.enable({
   "basedpyright",
+  "cue",
   "gopls",
   "html",
   "jsonls",
-  "lua-ls",
   "kcl-lsp",
+  "lua-ls",
   "pkl-lsp",
+  "starlark-rust",
   "taplo",
   "yamlls",
 })
