@@ -61,20 +61,39 @@ vim.diagnostic.config({
 	update_in_insert = false,
 })
 
+{{#if opencode_profile_work}}
+  -- Work LSP servers: configs in src/nvim/work/lsp/
+  if vim.fn.isdirectory("~/.config/nvim/work/lsp/") == 1 then
+    vim.lsp.enable({
+      "apex-language-server",
+      "gitlab-ci-ls",
+      "lwc-language-server",
+      "terraform-ls",
+    })
+  end
+{{/if}}
+
+{{#if opencode_profile_personal}}
+  -- Personal LSP servers: configs in src/nvim/personal/lsp/
+  if vim.fn.isdirectory("~/.config/nvim/personal/lsp/") == 1 then
+    vim.lsp.enable({
+      "cue",
+      "starlark-rust",
+      "sourcekit-lsp",
+      "jinja-lsp",
+    })
+  end
+{{/if}}
+
+-- Default LSP servers (configs in src/nvim/default/lsp/ — always available).
 vim.lsp.enable({
-  "apex-language-server",
-  "gitlab-ci-ls",
-  "gopls",
   "basedpyright",
+  "gopls",
   "html",
   "jsonls",
   "lua-ls",
+  "kcl-lsp",
   "pkl-lsp",
-  "cue",
-  "starlark-rust",
-  "sourcekit-lsp",
-  "jinja-lsp",
-  "lwc-language-server",
-  "terraform-ls",
-  "visualforce-language-server",
+  "taplo",
+  "yamlls",
 })
