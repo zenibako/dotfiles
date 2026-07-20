@@ -106,11 +106,11 @@ AI_CO_AUTHOR="Kimi <kimi-k2.6:cloud@ai>" jjd "fix: correct typo"
 
 | Profile | Model (as of current config) | Co-authored-by |
 |---|---|---|
-| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
+| Personal | `opencode-go/glm-5.2` | `GLM <glm-5.2@ai>` |
 | Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
 | Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
 
-**Format**: Extract the model name from the config value. For `ollama-cloud/kimi-k2.6:cloud`, use `Kimi <kimi-k2.6:cloud@ai>`. For `openai/gpt-5.4`, use `GPT-5.4 <gpt-5.4@ai>`.
+**Format**: Extract the model name from the config value. For `opencode-go/glm-5.2`, use `GLM <glm-5.2@ai>`. For `openai/gpt-5.4`, use `GPT-5.4 <gpt-5.4@ai>`.
 
 **Note**: The `gitc`, `jjc`, and `jjd` shell functions are defined in `zshrc` and are deployed via dotter. After deployment, reload your shell or source `~/.zshrc` to use them.
 

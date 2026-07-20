@@ -208,7 +208,7 @@ Alternatively, manually append the co-author line when using `jj commit -m`.
 
 | Profile | Model | Co-authored-by |
 |---|---|---|
-| Personal | `ollama-cloud/kimi-k2.6:cloud` | `Kimi <kimi-k2.6:cloud@ai>` |
+| Personal | `opencode-go/glm-5.2` | `GLM <glm-5.2@ai>` |
 | Work | `openai/gpt-5.4` | `GPT-5.4 <gpt-5.4@ai>` |
 | Plan/Test | Check `opencode_*_agent_model` | Use the model name from config |
 
