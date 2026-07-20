@@ -6,7 +6,7 @@ local visualforce_ext = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/salesfor
 
 -- Use the VS Code Visualforce server when the extension is installed locally.
 if visualforce_ext ~= "" then
-  vim.lsp.config("visualforce_ls", {
+  vim.lsp.config("visualforce-language-server", {
     cmd = { "node", visualforce_ext, "--stdio" },
     init_options = {
       embeddedLanguages = {
@@ -64,27 +64,27 @@ vim.diagnostic.config({
 vim.lsp.enable({
 {{#if opencode_profile_work}}
   "apex-language-server",
-  "gitlab_ci_ls",
+  "gitlab-ci-ls",
 {{/if}}
   "gopls",
   "basedpyright",
   "html",
   "jsonls",
-  "lua_ls",
-  "pkl_lsp",
+  "lua-ls",
+  "pkl-lsp",
 {{#if opencode_profile_work}}
-  "lwc_ls",
-  "starlark_rust",
-  "terraformls",
-  "visualforce_ls",
+  "lwc-language-server",
+  "starlark-rust",
+  "terraform-ls",
+  "visualforce-language-server",
 {{/if}}
-  "kcl_lsp",
+  "kcl-lsp",
   "yamlls",
   "taplo",
 {{#if opencode_profile_personal}}
   "cue",
-  "starlark_rust",
-  "sourcekit",
+  "starlark-rust",
+  "sourcekit-lsp",
   "jinja-lsp",
 {{/if}}
 {{#if opencode_profile_work}}
