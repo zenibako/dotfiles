@@ -34,7 +34,9 @@
 set -uo pipefail
 
 KEYCHAIN_CACHE="${HOME}/.cache/macos-keychain-secrets.env"
-CACHE_MAX_AGE_HOURS=1
+# Secrets rarely rotate; freshness mostly gates the post_deploy refresh hint.
+# Rebuilds are explicit via scripts/secrets/seed-secrets.sh (or --build).
+CACHE_MAX_AGE_HOURS=72
 
 # ANSI colors (matched to scripts/dotter/lib.sh)
 if [ -t 2 ] && [ -z "${NO_COLOR:-}" ]; then

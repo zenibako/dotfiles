@@ -57,7 +57,12 @@ packages = ["work", "mac", "monokai"]
 
 ### Secrets
 
-Secrets are fetched from macOS Keychain (or Proton Pass) and injected into deployed configs during `post_deploy.sh`. Never commit secrets to `local.toml`.
+Secret injection is split in two:
+
+- **Seeding** (explicit): `scripts/secrets/seed-secrets.sh` builds a local cache from Proton Pass (`pass-cli`, parallel fetches) or macOS Keychain. Run it on a fresh machine, after rotating a secret, or when a deploy warns the cache is stale (>72h). `--force` rebuilds, `--status` shows freshness.
+- **Injection** (every deploy): `post_deploy.sh` consumes whichever cache exists and injects values into deployed configs. It never builds the cache inline — deploys stay fast and never block on vault prompts. (Exception: an interactive deploy with no cache at all seeds once automatically.)
+
+Never commit secrets to `local.k`/`local.toml`.
 
 ```bash
 security add-generic-password -s KEY_NAME -a dotfiles -w SECRET_VALUE -U login.keychain

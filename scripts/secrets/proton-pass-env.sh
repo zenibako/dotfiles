@@ -24,7 +24,13 @@
 set -uo pipefail
 
 PROTON_PASS_CACHE="${HOME}/.cache/proton-pass-secrets.env"
-CACHE_MAX_AGE_HOURS=1
+# Secrets rarely rotate; freshness mostly gates the post_deploy refresh hint.
+# Rebuilds are explicit via scripts/secrets/seed-secrets.sh (or --build).
+CACHE_MAX_AGE_HOURS=72
+# Concurrent pass-cli fetches during --build. Each item view is a separate
+# CLI invocation with a Proton API roundtrip (~2-5s), so serial builds cost
+# 30-60s. Waves of 4 cut that to roughly a quarter. Set to 1 for serial.
+PASS_FETCH_JOBS="${PASS_FETCH_JOBS:-4}"
 
 # ANSI colors (matched to scripts/dotter/lib.sh)
 if [ -t 2 ] && [ -z "${NO_COLOR:-}" ]; then
@@ -183,54 +189,75 @@ _build_cache() {
     _resolve_profiles
     _log_info "Active profiles: personal=$PROFILE_PERSONAL work=$PROFILE_WORK"
 
+    # Parallel fetch scaffolding: each job writes its cache line to an
+    # index-ordered file in a private tmpdir; results are concatenated in
+    # declaration order once all waves finish. Wave-based (spawn N, wait all)
+    # keeps this compatible with macOS bash 3.2, which lacks `wait -n`.
+    local _jobdir="${_tmp}.jobs"
+    rm -rf "$_jobdir" && mkdir -p "$_jobdir"
+    local _jobidx=0 _wave=0
+
+    _spawn_fetch() { # KEY vault item [field]
+        local _key="$1" _vault="$2" _item="$3" _field="${4:-}"
+        _jobidx=$((_jobidx + 1))
+        local _out
+        _out=$(printf '%s/%03d' "$_jobdir" "$_jobidx")
+        (
+            local _v
+            _v=$(_fetch_secret "$_vault" "$_item" "$_field") && _write "$_key" "$_v" > "$_out"
+        ) &
+        _wave=$((_wave + 1))
+        if [ "$_wave" -ge "$PASS_FETCH_JOBS" ]; then
+            wait
+            _wave=0
+        fi
+    }
+
     # --- Shared credentials (fetched under every profile) ---
     # GitHub PAT — the GitHub MCP is enabled in both profiles (see
     # src/_shared/mcp.k) and its token is injected regardless of profile.
+    # Fetched SERIALLY as a warm-up: if the vault needs unlocking, exactly one
+    # call prompts — the parallel waves below then reuse the unlocked session.
     val=$(_fetch_secret "Personal" "GitHub" "Personal Access Token") && _write "GITHUB_PERSONAL_ACCESS_TOKEN" "$val" >> "$_tmp"
 
     # --- Personal credentials (only if personal profile is active) ---
     if [ "$PROFILE_PERSONAL" = "1" ]; then
-        # Home Assistant
-        val=$(_fetch_secret "Personal" "Home Assistant" "PAT") && _write "HA_TOKEN" "$val" >> "$_tmp"
-
-        # Bluesky (app password is in hidden field)
-        val=$(_fetch_secret "Personal" "Bluesky" "App Password") && _write "BSKY_APP_PASSWORD" "$val" >> "$_tmp"
-
-        # Plex (tokens are in hidden fields)
-        val=$(_fetch_secret "Personal" "Plex (DigitalGlue)" "User Token") && _write "PLEX_USER_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Personal" "Plex (Personal)" "Server Token") && _write "PLEX_SERVER_TOKEN" "$val" >> "$_tmp"
-
-        # Brave Search
-        val=$(_fetch_secret "Personal" "Brave Search API") && _write "BRAVE_API_KEY" "$val" >> "$_tmp"
-
+        _spawn_fetch "HA_TOKEN" "Personal" "Home Assistant" "PAT"
+        # Bluesky app password and Plex tokens are in hidden fields
+        _spawn_fetch "BSKY_APP_PASSWORD" "Personal" "Bluesky" "App Password"
+        _spawn_fetch "PLEX_USER_TOKEN" "Personal" "Plex (DigitalGlue)" "User Token"
+        _spawn_fetch "PLEX_SERVER_TOKEN" "Personal" "Plex (Personal)" "Server Token"
+        _spawn_fetch "BRAVE_API_KEY" "Personal" "Brave Search API"
         # Proton Mail Bridge — using "Proton" login item; the bridge password is
         # not in a hidden field, so we use the main (account) password.
-        val=$(_fetch_secret "Personal" "Proton") && _write "PROTON_PASSWORD" "$val" >> "$_tmp"
-
-        # Telegram
-        val=$(_fetch_secret "Personal" "Telegram Bot Token") && _write "TELEGRAM_BOT_TOKEN" "$val" >> "$_tmp"
-
-        # TripIt — using existing "TripIt" login item (password field)
-        val=$(_fetch_secret "Personal" "TripIt") && _write "TRIPIT_PASSWORD" "$val" >> "$_tmp"
-
-        # Last.fm — using existing "last.fm" login item (password field)
-        val=$(_fetch_secret "Personal" "last.fm") && _write "LAST_FM_API_KEY" "$val" >> "$_tmp"
-
-        # Obsidian MCP
-        val=$(_fetch_secret "Personal" "Obsidian MCP Token") && _write "MCP_OBSIDIAN_TOKEN" "$val" >> "$_tmp"
+        _spawn_fetch "PROTON_PASSWORD" "Personal" "Proton"
+        _spawn_fetch "TELEGRAM_BOT_TOKEN" "Personal" "Telegram Bot Token"
+        # TripIt / last.fm — existing login items (password field)
+        _spawn_fetch "TRIPIT_PASSWORD" "Personal" "TripIt"
+        _spawn_fetch "LAST_FM_API_KEY" "Personal" "last.fm"
+        _spawn_fetch "MCP_OBSIDIAN_TOKEN" "Personal" "Obsidian MCP Token"
 
         # Rocksky (not yet in Proton Pass; disabled until created)
-        # val=$(_fetch_secret "Personal" "Rocksky Password") && _write "ROCKSKY_PASSWORD" "$val" >> "$_tmp"
+        # _spawn_fetch "ROCKSKY_PASSWORD" "Personal" "Rocksky Password"
     fi
 
     # --- Work credentials (only if work profile is active) ---
     if [ "$PROFILE_WORK" = "1" ]; then
-        val=$(_fetch_secret "Personal" "GitLab" "Personal Access Token") && _write "GITLAB_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Personal" "SonarQube Token") && _write "SONAR_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Personal" "Postman API Key") && _write "POSTMAN_API_KEY" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Personal" "Slack Token") && _write "SLACK_TOKEN" "$val" >> "$_tmp"
-        val=$(_fetch_secret "Personal" "Slack D Cookie") && _write "SLACK_D_COOKIE" "$val" >> "$_tmp"
+        _spawn_fetch "GITLAB_TOKEN" "Personal" "GitLab" "Personal Access Token"
+        _spawn_fetch "SONAR_TOKEN" "Personal" "SonarQube Token"
+        _spawn_fetch "POSTMAN_API_KEY" "Personal" "Postman API Key"
+        _spawn_fetch "SLACK_TOKEN" "Personal" "Slack Token"
+        _spawn_fetch "SLACK_D_COOKIE" "Personal" "Slack D Cookie"
     fi
+
+    # Collect: wait for the final partial wave, then append job results in
+    # declaration order after the serially-fetched shared entries.
+    wait
+    if [ -n "$(ls -A "$_jobdir" 2>/dev/null)" ]; then
+        cat "$_jobdir"/* >> "$_tmp"
+    fi
+    rm -rf "$_jobdir"
+    unset -f _spawn_fetch
 
     # Only create the cache if we actually wrote secrets.
     # If no secrets were fetched, report failure so the caller can fall back.
