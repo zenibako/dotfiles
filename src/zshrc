@@ -297,6 +297,10 @@ if (( ${+commands[atuin]} )); then
   eval "$(atuin init zsh)"
 fi
 
+if (( ${+commands[direnv]} )); then
+  eval "$(direnv hook zsh)"
+fi
+
 # Note: XDG_CONFIG_HOME is now loaded from shared/env.toml
 
 # Updates the gpg-agent TTY before every command since
