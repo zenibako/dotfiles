@@ -67,7 +67,7 @@ local lsp_tests = {
     root_markers = { "pyproject.toml" },
     root_content = "[tool.basedpyright]\n",
   },
-  ["lua_ls"] = {
+  ["lua-ls"] = {
     filetype = "lua",
     filename = "test.lua",
     content = "local M = {}\nreturn M\n",
