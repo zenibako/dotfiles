@@ -1,4 +1,5 @@
 import json
+import regex
 import _shared.mcp as mcp_shared
 
 # ── OpenCode (opencode.jsonc) ────────────────────────────────────────
@@ -137,17 +138,30 @@ _agent_prompt = lambda name: str -> str {
 # Per-agent MCP scoping. OpenCode silently ignores a per-agent `mcp` field, so
 # MCP access is controlled with `permission` wildcards (which DO apply per agent,
 # including primary agents). Built-in tools keep their default (allow); only
-# MCP-server tools are denied. NOTE: `permission: deny` gates execution — what
-# removes a server from context is excluding it from the host config entirely
-# (see _MCP_HOST_EXCLUDED in _shared/mcp.k).
-_deny_all_mcp = {name + "*": "deny" for name in mcp_shared.mcp_server_names}
+# MCP-server tools are denied. NOTE (verified against opencode v1.18 source):
+# a string-form deny rule (pattern "*") REMOVES the tool schema from the model
+# request (session/llm/request.ts resolveTools + Permission.disabled) and drops
+# the server's MCP instructions from the system prompt (session/system.ts) — so
+# this is a real context lever, not just an execution gate. Host-level exclusion
+# (_MCP_HOST_EXCLUDED in _shared/mcp.k) additionally avoids spawning the server.
+
+# MCP tool keys are `sanitize(server) + "_" + sanitize(tool)` with any char
+# outside [a-zA-Z0-9_-] replaced by "_" (opencode mcp/catalog.ts). Patterns must
+# be built from the sanitized name or multi-word servers ("Chrome DevTools",
+# "Home Assistant") silently never match — neither for context stripping nor
+# for execution gating.
+_sanitize_mcp = lambda name: str -> str {
+    regex.replace(name, "[^a-zA-Z0-9_-]", "_")
+}
+
+_deny_all_mcp = {_sanitize_mcp(name) + "*": "deny" for name in mcp_shared.mcp_server_names}
 
 # Deny all MCP tools except the named servers (built-in tools untouched). The
 # deny set excludes `keep` so there is no conflicting key with the allow set
 # (KCL's `|` errors on conflicting values rather than overriding).
 _mcp_only = lambda keep: [str] -> {str:str} {
-    {name + "*": "deny" for name in mcp_shared.mcp_server_names if name not in keep} \
-    | {k + "*": "allow" for k in keep}
+    {_sanitize_mcp(name) + "*": "deny" for name in mcp_shared.mcp_server_names if name not in keep} \
+    | {_sanitize_mcp(k) + "*": "allow" for k in keep}
 }
 
 # Agent config
@@ -164,13 +178,21 @@ _agent = {
         "description" = "Local orchestrator; delegates to subagents. No MCP tools."
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local")
-        # Orchestrator delegates via the task tool; it needs no MCP servers.
-        "permission" = _deny_all_mcp
+        # Router only: no MCP servers, no file edits (edit deny also removes the
+        # edit/write/apply_patch schemas), no skills — keeps the small local
+        # model's context as lean as possible.
+        "permission" = _deny_all_mcp | {"edit" = "deny", "skill" = "deny"}
     }
     "tester" = {
-        "description" = "Writes and runs tests, checks coverage, and fixes failing tests"
+        "description" = "Writes and runs tests via the project's own test runner and reports results"
         "mode" = "subagent"
         "model" = "{{opencode_test_agent_model}}"
+        "prompt" = _agent_prompt("tester")
+        # Runs test commands via bash; needs no MCP servers. Skills: radar for
+        # orientation, but not the jj conflict workflow (tester never commits).
+        "permission" = _deny_all_mcp | {
+            "skill" = {"jj-sequential-conflict-resolution" = "deny"}
+        }
     }
     "reviewer" = {
         "description" = "Reviews the session diff using jj/git; only needs Jujutsu + GitHub MCPs"
@@ -187,16 +209,20 @@ _agent = {
         "mode" = "subagent"
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-pm")
-        # Only the Backlog + Jujutsu MCP servers; all other MCP tools denied.
-        "permission" = _mcp_only(["Backlog", "Jujutsu"])
+        # Backlog MCP only (its core function; Backlog commits its own task
+        # files, so Jujutsu isn't needed). No file edits, no skills — neither
+        # skill is relevant to PM work.
+        "permission" = _mcp_only(["Backlog"]) | {"edit" = "deny", "skill" = "deny"}
     }
     "local-dev" = {
-        "description" = "Local Development subagent that writes code and commits/pushes work"
+        "description" = "Local Development subagent that writes code and commits work (VCS via jj/git CLI)"
         "mode" = "subagent"
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-dev")
-        # Only the Jujutsu + GitHub MCP servers; all other MCP tools denied.
-        "permission" = _mcp_only(["Jujutsu", "GitHub"])
+        # CLI-first for the small local model: no MCP servers at all. The
+        # Jujutsu MCP alone is ~60 tool schemas per request — `jj` via bash
+        # costs none. Skills stay at default (radar + jj conflict workflow).
+        "permission" = _deny_all_mcp
     }
 }
 

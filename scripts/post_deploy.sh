@@ -107,9 +107,13 @@ _merge_config "$HOME/.cache/dotfiles/claude_code_settings.rendered.json" \
 _merge_config "$HOME/.cache/dotfiles/claude_code_mcp.rendered.json" \
   "$HOME/.claude.json" \
   --replace mcpServers
+# `agent` is rendered completely from the dotfiles (models resolve via
+# Handlebars at render time; no post-deploy secret injection), so replace it
+# wholesale — otherwise agents removed from the KCL roster linger in the live
+# file forever via the deep-merge.
 _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
   "$HOME/.config/opencode/opencode.jsonc" \
-  --replace mcp --replace provider
+  --replace mcp --replace provider --replace agent
 unset -f _merge_config
 unset _rendered _live
 
