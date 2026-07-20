@@ -185,7 +185,7 @@ The Neovim config (`src/nvim/`) is a **static tree deployed as a dotter template
 - **Entry flow**: `init.lua` sets `vim.g.mapleader`, then `require("config.<module>")` for each core module, then plugin/LSP wiring. Keep `init.lua` thin — orchestration only.
 - **Core modules** live in `lua/config/` (`formatting.lua`, `keymaps.lua`, `lsp.lua`, `pack.lua`, `neovide.lua`, …), one concern per file, loaded by name via `require("config.<name>")`.
 - **Plugins** live in `lua/plugins/`, **one file per plugin**. Adding a plugin = a new file, not an edit to a monolithic list.
-- **LSP servers** live in `lsp/<server>.lua` (native Neovim 0.11+ `vim.lsp.config` / `vim.lsp.enable` convention — e.g. `basedpyright.lua`, `gopls.lua`, `kcl_lsp.lua`, `lua_ls.lua`). Add a server = a new file here, matching the existing ones.
+- **LSP servers** live in `lsp/<server>.lua` (native Neovim 0.11+ `vim.lsp.config` / `vim.lsp.enable` convention — e.g. `gopls.lua`, `html.lua`, `jsonls.lua`, `lua-ls.lua`, `cue.lua`, `pkl-lsp.lua`, `taplo.lua`, `kcl-lsp.lua`, `basedpyright.lua`). Add a server = a new file here, matching the existing ones.
 
 ### Plugin manager
 
