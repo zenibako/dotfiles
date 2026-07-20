@@ -62,32 +62,19 @@ vim.diagnostic.config({
 })
 
 vim.lsp.enable({
-{{#if opencode_profile_work}}
   "apex-language-server",
   "gitlab-ci-ls",
-{{/if}}
   "gopls",
   "basedpyright",
   "html",
   "jsonls",
   "lua-ls",
   "pkl-lsp",
-{{#if opencode_profile_work}}
-  "lwc-language-server",
-  "starlark-rust",
-  "terraform-ls",
-  "visualforce-language-server",
-{{/if}}
-  "kcl-lsp",
-  "yamlls",
-  "taplo",
-{{#if opencode_profile_personal}}
   "cue",
   "starlark-rust",
   "sourcekit-lsp",
   "jinja-lsp",
-{{/if}}
-{{#if opencode_profile_work}}
-  "cue",
-{{/if}}
+  "lwc-language-server",
+  "terraform-ls",
+  "visualforce-language-server",
 })

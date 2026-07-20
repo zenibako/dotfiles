@@ -1,5 +1,6 @@
----@type vim.lsp.Config
+local wrapper = vim.fn.expand("~/.config/opencode/script/lwc-lsp-wrapper.sh")
+
 return {
-	cmd = { "~/.config/opencode/script/lwc-lsp-wrapper.sh" },
+	cmd = { wrapper },
 	filetypes = { "javascript", "html" },
 }
