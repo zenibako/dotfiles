@@ -25,7 +25,7 @@ _lsp = {
         "command" = ["vscode-json-language-server", "--stdio"]
         "extensions" = [".json", ".jsonc"]
     }
-    "lua_ls" = {
+    "lua-ls" = {
         "command" = ["lua-language-server"]
         "extensions" = [".lua"]
     }
