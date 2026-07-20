@@ -1,9 +1,10 @@
 ---
 id: TASK-18.1
 title: Flesh out local-pm / local-dev / tester agent prompts and scope their skills
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-07-20 14:33'
+updated_date: '2026-07-20 15:23'
 labels:
   - opencode
   - context-management
