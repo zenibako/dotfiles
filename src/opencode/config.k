@@ -134,6 +134,22 @@ _agent_prompt = lambda name: str -> str {
     "{file:~/.config/opencode/prompt/agents/" + name + ".md}"
 }
 
+# Per-agent MCP scoping. OpenCode silently ignores a per-agent `mcp` field, so
+# MCP access is controlled with `permission` wildcards (which DO apply per agent,
+# including primary agents). Built-in tools keep their default (allow); only
+# MCP-server tools are denied. NOTE: `permission: deny` gates execution — what
+# removes a server from context is excluding it from the host config entirely
+# (see _MCP_HOST_EXCLUDED in _shared/mcp.k).
+_deny_all_mcp = {name + "*": "deny" for name in mcp_shared.mcp_server_names}
+
+# Deny all MCP tools except the named servers (built-in tools untouched). The
+# deny set excludes `keep` so there is no conflicting key with the allow set
+# (KCL's `|` errors on conflicting values rather than overriding).
+_mcp_only = lambda keep: [str] -> {str:str} {
+    {name + "*": "deny" for name in mcp_shared.mcp_server_names if name not in keep} \
+    | {k + "*": "allow" for k in keep}
+}
+
 # Agent config
 _agent = {
     "build" = {
@@ -145,20 +161,11 @@ _agent = {
         "prompt" = _agent_prompt("plan")
     }
     "local" = {
-        "description" = "Local machine agent with all MCPs disabled"
+        "description" = "Local orchestrator; delegates to subagents. No MCP tools."
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local")
-        "mcp" = {
-            "Backlog" = {
-                "enabled" = False
-            }
-            "Jujutsu" = {
-                "enabled" = False
-            }
-            "GitHub" = {
-                "enabled" = False
-            }
-        }
+        # Orchestrator delegates via the task tool; it needs no MCP servers.
+        "permission" = _deny_all_mcp
     }
     "tester" = {
         "description" = "Writes and runs tests, checks coverage, and fixes failing tests"
@@ -171,57 +178,25 @@ _agent = {
         # Same model as the plan agent — strong reasoning, lower cost than build.
         "model" = "{{opencode_plan_agent_model}}"
         "prompt" = _agent_prompt("reviewer")
-        # Read-only: the reviewer reports issues but never edits files. It still
-        # needs bash (for `jj diff`/`git diff`/`git show`) and read/grep/glob for
-        # context, so only `edit` is denied.
-        "permission" = {
-            "edit" = "deny"
-        }
-        "mcp" = {
-            "Backlog" = {
-                "enabled" = False
-            }
-            "Jujutsu" = {
-                "enabled" = True
-            }
-            "GitHub" = {
-                "enabled" = True
-            }
-        }
+        # Read-only (never edits files; keeps bash/read/grep for diffs) and scoped
+        # to the Jujutsu + GitHub MCP servers; all other MCP tools denied.
+        "permission" = {"edit" = "deny"} | _mcp_only(["Jujutsu", "GitHub"])
     }
     "local-pm" = {
         "description" = "Local Project Management subagent that uses Backlog.md to write and read tasks"
         "mode" = "subagent"
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-pm")
-        "mcp" = {
-            "Backlog" = {
-                "enabled" = True
-            }
-            "Jujutsu" = {
-                "enabled" = True
-            }
-            "GitHub" = {
-                "enabled" = False
-            }
-        }
+        # Only the Backlog + Jujutsu MCP servers; all other MCP tools denied.
+        "permission" = _mcp_only(["Backlog", "Jujutsu"])
     }
     "local-dev" = {
         "description" = "Local Development subagent that writes code and commits/pushes work"
         "mode" = "subagent"
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-dev")
-        "mcp" = {
-            "Backlog" = {
-                "enabled" = False
-            }
-            "Jujutsu" = {
-                "enabled" = True
-            }
-            "GitHub" = {
-                "enabled" = True
-            }
-        }
+        # Only the Jujutsu + GitHub MCP servers; all other MCP tools denied.
+        "permission" = _mcp_only(["Jujutsu", "GitHub"])
     }
 }
 

@@ -89,6 +89,10 @@ opencode_mcp_for = lambda included {
     }
 }
 
+# Public list of every MCP server name. Used by opencode/config.k to generate
+# per-agent `permission` wildcards, since OpenCode has no per-agent `mcp` field.
+mcp_server_names = [s.name for s in _mcp_servers]
+
 
 _mcp_servers = [
     {
