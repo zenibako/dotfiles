@@ -1,5 +1,5 @@
 -- Optional SonarLint integration (SonarQube rules in real-time).
--- Auto-detects the SonarLint VS Code extension server JAR, similar to visualforce_ls.
+-- Auto-detects the SonarLint VS Code extension server JAR, similar to visualforce-language-server.
 local sonarlint_jar = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/sonarsource.sonarlint-vscode-*/server/sonarlint-ls.jar"))
 
 if sonarlint_jar ~= "" then

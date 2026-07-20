@@ -12,5 +12,5 @@ return {
 		".git",
 	},
 	filetypes = { "lua" },
-	on_init = require("util").lua-ls_on_init,
+	on_init = require("util").lua_ls_on_init,
 }
