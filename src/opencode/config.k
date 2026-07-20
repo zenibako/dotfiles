@@ -45,6 +45,28 @@ _lsp = {
         "command" = ["kcl-language-server"]
         "extensions" = [".k", ".kcl"]
     }
+    "taplo" = {
+        "command" = ["taplo", "lsp", "stdio"]
+        "extensions" = [".toml"]
+    }
+    "pkl-lsp" = {
+        "command" = ["pkl-lsp"]
+        "extensions" = [".pkl"]
+    }
+    # The starlark-rust brew formula installs its binary as `starlark`.
+    "starlark-rust" = {
+        "command" = ["starlark", "--lsp"]
+        "extensions" = [".star", ".bzl"]
+    }
+    # New-generation Apex LSP prototype (forcedotcom/apex-language-support),
+    # extracted from the VSIX into ~/.local/share/apex-language-server/.
+    # Replaces jorje for OpenCode (jorje below stays disabled) — the Node stdio
+    # server works reliably where the raw java launcher did not. Inert on
+    # machines without the wrapper (OpenCode skips LSPs whose command is missing).
+    "apex-ls" = {
+        "command" = ["~/.local/share/apex-language-server/apex-ls-stdio.sh"]
+        "extensions" = [".cls", ".trigger", ".apex"]
+    }
     # Work profile LSPs (disabled by default)
     "apex-language-server" = {
         "command" = [

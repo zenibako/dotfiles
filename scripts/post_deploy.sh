@@ -107,13 +107,14 @@ _merge_config "$HOME/.cache/dotfiles/claude_code_settings.rendered.json" \
 _merge_config "$HOME/.cache/dotfiles/claude_code_mcp.rendered.json" \
   "$HOME/.claude.json" \
   --replace mcpServers
-# `agent` is rendered completely from the dotfiles (models resolve via
-# Handlebars at render time; no post-deploy secret injection), so replace it
-# wholesale — otherwise agents removed from the KCL roster linger in the live
-# file forever via the deep-merge.
+# `agent` and `lsp` are rendered completely from the dotfiles (models resolve
+# via Handlebars at render time; no post-deploy secret injection), so replace
+# them wholesale — otherwise entries removed/renamed in the KCL roster linger
+# in the live file forever via the deep-merge (e.g. the stale `lua_ls` key
+# that survived the lua_ls -> lua-ls rename).
 _merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
   "$HOME/.config/opencode/opencode.jsonc" \
-  --replace mcp --replace provider --replace agent
+  --replace mcp --replace provider --replace agent --replace lsp
 unset -f _merge_config
 unset _rendered _live
 
@@ -442,7 +443,7 @@ _STEP "Post-deploy: Neovim validation"
 
 # ── Lua validation ────────────────────────────────────────────────────────
 if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
-  _STEP "Validating Lua files"
+  _INFO "Validating Lua files"
   # Single pass: collect failures via a temp marker (the while loop runs in a
   # subshell, so a plain variable wouldn't survive the pipe).
   _lua_errs=$(mktemp)
@@ -474,9 +475,11 @@ if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
   fi
   _OK "Neovim startup"
 
-  # LSP validation
+  # ── Neovim LSP attach validation ─────────────────────────────────────────
+  # Live headless attach test for every enabled server (validate_lsp.lua);
+  # the OpenCode/Claude Code rosters get their own step below.
   if [ -f "$_scripts/validate_lsp.lua" ]; then
-    begin_wait "Validating LSP attachments" "up to 5 min"
+    begin_wait "Validating Neovim LSP attachments" "up to 5 min"
     lsp_out=$(mktemp)
     lsp_ignore=$(mktemp)
     cat > "$lsp_ignore" <<'LSP_FILTERS'
@@ -506,15 +509,57 @@ validate_lsp.lua:
 python3_provider
 g:loaded_python3_provider
 provider: python3: missing
+sf_cache/test_result.json
+SonarQube language server is ready
+LWC Language Server shutting down
 LSP_FILTERS
     run_with_timeout 300 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
+
+    # Keep the full raw output around for troubleshooting — the display below
+    # is filtered, so anything suppressed can still be inspected here.
+    _lsp_log_dir="$HOME/.cache/dotfiles/logs"
+    mkdir -p "$_lsp_log_dir"
+    cp "$lsp_out" "$_lsp_log_dir/lsp-validation-raw.log" 2>/dev/null || true
+    _lsp_stray="$_lsp_log_dir/lsp-validation-stray.log"
+    : > "$_lsp_stray"
+
     if command -v perl >/dev/null 2>&1; then
-      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" | grep -Fv -f "$lsp_ignore" | grep -v '^\s*$' || true
+      perl -pe 's/\e\[[0-9;]*m//g' < "$lsp_out" > "$lsp_out.clean"
     else
-      cat "$lsp_out" | grep -Fv -f "$lsp_ignore" | grep -v '^\s*$' || true
+      cp "$lsp_out" "$lsp_out.clean"
     fi
-    rm -f "$lsp_out" "$lsp_ignore"
+
+    # Colorize the validation output (lib.sh palette; vars are empty when not
+    # a TTY, so this is a no-op in logs/CI). Lines that are neither section
+    # headers nor indented result rows are unexpected leakage: show them
+    # dimmed, collect them in the stray log, and flag the count afterwards.
+    grep -Fv -f "$lsp_ignore" "$lsp_out.clean" | grep -v '^[[:space:]]*$' \
+      | awk -v g="$COLOR_GREEN" -v y="$COLOR_YELLOW" -v gy="$COLOR_GRAY" \
+            -v b="$COLOR_BOLD" -v u="$COLOR_BLUE" -v r="$COLOR_RESET" \
+            -v stray="$_lsp_stray" '
+        /^==>/                { printf "%s%s%s%s\n", b, u, $0, r; next }
+        index($0, "  ✓") == 1 { sub(/✓/, g "✓" r); print; next }
+        index($0, "  ⚠") == 1 { sub(/⚠/, y "⚠" r); print; next }
+        index($0, "  ⊘") == 1 { sub(/⊘/, gy "⊘" r); print; next }
+        /^  /                 { print; next }
+        { printf "%s%s%s\n", gy, $0, r; print > stray }
+      ' || true
+
+    if [ -s "$_lsp_stray" ]; then
+      _WARN "$(grep -c . "$_lsp_stray") unexpected line(s) during LSP validation — see $_lsp_stray (raw: $_lsp_log_dir/lsp-validation-raw.log)"
+    fi
+    rm -f "$lsp_out" "$lsp_out.clean" "$lsp_ignore"
+    unset _lsp_log_dir _lsp_stray
   fi
+fi
+
+_STEP "Post-deploy: agent LSP validation"
+
+# ── Agent LSP validation (OpenCode + Claude Code) ─────────────────────────
+# Binary/duplicate checks for the LSP rosters of both agent CLIs, plus a
+# language × tool coverage matrix (Neovim column included for contrast).
+if [ -f "$_scripts/validate_agent_lsp.py" ] && command -v "$PYTHON" >/dev/null 2>&1; then
+  "$PYTHON" "$_scripts/validate_agent_lsp.py" || _WARN "Agent LSP validation failed"
 fi
 
 _STEP "Post-deploy validation complete"

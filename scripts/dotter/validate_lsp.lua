@@ -3,17 +3,21 @@
 -- Usage: nvim --headless -c "luafile validate_lsp.lua" -c "qa!"
 --
 -- This checks that enabled LSPs have their binaries available and can attach
--- to test buffers.
+-- to test buffers, then runs the nvim-lint linter validation (sf code-analyzer
+-- against an apex fixture).
 --
 -- Output format matches scripts/dotter/lib.sh conventions (2-space indent,
--- ✓/⚠/⊘ glyphs). ANSI colors are emitted when stdout is a TTY (which it
--- never is under `nvim --headless`, but the shell wrapper preserves them
--- if NO_COLOR is unset and the deploy runs on a real terminal).
+-- ✓/⚠/⊘ glyphs). This script emits NO ANSI codes itself — headless nvim
+-- writes to stderr, which post_deploy.sh captures, strips, filters, and then
+-- colorizes with the lib.sh COLOR_* palette (see the LSP validation block).
 
 local test_dir = vim.fn.tempname() .. "-nvim-lsp-test"
 vim.fn.mkdir(test_dir, "p")
 
--- Suppress known non-fatal Salesforce LSP stack traces during headless init.
+-- Suppress known non-fatal plugin/LSP chatter during headless init. Messages
+-- suppressed here are dropped before they ever reach stderr; noise that
+-- bypasses vim.notify is instead filtered by post_deploy.sh, which also keeps
+-- the raw stderr at ~/.cache/dotfiles/logs/lsp-validation-raw.log.
 local orig_notify = vim.notify
 vim.notify = function(msg, level, opts)
   if type(msg) == "string" and (
@@ -21,6 +25,13 @@ vim.notify = function(msg, level, opts)
     or msg:match("vim%.schedule callback")
     or msg:match("RPC%[Error%]")
     or msg:match("Request initialize failed")
+    -- sf.nvim probes <root>/sf_cache/test_result.json on apex buffers; the
+    -- throwaway test roots never have it.
+    or msg:match("sf_cache")
+    -- sonarlint.nvim announces readiness; lwc logs on shutdown via
+    -- window/showMessage when the test buffer is deleted.
+    or msg:match("SonarQube language server is ready")
+    or msg:match("LWC Language Server shutting down")
   ) then
     return
   end
@@ -49,6 +60,8 @@ local install_hints = {
   ["terraform-ls"]         = { binary = "terraform-ls", manager = "brew", cmd = "brew install hashicorp/tap/terraform-ls" },
   ["visualforce-language-server"] = { binary = "visualforceServer.js", manager = "vscode", cmd = "Install Salesforce Extension Pack in VS Code" },
   ["tsc"]                  = { binary = "typescript", manager = "npm", cmd = "npm install -g typescript" },
+  ["kcl-language-server"]  = { binary = "kcl-language-server", manager = "brew", cmd = "brew install kcl-lang/tap/kcl-lsp" },
+  ["apex_ls"]              = { binary = "apex-ls-stdio.sh", manager = "local", cmd = "Local prototype — see ~/.local/share/apex-language-server/" },
 }
 
 -- Test file definitions per LSP
@@ -92,17 +105,19 @@ local lsp_tests = {
     filename = "test.toml",
     content = "key = \"value\"\n",
   },
-  pkl_lsp = {
+  ["pkl-lsp"] = {
     filetype = "pkl",
     filename = "test.pkl",
     content = "bird {\n  name = \"Dodo\"\n}\n",
     root_markers = { "PklProject" },
     root_content = "amends \"pkl:Project\"\n",
   },
-  ts_ls = {
-    filetype = "typescript",
-    filename = "test.ts",
-    content = "const x: number = 1;\n",
+  ["kcl-lsp"] = {
+    filetype = "kcl",
+    filename = "test.k",
+    content = "schema Test:\n    name: str\n\ntest = Test {name = \"hello\"}\n",
+    root_markers = { "kcl.mod" },
+    root_content = "[package]\nname = \"test\"\nedition = \"0.9.0\"\nversion = \"0.0.1\"\n",
   },
   cue = {
     filetype = "cue",
@@ -111,12 +126,12 @@ local lsp_tests = {
     root_markers = { "cue.mod" },
     root_content = "",
   },
-  starlark_rust = {
-    filetype = "star",
+  ["starlark-rust"] = {
+    filetype = "starlark",
     filename = "test.star",
     content = "def hello():\n    return \"world\"\n",
   },
-  sourcekit = {
+  ["sourcekit-lsp"] = {
     filetype = "swift",
     filename = "test.swift",
     content = 'import Foundation\nprint("hello")\n',
@@ -131,24 +146,41 @@ local lsp_tests = {
     filename = "Test.cls",
     content = "public class Test {}\n",
   },
-  gitlab_ci_ls = {
-    filetype = "yaml",
+  -- Local prototype server (forcedotcom/apex-language-support), enabled by
+  -- ~/.config/nvim/plugin/apex_ls_prototype.lua only when its wrapper exists.
+  apex_ls = {
+    filetype = "apex",
+    filename = "Test.cls",
+    content = "public class Test {}\n",
+    root_markers = { "sfdx-project.json" },
+    root_content = '{ "packageDirectories": [{ "path": "force-app", "default": true }] }\n',
+    -- Node server; needs longer than the default 2s grace after null-ls attaches.
+    grace_period_ms = 15000,
+  },
+  ["gitlab-ci-ls"] = {
+    filetype = "yaml.gitlab",
     filename = ".gitlab-ci.yml",
     content = "stages:\n  - build\n",
   },
-  lwc_ls = {
+  ["lwc-language-server"] = {
     filetype = "javascript",
     filename = "lwc/myComponent/myComponent.js",
     content = "import { LightningElement } from 'lwc';\nexport default class MyComponent extends LightningElement {}\n",
-    root_markers = { "sfdx-project.json", "force-app/" },
+    -- The lwc-lsp-wrapper.sh gates on $PWD/.sf existing (spawned with nvim's
+    -- cwd), so the test must create .sf/ AND chdir into the test root.
+    root_markers = { "sfdx-project.json", "force-app/", ".sf/" },
     root_content = '{ "packageDirectories": [{ "path": "force-app", "default": true }] }\n',
+    chdir = true,
+    -- Node server; typescript-tools/null-ls attach to .js instantly, so give
+    -- the slower LWC server more than the default 2s grace to join them.
+    grace_period_ms = 15000,
   },
-  terraformls = {
+  ["terraform-ls"] = {
     filetype = "terraform",
     filename = "main.tf",
     content = 'resource "null_resource" "test" {}\n',
   },
-  visualforce_ls = {
+  ["visualforce-language-server"] = {
     filetype = "visualforce",
     filename = "pages/myPage.page",
     content = "<apex:page controller=\"MyController\">\n  <apex:form>\n    <apex:inputText value=\"{!myField}\"/>\n  </apex:form>\n</apex:page>\n",
@@ -163,9 +195,9 @@ local lsp_tests = {
 }
 
 -- Name aliases: map from enable() name to actual config name when they differ.
-local name_aliases = {
-  cue = "cue",
-}
+-- Currently empty — every enabled server matches its lsp/<name>.lua config
+-- name since the underscore -> hyphen consolidation.
+local name_aliases = {}
 
 local results = {}
 local missing_installs = {}
@@ -246,15 +278,22 @@ for _, lsp_name in ipairs(enabled_lsps) do
     end
   end
 
-  -- Write test file
+  -- Write test file (filename may contain subdirectories, e.g. lwc/x/x.js)
   local test_file = lsp_test_dir .. "/" .. test.filename
+  vim.fn.mkdir(vim.fn.fnamemodify(test_file, ":h"), "p")
   local f = io.open(test_file, "w")
   if f then
     f:write(test.content)
     f:close()
   end
 
-  -- Open file
+  -- Open file (some servers — e.g. the lwc wrapper — inspect the spawn cwd,
+  -- so tests can opt into running with cwd = the test root)
+  local orig_cwd = nil
+  if test.chdir then
+    orig_cwd = vim.fn.getcwd()
+    vim.cmd("cd " .. vim.fn.fnameescape(lsp_test_dir))
+  end
   vim.cmd("edit " .. vim.fn.fnameescape(test_file))
   vim.bo.filetype = test.filetype
 
@@ -318,6 +357,9 @@ for _, lsp_name in ipairs(enabled_lsps) do
 
   -- Close buffer cleanly
   vim.cmd("bdelete!")
+  if orig_cwd then
+    vim.cmd("cd " .. vim.fn.fnameescape(orig_cwd))
+  end
   quiet_wait(50)
 
   ::continue::
