@@ -30,6 +30,15 @@ When the current repo contains a `.lattice/` directory, it is a **Lattice projec
 - Read and follow `.lattice/standards/*.md` (architecture, clean-code, knowledge-base, language-idioms). These override generic defaults for this repo.
 - Use the Lattice workflow skills for substantial work: `design-blueprint` (design a feature), `code-forge` (implement from an approved design), `refactor-safely`, `bug-fix`, and `review` (structured code review that applies `.lattice/standards`).
 
+## Navigation & Context Discipline
+
+Re-exploring an unfamiliar codebase every task is the single biggest recurring token cost. Orient cheaply, then read narrowly:
+
+- **Look for a map before exploring.** Check for a `MAP.md`, a `.lattice/` knowledge base, structure notes in `AGENTS.md`, or a navigation index (`radar`, `ctags`, tree-sitter). Use it to jump to an exact `file#symbol` instead of listing trees or grepping many terms.
+- **Navigate before you grep.** Prefer one targeted lookup (exact symbol / rare term) over broad directory walks and speculative reads; open the specific region you need, not whole trees.
+- **Prefer deterministic tools over model exploration.** A CLI/index that returns an anchor costs no model tokens; reasoning through the tree costs many.
+- **Pass anchors down.** When delegating to a subagent, hand it the paths/anchors you already found so it doesn't re-explore from scratch.
+
 ## Shell
 - Before running the first command, check which shell is being used.
 - **Important**: If the default shell is Nushell (`nu`), note that it is NOT POSIX compliant - use `help` command if an error is thrown for incompatible commands/syntax.

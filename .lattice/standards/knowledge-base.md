@@ -93,6 +93,25 @@ dotfiles/
 +-- local.k.example        # Template for local.k (secrets + per-machine vars)
 ```
 
+### Key Anchors
+
+Jump straight to these instead of exploring the tree:
+
+| To change… | Go to |
+|------------|-------|
+| What gets generated / composition root | `src/main.k` (imports every module + `file.write` calls) |
+| Shared schemas / types | `src/_shared/schemas.k` |
+| MCP servers (defs, inclusion, host emission) | `src/_shared/mcp.k` — `_mcp_servers`, `opencode_mcp_for`, `MCP_PERSONAL`/`MCP_WORK`, `_MCP_HOST_EXCLUDED`, `mcp_server_names` |
+| OpenCode agents / config | `src/opencode/config.k` — `_agent`, `_mcp_only`, `_agent_prompt`, `build` |
+| OpenCode agent prompts | `src/opencode/prompt/agents/*.md` |
+| dotter file mappings (what deploys where) | `src/profiles.k` — each profile's `files = { … }` |
+| A tool's config (starship, jj, atuin, …) | `src/<tool>.k` (one module per tool) |
+| Neovim config | `src/nvim/{default,work,personal}/` (Lua; deployed as a dotter template) |
+| JSON→TOML conversion | `scripts/dotter/generate_from_kcl.py` |
+| Deploy hooks (build / secrets) | `scripts/pre_deploy.sh`, `scripts/post_deploy.sh` |
+| Secret injection | `scripts/dotter/patch_opencode_secrets.py`, `scripts/secrets/*.sh` |
+| Shared shell helpers | `scripts/dotter/lib.sh` |
+
 ## 5. Project Conventions
 
 - **KCL is the single source of truth** — never edit `.dotter/global.toml` or `out/` files directly; they are generated. Edit `src/*.k` and run `./deploy.sh`.
