@@ -3,16 +3,26 @@ import _shared
 # ── Aerospace config (macOS specific) ──────────────────────────────────
 _gap = 10
 
+# Per-monitor layout profiles: built-in display stacks (accordion), external
+# monitors tile. AeroSpace has no display-change event, so the script is
+# triggered from every callback below and no-ops until the monitor set changes.
+# Policy lives in src/aerospace/display-profile.sh.
+_display_profile = "~/.local/bin/aerospace-display-profile"
+
 aerospace = _shared.AerospaceConfig {
     "config-version" = 2
-    "after-startup-command" = []
+    "after-startup-command" = ["exec-and-forget ${_display_profile} --force"]
+    "exec-on-workspace-change" = ["/bin/bash", "-c", _display_profile]
     "start-at-login" = True
     "enable-normalization-flatten-containers" = True
     "enable-normalization-opposite-orientation-for-nested-containers" = True
     "accordion-padding" = 30
     "default-root-container-layout" = "tiles"
     "default-root-container-orientation" = "auto"
-    "on-focused-monitor-changed" = ["move-mouse monitor-lazy-center"]
+    "on-focused-monitor-changed" = [
+        "move-mouse monitor-lazy-center"
+        "exec-and-forget ${_display_profile}"
+    ]
     "automatically-unhide-macos-hidden-apps" = True
     "persistent-workspaces" = ["1", "2", "3", "4", "5", "6"]
     "on-mode-changed" = []

@@ -111,6 +111,7 @@ schema TemplateConfig:
 schema AerospaceConfig:
     "config-version"?: int = 2
     "after-startup-command"?: [str]
+    "exec-on-workspace-change"?: [str]
     "start-at-login"?: bool = True
     "enable-normalization-flatten-containers"?: bool = True
     "enable-normalization-opposite-orientation-for-nested-containers"?: bool = True
