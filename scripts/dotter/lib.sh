@@ -221,3 +221,26 @@ _RUN() {
   _CMD "$*"
   "$@"
 }
+
+# Surface the one manual step per machine for TTY-less GPG signing: warn (with
+# the exact store command) when a signing key is configured but the OS secret
+# store has no GPG passphrase for gpg-warm-agent to preset. Silent when there
+# is nothing actionable (no signing key, or no secret-store backend).
+# Usage: gpg_warm_cta
+gpg_warm_cta() {
+  _gpg_key=$(git config --get user.signingkey 2>/dev/null || true)
+  [ -n "$_gpg_key" ] || return 0
+  if command -v security >/dev/null 2>&1; then
+    security find-generic-password -s GPG_PASSPHRASE -a dotfiles >/dev/null 2>&1 && return 0
+    _store_cmd="security add-generic-password -s GPG_PASSPHRASE -a dotfiles -w 'YOUR_PASSPHRASE' -U login.keychain"
+  elif command -v secret-tool >/dev/null 2>&1; then
+    [ -n "$(secret-tool lookup service GPG_PASSPHRASE account dotfiles 2>/dev/null)" ] && return 0
+    _store_cmd="secret-tool store --label='GPG passphrase' service GPG_PASSPHRASE account dotfiles"
+  else
+    return 0
+  fi
+  _WARN "GPG passphrase not in the OS secret store (or the keychain is locked) — TTY-less signing will fail once the agent cache goes cold"
+  _GUIDE "One-time setup for this machine (signing key $_gpg_key):"
+  _GUIDE "  $_store_cmd"
+  unset _gpg_key _store_cmd
+}

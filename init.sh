@@ -290,6 +290,10 @@ fi
 # Deploy dotfiles
 _STEP "Deploying dotfiles"
 ensure_dotter_dir "$DOTFILES_DIR"
+# Record this machine's pinentry before dotter reads local.toml — from inside
+# the pre_deploy hook the value would only land on the SECOND deploy, leaving
+# the first gpg-agent.conf render with a possibly-dangling default path.
+sh scripts/dotter/detect_pinentry.sh || true
 dotter deploy -f
 
 # Setup dotter-managed gitconfig via include (avoids conflicts with gh auth setup-git)
@@ -311,5 +315,9 @@ if command -v gh >/dev/null 2>&1; then
   _INFO "Configuring gh credential helper"
   gh auth setup-git 2>/dev/null || _WARN "not authenticated with gh yet"
 fi
+
+# Final next-step CTA — the deploy above already warned, but init output is
+# long and this is the last thing a fresh machine's user sees.
+gpg_warm_cta
 
 _OK "Done! Start a new zsh session: exec zsh"

@@ -639,5 +639,7 @@ elif command -v systemctl >/dev/null 2>&1 \
 fi
 # Belt-and-suspenders for headless deploys where launchd/systemd is absent.
 [ -x "$HOME/.local/bin/gpg-warm-agent" ] && "$HOME/.local/bin/gpg-warm-agent" || true
+# CTA: the one manual step per machine — store the passphrase for warming.
+gpg_warm_cta
 
 _STEP "Post-deploy validation complete"
