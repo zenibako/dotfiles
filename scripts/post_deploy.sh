@@ -599,4 +599,45 @@ trap - EXIT
 unset _oc_mcp_result _cc_mcp_result _oc_mcp_pid _cc_mcp_pid
 unset -f _check_opencode_mcps _check_claude_mcps
 
+_STEP "Post-deploy: GPG signing convergence"
+
+# ── GPG: valid pinentry + warm passphrase cache (TTY-less signing) ────────
+# detect_pinentry.sh runs pre-deploy; this validates the deployed result and
+# (re)arms the warming trigger so signing never needs a TTY.
+_gpg_conf="$HOME/.gnupg/gpg-agent.conf"
+if [ -f "$_gpg_conf" ]; then
+  _pinentry=$(sed -n 's/^pinentry-program[[:space:]]*//p' "$_gpg_conf" | tail -n 1)
+  if [ -n "$_pinentry" ] && [ ! -x "$_pinentry" ]; then
+    _WARN "gpg-agent.conf pinentry '$_pinentry' missing — GPG Suite's fixGpgHome will strip it at next login"
+  else
+    _OK "gpg-agent.conf pinentry is valid"
+  fi
+  unset _pinentry
+  # Pick up conf changes without dropping the agent's passphrase cache.
+  command -v gpgconf >/dev/null 2>&1 && gpgconf --reload gpg-agent 2>/dev/null || true
+fi
+if [ "$(uname)" = "Darwin" ]; then
+  _gpg_plist="$HOME/Library/LaunchAgents/com.dotfiles.gpg-warm.plist"
+  if [ -f "$_gpg_plist" ]; then
+    # RunAtLoad=true → reloading also warms the cache right now.
+    launchctl unload "$_gpg_plist" 2>/dev/null || true
+    if launchctl load "$_gpg_plist" 2>/dev/null; then
+      _OK "Loaded gpg-warm LaunchAgent"
+    else
+      _WARN "Could not load gpg-warm LaunchAgent (headless session?)"
+    fi
+  fi
+  unset _gpg_plist
+elif command -v systemctl >/dev/null 2>&1 \
+  && [ -f "$HOME/.config/systemd/user/gpg-warm.timer" ]; then
+  systemctl --user daemon-reload 2>/dev/null || true
+  if systemctl --user enable --now gpg-warm.timer 2>/dev/null; then
+    _OK "Enabled gpg-warm systemd timer"
+  else
+    _WARN "Could not enable gpg-warm timer (no user session bus?)"
+  fi
+fi
+# Belt-and-suspenders for headless deploys where launchd/systemd is absent.
+[ -x "$HOME/.local/bin/gpg-warm-agent" ] && "$HOME/.local/bin/gpg-warm-agent" || true
+
 _STEP "Post-deploy validation complete"

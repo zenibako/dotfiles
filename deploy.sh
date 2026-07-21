@@ -22,6 +22,10 @@ ensure_dotter_dir "$SCRIPT_DIR"
 # fresh, present global.toml when dotter reads it.
 regenerate_from_kcl "$SCRIPT_DIR"
 
+# Machine-local pinentry detection must also happen before dotter starts:
+# dotter reads local.toml at config-load time, same as global.toml above.
+sh scripts/dotter/detect_pinentry.sh || true
+
 # Tell the pre_deploy hook to skip its own regeneration — we just did it.
 export DOTTER_SKIP_KCL_REGEN=1
 

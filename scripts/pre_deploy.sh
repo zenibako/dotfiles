@@ -33,6 +33,12 @@ if [ ! -f "$LOCAL_CONFIG" ]; then
   exit 1
 fi
 
+# Pinentry detection for direct `dotter deploy` runs (deploy.sh already ran it
+# pre-load; from inside this hook a new value only takes effect next run).
+if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/scripts/dotter/detect_pinentry.sh" ]; then
+  sh "$REPO_ROOT/scripts/dotter/detect_pinentry.sh" || true
+fi
+
 get_var() {
   grep -E "^[[:space:]]*$1[[:space:]]*=" "$LOCAL_CONFIG" | tail -n 1 | cut -d '=' -f 2- | tr -d '"' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
 }

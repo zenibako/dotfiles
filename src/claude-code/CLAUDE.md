@@ -50,7 +50,7 @@ When automating a browser or investigating UI behavior, **prefer the cmux browse
 - **Commit style**: Conventional commits (e.g., `fix:`, `feat:`, `chore:`, `docs:`)
 - **Prefer MCPs over CLIs**: When available, use the Jujutsu, GitHub, and GitLab MCP tools instead of their command-line interfaces for better integration and error handling.
 - **Always commit changes**: Before moving on to another topic or task, commit all changes with an appropriate conventional commit message.
-- **GPG signing**: The `SessionStart` hook warms the GPG cache automatically. If signing still fails, run `gpg-preset-from-keychain` manually or ask the user to unlock GPG.
+- **GPG signing**: The gpg-agent passphrase cache is warmed automatically (dotfiles-managed `gpg-warm-agent`: login shells, a launchd/systemd 6h timer, and every deploy), so signing works without a TTY. If signing still fails, run `~/.local/bin/gpg-warm-agent` manually or ask the user to store the passphrase in the OS secret store (see comments in that script).
 
 ## Destructive Operations — Always Ask First
 

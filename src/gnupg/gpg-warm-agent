@@ -1,0 +1,46 @@
+#!/bin/sh
+# gpg-warm-agent — pre-seed gpg-agent's passphrase cache from the OS secret
+# store, so GPG signing works without a TTY (agents, hooks, launchd, SSH).
+#
+# Silent no-op whenever a prerequisite is missing, so it is safe to fire from
+# login shells, timers, and deploy hooks unconditionally.
+#
+# Secret setup (one-time per machine):
+#   macOS: security add-generic-password -s GPG_PASSPHRASE -a dotfiles -w 'PASSPHRASE' -U login.keychain
+#   Linux: secret-tool store --label='GPG passphrase' service GPG_PASSPHRASE account dotfiles
+#
+# Usage: gpg-warm-agent [key-id]
+#   Defaults to git's user.signingkey. Presets every keygrip of the key
+#   (primary + subkeys); preset entries live for max-cache-ttl (24h here),
+#   so the 6h warm cadence keeps the cache permanently hot.
+set -eu
+
+PATH="/opt/homebrew/bin:/usr/local/bin:/usr/local/MacGPG2/bin:$PATH"
+
+command -v gpg >/dev/null 2>&1 || exit 0
+command -v gpgconf >/dev/null 2>&1 || exit 0
+
+key="${1:-$(git config --get user.signingkey 2>/dev/null || true)}"
+[ -n "$key" ] || exit 0
+
+if command -v security >/dev/null 2>&1; then
+    passphrase="$(security find-generic-password -s GPG_PASSPHRASE -a dotfiles -w 2>/dev/null || true)"
+elif command -v secret-tool >/dev/null 2>&1; then
+    passphrase="$(secret-tool lookup service GPG_PASSPHRASE account dotfiles 2>/dev/null || true)"
+else
+    passphrase=""
+fi
+[ -n "$passphrase" ] || exit 0
+
+preset="$(gpgconf --list-dirs libexecdir)/gpg-preset-passphrase"
+[ -x "$preset" ] || exit 0
+
+# Requires allow-preset-passphrase in gpg-agent.conf (dotfiles-managed).
+gpg-connect-agent /bye >/dev/null 2>&1 || true
+
+gpg --batch --with-colons --with-keygrip --list-secret-keys "$key" 2>/dev/null \
+    | awk -F: '$1 == "grp" { print $10 }' \
+    | while read -r grip; do
+        [ -n "$grip" ] || continue
+        printf '%s' "$passphrase" | "$preset" --preset "$grip" >/dev/null 2>&1 || true
+    done

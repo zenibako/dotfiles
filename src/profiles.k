@@ -11,6 +11,7 @@ default = _shared.Profile {
         "out/shared/env.toml" = { target = "~/.config/shared/env.toml", type = "template" }
         "out/shared/completions.toml" = "~/.config/shared/completions.toml"
         "src/atuin/bin" = "~/.atuin/bin"
+        "src/gnupg/gpg-warm-agent" = { target = "~/.local/bin/gpg-warm-agent", type = "symbolic" }
         "out/atuin/config.toml" = "~/.config/atuin/config.toml"
         "out/iamb/config.toml" = "~/.config/iamb/config.toml"
         "out/pnpm/rc" = "~/.config/pnpm/rc"
@@ -197,6 +198,8 @@ linux = _shared.Profile {
     files = {
         "src/hypr" = "~/.config/hypr"
         "src/waybar" = "~/.config/waybar"
+        "src/gnupg/gpg-warm.service" = "~/.config/systemd/user/gpg-warm.service"
+        "src/gnupg/gpg-warm.timer" = "~/.config/systemd/user/gpg-warm.timer"
     }
     variables = {
         shell_bin_path = "/usr/bin"
@@ -209,6 +212,7 @@ mac = _shared.Profile {
         "src/aerospace/display-profile.sh" = { target = "~/.local/bin/aerospace-display-profile", type = "symbolic" }
         "out/aerospace-display-profile.conf" = "~/.config/aerospace/display-profile.conf"
         "src/gnupg/gpg-agent.conf" = { target = "~/.gnupg/gpg-agent.conf", type = "template" }
+        "src/gnupg/com.dotfiles.gpg-warm.plist" = { target = "~/Library/LaunchAgents/com.dotfiles.gpg-warm.plist", type = "template" }
         "src/colima/com.colima.autostart.plist" = { target = "~/Library/LaunchAgents/com.colima.autostart.plist", type = "template" }
     }
     variables = {

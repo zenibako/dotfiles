@@ -1,0 +1,11 @@
+# Dotfiles-managed gpg-agent cache warming cadence. Preset passphrases expire
+# at max-cache-ttl (24h); 6h keeps the cache permanently hot.
+[Unit]
+Description=Periodically warm gpg-agent passphrase cache
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=6h
+
+[Install]
+WantedBy=timers.target

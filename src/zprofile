@@ -1,2 +1,6 @@
 # Managed by dotfiles (symlinked from src/zprofile) — login-shell environment.
-eval "$(/opt/homebrew/bin/brew shellenv)"
+[ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Warm the gpg-agent passphrase cache in the background so signing works
+# without a TTY. Silent no-op when unconfigured (see src/gnupg/gpg-warm-agent).
+[ -x "$HOME/.local/bin/gpg-warm-agent" ] && ("$HOME/.local/bin/gpg-warm-agent" >/dev/null 2>&1 &)

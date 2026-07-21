@@ -1,0 +1,7 @@
+# Dotfiles-managed gpg-agent cache warming (see src/gnupg/gpg-warm-agent).
+[Unit]
+Description=Warm gpg-agent passphrase cache from the OS secret store
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/gpg-warm-agent
