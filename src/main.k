@@ -120,7 +120,7 @@ file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))
 # second CLI input.
 
 # If local.k declares `mcp_included`, derive the per-server boolean flags here
-# so the dotter templates (opencode.jsonc, claude mcp.json, etc.) see them.
+# so the dotter templates (opencode.json, claude mcp.json, etc.) see them.
 # This mirrors the expansion done for global profiles in src/profiles.k.
 _local_variables = mcp_shared.expand_mcp_included(local.variables)
 

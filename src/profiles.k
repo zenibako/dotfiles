@@ -34,7 +34,7 @@ default = _shared.Profile {
         # Rendered to a private staging file; post_deploy.sh merges it into the
         # live config (post-deploy secret injection rewrites the live file, so
         # dotter must not own it directly). See merge_json_config.py.
-        "out/opencode.jsonc" = { target = "~/.cache/dotfiles/opencode.rendered.jsonc", type = "template" }
+        "out/opencode.json" = { target = "~/.cache/dotfiles/opencode.rendered.json", type = "template" }
         "src/opencode/script" = { target = "~/.config/opencode/script", type = "symbolic" }
         "src/opencode/skills" = { target = "~/.config/opencode/skills", type = "symbolic" }
         # Rendered to a private staging file dotter owns exclusively;

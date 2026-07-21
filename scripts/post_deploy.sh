@@ -112,8 +112,8 @@ _merge_config "$HOME/.cache/dotfiles/claude_code_mcp.rendered.json" \
 # them wholesale — otherwise entries removed/renamed in the KCL roster linger
 # in the live file forever via the deep-merge (e.g. the stale `lua_ls` key
 # that survived the lua_ls -> lua-ls rename).
-_merge_config "$HOME/.cache/dotfiles/opencode.rendered.jsonc" \
-  "$HOME/.config/opencode/opencode.jsonc" \
+_merge_config "$HOME/.cache/dotfiles/opencode.rendered.json" \
+  "$HOME/.config/opencode/opencode.json" \
   --replace mcp --replace provider --replace agent --replace lsp
 unset -f _merge_config
 unset _rendered _live
@@ -282,7 +282,7 @@ _inject_github_token "$HOME/Library/Application Support/Claude/claude_desktop_co
 _inject_github_token "$HOME/Library/Application Support/Claude/settings.json"
 
 # OpenCode MCP config — GitHub token injected first (doesn't need secret cache)
-_opencode_config="$HOME/.config/opencode/opencode.jsonc"
+_opencode_config="$HOME/.config/opencode/opencode.json"
 if [ -f "$_opencode_config" ] && command -v "$PYTHON" >/dev/null 2>&1; then
   _patch_args=""
   _tok=$(_gh_token) && _patch_args="$_patch_args --github-token $_tok"
@@ -445,7 +445,7 @@ _check_claude_mcps() {
 
 _oc_mcp_result=""; _oc_mcp_pid=""
 _cc_mcp_result=""; _cc_mcp_pid=""
-if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.jsonc" ]; then
+if command -v opencode >/dev/null 2>&1 && [ -f "$DEPLOYED/opencode/opencode.json" ]; then
   _oc_mcp_result=$(mktemp)
   _check_opencode_mcps > "$_oc_mcp_result" 2>&1 &
   _oc_mcp_pid=$!

@@ -159,7 +159,7 @@ def main():
         ("gitlogue/config.toml", "gitlogue config", check_toml_parses),
         ("pnpm/rc", "pnpm config", check_file_exists),
         ("gitconfig", "gitconfig", check_template_file),
-        ("opencode.jsonc", "opencode config", check_template_file),
+        ("opencode.json", "opencode config", check_template_file),
         ("claude_desktop_config.json", "Claude Desktop config", check_template_file),
         ("claude-code/settings.json", "Claude Code settings", check_template_file),
         ("claude-code/mcp.json", "Claude Code MCP config", check_template_file),

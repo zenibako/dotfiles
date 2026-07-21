@@ -5,7 +5,7 @@ Companion to validate_lsp.lua (which exercises Neovim attachments in a live
 headless session). This script covers the two agent CLIs where a live
 attachment test isn't practical:
 
-- OpenCode: parses the deployed ~/.config/opencode/opencode.jsonc `lsp`
+- OpenCode: parses the deployed ~/.config/opencode/opencode.json `lsp`
   section, checks each enabled server's binary resolves, and flags duplicate
   entries (underscore/hyphen key drift, two keys sharing one binary).
 - Claude Code: reads enabledPlugins from ~/.claude/settings.json, resolves
@@ -51,7 +51,7 @@ def _header(title: str) -> None:
 
 
 HOME = Path.home()
-OPENCODE_CONFIG = HOME / ".config/opencode/opencode.jsonc"
+OPENCODE_CONFIG = HOME / ".config/opencode/opencode.json"
 CLAUDE_SETTINGS = HOME / ".claude/settings.json"
 PLUGIN_CATALOG = HOME / ".claude/plugins/plugin-catalog-cache.json"
 CLAUDE_SKILLS_DIR = HOME / ".claude/skills"
@@ -144,13 +144,13 @@ def validate_opencode() -> dict[str, str]:
     """Returns {normalized server name: language or ''} for covered servers."""
     _header("OpenCode LSP Validation")
     if not OPENCODE_CONFIG.is_file():
-        _row("⊘", "opencode.jsonc", "not deployed")
+        _row("⊘", "opencode.json", "not deployed")
         return {}
 
     try:
         cfg = json.loads(_strip_jsonc(OPENCODE_CONFIG.read_text()))
     except (json.JSONDecodeError, OSError) as e:
-        _row("⚠", "opencode.jsonc", f"unparseable: {e}")
+        _row("⚠", "opencode.json", f"unparseable: {e}")
         return {}
 
     lsp = cfg.get("lsp", {})

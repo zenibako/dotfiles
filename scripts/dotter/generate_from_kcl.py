@@ -62,6 +62,33 @@ def _resolve_template_value(value):
     return value
 
 
+def _write_json(data, out_path):
+    """Write data as clean JSON with indentation and trailing newline.
+
+    KCL hands us the config as text with a leading /** ... */ header comment.
+    Strip it and re-parse, so what lands on disk is a JSON object rather than
+    a JSON-encoded string — and so malformed output fails here, not at deploy.
+    """
+    if isinstance(data, str):
+        lines = data.strip().split("\n")
+        start = 0
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped == "*/":
+                start = i + 1
+                break
+            if stripped in ("{", "["):
+                start = i
+                break
+        data = json.loads("\n".join(lines[start:]))
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+    print(f"  {_GY}Wrote{_X} {out_path}")
+
+
 def _write_raw_text(content, out_path, *, strip_trailing_newline=False):
     """Write raw text content verbatim."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -354,9 +381,9 @@ def main():
     if brew.get("data"):
         _write_brewfile(brew["data"], OUT_DIR / brew["path"])
 
-    # 7. JSONC files (text with JSON + header comment)
+    # 7. opencode.json (clean JSON)
     if cfg.get("opencode"):
-        _write_raw_text(cfg["opencode"], OUT_DIR / "opencode.jsonc")
+        _write_json(cfg["opencode"], OUT_DIR / "opencode.json")
 
     print(f"  {_G}✓{_X} Done")
 
