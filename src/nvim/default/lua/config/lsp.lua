@@ -99,7 +99,7 @@ vim.lsp.enable({
   "html",
   "jsonls",
   "kcl-lsp",
-  "kotlin",
+  "kotlin-lsp",
   "lua-ls",
   "pkl-lsp",
   "starlark-rust",

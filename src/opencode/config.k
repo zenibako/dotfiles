@@ -13,6 +13,10 @@ _lsp = {
         "command" = ["basedpyright-langserver", "--stdio"]
         "extensions" = [".py"]
     }
+    "cue" = {
+        "command" = ["cue", "lsp"]
+        "extensions" = [".cue"]
+    }
     "gopls" = {
         "command" = ["gopls"]
         "extensions" = [".go"]
@@ -25,49 +29,43 @@ _lsp = {
         "command" = ["vscode-json-language-server", "--stdio"]
         "extensions" = [".json", ".jsonc"]
     }
-    "lua-ls" = {
-        "command" = ["lua-language-server"]
-        "extensions" = [".lua"]
-    }
-    "yamlls" = {
-        "command" = ["yaml-language-server", "--stdio"]
-        "extensions" = [".yml", ".yaml"]
-    }
-    "cue" = {
-        "command" = ["cue", "lsp"]
-        "extensions" = [".cue"]
-    }
-    "typescript-language-server" = {
-        "command" = ["typescript-language-server", "--stdio"]
-        "extensions" = [".ts", ".tsx", ".js", ".jsx"]
-    }
     "kcl-lsp" = {
         "command" = ["kcl-language-server"]
         "extensions" = [".k", ".kcl"]
     }
-    "taplo" = {
-        "command" = ["taplo", "lsp", "stdio"]
-        "extensions" = [".toml"]
+    "kotlin-lsp" = {
+        "command" = ["kotlin-lsp", "--stdio"]
+        "extensions" = [".kt", ".kts"]
+    }
+    "lua-ls" = {
+        "command" = ["lua-language-server"]
+        "extensions" = [".lua"]
     }
     "pkl-lsp" = {
         "command" = ["pkl-lsp"]
         "extensions" = [".pkl"]
     }
-    # The starlark-rust brew formula installs its binary as `starlark`.
     "starlark-rust" = {
         "command" = ["starlark", "--lsp"]
         "extensions" = [".star", ".bzl"]
     }
-    # New-generation Apex LSP prototype (forcedotcom/apex-language-support),
-    # extracted from the VSIX into ~/.local/share/apex-language-server/.
-    # Replaces jorje for OpenCode (jorje below stays disabled) — the Node stdio
-    # server works reliably where the raw java launcher did not. Inert on
-    # machines without the wrapper (OpenCode skips LSPs whose command is missing).
+    "taplo" = {
+        "command" = ["taplo", "lsp", "stdio"]
+        "extensions" = [".toml"]
+    }
+    "typescript-language-server" = {
+        "command" = ["typescript-language-server", "--stdio"]
+        "extensions" = [".ts", ".tsx", ".js", ".jsx"]
+    }
+    "yamlls" = {
+        "command" = ["yaml-language-server", "--stdio"]
+        "extensions" = [".yml", ".yaml"]
+    }
+    # Apex LSP entries (disabled by default)
     "apex-ls" = {
         "command" = ["~/.local/share/apex-language-server/apex-ls-stdio.sh"]
         "extensions" = [".cls", ".trigger", ".apex"]
     }
-    # Work profile LSPs (disabled by default)
     "apex-language-server" = {
         "command" = [
             "java",
@@ -83,6 +81,12 @@ _lsp = {
             "enableSemanticErrors" = True
             "enableCompletionStatistics" = False
         }
+    }
+    # Work profile LSPs (disabled by default)
+    "jinja-lsp" = {
+        "command" = ["jinja-lsp"]
+        "extensions" = [".jinja", ".jinja2"]
+        "disabled" = True
     }
     "lwc-language-server" = {
         "command" = ["~/.config/opencode/script/lwc-lsp-wrapper.sh"]
@@ -105,14 +109,19 @@ _lsp = {
         "disabled" = True
     }
     # Personal profile LSPs (disabled by default)
-    "jinja-lsp" = {
-        "command" = ["jinja-lsp"]
-        "extensions" = [".jinja", ".jinja2"]
+    "lwp-lsp" = {
+        "command" = ["lwp-lsp"]
+        "extensions" = [".lwp", ".lwp.json"]
         "disabled" = True
     }
     "sourcekit-lsp" = {
         "command" = ["sourcekit-lsp"]
         "extensions" = [".swift"]
+        "disabled" = True
+    }
+    "jorje" = {
+        "command" = ["python", "-m", "jorje", "lsp", "--stdio"]
+        "extensions" = [".apex", ".aura", "*.cls", "*.trigger", "*.md", "package.md"]
         "disabled" = True
     }
 }
@@ -273,7 +282,7 @@ opencode = {
 }
 
 # JSONC output helper — writes a dict as JSON with a header comment
-_jsonc_header = """/**
+_jsonc_header = """**
  * # PREREQUISITES:
  * - OpenCode CLI: https://opencode.ai/docs/cli/installation
  * - `npm install`

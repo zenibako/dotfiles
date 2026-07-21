@@ -59,9 +59,10 @@ local install_hints = {
   ["lwc-language-server"]  = { binary = "lwc-language-server", manager = "npm", cmd = "npm install -g @salesforce/lwc-language-server" },
   ["terraform-ls"]         = { binary = "terraform-ls", manager = "brew", cmd = "brew install hashicorp/tap/terraform-ls" },
   ["visualforce-language-server"] = { binary = "visualforceServer.js", manager = "vscode", cmd = "Install Salesforce Extension Pack in VS Code" },
-  ["tsc"]                  = { binary = "typescript", manager = "npm", cmd = "npm install -g typescript" },
   ["kcl-language-server"]  = { binary = "kcl-language-server", manager = "brew", cmd = "brew install kcl-lang/tap/kcl-lsp" },
+  ["kotlin-lsp"]           = { binary = "kotlin-lsp", manager = "brew", cmd = "brew install jetbrains/kotlin-kotlinlang/kotlin-lsp" },
   ["apex_ls"]              = { binary = "apex-ls-stdio.sh", manager = "local", cmd = "Local prototype — see ~/.local/share/apex-language-server/" },
+  ["tsc"]                  = { binary = "typescript", manager = "npm", cmd = "npm install -g typescript" },
 }
 
 -- Test file definitions per LSP
@@ -140,6 +141,11 @@ local lsp_tests = {
     filetype = "jinja",
     filename = "test.jinja",
     content = "{{ variable }}\n",
+  },
+  kotlin = {
+    filetype = "kotlin",
+    filename = "MyClass.kt",
+    content = 'interface MyInterface\n\ninterface Impl : MyInterface {}\n\nobject impl : Impl {}\n',
   },
   ["apex-language-server"] = {
     filetype = "apex",

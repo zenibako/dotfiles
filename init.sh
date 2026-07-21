@@ -271,7 +271,7 @@ fi
 # Regenerate dotter configs from KCL source of truth
 echo "Regenerating configs from KCL..."
 if command -v kcl >/dev/null 2>&1; then
-    mkdir -p generated
+    mkdir -p out
     # Resolve local.k at the repo root
     if [ -f local.k ]; then
         LOCAL_K="local.k"
