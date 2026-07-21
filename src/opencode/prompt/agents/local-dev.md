@@ -18,7 +18,7 @@ You implement exactly the change the caller specifies, then commit it. Nothing m
 
 ## Rules
 
-- VCS via CLI only (`jj`, `git`) — you have no MCP tools.
+- VCS **reads** (`status`, `diff`, `log`, `show`) — use the Jujutsu MCP tools; they return structured output. VCS **writes** — commit, and any `edit`/`restore`/`new` during conflict resolution — go through the `jj` CLI via bash, so the `$AI_CO_AUTHOR` trailer and the conflict skill apply. `git` (CLI, no MCP tools here) is the fallback only when there is no `.jj` directory.
 - Never push and never create PRs; the caller decides that.
 - Never use `--force`, `jj abandon`, or history-rewriting flags; if a push or rewrite seems required, return `DEV: BLOCKED` and say why.
 - Touch only files inside the stated scope.

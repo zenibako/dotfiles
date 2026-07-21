@@ -195,6 +195,15 @@ _mcp_only = lambda keep: [str] -> {str:str} {
     | {_sanitize_mcp(k) + "*": "allow" for k in keep}
 }
 
+# local-dev's curated Jujutsu MCP slice: read-only inspection only. These are
+# the high-frequency orient/verify calls where structured tool output beats
+# parsing CLI text and there is no shell-quoting risk. Every *mutation* stays on
+# the `jj` CLI via bash: `commit` needs the AI_CO_AUTHOR trailer (injected only
+# into the bash tool env by the ai-coauthor plugin's shell.env hook — an MCP
+# call runs jj with no shell and would silently drop it), and the
+# jj-sequential-conflict-resolution skill drives edit/restore/new in CLI terms.
+_local_dev_jj_read_tools = ["status", "diff", "log", "show"]
+
 # Agent config
 _agent = {
     "build" = {
@@ -253,10 +262,20 @@ _agent = {
         "mode" = "subagent"
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-dev")
-        # CLI-first for the small local model: no MCP servers at all. The
-        # Jujutsu MCP alone is ~60 tool schemas per request — `jj` via bash
-        # costs none. Skills stay at default (radar + jj conflict workflow).
-        "permission" = _deny_all_mcp
+        # Deny every MCP server, then re-allow a curated read-only slice of the
+        # Jujutsu MCP. Order is load-bearing: opencode resolves a tool's schema
+        # with findLast over config order (permission/index.ts `fromConfig`
+        # preserves object insertion order; a schema is stripped only when the
+        # tool's LAST matching rule is a string-form `*` deny). The allow keys
+        # merge AFTER _deny_all_mcp, so each named jj tool's last match is its
+        # allow (schema kept) while every other Jujutsu tool's last match stays
+        # `Jujutsu*: deny` (stripped) — ~4 schemas instead of the ~60 the full
+        # server adds. Mutations (commit/edit/restore/new) stay on `jj` via
+        # bash; see the _local_dev_jj_read_tools note above.
+        "permission" = _deny_all_mcp | {
+            _sanitize_mcp("Jujutsu") + "_" + _sanitize_mcp(t): "allow"
+            for t in _local_dev_jj_read_tools
+        }
     }
 }
 
