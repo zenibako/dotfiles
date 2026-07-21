@@ -78,6 +78,7 @@ file.write("out/config.json", json.encode(config, indent=2))
 
 # ── Write text files directly (no Python needed) ──────────────────────
 file.write("out/ghostty/config", ghostty_mod.ghostty)
+file.write("out/aerospace-display-profile.conf", aerospace_mod.display_profile_conf)
 file.write("out/gitconfig", gitconfig_mod.gitconfig)
 file.write("out/pnpm/rc", pnpm_mod.pnpm.rc or "")
 file.write("out/tmux.conf", tmux_mod.tmux._full_text)

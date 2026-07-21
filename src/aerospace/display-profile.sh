@@ -2,7 +2,9 @@
 # aerospace-display-profile — apply per-monitor root layouts to AeroSpace
 # workspaces.
 #
-# Policy (edit layout_for_monitor below to tune):
+# Policy is declared in KCL (src/aerospace/main.k) and deployed to
+# ~/.config/aerospace/display-profile.conf; the defaults below only apply
+# when that file is missing:
 #   built-in laptop display  -> h_accordion (stacking; small screen)
 #   any external monitor     -> h_tiles     (side-by-side tiling)
 #
@@ -22,10 +24,16 @@ PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/aerospace"
 STATE_FILE="$CACHE_DIR/display-profile.state"
 
+BUILTIN_LAYOUT="h_accordion"
+EXTERNAL_LAYOUT="h_tiles"
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/aerospace/display-profile.conf"
+# shellcheck source=/dev/null
+[ -f "$CONF" ] && . "$CONF"
+
 layout_for_monitor() {
     case "$1" in
-        *[Bb]uilt-in*) echo "h_accordion" ;;
-        *) echo "h_tiles" ;;
+        *[Bb]uilt-in*) echo "$BUILTIN_LAYOUT" ;;
+        *) echo "$EXTERNAL_LAYOUT" ;;
     esac
 }
 

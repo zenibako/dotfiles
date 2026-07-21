@@ -207,6 +207,7 @@ mac = _shared.Profile {
     files = {
         "out/aerospace.toml" = "~/.aerospace.toml"
         "src/aerospace/display-profile.sh" = { target = "~/.local/bin/aerospace-display-profile", type = "symbolic" }
+        "out/aerospace-display-profile.conf" = "~/.config/aerospace/display-profile.conf"
         "src/gnupg/gpg-agent.conf" = { target = "~/.gnupg/gpg-agent.conf", type = "template" }
         "src/colima/com.colima.autostart.plist" = { target = "~/Library/LaunchAgents/com.colima.autostart.plist", type = "template" }
     }
