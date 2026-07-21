@@ -111,6 +111,7 @@ SERVER_LANGUAGE = {
     "swift-lsp": "swift",
     "jinja-lsp": "jinja",
     "clangd-lsp": "c/c++",
+    "kotlin-lsp": "kotlin",
 }
 
 
@@ -290,9 +291,34 @@ def validate_claude_code() -> dict[str, str]:
     return covered
 
 
+def _nvim_cmd_binary(path: Path) -> str | None:
+    """First literal cmd[1] in a Neovim lsp/*.lua config (`cmd = { "bin", … }`).
+
+    Returns None when cmd is built dynamically — a variable or runtime-assembled
+    invocation, e.g. apex jorje's `config.cmd = { java, … }` (the brace line has
+    no literal) or the lwc `cmd = { wrapper }` — so callers can leave those
+    servers covered rather than guess at a binary that isn't spelled out.
+    """
+    try:
+        for line in path.read_text().splitlines():
+            m = re.search(r'cmd\s*=\s*\{\s*"([^"]+)"', line)
+            if m:
+                return m.group(1)
+    except OSError:
+        return None
+    return None
+
+
 def detect_nvim_servers() -> dict[str, str]:
     covered: dict[str, str] = {}
     for f in sorted(NVIM_LSP_DIR.glob("*.lua")) if NVIM_LSP_DIR.is_dir() else []:
+        binary = _nvim_cmd_binary(f)
+        # A literal cmd[1] we can resolve gates coverage on the binary actually
+        # being installed, so the matrix reflects installation and not just that
+        # a config file was deployed (e.g. kotlin-lsp.lua present, binary absent).
+        # A dynamic cmd (binary is None) stays covered — we can't verify it here.
+        if binary is not None and not _binary_ok(binary):
+            continue
         covered[_norm(f.stem)] = SERVER_LANGUAGE.get(_norm(f.stem), "")
 
     # Servers enabled outside lsp/*.lua (mirrors config/lsp.lua + the local

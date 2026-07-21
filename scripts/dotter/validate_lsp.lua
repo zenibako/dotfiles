@@ -142,7 +142,10 @@ local lsp_tests = {
     filename = "test.jinja",
     content = "{{ variable }}\n",
   },
-  kotlin = {
+  -- Keyed by the enabled config name (kotlin-lsp), NOT the filetype (kotlin);
+  -- the lookup is lsp_tests[lsp_name], so a "kotlin" key would never match and
+  -- the server would fall through to "no test mapping".
+  ["kotlin-lsp"] = {
     filetype = "kotlin",
     filename = "MyClass.kt",
     content = 'interface MyInterface\n\ninterface Impl : MyInterface {}\n\nobject impl : Impl {}\n',
@@ -372,7 +375,7 @@ for _, lsp_name in ipairs(enabled_lsps) do
 end
 
 -- Print results
-print("\n==> LSP Validation Results")
+print("\n==> Neovim LSP Validation")
 local ok_count, warn_count, skip_count = 0, 0, 0
 
 for _, r in ipairs(results) do
