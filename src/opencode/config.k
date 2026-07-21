@@ -282,7 +282,7 @@ opencode = {
 }
 
 # JSONC output helper — writes a dict as JSON with a header comment
-_jsonc_header = """**
+_jsonc_header = """/**
  * # PREREQUISITES:
  * - OpenCode CLI: https://opencode.ai/docs/cli/installation
  * - `npm install`
