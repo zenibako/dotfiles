@@ -229,6 +229,46 @@ _mcp_only = lambda keep: [str] -> {str:str} {
 # jj-sequential-conflict-resolution skill drives edit/restore/new in CLI terms.
 _local_dev_jj_read_tools = ["status", "diff", "log", "show"]
 
+# MCP *resource* plumbing. opencode ships these three regardless of whether any
+# MCP server is reachable, so they are dead weight for any agent that denies
+# servers wholesale. Verified against captured requests, not guessed.
+# CAVEAT (measured 2026-07-22, opencode 1.18.4): denying these strips them for
+# `local`, which allows no MCP tools at all, but NOT for `local-dev`, which
+# allows four Jujutsu_* tools — there they stay in the request despite the deny.
+# Isolated by re-measuring with the skill ruleset removed; the skill rules are
+# not the cause. Root cause unconfirmed; the likely shape is that opencode
+# force-includes resource tools whenever any MCP tool survives for the agent.
+# The denies are kept because they are correct intent and do work for `local`.
+_mcp_resource_tools = [
+    "list_mcp_resources"
+    "read_mcp_resource"
+    "list_mcp_resource_templates"
+]
+
+# Skills local-dev keeps. Everything else is filtered out of <available_skills>
+# by a `{"*": "deny", <name>: "allow"}` ruleset — the same deny-then-allow,
+# order-sensitive findLast resolution the MCP patterns use (verified: a captured
+# local-dev request went from 52 skills / 30,014 chars to exactly the named set).
+# The wildcard matters more than the savings: the global catalogs under
+# ~/.agents/skills and ~/.opencode/skills change whenever a skill is installed,
+# and enumerating the denied names here would rot immediately.
+#
+# Kept: the Lattice *atoms* that govern how code gets written, plus the two
+# workflow skills local-dev's own prompt references. Deliberately dropped: every
+# `*-refiner` and `lattice-init` (interactive setup conversations), the
+# requirement/design/review molecules (orchestrator and PM work, not
+# implementation), and the Cloudflare/wiki/validate catalogs (project-specific;
+# a subagent handed a precise brief does not browse for them).
+_local_dev_skills = [
+    "clean-code"
+    "secure-coding"
+    "architecture"
+    "test-quality"
+    "domain-driven-design"
+    "jj-sequential-conflict-resolution"
+    "radar-navigation"
+]
+
 # Built-in tools the `local` orchestrator is denied, on top of edit/bash/skill.
 # Names are the literal tool ids opencode sends (verified against a captured
 # /v1/chat/completions request, not guessed — a misspelled id silently no-ops).
@@ -244,10 +284,7 @@ _local_router_denied_tools = [
     "grep"
     "glob"
     "webfetch"
-    "list_mcp_resources"
-    "read_mcp_resource"
-    "list_mcp_resource_templates"
-]
+] + _mcp_resource_tools
 
 # Agent config
 _agent = {
@@ -319,9 +356,16 @@ _agent = {
         # `Jujutsu*: deny` (stripped) — ~4 schemas instead of the ~60 the full
         # server adds. Mutations (commit/edit/restore/new) stay on `jj` via
         # bash; see the _local_dev_jj_read_tools note above.
+        # The skills catalog, not the tool schemas, dominated this agent's
+        # context: 52 skills / ~7,500 tokens of a ~16,000-token request. Scoping
+        # it to _local_dev_skills and dropping the dead MCP-resource tools and
+        # webfetch (it implements from a brief; it does not browse) roughly
+        # halves the footprint.
         "permission" = _deny_all_mcp | {
             _sanitize_mcp("Jujutsu") + "_" + _sanitize_mcp(t): "allow"
             for t in _local_dev_jj_read_tools
+        } | {t: "deny" for t in _mcp_resource_tools} | {"webfetch" = "deny"} | {
+            "skill" = {"*" = "deny"} | {s: "allow" for s in _local_dev_skills}
         }
     }
 }
