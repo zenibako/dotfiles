@@ -346,7 +346,18 @@ _agent = {
     # standing declaration of intent: if that behaviour is fixed, or if a new
     # MCP server starts leaking tools into this agent, the wildcards apply
     # without anyone having to rediscover the problem.
+    #
+    # `model` is pinned for the same reason every other local agent pins it:
+    # without it explore inherits the *session* model, so running the
+    # orchestrator on the 27B dragged explore onto it too. That does not fit —
+    # the 27B's fitted window is 11,776 tokens, explore's fixed overhead is
+    # ~6,450, and compaction.reserved takes another 2,048, leaving ~3,300 for
+    # actual work. A single `read` of a 400-line file exceeds it, so the agent
+    # compacts, lands back at the threshold, and compacts again — observed
+    # looping at ~2 min per cycle. On the 9B's 32k the same overhead leaves
+    # ~24k of working room.
     "explore" = {
+        "model" = "{{opencode_local_agent_model}}"
         "permission" = _deny_all_mcp | {t: "deny" for t in _mcp_resource_tools}
     }
     "local-pm" = {
