@@ -218,6 +218,12 @@ mac = _shared.Profile {
     variables = {
         shell_bin_path = "/opt/homebrew/bin"
         gpg_pinentry_program = "/opt/homebrew/bin/pinentry-mac"
+
+        # Apple Silicon GPU wired-memory cap, in MiB. 0 = leave macOS's default
+        # (~75% of physical RAM) alone, which is right for every machine that
+        # isn't running a model too big for it. Set per-machine in local.k only
+        # when a local LLM needs more; see src/launchd/iogpu_wired_limit.k.
+        iogpu_wired_limit_mb = 0
     }
 }
 

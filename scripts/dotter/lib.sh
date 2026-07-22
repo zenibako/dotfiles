@@ -167,7 +167,7 @@ regenerate_from_kcl() {
 
   _STEP "Regenerating configs from KCL"
   cd "$root"
-  mkdir -p generated out out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
+  mkdir -p generated out out/launchd out/shared out/ghostty out/atuin out/jj out/iamb out/gitlogue out/pnpm out/claude-code out/kiro
 
   # Resolve the per-machine overrides file. It is gitignored and lives next to
   # main.k inside the KCL package; src/main.k pulls it in via `import local`.

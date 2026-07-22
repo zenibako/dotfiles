@@ -29,6 +29,7 @@ import zshenv
 import gitconfig as gitconfig_mod
 import local
 import _shared.mcp as mcp_shared
+import launchd.iogpu_wired_limit as iogpu_mod
 
 # Effective MCP inclusion list for this machine. local.k's `mcp_included` wins,
 # then the active dotter profile (personal/work), then none. This is used to
@@ -42,6 +43,14 @@ _kiro_eval = kiro_mod.kiro_config
 _claude_eval = claude.claude_config
 _claude_code_eval = claude_code._settings_json
 _zshenv_eval = zshenv._final_zshenv
+
+# GPU wired-memory daemon. Written for every machine so a value removed from
+# local.k renders an empty plist (post_deploy then skips), rather than leaving a
+# stale daemon behind. local.k wins, then the mac profile's 0 default.
+_iogpu_limit = local.variables.iogpu_wired_limit_mb \
+    if "iogpu_wired_limit_mb" in local.variables \
+    else (profiles.mac.variables.iogpu_wired_limit_mb if "mac" in local.packages else 0)
+file.write("out/launchd/" + iogpu_mod.label + ".plist", iogpu_mod.render(_iogpu_limit))
 
 # ── Assemble config data ──────────────────────────────────────────────
 config = _shared.ConfigMap {

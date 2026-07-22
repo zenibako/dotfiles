@@ -103,6 +103,13 @@ variables = {
     opencode_test_agent_model = ""
     opencode_local_agent_model = ""
 
+    # ── Apple Silicon GPU memory ──────────────────────────────────────
+    # MiB of unified memory macOS may wire for the GPU. 0 keeps the system
+    # default (~75% of RAM). Only raise it when a local model does not fit —
+    # see src/launchd/iogpu_wired_limit.k. Overshooting panics the machine;
+    # post_deploy.sh refuses any value leaving macOS under 4 GiB.
+    iogpu_wired_limit_mb = 0
+
     # ── MCP servers ───────────────────────────────────────────────────
     # Declare only the servers this machine should include. The per-server
     # `mcp_*_included` flags are derived automatically. See src/_shared/mcp.k.

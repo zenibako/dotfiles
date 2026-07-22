@@ -642,4 +642,62 @@ fi
 # CTA: the one manual step per machine — store the passphrase for warming.
 gpg_warm_cta
 
+_STEP "Post-deploy: GPU wired-memory limit"
+
+# ── iogpu.wired_limit_mb (Apple Silicon only) ─────────────────────────────
+# macOS caps GPU-wired unified memory at ~75% of RAM and resets it every boot.
+# A machine running a local model that does not fit under that cap opts in via
+# `iogpu_wired_limit_mb` in local.k; KCL renders a launchd daemon and this step
+# installs it. Machines at the default render an empty plist and skip.
+#
+# Requires root, so this NEVER prompts inside a deploy: it applies the change
+# only when sudo is already non-interactive, otherwise it prints the exact
+# commands and moves on. A deploy must not block on a password.
+_iogpu_label="tech.chanderson.iogpu-wired-limit"
+_iogpu_src="$REPO_ROOT/out/launchd/$_iogpu_label.plist"
+_iogpu_dst="/Library/LaunchDaemons/$_iogpu_label.plist"
+
+if [ "$(uname)" = "Darwin" ] && [ -s "$_iogpu_src" ]; then
+  _iogpu_want=$(sed -n 's/.*iogpu\.wired_limit_mb=\([0-9]*\).*/\1/p' "$_iogpu_src" | head -n 1)
+  _iogpu_total=$(( $(sysctl -n hw.memsize) / 1024 / 1024 ))
+  # Leave macOS at least 4 GiB. Above this the kernel panics rather than
+  # degrading, so this is a hard refusal, not a warning.
+  _iogpu_max=$(( _iogpu_total - 4096 ))
+
+  if [ -z "$_iogpu_want" ] || [ "$_iogpu_want" -le 0 ] 2>/dev/null; then
+    _SKIP "GPU wired limit (no value rendered)"
+  elif [ "$_iogpu_want" -gt "$_iogpu_max" ]; then
+    _ERR "iogpu_wired_limit_mb=$_iogpu_want exceeds the safe max ${_iogpu_max}MiB for ${_iogpu_total}MiB of RAM"
+    _GUIDE "Lower it in src/local.k. Values leaving macOS under 4 GiB panic the machine."
+  else
+    _iogpu_now=$(sysctl -n iogpu.wired_limit_mb 2>/dev/null || echo 0)
+    _iogpu_stale=1
+    [ -f "$_iogpu_dst" ] && cmp -s "$_iogpu_src" "$_iogpu_dst" && _iogpu_stale=0
+
+    if [ "$_iogpu_stale" = "0" ] && [ "$_iogpu_now" = "$_iogpu_want" ]; then
+      _OK "GPU wired limit ${_iogpu_want}MiB (daemon installed, live)"
+    elif sudo -n true 2>/dev/null; then
+      sudo install -m 644 -o root -g wheel "$_iogpu_src" "$_iogpu_dst" \
+        && sudo launchctl bootout system "$_iogpu_dst" 2>/dev/null
+      if sudo launchctl bootstrap system "$_iogpu_dst" 2>/dev/null \
+        || sudo sysctl -w "iogpu.wired_limit_mb=$_iogpu_want" >/dev/null 2>&1; then
+        _OK "GPU wired limit set to ${_iogpu_want}MiB (persists across reboot)"
+      else
+        _WARN "Installed the daemon but could not apply ${_iogpu_want}MiB this session"
+      fi
+    else
+      _WARN "GPU wired limit is ${_iogpu_now}MiB, want ${_iogpu_want}MiB (needs root)"
+      _GUIDE "sudo install -m 644 -o root -g wheel '$_iogpu_src' '$_iogpu_dst'"
+      _GUIDE "sudo launchctl bootstrap system '$_iogpu_dst'"
+    fi
+    unset _iogpu_now _iogpu_stale
+  fi
+  unset _iogpu_want _iogpu_total _iogpu_max
+elif [ "$(uname)" = "Darwin" ] && [ -f "$_iogpu_dst" ]; then
+  # Opted out after previously opting in — leave nothing stale behind.
+  _WARN "GPU wired limit no longer configured, but $_iogpu_dst is still installed"
+  _GUIDE "sudo launchctl bootout system '$_iogpu_dst' && sudo rm '$_iogpu_dst'"
+fi
+unset _iogpu_label _iogpu_src _iogpu_dst
+
 _STEP "Post-deploy validation complete"
