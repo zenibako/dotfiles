@@ -444,3 +444,4 @@ task() {
 export PATH="$PATH:/Users/chanderson/.lmstudio/bin"
 # End of LM Studio CLI section
 
+export ANDROID_HOME=/usr/local/share/android-commandlinetools
