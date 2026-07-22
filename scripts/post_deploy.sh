@@ -685,6 +685,13 @@ if [ "$(uname)" = "Darwin" ] && [ -s "$_iogpu_src" ]; then
       else
         _WARN "Installed the daemon but could not apply ${_iogpu_want}MiB this session"
       fi
+    elif [ "$_iogpu_now" = "$_iogpu_want" ]; then
+      # Right value, no daemon — the usual state after applying it by hand.
+      # Reporting this as a mismatch ("is 20480, want 20480") is nonsense; the
+      # only thing actually missing is persistence across reboot.
+      _WARN "GPU wired limit ${_iogpu_want}MiB is live but resets at reboot (daemon not installed; needs root)"
+      _GUIDE "sudo install -m 644 -o root -g wheel '$_iogpu_src' '$_iogpu_dst'"
+      _GUIDE "sudo launchctl bootstrap system '$_iogpu_dst'"
     else
       _WARN "GPU wired limit is ${_iogpu_now}MiB, want ${_iogpu_want}MiB (needs root)"
       _GUIDE "sudo install -m 644 -o root -g wheel '$_iogpu_src' '$_iogpu_dst'"
