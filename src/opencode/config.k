@@ -336,12 +336,18 @@ _agent = {
     # captured system prompt still opens "You are a file search specialist").
     # It ships a fixed roster — bash/glob/grep/read plus webfetch and the MCP
     # resource tools — and carries no skills section, so unlike local-dev there
-    # is no catalog to trim; webfetch is the only real win. `bash` stays: `rg`
-    # and `fd` are how a search agent earns its keep.
+    # is no catalog to trim. `bash` stays: `rg` and `fd` are how a search agent
+    # earns its keep. `webfetch` stays too: exploration legitimately runs into
+    # docs and URLs, and ~320 tokens is a cheap price for that.
+    #
+    # NOTE: as of opencode 1.18.4 this block has no measurable effect — explore
+    # already surfaced no MCP server tools, and the _mcp_resource_tools deny
+    # does not strip for subagents (see the caveat above). It is kept as the
+    # standing declaration of intent: if that behaviour is fixed, or if a new
+    # MCP server starts leaking tools into this agent, the wildcards apply
+    # without anyone having to rediscover the problem.
     "explore" = {
-        "permission" = _deny_all_mcp \
-            | {t: "deny" for t in _mcp_resource_tools} \
-            | {"webfetch" = "deny"}
+        "permission" = _deny_all_mcp | {t: "deny" for t in _mcp_resource_tools}
     }
     "local-pm" = {
         "description" = "Local Project Management subagent that uses Backlog.md to write and read tasks"
