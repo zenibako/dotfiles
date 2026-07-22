@@ -207,6 +207,26 @@ _mcp_only = lambda keep: [str] -> {str:str} {
 # jj-sequential-conflict-resolution skill drives edit/restore/new in CLI terms.
 _local_dev_jj_read_tools = ["status", "diff", "log", "show"]
 
+# Built-in tools the `local` orchestrator is denied, on top of edit/bash/skill.
+# Names are the literal tool ids opencode sends (verified against a captured
+# /v1/chat/completions request, not guessed — a misspelled id silently no-ops).
+#   read/grep/glob/webfetch — its prompt already routes all discovery to the
+#     `explore` subagent; leaving them available invites the small model to
+#     accumulate context in the router instead of delegating (same failure mode
+#     that got `bash` denied).
+#   *_mcp_resource* — MCP resource plumbing, dead weight once _deny_all_mcp has
+#     denied every server; opencode ships them regardless.
+# Leaves exactly `task` (delegation) and `todowrite` (pipeline tracking).
+_local_router_denied_tools = [
+    "read"
+    "grep"
+    "glob"
+    "webfetch"
+    "list_mcp_resources"
+    "read_mcp_resource"
+    "list_mcp_resource_templates"
+]
+
 # Agent config
 _agent = {
     "build" = {
@@ -226,7 +246,9 @@ _agent = {
         # model's context as lean as possible. bash is denied too: with it
         # available, the small model bypasses the edit denial via sed/cat
         # instead of delegating to local-dev (observed with qwen3.5-9b).
-        "permission" = _deny_all_mcp | {"edit" = "deny", "bash" = "deny", "skill" = "deny"}
+        # Reading/searching/fetching go too — see _local_router_denied_tools.
+        "permission" = _deny_all_mcp | {"edit" = "deny", "bash" = "deny", "skill" = "deny"} \
+            | {t: "deny" for t in _local_router_denied_tools}
     }
     "tester" = {
         "description" = "Writes and runs tests via the project's own test runner and reports results"

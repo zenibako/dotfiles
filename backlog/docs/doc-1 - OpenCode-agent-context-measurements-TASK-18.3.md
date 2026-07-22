@@ -29,11 +29,15 @@ Findings for TASK-18.3 — validating that the per-agent MCP/permission scoping 
 |---|---|---|---|---|---|
 | build (baseline, all MCPs) | 150 (137 MCP) | 143.0 KB | 44.8 KB | 182.5 KB | ~46,700 |
 | local (deny all MCP + edit + skill) | 10 | 18.9 KB | 14.2 KB | 33.3 KB | ~8,500 |
+| local — router-only retune (2026-07-22) | 2 | 6.9 KB | 14.5 KB | 21.8 KB | ~5,600 |
 | local-pm (Backlog only + deny edit/skill) | 28 (20 MCP) | 29.4 KB | 13.4 KB | 42.0 KB | ~10,700 |
 | local-dev (deny all MCP) | 11 | 15.7 KB | 37.6 KB | 53.7 KB | ~13,700 |
 
 - (a) **Per-agent `permission: deny` reduces context tokens: CONFIRMED** — 71–82% request-size reduction vs the build baseline. The scoped rosters contained exactly the expected tools (local-pm: builtins + 20 Backlog tools; local-dev: 11 builtins, zero MCP).
 - (b) **Host-level MCP exclusion reduces context: CONFIRMED trivially** — excluded servers (Obsidian, Home Assistant) cannot appear in any request; unconnected/failed servers' tools were also absent from the build baseline.
+- **Router-only retune of `local` (measured 2026-07-22, opencode 1.18.4).** The original `local` roster was `glob, grep, read, webfetch, task, todowrite, list_mcp_resources, read_mcp_resource, list_mcp_resource_templates`. The three `*_mcp_resource*` tools ship regardless of `_deny_all_mcp` and are dead weight once every server is denied; `read/grep/glob/webfetch` contradict the agent's own "route discovery to `explore`" instruction. Denying all seven leaves `task` + `todowrite`: **9 → 2 tools, 14.0 → 6.9 KB of tool JSON, request 29.1 → 21.8 KB (−23%)**. Tool ids were taken from a captured request, not guessed — see the sanitization bug above for why that matters.
+- **The system prompt is now the larger half of `local`'s footprint** (14.5 KB of a 21.8 KB request). Further reduction has to come from opencode's base prompt, not from tool scoping.
+- Harness note: LM Studio normally holds 127.0.0.1:1234. To measure without stopping it, copy the deployed `~/.config/opencode/opencode.json`, repoint `provider.lmstudio.options.baseURL` at a free port, run the capture script on that port, and pass the copy via `OPENCODE_CONFIG`.
 - The captured system prompts contained the new agent prompt-file headers, confirming the `{file:~/.config/opencode/prompt/agents/*.md}` refs resolve.
 
 ## Recommendation
