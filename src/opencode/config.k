@@ -149,12 +149,23 @@ _provider = {
         "options" = {
             "baseURL" = "http://127.0.0.1:1234/v1"
         }
+        # `limit` is mandatory for local models: models.dev has no entry for an
+        # LM Studio model id, so opencode falls back to max_tokens=32000. The
+        # MLX engine reserves that entire output budget against the loaded
+        # context up front, so a ~6k-token prompt + 32k reserved needs ~38k and
+        # LM Studio rejects the request with "number of tokens to keep from the
+        # initial prompt is greater than the context length" — even though the
+        # prompt itself is tiny. `context` must not exceed the context length
+        # the model is actually loaded with in LM Studio (per-model load
+        # setting); `output` is the real ceiling on a reply.
         "models" = {
             "qwen3.5-9b" = {
                 "name" = "Qwen 3.5 9B"
+                "limit" = {"context" = 32768, "output" = 8192}
             }
             "qwen3.6-27b" = {
                 "name" = "Qwen 3.6 27B"
+                "limit" = {"context" = 32768, "output" = 8192}
             }
         }
     }
