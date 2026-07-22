@@ -232,13 +232,14 @@ _local_dev_jj_read_tools = ["status", "diff", "log", "show"]
 # MCP *resource* plumbing. opencode ships these three regardless of whether any
 # MCP server is reachable, so they are dead weight for any agent that denies
 # servers wholesale. Verified against captured requests, not guessed.
-# CAVEAT (measured 2026-07-22, opencode 1.18.4): denying these strips them for
-# `local`, which allows no MCP tools at all, but NOT for `local-dev`, which
-# allows four Jujutsu_* tools — there they stay in the request despite the deny.
-# Isolated by re-measuring with the skill ruleset removed; the skill rules are
-# not the cause. Root cause unconfirmed; the likely shape is that opencode
-# force-includes resource tools whenever any MCP tool survives for the agent.
-# The denies are kept because they are correct intent and do work for `local`.
+# CAVEAT (measured 2026-07-22, opencode 1.18.4): the deny strips them for the
+# primary agent `local`, but not for the subagents `local-dev` or `explore` —
+# there they stay in the request regardless. The split is primary vs subagent,
+# not MCP-related: `explore` allows no MCP tools at all and still keeps them,
+# and a string deny of `webfetch` in the same ruleset *does* strip for both
+# subagents. Not the skill ruleset either (isolated by re-measuring without it).
+# Root cause unconfirmed. Residual cost ~1,300 bytes (~330 tokens) per subagent
+# request. The denies stay: correct intent, and they do work for `local`.
 _mcp_resource_tools = [
     "list_mcp_resources"
     "read_mcp_resource"
@@ -329,6 +330,18 @@ _agent = {
         # Read-only (never edits files; keeps bash/read/grep for diffs) and scoped
         # to the Jujutsu + GitHub MCP servers; all other MCP tools denied.
         "permission" = {"edit" = "deny"} | _mcp_only(["Jujutsu", "GitHub"])
+    }
+    # opencode's built-in search subagent. Declaring only `permission` scopes it
+    # without replacing its built-in prompt or description (verified: the
+    # captured system prompt still opens "You are a file search specialist").
+    # It ships a fixed roster — bash/glob/grep/read plus webfetch and the MCP
+    # resource tools — and carries no skills section, so unlike local-dev there
+    # is no catalog to trim; webfetch is the only real win. `bash` stays: `rg`
+    # and `fd` are how a search agent earns its keep.
+    "explore" = {
+        "permission" = _deny_all_mcp \
+            | {t: "deny" for t in _mcp_resource_tools} \
+            | {"webfetch" = "deny"}
     }
     "local-pm" = {
         "description" = "Local Project Management subagent that uses Backlog.md to write and read tasks"
