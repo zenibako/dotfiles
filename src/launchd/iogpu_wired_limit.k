@@ -17,6 +17,11 @@
 # src/opencode/config.k — a wired limit and a limit.context that disagree
 # reproduce exactly that failure.
 #
+# Still worth keeping after moving to the 3-bit quant (11.27 GiB of weights).
+# That model would load at the macOS default — ~23,000 fitted tokens — so the
+# daemon is no longer load-bearing, but it is still worth ~10,000 tokens of KV
+# cache: ceiling 15.30 → 17.00 GiB takes the projection to ~32,900.
+#
 # SAFETY: overshooting starves the kernel and panics the machine rather than
 # merely slowing it down. scripts/post_deploy.sh refuses any value that leaves
 # macOS less than 4 GiB and will not apply it.

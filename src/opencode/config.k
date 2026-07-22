@@ -158,10 +158,28 @@ _provider = {
         # prompt itself is tiny. `context` must not exceed the context length
         # the model is actually loaded with in LM Studio (per-model load
         # setting); `output` is the real ceiling on a reply.
+        # SUBSTITUTION HAZARD — why every entry below shares one context limit.
+        # LM Studio serves whatever model is *resident* regardless of the `model`
+        # field in the request. With only the 27B loaded, a request saying
+        # "model": "qwen3.5-9b" is answered by the 27B and the log shows
+        # `[qwen3.6-27b] Running chat completion` — no error, no warning.
+        # opencode still budgets that session against the 9B's declared limit.
+        # That is not academic: it crashed a session on 2026-07-22. `explore`
+        # is pinned to the 9B, so opencode let its context grow toward 32,768,
+        # but the 27B was answering and died at its ~24,600-token wall with a
+        # Metal OOM, taking the whole backend down mid-task.
+        # Co-residency would fix the substitution but does not fit: the 27B
+        # (11 GB) plus the 8-bit 9B (9.7 GB) is ~20 GiB of weights against a
+        # 20 GiB wired limit, before any KV cache.
+        # So every model here carries the SMALLEST safe limit across the models
+        # that might actually answer. Raising one in isolation reintroduces the
+        # crash. If you ever load only the 9B and want its full window back,
+        # raise them together — or accept that the ceiling is set by whichever
+        # model is loaded, not by which one you asked for.
         "models" = {
             "qwen3.5-9b" = {
                 "name" = "Qwen 3.5 9B"
-                "limit" = {"context" = 32768, "output" = 8192}
+                "limit" = {"context" = 20480, "output" = 8192}
             }
             # 27B is memory-bound on a 24 GiB machine, and LM Studio loads it
             # through the mlx-vlm path (no KV-cache quantization available).
@@ -174,9 +192,47 @@ _provider = {
             # length": the cache layer keeps using `configured` while the engine
             # allocated `fitted`. Keep this at or below the LM Studio context
             # slider, and keep that at or below `fitted=`.
+            # Now the 3-bit MLX quant (leonsarmiento/Qwen3.6-27B-3bit-mlx),
+            # loaded under the SAME LM Studio identifier as the 4-bit it
+            # replaced — hence one entry, not two. Confirm which is actually
+            # resident with:
+            #   curl -s localhost:1234/api/v0/models | jq '.data[].publisher'
+            #
+            # THIS MODEL HAS NO AUTO-FIT. It loads through mlx_engine's
+            # `batched_model_kit`, which — unlike the plain MLX path the 4-bit
+            # used — emits no `[context_fit]` line and never clamps the context
+            # to what actually fits. Nothing sizes the KV cache against the GPU
+            # budget, so an over-long prompt does not fail with "the number of
+            # tokens to keep..."; it hard-crashes the Python backend:
+            #   [METAL] Command buffer execution failed: Insufficient Memory
+            #   (kIOGPUCommandBufferCallbackErrorOutOfMemory)
+            # There is therefore no `fitted=` to read, and the only source of
+            # truth is measurement. Probed 2026-07-22 (single-shot, temp 0):
+            #   9,016 / 22,516 prompt tokens -> OK
+            #   ~31,500 -> crashed at 78% of prompt processing, i.e. the wall is
+            #   at roughly 24,600 tokens of KV cache
+            #
+            # The earlier arithmetic (~32,900 fitted, from 12.1 GB of
+            # safetensors and the 4-bit's 182.5 KiB/token) was wrong twice over:
+            # file size is not resident size, and the per-token cost does not
+            # carry across quants or across engine paths. LM Studio also reports
+            # this model's quantization as "4bit" despite the name, and the repo
+            # ships a 128 kB config.json — mixed per-layer quant, not uniform
+            # 3-bit.
+            #
+            # 20480 sits ~4,000 tokens below the measured wall on purpose: the
+            # failure mode is a process death costing a manual reload, not a
+            # recoverable error, and KV cost varies with content while other
+            # apps compete for the same GPU budget.
+            #
+            # ALSO SET THE LM STUDIO CONTEXT SLIDER TO MATCH. It is loaded at
+            # 32,768 — above the hardware wall — so any conversation that grows
+            # past ~24,600 crashes the backend. The "Stop at limit" overflow
+            # policy only triggers at the *configured* length, so it cannot
+            # protect anything while that length is above what the GPU can hold.
             "qwen3.6-27b" = {
                 "name" = "Qwen 3.6 27B"
-                "limit" = {"context" = 10240, "output" = 4096}
+                "limit" = {"context" = 20480, "output" = 8192}
             }
         }
     }
@@ -229,6 +285,43 @@ _mcp_only = lambda keep: [str] -> {str:str} {
 # jj-sequential-conflict-resolution skill drives edit/restore/new in CLI terms.
 _local_dev_jj_read_tools = ["status", "diff", "log", "show"]
 
+# explore's read-only Backlog slice. The `local` orchestrator cannot afford the
+# Backlog server (see the `local` block), so task triage lands here — explore is
+# already the agent `local` delegates every "go find out X" question to, and on
+# the 9B it has the headroom. Read-only by construction: this is the complete
+# list of non-mutating Backlog tools, so no `task_create`/`task_edit`/
+# `task_complete`/`*_archive`/`*_upsert`, and nothing that touches milestones
+# (creating and reorganizing work stays a human decision). Cheap, too — the six
+# together are ~911 est. tokens, vs ~4,440 for the whole server, because the
+# write tools carry the big schemas (`task_edit` alone is ~1,351).
+_explore_backlog_read_tools = [
+    "task_list"
+    "task_search"
+    "task_view"
+    "document_list"
+    "document_search"
+    "document_view"
+]
+
+# local-pm's Backlog write slice. The read/write split across two agents is
+# forced by `local`'s 27B budget (see the `local` block): triage is
+# high-frequency and rides along with the discovery `explore` already does,
+# while writes are rare, deliberate, and expensive to get wrong — so they get
+# their own agent that is only spawned when the user actually asks for one.
+# `task_edit` alone is ~1,351 est. tokens, 30% of the whole Backlog server;
+# isolating it here keeps it out of every other agent's request.
+# `task_search`/`task_view` come along because the first step of writing a task
+# is checking it does not already exist.
+# Deliberately absent: `document_*` and `milestone_*` (restructuring a project
+# is not a subagent's call) and `*_archive` (destructive; ask the user).
+_local_pm_backlog_write_tools = [
+    "task_search"
+    "task_view"
+    "task_create"
+    "task_edit"
+    "task_complete"
+]
+
 # MCP *resource* plumbing. opencode ships these three regardless of whether any
 # MCP server is reachable, so they are dead weight for any agent that denies
 # servers wholesale. Verified against captured requests, not guessed.
@@ -273,13 +366,17 @@ _local_dev_skills = [
 # Built-in tools the `local` orchestrator is denied, on top of edit/bash/skill.
 # Names are the literal tool ids opencode sends (verified against a captured
 # /v1/chat/completions request, not guessed — a misspelled id silently no-ops).
-#   read/grep/glob/webfetch — its prompt already routes all discovery to the
-#     `explore` subagent; leaving them available invites the small model to
-#     accumulate context in the router instead of delegating (same failure mode
-#     that got `bash` denied).
+#   read/grep/glob/webfetch — its prompt routes all discovery to `explore`;
+#     leaving them available invites the small model to accumulate context in
+#     the router instead of delegating (same failure mode that got `bash`
+#     denied).
 #   *_mcp_resource* — MCP resource plumbing, dead weight once _deny_all_mcp has
 #     denied every server; opencode ships them regardless.
 # Leaves exactly `task` (delegation) and `todowrite` (pipeline tracking).
+#
+# This roster is set by the 27B's context window, not by taste — see the
+# `local` block below. Adding anything here has to be paid for out of ~4,000
+# tokens of working room.
 _local_router_denied_tools = [
     "read"
     "grep"
@@ -307,6 +404,22 @@ _agent = {
         # available, the small model bypasses the edit denial via sed/cat
         # instead of delegating to local-dev (observed with qwen3.5-9b).
         # Reading/searching/fetching go too — see _local_router_denied_tools.
+        #
+        # WHY THE BACKLOG MCP IS NOT HERE (measured 2026-07-22, per-tool bytes
+        # via scripts/measure_opencode_context.py; full table in Backlog doc-1).
+        # Folding the old `local-pm` subagent in here and allowing the Backlog
+        # server outright works fine on the 9B, but it takes `local` off the
+        # 27B, which is the one agent the 27B can still run on this machine
+        # (11,776 fitted tokens — src/launchd/iogpu_wired_limit.k). The budget:
+        #   usable = 11,776 - 2,048 (compaction.reserved) = 9,728
+        #   floor  = ~3,920 system prompt + 1,746 (task + todowrite) = ~5,666
+        # That floor is not negotiable — the system prompt is opencode's own and
+        # a router cannot give up `task`. It leaves ~4,060 for actual work, and
+        # every Backlog schema comes out of that: the smallest useful read-only
+        # slice (task_list/search/view, ~669) drops it to ~3,393 — the same
+        # budget that had `explore` looping on compaction. The full server is
+        # ~4,440 and overruns the window outright. So Backlog lives on `explore`
+        # (pinned to the 9B) instead, and the router reaches it via `task`.
         "permission" = _deny_all_mcp | {"edit" = "deny", "bash" = "deny", "skill" = "deny"} \
             | {t: "deny" for t in _local_router_denied_tools}
     }
@@ -340,12 +453,12 @@ _agent = {
     # earns its keep. `webfetch` stays too: exploration legitimately runs into
     # docs and URLs, and ~320 tokens is a cheap price for that.
     #
-    # NOTE: as of opencode 1.18.4 this block has no measurable effect — explore
-    # already surfaced no MCP server tools, and the _mcp_resource_tools deny
-    # does not strip for subagents (see the caveat above). It is kept as the
-    # standing declaration of intent: if that behaviour is fixed, or if a new
-    # MCP server starts leaking tools into this agent, the wildcards apply
-    # without anyone having to rediscover the problem.
+    # The _mcp_resource_tools deny has no measurable effect here — it does not
+    # strip for subagents (see the caveat above). It is kept as the standing
+    # declaration of intent: if that behaviour is fixed, or if a new MCP server
+    # starts leaking tools into this agent, the wildcards apply without anyone
+    # having to rediscover the problem. The Backlog allows DO take effect (same
+    # deny-then-allow findLast ordering local-dev relies on).
     #
     # `model` is pinned for the same reason every other local agent pins it:
     # without it explore inherits the *session* model, so running the
@@ -358,18 +471,30 @@ _agent = {
     # ~24k of working room.
     "explore" = {
         "model" = "{{opencode_local_agent_model}}"
-        "permission" = _deny_all_mcp | {t: "deny" for t in _mcp_resource_tools}
+        "permission" = _deny_all_mcp | {
+            _sanitize_mcp("Backlog") + "_" + _sanitize_mcp(t): "allow"
+            for t in _explore_backlog_read_tools
+        } | {t: "deny" for t in _mcp_resource_tools}
     }
+    # Backlog *writes* only — reads live on `explore`. Splitting them is not
+    # symmetry for its own sake: it keeps `task_edit` (the single most expensive
+    # schema in the local lane) out of the agent that gets invoked on every
+    # discovery question, and it makes task mutation an explicit, separately
+    # spawned step rather than something a small model can do as a side effect
+    # of answering "what should I work on?".
     "local-pm" = {
-        "description" = "Local Project Management subagent that uses Backlog.md to write and read tasks"
+        "description" = "Creates and updates Backlog tasks. Invoke only when the user explicitly asks to write, update, or close a task."
         "mode" = "subagent"
         "model" = "{{opencode_local_agent_model}}"
         "prompt" = _agent_prompt("local-pm")
-        # Backlog MCP only (its core function; Backlog commits its own task
-        # files, so Jujutsu isn't needed). No file edits, no bash (same
-        # sed/cat bypass risk as the orchestrator; its prompt already forbids
-        # VCS commands), no skills — neither skill is relevant to PM work.
-        "permission" = _mcp_only(["Backlog"]) | {"edit" = "deny", "bash" = "deny", "skill" = "deny"}
+        # Deny every server, then re-allow the named Backlog tools — same
+        # deny-then-allow findLast ordering local-dev relies on. No file edits,
+        # no bash (its prompt forbids VCS commands and Backlog commits its own
+        # task files), no skills — none apply to writing a task.
+        "permission" = _deny_all_mcp | {
+            _sanitize_mcp("Backlog") + "_" + _sanitize_mcp(t): "allow"
+            for t in _local_pm_backlog_write_tools
+        } | {"edit" = "deny", "bash" = "deny", "skill" = "deny"}
     }
     "local-dev" = {
         "description" = "Local Development subagent that writes code and commits work (VCS via jj/git CLI)"

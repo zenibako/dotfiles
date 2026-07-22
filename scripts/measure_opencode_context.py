@@ -10,7 +10,7 @@ Usage (findings recorded in the Backlog doc "OpenCode agent context measurements
 
     python3 scripts/measure_opencode_context.py &          # occupy the LM Studio port
     opencode run -m lmstudio/qwen3.5-9b --agent local "Say ok"      # primary agent
-    opencode run -m lmstudio/qwen3.5-9b --agent local "INVOKE:local-pm"  # subagent
+    opencode run -m lmstudio/qwen3.5-9b --agent local "INVOKE:local-dev"  # subagent
     cat /tmp/opencode-capture.jsonl                        # one JSON row per request
 
 If the conversation's first user message contains "INVOKE:<agent>" and the
@@ -79,6 +79,11 @@ class Handler(BaseHTTPRequestHandler):
         user_texts = [text_of(m) for m in msgs if m.get("role") == "user"]
         agent_label = next((v for k, v in AGENT_MARKERS.items() if k in system_text), "?")
         tool_names = sorted(t.get("function", {}).get("name", "?") for t in tools)
+        # Per-tool schema bytes. Tool schemas dominate a scoped agent's request,
+        # but they are wildly uneven — a single MCP write tool can cost 20x a
+        # builtin — so trimming a roster to fit a context window needs the
+        # breakdown, not just the total.
+        tool_bytes = {t.get("function", {}).get("name", "?"): len(json.dumps(t)) for t in tools}
 
         entry = {
             "ts": time.strftime("%H:%M:%S"),
@@ -89,6 +94,7 @@ class Handler(BaseHTTPRequestHandler):
             "request_bytes": len(raw),
             "est_prompt_tokens": len(raw) // 4,
             "tool_names": tool_names,
+            "tool_bytes": tool_bytes,
         }
         with open(LOG, "a") as f:
             f.write(json.dumps(entry) + "\n")
