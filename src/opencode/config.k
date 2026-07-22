@@ -153,6 +153,9 @@ _provider = {
             "qwen3.5-9b" = {
                 "name" = "Qwen 3.5 9B"
             }
+            "qwen3.6-27b" = {
+                "name" = "Qwen 3.6 27B"
+            }
         }
     }
 }
