@@ -163,9 +163,20 @@ _provider = {
                 "name" = "Qwen 3.5 9B"
                 "limit" = {"context" = 32768, "output" = 8192}
             }
+            # 27B is memory-bound on a 24 GiB machine, and LM Studio loads it
+            # through the mlx-vlm path (no KV-cache quantization available).
+            # Its `[context_fit]` log charges ~170 KiB/token — full_kv 64 KiB +
+            # prompt_inputs 10 KiB + attention 96 KiB — so with
+            # iogpu.wired_limit_mb=20480 (working_set 20 GiB, safe_ceiling 17
+            # GiB, baseline 14.95 GiB) it fits only 11,776 tokens. Configuring
+            # LM Studio above the fitted value is what produced "the number of
+            # tokens to keep from the initial prompt is greater than the context
+            # length": the cache layer keeps using `configured` while the engine
+            # allocated `fitted`. Keep this at or below the LM Studio context
+            # slider, and keep that at or below `fitted=`.
             "qwen3.6-27b" = {
                 "name" = "Qwen 3.6 27B"
-                "limit" = {"context" = 32768, "output" = 8192}
+                "limit" = {"context" = 10240, "output" = 4096}
             }
         }
     }
