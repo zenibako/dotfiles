@@ -709,69 +709,34 @@ unset _iogpu_label _iogpu_src _iogpu_dst
 
 # ── LM Studio model identifiers ───────────────────────────────────────────
 # opencode addresses a local model by its LM Studio *identifier*, which is
-# assigned at load time and defaults to the repo path (e.g.
+# assigned at load time and defaults to the model key (e.g.
 # "leonsarmiento/qwen3.6-27b-mlx"), NOT to whatever it was called last time.
-# Reload a model without `--identifier` and every agent pinned to it starts
-# returning 400 "Invalid model identifier" — the entire local workflow dies at
-# once, with the failure surfacing as an opaque agent error several layers up.
-# Observed 2026-07-22. Worse when the drift goes the other way: an identifier
+# Reload without `--identifier` and every agent pinned to it starts returning
+# 400 "Invalid model identifier" — the whole local workflow dies at once, with
+# the failure surfacing several layers up as an opaque agent error. Observed
+# twice on 2026-07-22. Worse when the drift goes the other way: an identifier
 # pointed at a *different* model answers happily while opencode budgets the
 # session against the wrong context window, which is how a 27B got driven past
 # its KV ceiling into a Metal OOM.
 #
-# So check both invariants against the running server: every model id the
-# rendered config references is loaded, and the context we declare fits inside
-# the context it was actually loaded with. Advisory only — LM Studio not
-# running is normal, and this must never fail a deploy.
-_lms_cfg="$HOME/.config/opencode/opencode.json"
-_lms_bin="$HOME/.lmstudio/bin/lms"
-[ -x "$_lms_bin" ] || _lms_bin="$(command -v lms 2>/dev/null || true)"
-if [ -n "$_lms_bin" ] && [ -x "$_lms_bin" ] && [ -f "$_lms_cfg" ] && command -v python3 >/dev/null 2>&1; then
-  if _lms_ps="$("$_lms_bin" ps --json 2>/dev/null)" && [ -n "$_lms_ps" ]; then
-    _lms_out="$(LMS_PS="$_lms_ps" python3 - "$_lms_cfg" <<'PY' 2>/dev/null || true
-import json, os, sys
-
-cfg = json.load(open(sys.argv[1]))
-declared = cfg.get("provider", {}).get("lmstudio", {}).get("models", {})
-if not declared:
-    sys.exit(0)
-
-loaded = {m["identifier"]: m for m in json.loads(os.environ["LMS_PS"]) if m.get("identifier")}
-
-# Only complain about models something is actually pinned to. A declared-but-
-# unused entry is inventory, not a fault.
-used = {
-    a["model"].split("/", 1)[1]
-    for a in cfg.get("agent", {}).values()
-    if isinstance(a.get("model"), str) and a["model"].startswith("lmstudio/")
-}
-
-for name in sorted(used & set(declared)):
-    want = declared[name].get("limit", {}).get("context")
-    if name not in loaded:
-        print(f"MISSING\t{name}\t{', '.join(sorted(loaded)) or 'nothing loaded'}")
-    elif want and loaded[name].get("contextLength") and want > loaded[name]["contextLength"]:
-        print(f"CONTEXT\t{name}\t{want}\t{loaded[name]['contextLength']}")
-PY
-)"
-    if [ -n "$_lms_out" ]; then
-      printf '%s\n' "$_lms_out" | while IFS="$(printf '\t')" read -r _k _a _b _c; do
-        case "$_k" in
-          MISSING)
-            _WARN "LM Studio has no model with identifier '$_a' — agents pinned to it will fail with 400 (loaded: $_b)"
-            _GUIDE "lms load <model-key> --identifier $_a"
-            ;;
-          CONTEXT)
-            _WARN "LM Studio loaded '$_a' with only ${_c} context, but opencode is configured for ${_b}"
-            _GUIDE "lms load <model-key> --identifier $_a --context-length $_b"
-            ;;
-        esac
-      done
-    else
-      _OK "LM Studio model identifiers match the opencode config"
-    fi
+# scripts/lmstudio_sync.sh owns the actual comparison (and can repair it with
+# --fix); this is only the deploy-time report. Advisory: LM Studio not running
+# is normal and must never fail a deploy.
+_lms_sync="$REPO_ROOT/scripts/lmstudio_sync.sh"
+if [ -x "$_lms_sync" ]; then
+  _lms_rc=0
+  _lms_out="$("$_lms_sync" 2>/dev/null)" || _lms_rc=$?
+  if [ "$_lms_rc" -eq 0 ]; then
+    _OK "LM Studio model identifiers match the opencode config"
+  # Exit 2 is "cannot tell" (no lms, server down, nothing deployed yet) and is
+  # not a deploy problem. Only exit 1 means real, actionable drift.
+  elif [ "$_lms_rc" -eq 1 ]; then
+    printf '%s\n' "$_lms_out" | grep -E '^  (UNMAPPED|MISSING|DRIFTED|CONTEXT)' | while read -r _l; do
+      _WARN "LM Studio: $_l"
+    done
+    _GUIDE "scripts/lmstudio_sync.sh --fix"
   fi
 fi
-unset _lms_cfg _lms_bin _lms_ps _lms_out
+unset _lms_sync _lms_out _lms_rc
 
 _STEP "Post-deploy validation complete"

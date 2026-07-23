@@ -1,0 +1,42 @@
+# Desired LM Studio identifier -> model key mapping.
+#
+# WHY THIS FILE EXISTS. opencode addresses a local model by the string in the
+# request's `model` field, and LM Studio resolves that string against the
+# *identifier* of a loaded model — nothing else. Verified against a running
+# server 2026-07-22: with just-in-time loading off (the default), a model key
+# does NOT resolve. Asking for "leonsarmiento/qwen3.6-27b-mlx" fails even when
+# exactly that model is loaded, because it was loaded under the identifier
+# "qwen3.6-27b".
+#
+#   model key   stable, content-derived, comes from the publisher, may contain
+#               a "/" and an "@variant" suffix (e.g. "qwen/qwen3.5-9b@8bit").
+#   identifier  assigned at LOAD time. Defaults to the model key, but `lms load
+#               --identifier` (and the field in the GUI load dialog) can set it
+#               to anything, including the identifier of a completely different
+#               model.
+#
+# So the identifier is the contract, and nothing keeps it stable on its own —
+# reload without `--identifier` and it silently reverts to the model key, at
+# which point every agent pinned to it gets a 400 and the local workflow dies
+# all at once. That happened twice in one evening on 2026-07-22. This file is
+# the declaration of what the identifiers are supposed to be; reconcile with
+#
+#   scripts/lmstudio_sync.sh --fix
+#
+# Context lengths are deliberately NOT here. They live in the opencode config
+# (src/opencode/config.k, provider.lmstudio.models.*.limit.context), which is
+# the thing that has to agree with reality, and the sync script reads them from
+# the deployed config so the two cannot drift apart.
+#
+# Keys are identifiers (what opencode asks for), values are model keys (what
+# LM Studio loads). Find a model key with `lms ls`.
+
+[identifiers]
+# 3-bit MLX quant, local. Deliberately not the lmstudio-community 4-bit of the
+# same name — that one is 16 GB and does not leave room for a usable KV cache.
+"qwen3.6-27b" = "leonsarmiento/qwen3.6-27b-mlx"
+
+# Lives on the mac-mini, not this machine, so it costs no local GPU memory and
+# can stay resident alongside the 27B. That is what lets the router and explore
+# sit on the 9B while local-dev gets the 27B.
+"qwen3.5-9b" = "qwen3.5-9b-mlx"
