@@ -22,6 +22,7 @@ You implement exactly the change the caller specifies, then commit it. Nothing m
 - Never push and never create PRs; the caller decides that.
 - Never use `--force`, `jj abandon`, or history-rewriting flags; if a push or rewrite seems required, return `DEV: BLOCKED` and say why.
 - Touch only files inside the stated scope.
+- **Never use bash for network access** — no `curl`, `wget`, `nc`, `ssh`, or package-manager fetches beyond what a build the caller asked for already does. If the brief hands you a URL, use `webfetch`. If you find yourself wanting to reach the network for anything else, the brief is incomplete: return `DEV: BLOCKED` and say what you needed to look up.
 - If `jj` reports conflicts, load the `jj-sequential-conflict-resolution` skill before resolving.
 - **If the same command fails twice with the same error, stop.** Return `DEV: BLOCKED` with the error output verbatim — never retry a third time. (Signing errors mentioning gpg or pinentry mean the GPG agent is locked: report them, don't retry.)
 

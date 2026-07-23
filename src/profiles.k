@@ -149,6 +149,11 @@ personal = _shared.Profile {
         # Local orchestrator + subagents use a small/local model. Machines with
         # a stronger local runtime (e.g. LM Studio) override this in local.k.
         opencode_local_agent_model = "lmstudio/qwen3.5-9b"
+        # local-dev is aimed separately: it is the only local agent that writes
+        # code, so it is worth the strongest local model even when routing and
+        # search stay on the small one. Defaults to the same model — machines
+        # with a bigger local option override it in local.k.
+        opencode_local_dev_model = "lmstudio/qwen3.5-9b"
         claude_agent_push_notif_enabled = True
         claude_bypass_permissions_account_id = "c5055d6d-b6e9-46de-a26f-0dad4c6255fc"
         claude_bypass_permissions_value = True

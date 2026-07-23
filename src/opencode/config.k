@@ -513,13 +513,24 @@ _agent = {
         # bash; see the _local_dev_jj_read_tools note above.
         # The skills catalog, not the tool schemas, dominated this agent's
         # context: 52 skills / ~7,500 tokens of a ~16,000-token request. Scoping
-        # it to _local_dev_skills and dropping the dead MCP-resource tools and
-        # webfetch (it implements from a brief; it does not browse) roughly
-        # halves the footprint.
+        # it to _local_dev_skills and dropping the dead MCP-resource tools
+        # roughly halves the footprint.
+        #
+        # webfetch was ALSO denied here ("it implements from a brief; it does
+        # not browse") and that was a mistake — reverted 2026-07-22 after the
+        # agent was observed reaching for `curl` instead. Denying a tool while
+        # leaving `bash` does not remove the capability; it just moves it to an
+        # unstructured path with no timeout, no size cap, and no format
+        # handling. This is the same lesson that got `bash` denied on the
+        # router, applied in the other direction: deny the *shell* to remove a
+        # capability, or provide the structured tool — denying only the
+        # structured tool gets you the shell version of it. ~320 tokens, and
+        # local-dev cannot delegate (it has no `task` tool), so it has no other
+        # legitimate way to resolve a URL the brief hands it.
         "permission" = _deny_all_mcp | {
             _sanitize_mcp("Jujutsu") + "_" + _sanitize_mcp(t): "allow"
             for t in _local_dev_jj_read_tools
-        } | {t: "deny" for t in _mcp_resource_tools} | {"webfetch" = "deny"} | {
+        } | {t: "deny" for t in _mcp_resource_tools} | {
             "skill" = {"*" = "deny"} | {s: "allow" for s in _local_dev_skills}
         }
     }
