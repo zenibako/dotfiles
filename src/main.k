@@ -122,6 +122,14 @@ packages_meta = {
 }
 file.write("out/.packages_meta.json", json.encode(packages_meta, indent=2))
 
+# ── Write VSIX LSP server pins for scripts/lsp_vsix_sync.sh ────────────
+# Work-profile only: all three servers (apex jorje, visualforce, sonarlint)
+# are work-gated in Neovim, so other machines skip the ~150MB fetch.
+vsix_meta = {
+    "servers": packages_mod.vsix_lsp_servers if "work" in local.packages else []
+}
+file.write("out/.lsp_vsix_meta.json", json.encode(vsix_meta, indent=2))
+
 # ── Write .dotter/local.toml from local.k ─────────────────────────────
 # `local.packages` and `local.variables` come from src/local.k (gitignored,
 # per-machine overrides), pulled in via `import local` at the top of this file.

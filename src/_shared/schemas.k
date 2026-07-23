@@ -24,7 +24,13 @@ schema PackageList:
     brew_taps?: [str]
     brew_formulae?: [str]
     brew_casks?: [str]
-    vscode_extensions?: [str]
+
+schema VsixLspServer:
+    namespace: str
+    name: str
+    version: str
+    target_platform?: str
+    artifact_check: str
 
 schema DotterConfig:
     default?: Profile

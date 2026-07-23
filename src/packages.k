@@ -5,81 +5,34 @@ packages = _shared.PackageList {
     fedora = ["fzf", "fd-find", "ripgrep", "zsh", "tmux", "git", "gh", "jq", "curl", "wget", "snapd", "golang", "cargo", "pinentry", "pinentry-gnome3"]
     brew_taps = ["atlassian/acli", "borkdude/brew", "hashicorp/tap", "browsh-org/browsh", "clojure/tools", "gcenx/wine", "jichu4n/palm-os", "jonathanruiz/tap", "koekeishiya/formulae", "rsteube/tap", "sst/tap", "valkyrie00/bbrew", "zerotier/tap", "vladkens/tap"]
     brew_formulae = ["xz","autoconf","automake","openssl@3","readline","node","aws-cdk","acli","glib","bison","carapace","cmake","coreutils","cryptography","curl","docker","docker-buildx","docker-credential-helper","direnv","dotter","enchant","fastfetch","fd","gnutls","harfbuzz","pango","ffmpeg","fswatch","fzf","isl","gcc","gh","git","git-extras","glab","go","gopls","netpbm","graphviz","mermaid-cli","grep","homeassistant-cli","htop","hunspell","icu4c@76","imagemagick","openjdk","jdtls","jj","openjdk@21","jmeter","jq","libffi","libolm","libyaml","lua","lua-language-server","vscode-langservers-extracted","yaml-language-server","typescript-language-server","cue","starlark-rust","luarocks","make","maven","mosh","neovim","nghttp2","nushell","ollama","pandoc","pinentry-mac","pkl","pkl-lsp","pmd","pnpm","postgresql@14","prettier","protobuf","python-yq","python@3.13","uv","ripgrep","ruby","ruby-install","rust","sesh","sf","sonar-scanner","starship","stylua","termscp","terraform","hashicorp/tap/terraform-ls","tmux","tree-sitter","weechat","wget","xq","yarn","yt-dlp","zlib","zoxide","zsh","zsh-autosuggestions","zsh-completions","borkdude/brew/babashka","browsh-org/browsh/browsh","clojure/tools/clojure","jichu4n/palm-os/pilot-link","vladkens/tap/macmon","jonathanruiz/tap/wakey","rsteube/tap/carapace-spec","sst/tap/opencode","valkyrie00/bbrew/bbrew"]
-    brew_casks = ["android-commandlinetools","android-platform-tools","font-hack-nerd-font","geekbench","ghostty","gpg-suite","mitmproxy","quakenotch","salesforce-cli","temurin","visual-studio-code","zap","zerotier-one"]
-    vscode_extensions = [
-        "alefragnani.project-manager",
-        "amiralizadeh9480.cpp-helper",
-        "astro-build.astro-vscode",
-        "augustocdias.tasks-shell-input",
-        "christian-kohler.npm-intellisense",
-        "chrmarti.network-proxy-test",
-        "chuckjonas.apex-pmd",
-        "codezombiech.gitignore",
-        "compulim.vscode-mocha",
-        "cpylua.language-postcss",
-        "cspotcode.vscode-mocha-latte",
-        "dbaeumer.vscode-eslint",
-        "docker.docker",
-        "donjayamanne.githistory",
-        "esbenp.prettier-vscode",
-        "financialforce.lana",
-        "github.copilot",
-        "github.copilot-chat",
-        "juanblanco.solidity",
-        "kendoui.kendotemplatewizard",
-        "linhmtran168.mac-ca-vscode",
-        "marus25.cortex-debug",
-        "mcu-debug.debug-tracker-vscode",
-        "mcu-debug.memory-view",
-        "mcu-debug.peripheral-viewer",
-        "mcu-debug.rtos-views",
-        "midouest.playdate-debug",
-        "ms-azuretools.vscode-containers",
-        "ms-azuretools.vscode-docker",
-        "ms-dotnettools.vscode-dotnet-runtime",
-        "ms-python.black-formatter",
-        "ms-python.debugpy",
-        "ms-python.isort",
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "ms-toolsai.jupyter",
-        "ms-toolsai.jupyter-keymap",
-        "ms-toolsai.jupyter-renderers",
-        "ms-toolsai.vscode-jupyter-cell-tags",
-        "ms-toolsai.vscode-jupyter-slideshow",
-        "ms-vscode-remote.remote-containers",
-        "ms-vscode.cmake-tools",
-        "ms-vscode.cpptools",
-        "ms-vscode.cpptools-extension-pack",
-        "ms-vscode.cpptools-themes",
-        "ms-vscode.makefile-tools",
-        "ms-vscode.remote-explorer",
-        "ms-vscode.remote-server",
-        "nomicfoundation.hardhat-solidity",
-        "orta.vscode-jest",
-        "piersdeseilligny.betterfountain",
-        "redhat.vscode-xml",
-        "salesforce.salesforce-vscode-slds",
-        "salesforce.salesforcedx-einstein-gpt",
-        "salesforce.salesforcedx-vscode",
-        "salesforce.salesforcedx-vscode-apex",
-        "salesforce.salesforcedx-vscode-apex-debugger",
-        "salesforce.salesforcedx-vscode-apex-replay-debugger",
-        "salesforce.salesforcedx-vscode-core",
-        "salesforce.salesforcedx-vscode-expanded",
-        "salesforce.salesforcedx-vscode-lightning",
-        "salesforce.salesforcedx-vscode-lwc",
-        "salesforce.salesforcedx-vscode-soql",
-        "salesforce.salesforcedx-vscode-visualforce",
-        "salesforce.sfdx-code-analyzer-vscode",
-        "sumneko.lua",
-        "twxs.cmake",
-        "vscodevim.vscode-vim",
-        "vue.volar",
-        "ziyasal.vscode-open-in-github",
-        "zxh404.vscode-proto3",
-    ]
+    brew_casks = ["android-commandlinetools","android-platform-tools","font-hack-nerd-font","geekbench","ghostty","gpg-suite","mitmproxy","quakenotch","salesforce-cli","temurin","zap","zerotier-one"]
 }
+
+# ── VSIX-distributed language servers ───────────────────────────────────
+# Apex (jorje), Visualforce, and SonarLint ship only inside VS Code
+# extension VSIXes. scripts/lsp_vsix_sync.sh fetches these pins from Open
+# VSX as plain zip archives — no VS Code involved. Bump versions here.
+vsix_lsp_servers: [_shared.VsixLspServer] = [
+    _shared.VsixLspServer {
+        namespace = "salesforce"
+        name = "salesforcedx-vscode-apex"
+        version = "66.10.1"
+        artifact_check = "dist/apex-jorje-lsp.jar"
+    }
+    _shared.VsixLspServer {
+        namespace = "salesforce"
+        name = "salesforcedx-vscode-visualforce"
+        version = "66.10.1"
+        artifact_check = "dist/visualforceServer.js"
+    }
+    _shared.VsixLspServer {
+        namespace = "SonarSource"
+        name = "sonarlint-vscode"
+        version = "5.2.1"
+        target_platform = "darwin-arm64"
+        artifact_check = "server/sonarlint-ls.jar"
+    }
+]
 
 # ── String builders ───────────────────────────────────────────────────
 packages_txt = "\n".join(packages.fedora)
@@ -87,6 +40,5 @@ packages_txt = "\n".join(packages.fedora)
 _brew_lines = ['tap "' + tap + '"' for tap in packages.brew_taps]
 _brew_lines += ['brew "' + formula + '"' for formula in packages.brew_formulae]
 _brew_lines += ['cask "' + cask + '"' for cask in packages.brew_casks]
-_brew_lines += ['vscode "' + ext + '"' for ext in packages.vscode_extensions]
 
 brewfile = "\n".join(_brew_lines)

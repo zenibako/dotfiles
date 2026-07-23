@@ -329,8 +329,6 @@ def _write_brewfile(data, out_path):
         lines.append(f'brew "{formula}"')
     for cask in data.get("brew_casks", []):
         lines.append(f'cask "{cask}"')
-    for ext in data.get("vscode_extensions", []):
-        lines.append(f'vscode "{ext}"')
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
