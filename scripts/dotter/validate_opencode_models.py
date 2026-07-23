@@ -11,6 +11,7 @@ Exits non-zero on any mismatch so dotter deploy is blocked.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -112,6 +113,27 @@ def _available_models() -> set[str] | None:
     return {line.strip() for line in out.decode().splitlines() if line.strip()}
 
 
+def _pending_models(repo: Path) -> set[str]:
+    """Model IDs declared by the config we are about to deploy.
+
+    `opencode models` reflects the config that is *already* live, so on its own
+    it makes renaming a custom provider model impossible: the new ID is not yet
+    deployed, validation fails, and the deploy that would have introduced it is
+    blocked. (Hit for real on 2026-07-22 renaming an LM Studio model to match
+    its actual `lms ps` identifier.) Anything out/opencode.json declares will
+    exist the moment this deploy lands, so it counts as available.
+    """
+    try:
+        cfg = json.loads((repo / "out" / "opencode.json").read_text())
+    except (OSError, ValueError):
+        return set()
+    return {
+        f"{provider}/{model}"
+        for provider, pcfg in (cfg.get("provider") or {}).items()
+        for model in (pcfg.get("models") or {})
+    }
+
+
 def _suggest(val: str, available: set[str]) -> str:
     """Suggest closest available model IDs by provider prefix then name token overlap."""
     provider, _, name = val.partition("/")
@@ -156,6 +178,7 @@ def main() -> int:
     available = _available_models()
     if available is None:
         return 1
+    available |= _pending_models(repo)
 
     failures: list[str] = []
     for var in AGENT_MODEL_VARS:
