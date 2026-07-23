@@ -60,6 +60,11 @@ default = _shared.Profile {
         "src/claude-code/commands/jj-fix-conflicts.md" = { target = "~/.claude/commands/jj-fix-conflicts.md", type = "symbolic" }
         "out/gitlogue/config.toml" = "~/.config/gitlogue/config.toml"
         "src/agents/skills" = { target = "~/.agents/skills", type = "symbolic" }
+        # Claude Code reads ~/.claude/skills only - it does not look in
+        # ~/.agents/skills - so cross-tool skills need an explicit link here.
+        # OpenCode still picks this one up through src/opencode/skills, which
+        # holds a repo-relative symlink back to the shared copy.
+        "src/agents/skills/radar-navigation" = { target = "~/.claude/skills/radar-navigation", type = "symbolic" }
         "out/kiro/mcp.json" = { target = "~/.kiro/settings/mcp.json", type = "template" }
         "src/kiro/steering" = { target = "~/.kiro/steering", type = "symbolic" }
         "src/codex/AGENTS.md" = { target = "~/.codex/AGENTS.md", type = "symbolic" }
@@ -187,6 +192,7 @@ work = _shared.Profile {
         # Work machines may not run a local LM Studio; default to the same model
         # as the other work agents. Per-machine overrides live in local.k.
         opencode_local_agent_model = "openai/gpt-5.4"
+        opencode_local_dev_model = "openai/gpt-5.4"
         p10k_root_dir = "$HOME/.p10k"
         claude_agent_push_notif_enabled = False
         claude_bypass_permissions_account_id = "cc63eabd-b672-4570-871a-fd0d4607e75d"

@@ -2,7 +2,7 @@
 name: radar-navigation
 description: Orient in a repository by jumping to an exact file#symbol anchor instead of grepping or listing the tree. Use when you need to find where code lives ("where is X", "how does Y work", "where is Z handled") in an unfamiliar or large repo. Requires the `radar` CLI; fall back to a targeted grep or the explore subagent if it is unavailable or the repo's language is unsupported.
 license: MIT
-compatibility: opencode
+compatibility: Requires the `radar` CLI (crate `rdar`). Works in Claude Code and OpenCode.
 metadata:
   category: navigation
   requires: radar
