@@ -25,7 +25,6 @@ variables = {
     gitea_token = ""
 
     # ── Editor / LSP ──────────────────────────────────────────────────
-    apex_lsp_jar_path = ""
     vim_set_num_relnum = "set number relativenumber"
 
     # ── Home Assistant ────────────────────────────────────────────────

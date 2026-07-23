@@ -1,7 +1,7 @@
 #!/bin/sh
 # Fetch the pinned VSIX-distributed language servers from Open VSX and unpack
 # them into ~/.local/share/lsp-servers/<name>/ — replacing the old dependency
-# on VS Code's ~/.vscode/extensions directory entirely.
+# on an editor's bundled extensions directory entirely.
 #
 # Pins live in src/packages.k (vsix_lsp_servers); KCL renders them to
 # out/.lsp_vsix_meta.json at generation time. A .vsix is just a zip whose

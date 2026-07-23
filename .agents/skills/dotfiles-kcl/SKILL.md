@@ -17,7 +17,7 @@ metadata:
 
 - When adding or modifying dotter profiles (default, personal, work, linux, mac)
 - When adding or modifying themes (monokai, nightowl, tokyonight)
-- When changing package lists (Fedora, Homebrew, VS Code extensions)
+- When changing package lists (Fedora, Homebrew, VSIX-distributed LSP servers)
 - When modifying tool configs: atuin, starship, aerospace, iamb, gitlogue, pnpm
 - When modifying template configs: jj, tmux, ghostty
 - When adding new KCL schemas or modules for new config domains
@@ -70,7 +70,7 @@ src/main.k + local.k ──→ kcl run src/main.k local.k ──→ out/config.j
 ├── local.k.example         # Template for local.k (committed, at repo root)
 ├── src/
 │   ├── main.k              # orchestration: imports all modules, writes JSON
-│   ├── packages.k          # Fedora packages, Homebrew taps/formulae/casks, VS Code extensions
+│   ├── packages.k          # Fedora packages, Homebrew taps/formulae/casks, vsix_lsp_servers
 │   ├── themes.k            # Theme variables (colors, plugins, prompts)
 │   ├── profiles.k          # dotter profiles: default, personal, work, linux, mac, oda_mcp
 │   ├── env.k               # Environment variables (PATH, XDG_CONFIG_HOME, etc.)

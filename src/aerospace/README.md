@@ -94,7 +94,7 @@ so personal-machine rules can stay. The actionable gaps:
    and Get Info panels, which can yank them to another workspace mid-drag.
    Alternative: drop the workspace rule and use `run = "layout floating"`.
 7. **Workspace 5 is a free slot** — no apps, no purpose yet. Candidates from
-   installed-but-unassigned apps: VS Code, Claude Desktop, Postman, Safari,
+   installed-but-unassigned apps: Claude Desktop, Postman, Safari,
    GitLab PWA, YouTube / YouTube Music PWAs.
 8. `persistent-workspaces` covers 1–6 while keybindings reach 7–9; 7–9 act as
    ad-hoc scratch spaces that vanish when emptied. Intentional, just noted.
