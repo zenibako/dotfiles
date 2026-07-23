@@ -168,6 +168,8 @@ local lsp_tests = {
     filetype = "apex",
     filename = "Test.cls",
     content = "public class Test {}\n",
+    -- JVM server; needs longer than the default 2s grace after null-ls attaches.
+    grace_period_ms = 15000,
   },
   -- Local prototype server (forcedotcom/apex-language-support), enabled by
   -- ~/.config/nvim/plugin/apex_ls_prototype.lua only when its wrapper exists.
