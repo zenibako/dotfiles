@@ -94,7 +94,9 @@ vim.lsp.enable({
 -- Default LSP servers (configs in src/nvim/default/lsp/ — always available).
 vim.lsp.enable({
   "basedpyright",
+  "cssls",
   "cue",
+  "eslint",
   "gopls",
   "html",
   "jsonls",
