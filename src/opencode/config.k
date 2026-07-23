@@ -499,7 +499,13 @@ _agent = {
     "local-dev" = {
         "description" = "Local Development subagent that writes code and commits work (VCS via jj/git CLI)"
         "mode" = "subagent"
-        "model" = "{{opencode_local_agent_model}}"
+        # Aimed separately from the router/search agents: this is the only local
+        # agent that writes code, and it is the heaviest (~9,268 est. tokens),
+        # so it is worth the strongest local model even when the others stay
+        # small. NOTE this pin is advisory — LM Studio serves whatever model is
+        # resident regardless of the request (see the SUBSTITUTION HAZARD note
+        # above), so it expresses intent rather than guaranteeing placement.
+        "model" = "{{opencode_local_dev_model}}"
         "prompt" = _agent_prompt("local-dev")
         # Deny every MCP server, then re-allow a curated read-only slice of the
         # Jujutsu MCP. Order is load-bearing: opencode resolves a tool's schema

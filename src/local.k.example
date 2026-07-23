@@ -102,6 +102,7 @@ variables = {
     opencode_plan_agent_model = ""
     opencode_test_agent_model = ""
     opencode_local_agent_model = ""
+    opencode_local_dev_model = ""
 
     # ── Apple Silicon GPU memory ──────────────────────────────────────
     # MiB of unified memory macOS may wire for the GPU. 0 keeps the system
