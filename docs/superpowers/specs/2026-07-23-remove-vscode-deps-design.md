@@ -27,6 +27,12 @@ under `~/Library/Application Support/Code` is left untouched.
 - **Uninstall from machine too**, gated on LSP validation passing first.
 - **Mechanism: KCL pins + sync script** (matches `lmstudio_sync.sh` pattern),
   not a hardcoded script and not vendored jars.
+- **Visualforce stays VSIX-sourced on the work profile.** The generic
+  `vscode-html-language-server` fallback was considered and rejected: it loses
+  VF-specific tag completions (`apex:*`, `c:*`).
+- **Wire up the unused `vscode-langservers-extracted` servers** — the formula
+  ships CSS and ESLint servers that nothing uses today; add them to the
+  default Neovim profile as part of this work (Markdown server skipped).
 
 ## Version pins (from currently installed extensions)
 
@@ -78,12 +84,24 @@ New `scripts/lsp_vsix_sync.sh` (modeled on `lmstudio_sync.sh`):
 - `src/nvim/default/lua/config/lsp.lua`: Visualforce glob → new path.
 - `src/nvim/work/lua/plugins/sonarlint.lua`: jar path → new path. Full-payload
   extraction preserves the `server/` + `analyzers/` sibling layout.
+- **New default-profile servers** (from `vscode-langservers-extracted`,
+  already installed via brew):
+  - `src/nvim/default/lsp/cssls.lua` — `vscode-css-language-server --stdio`,
+    filetypes css/scss/less.
+  - `src/nvim/default/lsp/eslint.lua` — `vscode-eslint-language-server
+    --stdio`, JS/TS filetypes, rooted on eslint config files so it stays
+    quiet in projects without one.
+  - Both added to the default `vim.lsp.enable` list in
+    `src/nvim/default/lua/config/lsp.lua`.
 
 ### 5. Validation scripts
 
 - `scripts/dotter/validate_agent_lsp.py`: visualforce coverage glob → new path.
 - `scripts/dotter/validate_lsp.lua`: visualforce install hint → "run
-  scripts/lsp_vsix_sync.sh". `vscode-json/html-language-server` entries stay.
+  scripts/lsp_vsix_sync.sh". `vscode-json/html-language-server` entries stay;
+  add matching entries for `vscode-css-language-server` and
+  `vscode-eslint-language-server` (same `vscode-langservers-extracted`
+  binary mapping) so the new servers are covered by the headless attach test.
 
 ### 6. Reference sweep
 
