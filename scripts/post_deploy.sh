@@ -558,6 +558,7 @@ provider: python3: missing
 sf_cache/test_result.json
 SonarQube language server is ready
 LWC Language Server shutting down
+[lspconfig] Unable to find ESLint library.
 LSP_FILTERS
     run_with_timeout 300 nvim --headless -c "luafile $_scripts/validate_lsp.lua" -c "qa!" 2>"$lsp_out" >/dev/null || true
 
