@@ -112,6 +112,7 @@ SERVER_LANGUAGE = {
     "jinja-lsp": "jinja",
     "clangd-lsp": "c/c++",
     "kotlin-lsp": "kotlin",
+    "rust-analyzer-lsp": "rust",
 }
 
 
