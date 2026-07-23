@@ -23,7 +23,6 @@ blockers.
 
 from __future__ import annotations
 
-import glob
 import json
 import os
 import re
@@ -324,9 +323,7 @@ def detect_nvim_servers() -> dict[str, str]:
 
     # Servers enabled outside lsp/*.lua (mirrors config/lsp.lua + the local
     # apex_ls prototype plugin's own existence checks).
-    if glob.glob(
-        str(HOME / ".vscode/extensions/salesforce.salesforcedx-vscode-visualforce-*/dist/visualforceServer.js")
-    ):
+    if (HOME / ".local/share/lsp-servers/salesforcedx-vscode-visualforce/dist/visualforceServer.js").exists():
         covered["visualforce-language-server"] = "visualforce"
     if os.access(HOME / ".local/share/apex-language-server/apex-ls-stdio.sh", os.X_OK):
         covered["apex-ls"] = "apex"
