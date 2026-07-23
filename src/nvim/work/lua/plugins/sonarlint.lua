@@ -1,8 +1,9 @@
 -- Optional SonarLint integration (SonarQube rules in real-time).
--- Auto-detects the SonarLint VS Code extension server JAR, similar to visualforce-language-server.
-local sonarlint_jar = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/sonarsource.sonarlint-vscode-*/server/sonarlint-ls.jar"))
+-- Uses the VSIX-unpacked server from scripts/lsp_vsix_sync.sh; the analyzers/
+-- directory sits beside server/ exactly as in the extension layout.
+local sonarlint_jar = vim.fn.expand("~/.local/share/lsp-servers/sonarlint-vscode/server/sonarlint-ls.jar")
 
-if sonarlint_jar ~= "" then
+if vim.fn.filereadable(sonarlint_jar) == 1 then
 	vim.pack.add({
 		"https://gitlab.com/schrieveslaach/sonarlint.nvim",
 	})

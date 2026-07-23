@@ -2,14 +2,14 @@
 -- Load Salesforce filetype detection BEFORE enabling LSPs.
 require("config.salesforce")
 
-local visualforce_ext = vim.fn.glob(vim.fn.expand("~/.vscode/extensions/salesforce.salesforcedx-vscode-visualforce-*/dist/visualforceServer.js"))
+local visualforce_server = vim.fn.expand("~/.local/share/lsp-servers/salesforcedx-vscode-visualforce/dist/visualforceServer.js")
 
--- Use the VS Code Visualforce server when the extension is installed locally.
--- filetypes is REQUIRED: an enabled config without it attaches to every buffer
--- (vim.lsp.enable treats nil filetypes as "all filetypes").
-if visualforce_ext ~= "" then
+-- Use the VSIX-unpacked Visualforce server when lsp_vsix_sync.sh has fetched
+-- it. filetypes is REQUIRED: an enabled config without it attaches to every
+-- buffer (vim.lsp.enable treats nil filetypes as "all filetypes").
+if vim.fn.filereadable(visualforce_server) == 1 then
   vim.lsp.config("visualforce-language-server", {
-    cmd = { "node", visualforce_ext, "--stdio" },
+    cmd = { "node", visualforce_server, "--stdio" },
     filetypes = { "visualforce" },
     root_markers = { "sfdx-project.json", ".git" },
     init_options = {
@@ -74,7 +74,7 @@ vim.diagnostic.config({
 
 {{#if opencode_profile_work}}
 -- Work LSP servers: configs from src/nvim/work/lsp/ (visualforce is enabled
--- above, only when the VS Code extension provides its server).
+-- above, only when lsp_vsix_sync.sh has provided its server).
 vim.lsp.enable({
   "apex-language-server",
   "gitlab-ci-ls",

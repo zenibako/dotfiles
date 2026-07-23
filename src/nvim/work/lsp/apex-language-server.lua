@@ -1,74 +1,18 @@
--- Auto-discover the Apex JAR from the VS Code Salesforce extension.
--- Override: set $NVIM_APEX_JAR_PATH to skip auto-discovery entirely.
+-- Apex jorje LSP. The jar is unpacked from the pinned Salesforce VSIX by
+-- scripts/lsp_vsix_sync.sh (dotfiles repo) into ~/.local/share/lsp-servers/ —
+-- VS Code is not involved and need not be installed.
+-- Override: set $NVIM_APEX_JAR_PATH to skip the managed path entirely.
+local MANAGED_JAR = "~/.local/share/lsp-servers/salesforcedx-vscode-apex/dist/apex-jorje-lsp.jar"
+
 local function discover_apex_jar()
 	local override = os.getenv("NVIM_APEX_JAR_PATH")
 	if override and override ~= "" then
 		return override
 	end
-
-	local homes = {}
-	local function add_home(h)
-		if h and h ~= "" then
-			for _, e in ipairs(homes) do
-				if e == h then return end
-			end
-			table.insert(homes, h)
-		end
+	local jar = vim.fn.expand(MANAGED_JAR)
+	if vim.fn.filereadable(jar) == 1 then
+		return jar
 	end
-
-	-- Gather every plausible home directory
-	add_home(vim.uv.os_homedir())
-	add_home(os.getenv("HOME"))
-	add_home(os.getenv("USERPROFILE"))
-
-	-- macOS: GUI apps sometimes resolve os_homedir() to the long display-name
-	-- path (e.g. /Users/chandler.anderson) while VS Code extensions are
-	-- installed under the short username path (/Users/chanderson). Derive the
-	-- short path from $USER as a fallback.
-	local user = os.getenv("USER") or os.getenv("USERNAME")
-	if user and user ~= "" then
-		add_home("/Users/" .. user)
-		add_home("/home/" .. user)
-	end
-
-	for _, home in ipairs(homes) do
-		local ext_dir = home .. "/.vscode/extensions"
-		if vim.fn.isdirectory(ext_dir) == 0 then
-			goto next_home
-		end
-
-		local pattern = ext_dir .. "/salesforce.salesforcedx-vscode-apex-*"
-		local matches = vim.fn.glob(pattern, false, true)
-
-		local dirs = {}
-		for _, m in ipairs(matches) do
-			if vim.fn.isdirectory(m) == 1 and m:match("salesforcedx%-vscode%-apex%-%d") then
-				table.insert(dirs, m)
-			end
-		end
-
-		if #dirs == 0 then
-			goto next_home
-		end
-
-		table.sort(dirs)
-		local latest = dirs[#dirs]
-
-		local candidates = {
-			latest .. "/dist/apex-jorje-lsp.jar",
-			latest .. "/out/apex-jorje-lsp.jar",
-			latest .. "/apex-jorje-lsp.jar",
-		}
-
-		for _, p in ipairs(candidates) do
-			if vim.fn.filereadable(p) == 1 then
-				return p
-			end
-		end
-
-		::next_home::
-	end
-
 	return nil
 end
 
@@ -79,32 +23,11 @@ if not apex_jar_path then
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = { "apex", "java", "trigger", "apexcode" },
 		callback = function()
-			local homes = {}
-			local function add(h)
-				if h and h ~= "" then
-					for _, e in ipairs(homes) do if e == h then return end end
-					table.insert(homes, h)
-				end
-			end
-			add(vim.uv.os_homedir())
-			add(os.getenv("HOME"))
-			add(os.getenv("USERPROFILE"))
-			local user = os.getenv("USER") or os.getenv("USERNAME")
-			if user then
-				add("/Users/" .. user)
-				add("/home/" .. user)
-			end
-
-			local searched = {}
-			for _, h in ipairs(homes) do
-				table.insert(searched, h .. "/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/{dist,out}/apex-jorje-lsp.jar")
-			end
-
 			vim.notify(
 				"Apex Language Server: apex-jorje-lsp.jar not found.\n"
-					.. "Searched:\n  - " .. table.concat(searched, "\n  - ") .. "\n\n"
-					.. "Override: export NVIM_APEX_JAR_PATH=/path/to/apex-jorje-lsp.jar\n"
-					.. "Please install the Salesforce VS Code extension: salesforce.salesforcedx-vscode-apex",
+					.. "Expected: " .. MANAGED_JAR .. "\n\n"
+					.. "Fetch it: run scripts/lsp_vsix_sync.sh in the dotfiles repo.\n"
+					.. "Override: export NVIM_APEX_JAR_PATH=/path/to/apex-jorje-lsp.jar",
 				vim.log.levels.WARN,
 				{ title = "Apex LSP" }
 			)
