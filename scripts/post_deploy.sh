@@ -494,6 +494,7 @@ fi
 # and then shows concretely as a missing server in the validation output.
 _vsix_sync="$REPO_ROOT/scripts/lsp_vsix_sync.sh"
 if [ -x "$_vsix_sync" ]; then
+  begin_wait "Syncing VSIX LSP servers" "may download ~150MB on first run"
   _vsix_rc=0
   _vsix_out="$("$_vsix_sync" 2>&1)" || _vsix_rc=$?
   if [ "$_vsix_rc" -eq 0 ]; then

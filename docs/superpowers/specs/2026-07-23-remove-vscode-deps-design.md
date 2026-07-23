@@ -50,7 +50,7 @@ manifest carries an optional `target_platform`.
 ### 1. Declarative pins (KCL)
 
 - `src/_shared/schemas.k`: remove `vscode_extensions?: [str]`; add
-  `VsixLspServer` schema (`publisher`, `name`, `version`, `target_platform?`,
+  `VsixLspServer` schema (`namespace`, `name`, `version`, `target_platform?`,
   `artifact_check`) and a `vsix_lsp_servers?: [VsixLspServer]` field.
 - `src/packages.k`: remove the `visual-studio-code` cask, the entire
   `vscode_extensions` list, and the `vscode "..."` Brewfile comprehension;
@@ -59,8 +59,8 @@ manifest carries an optional `target_platform`.
 ### 2. Generator
 
 `scripts/dotter/generate_from_kcl.py`: delete the `vscode_extensions` →
-Brewfile rendering; render `vsix_lsp_servers` to a JSON manifest under
-`generated/` for the sync script.
+Brewfile rendering. Render the pins to `out/.lsp_vsix_meta.json` (written by
+`main.k`) for the sync script to consume.
 
 ### 3. Sync script + deploy wiring
 

@@ -29,6 +29,8 @@ vsix_lsp_servers: [_shared.VsixLspServer] = [
         namespace = "SonarSource"
         name = "sonarlint-vscode"
         version = "5.2.1"
+        # Assumes Apple-silicon macOS; other platforms need a different
+        # target_platform (embedded JRE/analyzers differ).
         target_platform = "darwin-arm64"
         artifact_check = "server/sonarlint-ls.jar"
     }

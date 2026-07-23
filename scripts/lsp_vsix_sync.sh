@@ -62,7 +62,7 @@ while IFS="$_TAB" read -r _name _ver _tp _url _artifact; do
 
   echo "  syncing  $_name -> $_want"
   _tmpd="$(mktemp -d)"
-  if ! curl -fsSL --retry 2 -o "$_tmpd/pkg.vsix" "$_url"; then
+  if ! curl -fsSL --retry 2 --connect-timeout 15 --max-time 900 -o "$_tmpd/pkg.vsix" "$_url"; then
     echo "  FAILED   $_name — download error: $_url" >&2
     _fail=1; rm -rf "$_tmpd"; continue
   fi
