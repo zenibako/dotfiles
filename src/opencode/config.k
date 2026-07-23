@@ -158,28 +158,49 @@ _provider = {
         # prompt itself is tiny. `context` must not exceed the context length
         # the model is actually loaded with in LM Studio (per-model load
         # setting); `output` is the real ceiling on a reply.
-        # SUBSTITUTION HAZARD — why every entry below shares one context limit.
-        # LM Studio serves whatever model is *resident* regardless of the `model`
-        # field in the request. With only the 27B loaded, a request saying
-        # "model": "qwen3.5-9b" is answered by the 27B and the log shows
-        # `[qwen3.6-27b] Running chat completion` — no error, no warning.
-        # opencode still budgets that session against the 9B's declared limit.
-        # That is not academic: it crashed a session on 2026-07-22. `explore`
-        # is pinned to the 9B, so opencode let its context grow toward 32,768,
-        # but the 27B was answering and died at its ~24,600-token wall with a
-        # Metal OOM, taking the whole backend down mid-task.
-        # Co-residency would fix the substitution but does not fit: the 27B
-        # (11 GB) plus the 8-bit 9B (9.7 GB) is ~20 GiB of weights against a
-        # 20 GiB wired limit, before any KV cache.
-        # So every model here carries the SMALLEST safe limit across the models
-        # that might actually answer. Raising one in isolation reintroduces the
-        # crash. If you ever load only the 9B and want its full window back,
-        # raise them together — or accept that the ceiling is set by whichever
-        # model is loaded, not by which one you asked for.
+        # IDENTIFIER HAZARD — every key here must be a live LM Studio
+        # *identifier*, not a model name, a repo path, or a filename.
+        #
+        # An earlier version of this comment claimed LM Studio serves whatever
+        # model is resident regardless of the request's `model` field. That is
+        # wrong, and the correction matters. Verified 2026-07-22 against a
+        # running server: an unrecognized identifier is REJECTED —
+        #   Invalid model identifier "qwen3.6-27b". No matching loaded model
+        #   found, and just-in-time (JIT) model loading is disabled.
+        # Nothing is silently substituted by the server.
+        #
+        # What actually happened in the crashed session is narrower and still
+        # dangerous: an identifier is assigned at LOAD time (`lms load
+        # --identifier`, or the field in the load dialog) and is free to point
+        # at any model. The 27B had been loaded under the identifier the 9B
+        # normally uses, so requests for the 9B were answered by the 27B while
+        # opencode budgeted them against the 9B's much larger declared window.
+        # The 27B hit its ~24,600-token wall and died of a Metal OOM. So the
+        # binding is user-controlled and unverified at request time, not
+        # server-invented — and it drifts every time a model is reloaded
+        # without `--identifier`.
+        #
+        # Two consequences, both load-bearing:
+        #   1. Keys must match `lms ps` exactly. When they do not, every local
+        #      agent gets a 400 and the whole local workflow is dead — observed
+        #      2026-07-22 22:36 after a reload picked up the default identifier
+        #      `leonsarmiento/qwen3.6-27b-mlx`. It fails loudly, at least.
+        #   2. Because a mismatched identifier now 400s instead of answering,
+        #      each entry can carry its OWN true window again rather than the
+        #      smallest limit across every model that might answer. The old
+        #      shared-ceiling workaround cost the 9B two thirds of its context.
+        #
+        # scripts/post_deploy.sh checks both invariants against `lms ps --json`
+        # (identifier present, declared context <= loaded contextLength) so this
+        # is caught at deploy time instead of mid-task.
         "models" = {
+            # Loaded on the mac-mini, not this machine — remote, so it does not
+            # compete with the 27B for local GPU memory and the two can be
+            # resident at once. That is what lets `local`/`explore` sit on the
+            # 9B while `local-dev` gets the 27B. 65536 is its loaded window.
             "qwen3.5-9b" = {
                 "name" = "Qwen 3.5 9B"
-                "limit" = {"context" = 20480, "output" = 8192}
+                "limit" = {"context" = 65536, "output" = 8192}
             }
             # 27B is memory-bound on a 24 GiB machine, and LM Studio loads it
             # through the mlx-vlm path (no KV-cache quantization available).
@@ -420,8 +441,22 @@ _agent = {
         # budget that had `explore` looping on compaction. The full server is
         # ~4,440 and overruns the window outright. So Backlog lives on `explore`
         # (pinned to the 9B) instead, and the router reaches it via `task`.
+        #
+        # `task` is keyed by subagent name, so the roster is a permission, not
+        # just a prompt convention — deny an agent here and it disappears from
+        # the `task` schema the model sees. `general` is one of opencode's
+        # native subagents (build/plan/general/explore/compaction/title/summary
+        # exist whether or not we declare them), so it was in the router's
+        # roster despite local.md never mentioning it. Observed 2026-07-22: with
+        # explore returning unusable summaries, the router fell back to
+        # `general` twice — both returned empty in ~330ms, and it read that as
+        # "file reading is broken everywhere" and handed research to local-dev,
+        # which is exactly the mis-route local.md exists to prevent. A small
+        # model will use any tool it is offered; the fix is to stop offering it.
+        # opencode's own `plan` agent denies `general` the same way.
         "permission" = _deny_all_mcp | {"edit" = "deny", "bash" = "deny", "skill" = "deny"} \
-            | {t: "deny" for t in _local_router_denied_tools}
+            | {t: "deny" for t in _local_router_denied_tools} \
+            | {"task" = {"general" = "deny"}}
     }
     "tester" = {
         "description" = "Writes and runs tests via the project's own test runner and reports results"
@@ -444,14 +479,53 @@ _agent = {
         # to the Jujutsu + GitHub MCP servers; all other MCP tools denied.
         "permission" = {"edit" = "deny"} | _mcp_only(["Jujutsu", "GitHub"])
     }
-    # opencode's built-in search subagent. Declaring only `permission` scopes it
-    # without replacing its built-in prompt or description (verified: the
-    # captured system prompt still opens "You are a file search specialist").
-    # It ships a fixed roster — bash/glob/grep/read plus webfetch and the MCP
-    # resource tools — and carries no skills section, so unlike local-dev there
-    # is no catalog to trim. `bash` stays: `rg` and `fd` are how a search agent
-    # earns its keep. `webfetch` stays too: exploration legitimately runs into
-    # docs and URLs, and ~320 tokens is a cheap price for that.
+    # opencode's built-in search subagent. It ships a fixed roster —
+    # bash/glob/grep/read plus webfetch and the MCP resource tools — and carries
+    # no skills section, so unlike local-dev there is no catalog to trim.
+    # `bash` stays: `rg` and `fd` are how a search agent earns its keep.
+    # `webfetch` stays too: exploration legitimately runs into docs and URLs,
+    # and ~320 tokens is a cheap price for that.
+    #
+    # WHY WE NOW OVERRIDE THE PROMPT. We used to declare only `permission` and
+    # inherit the built-in prompt. That built-in prompt is, in full:
+    #
+    #     You are a file search specialist. You excel at thoroughly navigating
+    #     and exploring codebases.
+    #
+    # One sentence (extracted from the 1.18.4 binary — the `ae` template).
+    # That is enough for a frontier model, which supplies the output discipline
+    # itself, and nowhere near enough for a 9B. Observed 2026-07-22 across four
+    # consecutive invocations in one session: 18/10/13/20 tool calls, 2.5-8 min
+    # each, and every one returned a prose summary of the project instead of the
+    # file contents or anchors it was asked for — twice re-summarizing work
+    # status when asked to read a specific file. One run burned three attempts
+    # `cat`-ing a path containing an em-dash: macOS stores that filename
+    # decomposed (NFD), the model emitted it composed (NFC), so the shell got a
+    # byte sequence that does not exist while `read` would have opened it.
+    # There is no permission fix for any of this — it is all prompt. Hence
+    # explore.md: an output contract (anchors and verbatim quotes, not
+    # narrative), `read`-not-`cat`, and a two-strikes rule on repeated failures.
+    #
+    # It also carries an orientation ladder and a playbook keyed to the shapes
+    # of question this agent actually gets. The ladder's top rung is `radar`:
+    # where a repo has been mapped, MAP.md is a few dozen lines that route to
+    # per-directory maps, and `radar query` resolves an anchor with no model
+    # calls at all. The session that prompted this was exploring a mapped repo
+    # and never touched the map — it ran `glob **/*` instead, which is both the
+    # slowest way to orient and the one that grows a request until the backend
+    # dies. explore keeps `bash` partly so `radar` and `rg` stay reachable
+    # (`skill` is denied here, so the radar-navigation skill is not).
+    #
+    # The playbook's "how do I add a new N" entry is the one that pays for
+    # itself: the correct answer is two existing examples with every file each
+    # touched, which is what lets the caller tell the pattern from the
+    # incidentals — and it is exactly what a small model will not do unprompted.
+    #
+    # `steps` caps the wandering that the prompt only discourages. opencode
+    # defines it as "maximum agentic iterations before forcing a text-only
+    # response", so at the cap the agent must answer with what it has rather
+    # than run the caller out of patience. 20 is above every *productive* run
+    # measured and below the 8-minute flails.
     #
     # The _mcp_resource_tools deny has no measurable effect here — it does not
     # strip for subagents (see the caveat above). It is kept as the standing
@@ -471,6 +545,8 @@ _agent = {
     # ~24k of working room.
     "explore" = {
         "model" = "{{opencode_local_agent_model}}"
+        "prompt" = _agent_prompt("explore")
+        "steps" = 20
         "permission" = _deny_all_mcp | {
             _sanitize_mcp("Backlog") + "_" + _sanitize_mcp(t): "allow"
             for t in _explore_backlog_read_tools
