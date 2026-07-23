@@ -484,6 +484,29 @@ if [ -d "$DEPLOYED/nvim" ] && command -v luac >/dev/null 2>&1; then
   _OK "All Lua files valid"
 fi
 
+# ── VSIX-distributed LSP servers ──────────────────────────────────────────
+# Apex (jorje), Visualforce, and SonarLint ship only inside VS Code extension
+# VSIXes. scripts/lsp_vsix_sync.sh fetches the pinned versions from Open VSX
+# (plain zip archives — no VS Code involved) into ~/.local/share/lsp-servers/,
+# which is where the Neovim configs point. Run before the LSP attach
+# validation below so a broken fetch is visible in the same deploy. Advisory:
+# offline with artifacts already present exits 0; a real failure warns here
+# and then shows concretely as a missing server in the validation output.
+_vsix_sync="$REPO_ROOT/scripts/lsp_vsix_sync.sh"
+if [ -x "$_vsix_sync" ]; then
+  _vsix_rc=0
+  _vsix_out="$("$_vsix_sync" 2>&1)" || _vsix_rc=$?
+  if [ "$_vsix_rc" -eq 0 ]; then
+    _OK "VSIX LSP servers match the pinned versions"
+  else
+    printf '%s\n' "$_vsix_out" | grep -E '^  (STALE|FAILED)' | while read -r _l; do
+      _WARN "VSIX LSP: $_l"
+    done
+    _GUIDE "scripts/lsp_vsix_sync.sh"
+  fi
+fi
+unset _vsix_sync _vsix_out _vsix_rc
+
 # ── Neovim startup test ──────────────────────────────────────────────────
 if command -v nvim >/dev/null 2>&1 && [ -d "$DEPLOYED/nvim" ]; then
   begin_wait "Testing Neovim startup" "up to 1 min"
